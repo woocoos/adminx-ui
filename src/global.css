@@ -1,4 +1,4 @@
-@import 'antd/dist/antd.css';
+@import 'antd/dist/reset.css';
 
 .ant-pro-page-container .ant-page-header {
   background: white;
