@@ -1,58 +1,38 @@
+import { request } from 'ice';
 import type { LoginParams, LoginResult, UserInfo } from '@/interfaces/user';
 
-const adminInfo: UserInfo = {
-  name: 'Admin',
-  avatar: 'https://img.alicdn.com/tfs/TB1.ZBecq67gK0jSZFHXXa9jVXa-904-826.png',
-  userid: '00000001',
-  userType: 'admin',
-};
-const userInfo: UserInfo = {
-  name: 'User',
-  avatar: 'https://img.alicdn.com/tfs/TB1.ZBecq67gK0jSZFHXXa9jVXa-904-826.png',
-  userid: '00000002',
-  userType: 'user',
-};
-let currentUserInfo: UserInfo | {} = adminInfo;
-
-const waitTime = (time = 1000) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
+let currentUserInfo: UserInfo | {};
 
 export async function login(data: LoginParams): Promise<LoginResult> {
-  // return await request.post('/login', data);
-  const { username, password } = data;
-  await waitTime();
-  if (username === 'admin' && password === 'ice') {
-    currentUserInfo = adminInfo;
-    return {
-      success: true,
-      userType: 'admin',
-    };
+  const result: LoginResult = await request({
+    url: '/login',
+    method: "post",
+    data
+  });
+
+  if (result.data) {
+    currentUserInfo = result.data
   }
-  if (username === 'user' && password === 'ice') {
-    currentUserInfo = userInfo;
-    return {
-      success: true,
-      userType: 'user',
-    };
-  }
-  currentUserInfo = {};
-  return {
-    success: false,
-    userType: 'guest',
-  };
+  return result
 }
 
 export async function fetchUserInfo() {
-  // return await request.get('/user');
-  return currentUserInfo;
+  const result = await request({
+    url: '/ucenter_gql',
+    method: 'post',
+    data: {
+      query: `query {
+      viewer{
+        id,name,avatar,userType
+      }
+    }`}
+  })
+  if (result?.data?.viewer) {
+    return result.data.viewer;
+  }
 }
 
 export async function logout() {
-  // return await request.post('/logout');
-  console.log('logout');
+  currentUserInfo = {}
+  return await request.post('/logout');
 }

@@ -13,4 +13,5 @@ export interface LoginParams {
 export interface LoginResult {
   success?: boolean;
   userType?: 'user' | 'admin' | 'guest';
+  data?: UserInfo
 }

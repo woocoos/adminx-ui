@@ -30,12 +30,12 @@ export const storeConfig = defineStoreConfig(async (appData) => {
     initialStates: {
       user: {
         currentUser: userInfo,
-      },      
+      },
     },
   };
 });
 
-export const request = defineRequestConfig(() => ({
+export const requestConfig = defineRequestConfig(() => ({
   baseURL: "/api",
 }));
 
