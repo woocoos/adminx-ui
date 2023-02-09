@@ -1,11 +1,8 @@
 import { history } from 'ice';
 import { Button, Result } from 'antd';
-import React from 'react';
 import { useTranslation } from "react-i18next";
 
-
-
-export default function NotFoundPage() {
+export default () => {
   const { t } = useTranslation();
 
   return (

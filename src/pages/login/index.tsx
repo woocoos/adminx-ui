@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { definePageConfig, history, useAuth } from "ice";
+import { definePageConfig, useAuth } from "ice";
 import { message, Alert } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { ProFormCheckbox, ProFormText, LoginForm } from "@ant-design/pro-form";
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
         });
         userDispatcher.updateCurrentUser(result.data);
         const urlParams = new URL(window.location.href).searchParams;
-        history?.push(urlParams.get("redirect") || "/");
+        location.href = urlParams.get("redirect") || "/"
         return;
       }
       // 如果失败去设置用户错误信息，显示提示信息

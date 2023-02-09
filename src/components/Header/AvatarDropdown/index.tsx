@@ -17,11 +17,10 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
 
   const loginOut = async () => {
     await logout();
+
     const pathname = history?.location?.pathname;
-    history?.push({
-      pathname: '/login',
-      search: pathname ? `redirect=${pathname}` : '',
-    });
+    location.href = `/login${pathname ? `?redirect=${pathname}` : ''}`
+    
   };
 
   const onMenuClick = useCallback((event: MenuInfo) => {

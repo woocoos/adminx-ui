@@ -6,30 +6,29 @@ const asideMenuConfig: MenuDataItem[] = [
     name: '工作台',
     path: '/',
     icon: <DashboardOutlined />,
+    framework: true,
   },
   {
     name: '表单',
     path: '/form',
     icon: <FormOutlined />,
+    framework: true,
   },
   {
     name: '列表',
     path: '/list',
     icon: <TableOutlined />,
+    framework: true,
   },
   {
-    name: '结果&异常',
-    icon: <WarningOutlined />,
-    children: [
-      {
-        name: '成功',
-        path: '/success',
-      },
-      {
-        name: '404',
-        path: '/404',
-      },
-    ],
+    name: '低代码',
+    path: '/lowcode',
+    icon: <TableOutlined />,
+  },
+  {
+    name: '商家平台',
+    path: '/seller',
+    icon: <TableOutlined />,
   },
 ];
 
