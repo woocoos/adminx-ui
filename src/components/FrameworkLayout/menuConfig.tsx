@@ -21,13 +21,8 @@ const asideMenuConfig: MenuDataItem[] = [
     framework: true,
   },
   {
-    name: '低代码',
-    path: '/lowcode',
-    icon: <TableOutlined />,
-  },
-  {
-    name: '商家平台',
-    path: '/seller',
+    name: '用户列表',
+    path: '/lowcode-preview/user/list',
     icon: <TableOutlined />,
   },
 ];

@@ -49,6 +49,12 @@ export default function FrameworkLayout(props: {
         </>);
     }
 
+    if (pathname.split('/').includes('lowcode')) {
+        return (<>
+            {children}
+        </>);
+    }
+
     return (
         <ProLayout
             menu={{ defaultOpenAll: true }}
@@ -83,23 +89,4 @@ export default function FrameworkLayout(props: {
         </ProLayout>
     );
 
-
-    //   const Layout = pathname === '/login' ? UserLayout : BasicLayout;
-    //   useEffect(() => {
-    //     console.log('== app leave ==', appLeave);
-    //     if (appLeave.path === '/angular' && window.webpackJsonp) {
-    //       // remove webpackJsonp added by Angular app
-    //       delete window.webpackJsonp;
-    //     }
-    //   }, [appLeave]);
-
-    //   useEffect(() => {
-    //     console.log('== app enter ==', appEnter);
-    //   }, [appEnter]);
-
-    //   return (
-    //     <ConfigProvider prefix="next-icestark-">
-    //       <Layout pathname={pathname}>{children}</Layout>
-    //     </ConfigProvider>
-    //   );
 }

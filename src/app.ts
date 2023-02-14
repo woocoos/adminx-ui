@@ -20,25 +20,26 @@ export const icestark = defineFrameworkConfig(() => ({
   // 配置微应用信息，可为异步方法
   getApps: () => ([
     {
-      name: 'seller',
-      title: '商家平台',
-      activePath: '/seller',
-      loadScriptMode: 'import',
-      entry: 'https://iceworks.oss-cn-hangzhou.aliyuncs.com/icestark/child-seller-ice-vite/index.html',
+      name: 'lowcode',
+      title: '低代码编辑引擎',
+      activePath: '/lowcode',
+      entry: 'http://localhost:5556/index.html',
+      props: {
+        // 后续用户信息带入
+      }
     },
-    // 调试中
-    // {
-    //   name: 'lowcode',
-    //   title: '低代码',
-    //   activePath: '/lowcode',
-    //   loadScriptMode: 'import',
-    //   entry: 'http://localhost:5556/',
-    // },
+    {
+      name: 'lowcode-preview',
+      title: '低代码UI',
+      activePath: '/lowcode-preview',
+      entry: 'http://localhost:5556/preview.html',
+      props: {
+        // 后续用户信息带入
+      }
+    },
   ]),
   // icestark 提供的 AppRouter 组件的配置参数
-  appRouter: {
-    
-  },
+  appRouter: {},
 }));
 
 export const authConfig = defineAuthConfig(async (appData) => {

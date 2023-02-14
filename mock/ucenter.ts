@@ -12,13 +12,15 @@ type User {
 
 type Query {
     viewer:User
+    userList:[User]
 }
 `
 
 const mocks = {
     User: () => ({
         userType: "admin",
-        avatar: "https://img.alicdn.com/tfs/TB1.ZBecq67gK0jSZFHXXa9jVXa-904-826.png"
+        avatar: "https://img.alicdn.com/tfs/TB1.ZBecq67gK0jSZFHXXa9jVXa-904-826.png",
+        name: () => (Math.random() + 1).toString(36).substring(7)
     })
 }
 
