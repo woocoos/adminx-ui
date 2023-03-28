@@ -105,7 +105,7 @@ export default function Form() {
             placeholder="请直接 @姓名／工号，最多可邀请 5 人"
           />
 
-          <ProFormDigit
+          {/* <ProFormDigit
             label={
               <span>
                 权重
@@ -121,7 +121,7 @@ export default function Form() {
               formatter: (value) => `${value || 0}%`,
               parser: (value) => (value ? value.replace('%', '') : '0'),
             }}
-          />
+          /> */}
 
           <ProFormRadio.Group
             options={[
@@ -178,8 +178,8 @@ export default function Form() {
   );
 }
 
-export const pageConfig = definePageConfig(() => {
-  return {
-    auth: ['admin', 'user'],
-  };
-});
+// export const pageConfig = definePageConfig(() => {
+//   return {
+//     auth: ['admin', 'user'],
+//   };
+// });

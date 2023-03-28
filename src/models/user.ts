@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import { UserInfo } from '@/interfaces/user';
 import { createModel } from 'ice';
+import { LoginRes } from '@/services/user'
+import { setLoginRes } from '@/localstorage/user'
 
 interface ModelState {
-  currentUser: UserInfo;
+  currentUser: LoginRes
 }
 
 export default createModel({
@@ -11,7 +12,10 @@ export default createModel({
     currentUser: {},
   } as ModelState,
   reducers: {
-    updateCurrentUser(prevState: ModelState, payload) {
+    updateLoginRes(prevState: ModelState, payload) {
+      // 存储local
+      setLoginRes(payload)
+      // 设置状态
       prevState.currentUser = payload;
     },
   },

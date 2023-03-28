@@ -2,6 +2,11 @@ import type { Request, Response } from '@ice/app';
 import { mockServer } from '@graphql-tools/mock';
 import bodyParser from 'body-parser'
 
+// const fs = require('fs');
+// let schema = '';
+// fs.readFile('./mock/allinone.graphql', 'utf-8', (err, data) => {
+//     schema = data;
+// })
 const schema = `
 type User {
     id: ID!

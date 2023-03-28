@@ -1,10 +1,17 @@
-import { defineAppConfig, history, defineDataLoader } from "ice";
-import { fetchUserInfo } from "./services/user";
+import { defineAppConfig, history, defineDataLoader, useAppData } from "ice";
 import { defineAuthConfig } from "@ice/plugin-auth/esm/types";
 import { defineStoreConfig } from "@ice/plugin-store/esm/types";
 import { defineRequestConfig } from "@ice/plugin-request/esm/types";
 import { defineFrameworkConfig } from '@ice/plugin-icestark/esm/types';
 import FrameworkLayout from '@/components/FrameworkLayout';
+import { LoginRes } from "./services/user";
+
+import localStorage from "./pkg/localStorage";
+// 初始化local
+localStorage.init()
+// local
+import { getLoginRes } from "@/localstorage/user";
+
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
@@ -42,50 +49,54 @@ export const icestark = defineFrameworkConfig(() => ({
   appRouter: {},
 }));
 
-export const authConfig = defineAuthConfig(async (appData) => {
-  const { userInfo = {} } = appData;
+// export const authConfig = defineAuthConfig(async (appData) => {
+//   const { userInfo = {} } = appData;
 
-  if (userInfo.error) {
-    history?.push(`/login?redirect=${window.location.pathname}`);
-  }
+//   if (userInfo.error) {
+//     history?.push(`/login?redirect=${window.location.pathname}`);
+//   }
 
-  return {
-    initialAuth: {
-      admin: userInfo.userType === "admin",
-      user: userInfo.userType === "user",
-    },
-  };
-});
+//   return {
+//     initialAuth: {
+//       admin: userInfo.userType === "admin",
+//       user: userInfo.userType === "user",
+//     },
+//   };
+// });
 
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const { userInfo = {} } = appData;
+  // const { userInfo = {} } = appData;
+  // 从local初始化状态
+  let loginRes: LoginRes | null = await getLoginRes<LoginRes>()
   return {
     initialStates: {
       user: {
-        currentUser: userInfo,
+        currentUser: loginRes || {},
       },
     },
   };
 });
 
-export const requestConfig = defineRequestConfig(() => ({
-  baseURL: "/api",
-}));
-
-export const dataLoader = defineDataLoader(async () => {
-  const userInfo = await getUserInfo();
-  return {
-    userInfo,
-  };
-});
-
-async function getUserInfo() {
-  try {
-    const userInfo = await fetchUserInfo();
-    return userInfo;
-  } catch (error) {
-    return {
-      error,
-    };
+export const requestConfig = defineRequestConfig(() => [
+  {
+    baseURL: "/api"
   }
-}
+]);
+
+// export const dataLoader = defineDataLoader(async () => {
+//   const userInfo = await getUserInfo();
+//   return {
+//     userInfo
+//   };
+// });
+
+// async function getUserInfo() {
+//   try {
+//     const userInfo = await fetchUserInfo();
+//     return userInfo;
+//   } catch (error) {
+//     return {
+//       error,
+//     };
+//   }
+// }

@@ -4,10 +4,11 @@ import { message, Alert } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { ProFormCheckbox, ProFormText, LoginForm } from "@ant-design/pro-form";
 import styles from "./index.module.css";
-import type { LoginParams, LoginResult } from "@/interfaces/user";
+import type { LoginParams, LoginRes } from "@/services/user";
 import { login } from "@/services/user";
 import store from "@/store";
 import logo from "@/assets/logo.png";
+import Sha256 from "crypto-js/sha256";
 
 const LoginMessage: React.FC<{
   content: string;
@@ -24,23 +25,19 @@ const LoginMessage: React.FC<{
   );
 };
 
-const Login: React.FC = () => {
-  const [loginResult, setLoginResult] = useState<LoginResult>({});
+export default () => {
+  const [loginResult, setLoginResult] = useState<LoginRes>();
   const [, userDispatcher] = store.useModel("user");
-  const [, setAuth] = useAuth();
 
   async function handleSubmit(values: LoginParams) {
     try {
+      values.password = Sha256(values.password).toString();
       const result = await login(values);
-      if (result.success) {
+      if (result.accessToken) {
         message.success("登录成功！");
-        setAuth({
-          admin: result.userType === "admin",
-          user: result.userType === "user",
-        });
-        userDispatcher.updateCurrentUser(result.data);
+        userDispatcher.updateLoginRes(result);
         const urlParams = new URL(window.location.href).searchParams;
-        location.href = urlParams.get("redirect") || "/"
+        location.href = urlParams.get("redirect") || "/";
         return;
       }
       // 如果失败去设置用户错误信息，显示提示信息
@@ -57,16 +54,16 @@ const Login: React.FC = () => {
         logo={<img alt="logo" src={logo} />}
         subTitle="后台管理系统"
         initialValues={{
-          username: "admin",
-          password: "ice"
+          username: "woocoo.com",
+          password: "123456",
         }}
         onFinish={async (values) => {
           await handleSubmit(values as LoginParams);
         }}
       >
-        {loginResult.success === false && (
-          <LoginMessage content="账户或密码错误(admin/ice)" />
-        )}
+        {/* {loginResult.success === false && (
+          <LoginMessage content="账户或密码错误(admin/123456)" />
+        )} */}
         <ProFormText
           name="username"
           fieldProps={{
@@ -121,5 +118,3 @@ export const pageConfig = definePageConfig(() => {
     title: "登录",
   };
 });
-
-export default Login;

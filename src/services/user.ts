@@ -1,18 +1,30 @@
 import { request } from 'ice';
-import type { LoginParams, LoginResult, UserInfo } from '@/interfaces/user';
 
-let currentUserInfo: UserInfo | {};
+export interface LoginParams {
+  username: string;
+  password: string;
+}
 
-export async function login(data: LoginParams): Promise<LoginResult> {
-  const result: LoginResult = await request({
+export interface LoginRes {
+  accessToken: string,
+  expiresIn: number,
+  refreshToken: string,
+  user: UserInfo
+}
+
+export interface UserInfo {
+  id: number;
+  domainName: string;
+  domainId: number;
+  displayName: string;
+}
+
+export async function login(data: LoginParams): Promise<LoginRes> {
+  const result: LoginRes = await request({
     url: '/login',
     method: "post",
-    data
+    data,
   });
-
-  if (result.data) {
-    currentUserInfo = result.data
-  }
   return result
 }
 
@@ -33,6 +45,5 @@ export async function fetchUserInfo() {
 }
 
 export async function logout() {
-  currentUserInfo = {}
   return await request.post('/logout');
 }
