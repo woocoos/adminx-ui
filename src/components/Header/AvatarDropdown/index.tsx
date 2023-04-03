@@ -1,5 +1,4 @@
 import React, { useCallback } from "react";
-import { history } from "ice";
 import { LogoutOutlined } from "@ant-design/icons";
 import { Dropdown, Avatar } from "antd";
 import type { MenuInfo } from "rc-menu/lib/interface";
@@ -13,20 +12,16 @@ interface AvatarDropdownProps {
 }
 
 const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
-  const [, userDispatcher] = store.useModel("user");
+  const [, basisDispatcher] = store.useModel("basis");
 
-  const loginOut = async () => {
-    await logout();
 
-    const pathname = history?.location?.pathname;
-    location.href = `/login${pathname ? `?redirect=${pathname}` : ""}`;
-  };
 
   const onMenuClick = useCallback((event: MenuInfo) => {
     const { key } = event;
     if (key === "logout") {
-      userDispatcher.updateLoginRes({});
-      loginOut();
+      // 即使退出接口异常前端也需要直接退出掉所以不需要同步处理
+      logout();
+      basisDispatcher.logout()
     }
   }, []);
 

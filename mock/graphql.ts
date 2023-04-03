@@ -1,25 +1,23 @@
 import type { Request, Response } from '@ice/app';
 import { mockServer } from '@graphql-tools/mock';
 import bodyParser from 'body-parser'
+import { readFileSync } from "fs";
+import { join } from "path";
 
-// const fs = require('fs');
-// let schema = '';
-// fs.readFile('./mock/allinone.graphql', 'utf-8', (err, data) => {
-//     schema = data;
-// })
-const schema = `
-type User {
-    id: ID!
-    name: String
-    avatar:String
-    userType:String
-}
+const schema = readFileSync(join(__dirname, "allinone.graphql"), 'utf-8');
 
-type Query {
-    viewer:User
-    userList:[User]
-}
-`
+// const schema = `
+// type User {
+//     id: ID!
+//     name: String
+//     avatar:String
+//     userType:String
+// }
+// type Query {
+//     viewer:User
+//     userList:[User]
+// }
+// `
 
 const mocks = {
     User: () => ({
@@ -32,7 +30,7 @@ const mocks = {
 const preserveResolvers = false
 
 export default {
-    'POST /api/ucenter_gql': (request: Request, response: Response) => {
+    'POST /api/graphql/query': (request: Request, response: Response) => {
         bodyParser.json()(request, response, async () => {
             const { query, variables } = request.body;
             const ms = mockServer(schema, mocks, preserveResolvers)

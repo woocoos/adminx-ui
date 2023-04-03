@@ -1,47 +1,35 @@
 import { request } from 'ice';
 
 export interface LoginParams {
-  username: string;
-  password: string;
+  username: string
+  password: string
+  captcha: string
+}
+
+interface LoginErrors {
+  code: number
+  messsage: string
 }
 
 export interface LoginRes {
-  accessToken: string,
-  expiresIn: number,
-  refreshToken: string,
-  user: UserInfo
-}
-
-export interface UserInfo {
-  id: number;
-  domainName: string;
-  domainId: number;
-  displayName: string;
+  accessToken?: string
+  expiresIn?: number
+  refreshToken?: string
+  user?: {
+    id: number
+    displayName: string
+    domainName: string
+    domainId: number
+  },
+  errors?: LoginErrors[]
 }
 
 export async function login(data: LoginParams): Promise<LoginRes> {
-  const result: LoginRes = await request({
-    url: '/login',
+  return await request({
+    url: '/login/auth',
     method: "post",
     data,
   });
-  return result
-}
-
-export async function fetchUserInfo() {
-  const result = await request({
-    url: '/ucenter_gql',
-    method: 'post',
-    data: {
-      query: `query {
-      viewer{
-        id,name,avatar,userType
-      }
-    }`}
-  })
-  if (result?.data?.viewer) {
-    return result.data.viewer;
-  }
 }
 
 export async function logout() {

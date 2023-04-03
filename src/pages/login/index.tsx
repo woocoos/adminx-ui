@@ -10,43 +10,36 @@ import store from "@/store";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
 
-const LoginMessage: React.FC<{
-  content: string;
-}> = ({ content }) => {
+const SvgCaptcha = () => {
   return (
-    <Alert
-      style={{
-        marginBottom: 24,
-      }}
-      message={content}
-      type="error"
-      showIcon
-    />
-  );
-};
+    <img src={`/api/captcha?t=${Date.now()}`} height="32px" onClick={(e) => {
+      const svgDom = e.target as HTMLImageElement
+      svgDom.src = `/api/captcha?t=${Date.now()}`
+    }} />
+  )
+}
 
 export default () => {
-  const [loginResult, setLoginResult] = useState<LoginRes>();
-  const [, userDispatcher] = store.useModel("user");
+  const [, basisDispatcher] = store.useModel("basis");
 
   async function handleSubmit(values: LoginParams) {
-    try {
-      values.password = Sha256(values.password).toString();
-      const result = await login(values);
-      if (result.accessToken) {
-        message.success("登录成功！");
-        userDispatcher.updateLoginRes(result);
-        const urlParams = new URL(window.location.href).searchParams;
-        location.href = urlParams.get("redirect") || "/";
-        return;
-      }
-      // 如果失败去设置用户错误信息，显示提示信息
-      setLoginResult(result);
-    } catch (error) {
-      message.error("登录失败，请重试！");
-      console.log(error);
+    values.password = Sha256(values.password).toString();
+    const result = await login(values);
+    if (result.accessToken) {
+      basisDispatcher.updateToken(result.accessToken)
+      basisDispatcher.updateTenantId(`${result.user?.domainId || ''}`)
+      basisDispatcher.updateUser({
+        id: `${result.user?.id || ''}`,
+        displayName: `${result.user?.displayName || ''}`
+      })
+      message.success("登录成功！");
+      const urlParams = new URL(window.location.href).searchParams;
+      location.href = urlParams.get("redirect") || "/";
+      return true;
     }
+    return false
   }
+
   return (
     <div className={styles.container}>
       <LoginForm
@@ -57,13 +50,8 @@ export default () => {
           username: "woocoo.com",
           password: "123456",
         }}
-        onFinish={async (values) => {
-          await handleSubmit(values as LoginParams);
-        }}
+        onFinish={async (values: LoginParams) => await handleSubmit(values)}
       >
-        {/* {loginResult.success === false && (
-          <LoginMessage content="账户或密码错误(admin/123456)" />
-        )} */}
         <ProFormText
           name="username"
           fieldProps={{
@@ -89,6 +77,20 @@ export default () => {
             {
               required: true,
               message: "请输入密码！",
+            },
+          ]}
+        />
+        <ProFormText
+          name="captcha"
+          fieldProps={{
+            size: "large",
+            addonAfter: <SvgCaptcha />,
+          }}
+          placeholder={"验证码"}
+          rules={[
+            {
+              required: true,
+              message: "请输入验证码!",
             },
           ]}
         />

@@ -8,6 +8,7 @@ import AvatarDropdown from "@/components/Header/AvatarDropdown";
 import I18nDropdown from "@/components/Header/I18nDropdown";
 import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
+import defaultAvatar from "@/assets/images/default-avatar.png";
 
 const Link = ({ to, children }) => {
   return (
@@ -30,16 +31,15 @@ export default function FrameworkLayout(props: {
   appEnter: { path: string };
 }) {
   const { pathname, children, appLeave, appEnter } = props;
-  const [userState] = store.useModel("user");
   const [basisState] = store.useModel("basis");
 
-  useEffect(() => {
-    console.log("== app leave ==", appLeave);
-  }, [appLeave]);
+  // useEffect(() => {
+  //   console.log("== app leave ==", appLeave);
+  // }, [appLeave]);
 
-  useEffect(() => {
-    console.log("== app enter ==", appEnter);
-  }, [appEnter]);
+  // useEffect(() => {
+  //   console.log("== app enter ==", appEnter);
+  // }, [appEnter]);
 
   if (["/login"].includes(pathname)) {
     return <>{children}</>;
@@ -63,8 +63,8 @@ export default function FrameworkLayout(props: {
         <>
           <I18nDropdown />
           <AvatarDropdown
-            avatar=""
-            name={userState.currentUser?.user?.displayName || ""}
+            avatar={basisState.user?.avatar || defaultAvatar}
+            name={basisState.user?.displayName || ""}
           />
         </>
       )}
