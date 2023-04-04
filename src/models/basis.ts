@@ -1,5 +1,6 @@
-import { createModel } from 'ice';
+import { createModel, history } from 'ice';
 import localStorage from '@/pkg/localStorage'
+import { LoginRes } from '@/services/basis';
 
 interface BasisModelState {
   locale: "zh-CN" | "zh-TW" | "en-US"
@@ -22,32 +23,59 @@ export default createModel({
   } as BasisModelState,
   reducers: {
     updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US") {
-      localStorage.setItem("locale", payload)
       prevState.locale = payload;
     },
     updateToken(prevState: BasisModelState, payload: string) {
-      localStorage.setItem("token", payload)
       prevState.token = payload;
     },
     updateTenantId(prevState: BasisModelState, payload: string) {
-      localStorage.setItem("tenantId", payload)
       prevState.tenantId = payload;
     },
     updateUser(prevState: BasisModelState, payload: BasisUserModelState) {
-      localStorage.setItem("user", payload)
       prevState.user = payload;
     },
-    logout(prevState: BasisModelState, payload?: any) {
-      localStorage.removeItem("token")
-      localStorage.removeItem("tenantId")
-      localStorage.removeItem("user")
-      prevState.token = "";
-      prevState.tenantId = "";
-      prevState.user = {
+  },
+  effects: (dispatch) => ({
+    /**
+     * 登录
+     * @param payload 
+     */
+    async login(payload: { result: LoginRes, user: any }) {
+      const { result, user } = payload
+      if (result.accessToken) {
+        const token = result.accessToken, tenantId = `${result.user?.domainId || ''}`;
+        await localStorage.setItem("token", token)
+        await localStorage.setItem("tenantId", tenantId)
+        await localStorage.setItem("user", user)
+        this.updateToken(token)
+        this.updateTenantId(tenantId)
+        this.updateUser(user)
+      }
+    },
+    /**
+     * 退出
+     * @param isHistory 
+     */
+    async logout(isHistory?: boolean) {
+      await localStorage.removeItem("token")
+      await localStorage.removeItem("tenantId")
+      await localStorage.removeItem("user")
+      this.updateToken("")
+      this.updateTenantId("")
+      this.updateUser({
         id: "",
         displayName: ""
-      };
-      location.href = `/login?redirect=${encodeURIComponent(location.href)}`
+      })
+
+      if (!location.pathname.split('/').includes('login')) {
+        let href = `/login?redirect=${encodeURIComponent(location.href)}`
+        // 主应用调用这个有问题 后续看怎么处理
+        history?.push(href)
+        // if (isHistory) {
+        // } else {
+        //   location.href = href
+        // }
+      }
     }
-  },
+  })
 });

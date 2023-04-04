@@ -3,7 +3,7 @@ import { LogoutOutlined } from "@ant-design/icons";
 import { Dropdown, Avatar } from "antd";
 import type { MenuInfo } from "rc-menu/lib/interface";
 import styles from "./index.module.css";
-import { logout } from "@/services/user";
+import { logout } from "@/services/basis";
 import store from "@/store";
 
 interface AvatarDropdownProps {

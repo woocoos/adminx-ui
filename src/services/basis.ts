@@ -1,4 +1,5 @@
 import { request } from 'ice';
+import localStorage from "@/pkg/localStorage";
 
 export interface LoginParams {
   username: string
@@ -34,4 +35,18 @@ export async function login(data: LoginParams): Promise<LoginRes> {
 
 export async function logout() {
   return await request.post('/logout');
+}
+
+export async function basisData() {
+  const locale = await localStorage.getItem<string>("locale");
+  const token = await localStorage.getItem<string>("token");
+  const tenantId = await localStorage.getItem<string>("tenantId");
+  const user = await localStorage.getItem<any>("user");
+  console.log("token", token)
+  return {
+    locale,
+    token,
+    tenantId,
+    user,
+  };
 }

@@ -1,4 +1,4 @@
-import { defineAppConfig, history, defineDataLoader, useAppData } from "ice";
+import { defineAppConfig, defineDataLoader, history } from "ice";
 import { defineAuthConfig } from "@ice/plugin-auth/esm/types";
 import { defineStoreConfig } from "@ice/plugin-store/esm/types";
 import { defineRequestConfig } from "@ice/plugin-request/esm/types";
@@ -6,9 +6,8 @@ import { defineFrameworkConfig } from '@ice/plugin-icestark/esm/types';
 import FrameworkLayout from '@/components/FrameworkLayout';
 import { message } from 'antd';
 import store from "@/store";
-import localStorage from "./pkg/localStorage";
-// 初始化local
-localStorage.init()
+import { basisData } from "@/services/basis";
+import localStorage from "@/pkg/localStorage";
 
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
@@ -49,33 +48,30 @@ export const icestark = defineFrameworkConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  const locale = await localStorage.getItem("locale");
-  const token = await localStorage.getItem("token");
-  const tenantId = await localStorage.getItem("tenantId");
-  const user = await localStorage.getItem("user");
+  // 初始化local
+  localStorage.init()
+  const basis = await basisData()
 
   return {
-    basis: {
-      locale, token, tenantId, user,
-    }
+    basis,
   }
 });
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  //   const { userInfo = {} } = appData;
-
-  //   return {
-  //     initialAuth: {
-  //       admin: userInfo.userType === "admin",
-  //       user: userInfo.userType === "user",
-  //     },
-  //   };
+  const { basis } = appData;
+  // 判断路由权限
+  console.log('authConfig', basis)
+  if (!basis.token) {
+    store.dispatch.basis.logout()
+  }
   return {
-    initialAuth: {}
+    initialAuth: {
+    }
   }
 });
 
+// 数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
   const { basis } = appData;
   return {

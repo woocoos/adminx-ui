@@ -4,10 +4,11 @@ import { message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { ProFormCheckbox, ProFormText, LoginForm } from "@ant-design/pro-form";
 import styles from "./index.module.css";
-import type { LoginParams, LoginRes } from "@/services/user";
-import { login } from "@/services/user";
+import type { LoginParams, LoginRes } from "@/services/basis";
+import { login } from "@/services/basis";
 import { graphqlApi } from "@/services/graphql";
 import store from "@/store";
+import { gid } from "@/util";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
 
@@ -23,15 +24,11 @@ const SvgCaptcha = () => {
 export default () => {
   const [, basisDispatcher] = store.useModel("basis");
 
-  function loginSuccess(result: LoginRes, user: any) {
-    if (result.accessToken) {
-      basisDispatcher.updateToken(result.accessToken)
-      basisDispatcher.updateTenantId(`${result.user?.domainId || ''}`)
-      basisDispatcher.updateUser(user)
-      message.success("登录成功！");
-      const urlParams = new URL(window.location.href).searchParams;
-      location.href = urlParams.get("redirect") || "/";
-    }
+  async function loginSuccess(result: LoginRes, user: any) {
+    await basisDispatcher.login({ result, user })
+    message.success("登录成功！");
+    const urlParams = (new URL(window.location.href)).searchParams;
+    location.replace(urlParams.get("redirect") || "/");
   }
 
   async function handleSubmit(values: LoginParams) {
@@ -39,7 +36,7 @@ export default () => {
     const result = await login(values);
     if (result.accessToken && result.user?.id) {
       const userInfo = await graphqlApi(`query{
-        node(id:"${result.user.id}"){
+        node(id:"${gid("user", result.user.id)}"){
           ... on User{
             id,displayName,loginProfile{
               passwordReset
@@ -54,7 +51,7 @@ export default () => {
         if (userInfo.data.node.loginProfile?.passwordReset) {
           // 需要强制设置新密码
         } else {
-          loginSuccess(result, userInfo.data.node)
+          await loginSuccess(result, userInfo.data.node)
           return true;
         }
       }
@@ -70,7 +67,7 @@ export default () => {
         logo={<img alt="logo" src={logo} />}
         subTitle="后台管理系统"
         initialValues={{
-          username: "woocoo.com",
+          username: "admin",
           password: "123456",
         }}
         onFinish={async (values: LoginParams) => await handleSubmit(values)}
