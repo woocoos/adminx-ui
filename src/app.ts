@@ -61,7 +61,6 @@ export const dataLoader = defineDataLoader(async () => {
 export const authConfig = defineAuthConfig(async (appData) => {
   const { basis } = appData;
   // 判断路由权限
-  console.log('authConfig', basis)
   if (!basis.token) {
     store.dispatch.basis.logout()
   }

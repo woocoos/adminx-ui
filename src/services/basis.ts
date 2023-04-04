@@ -38,13 +38,11 @@ export async function logout() {
 }
 
 export async function basisData() {
-  const locale = await localStorage.getItem<string>("locale");
   const token = await localStorage.getItem<string>("token");
   const tenantId = await localStorage.getItem<string>("tenantId");
   const user = await localStorage.getItem<any>("user");
-  console.log("token", token)
+  
   return {
-    locale,
     token,
     tenantId,
     user,

@@ -35,7 +35,7 @@ export default createModel({
       prevState.user = payload;
     },
   },
-  effects: (dispatch) => ({
+  effects: () => ({
     /**
      * 登录
      * @param payload 
@@ -43,13 +43,9 @@ export default createModel({
     async login(payload: { result: LoginRes, user: any }) {
       const { result, user } = payload
       if (result.accessToken) {
-        const token = result.accessToken, tenantId = `${result.user?.domainId || ''}`;
-        await localStorage.setItem("token", token)
-        await localStorage.setItem("tenantId", tenantId)
-        await localStorage.setItem("user", user)
-        this.updateToken(token)
-        this.updateTenantId(tenantId)
-        this.updateUser(user)
+        this.updateToken(await localStorage.setItem("token", result.accessToken))
+        this.updateTenantId(await localStorage.setItem("tenantId", `${result.user?.domainId || ''}`))
+        this.updateUser(await localStorage.setItem("user", user))
       }
     },
     /**
