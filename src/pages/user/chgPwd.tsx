@@ -4,6 +4,7 @@ import {
   ProFormInstance,
   ProFormRadio,
   ProFormText,
+  useToken,
 } from "@ant-design/pro-components";
 import { Card, Col, message, Row, Space } from "antd";
 import { useRef, useState } from "react";
@@ -18,10 +19,12 @@ const waitTime = (time: number = 100) => {
 
 export default () => {
   const formRef = useRef<ProFormInstance>();
+  const { token } = useToken();
   return (
     <PageContainer
       header={{
         title: "修改密码",
+        style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             {

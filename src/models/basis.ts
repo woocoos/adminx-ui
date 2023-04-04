@@ -6,6 +6,8 @@ interface BasisModelState {
   locale: "zh-CN" | "zh-TW" | "en-US"
   token: string
   tenantId: string
+  darkMode: boolean
+  compactMode: boolean
   user: BasisUserModelState
 }
 interface BasisUserModelState {
@@ -19,7 +21,9 @@ export default createModel({
     locale: "zh-CN",
     token: "",
     tenantId: "",
-    user: {}
+    darkMode: false,
+    compactMode: false,
+    user: {},
   } as BasisModelState,
   reducers: {
     updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US") {
@@ -30,6 +34,14 @@ export default createModel({
     },
     updateTenantId(prevState: BasisModelState, payload: string) {
       prevState.tenantId = payload;
+    },
+    updateDarkMode(prevState: BasisModelState, payload: boolean) {
+      localStorage.setItem("darkMode", payload)
+      prevState.darkMode = payload;
+    },
+    updateCompactMode(prevState: BasisModelState, payload: boolean) {
+      localStorage.setItem("compactMode", payload)
+      prevState.compactMode = payload;
     },
     updateUser(prevState: BasisModelState, payload: BasisUserModelState) {
       prevState.user = payload;
