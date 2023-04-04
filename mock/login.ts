@@ -6,6 +6,7 @@ interface LoginResponse {
     accessToken?: string
     expiresIn?: number
     refreshToken?: string
+    stateToken?: string
     user?: {
         displayName: string
         domainId: string | number
@@ -18,6 +19,15 @@ interface LoginResponse {
     }[]
 }
 
+const token = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjgwNDkxMDkwLCJpc3MiOiJPbmxpbmUgWUF1dGggQnVpbGRlciIsImV4cCI6MTY4MDQ5ODU5MH0.JRwXrpQR1FFmPtb62dg5DOMl78tR8-H-BRuRCLzBDRkBV7la4JQy9yUctT0ZDielqhIyySebtlDrgG6DCXRCOVeF8joEKstOP_mAtvxtxPX5BAzMZRUYXoehvTZeZuBYNXVGY1TbzGkW-r90u5igIXUpl7eoWL-kVfKMU4jqzYgL1SakdfI6HP78y10xKAmHg3cIk4yd7gNDp9161htxDna36BVbo0NO46zo8M1PjFkwsJD4_HzlQpSRB-lLyNxGvmzA4mgWEgqs9TbMBF1VELr0PH0sgXuQ8q9u4Qbf-Yl8SnA3XcKNEmIVo213hVmrd54tGIIUBlcsqyKQoVPJxg",
+    refreshToken = "",
+    user = {
+        displayName: "admin",
+        domainId: 1,
+        domainName: "wooocoo",
+        id: 1
+    };
+
 export default {
     'POST /api/login/auth': (request: Request, response: Response) => {
         bodyParser.json()(request, response, async () => {
@@ -25,15 +35,11 @@ export default {
             const { username, password, captcha } = request.body;
             const cookies = request.headers.cookie?.split('; ')
             if (username === 'woocoo.com' && password === '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92' && cookies?.includes(`captcha=${captcha}`)) {
-                result.accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDAwOTI0OTA4MzM2NjQiLCJleHAiOjE2Nzk5ODU1ODksImlhdCI6MTY3OTk4MTk4OSwianRpIjoidG9rZW46MjAwMDkyNDkwODMzNjY0OjQ4MTIyMzViLTg4YmMtNDY2NS1hMWU5LTcwZDljMDQ0YTViZSJ9.Uu7u-lAi641zdVyLevfEjwbO0og--0G3Ekz0m1HEAlw"
+                result.accessToken = token
+                result.stateToken = token
                 result.expiresIn = 3600
-                result.refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDAwOTI0OTA4MzM2NjQiLCJleHAiOjE2Nzk5ODE5ODksImlhdCI6MTY3OTk4MTk4OSwianRpIjoidG9rZW46MjAwMDkyNDkwODMzNjY0OjBiZDkyN2UyLTczN2YtNDBjNy1iZDU0LTg3YzQ1MzEyMmFjMCJ9.ovbpjnG6k9zVsmERZa6LX9VT9wJaXLmm7-yVgwx6C5w"
-                result.user = {
-                    displayName: "admin",
-                    domainId: 198555049289472,
-                    domainName: "wooocoo",
-                    id: 200092490833664
-                }
+                result.refreshToken = refreshToken
+                result.user = user
             } else {
                 result.errors = [
                     {
@@ -42,7 +48,7 @@ export default {
                     }
                 ]
             }
-            response.status(500);
+            // response.status(500);
             response.send(result);
         })
     },
@@ -52,15 +58,12 @@ export default {
             const result: LoginResponse = {}
             const { deviceId, stateToken, otpToken } = request.body;
             if (stateToken === '1234' && otpToken === '1234' && deviceId) {
-                result.accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDAwOTI0OTA4MzM2NjQiLCJleHAiOjE2Nzk5ODU1ODksImlhdCI6MTY3OTk4MTk4OSwianRpIjoidG9rZW46MjAwMDkyNDkwODMzNjY0OjQ4MTIyMzViLTg4YmMtNDY2NS1hMWU5LTcwZDljMDQ0YTViZSJ9.Uu7u-lAi641zdVyLevfEjwbO0og--0G3Ekz0m1HEAlw"
+                result.accessToken = token
+                result.stateToken = token
                 result.expiresIn = 3600
-                result.refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDAwOTI0OTA4MzM2NjQiLCJleHAiOjE2Nzk5ODE5ODksImlhdCI6MTY3OTk4MTk4OSwianRpIjoidG9rZW46MjAwMDkyNDkwODMzNjY0OjBiZDkyN2UyLTczN2YtNDBjNy1iZDU0LTg3YzQ1MzEyMmFjMCJ9.ovbpjnG6k9zVsmERZa6LX9VT9wJaXLmm7-yVgwx6C5w"
-                result.user = {
-                    displayName: "admin",
-                    domainId: 198555049289472,
-                    domainName: "wooocoo",
-                    id: 200092490833664
-                }
+                result.refreshToken = refreshToken
+                result.user = user
+
             } else {
                 result.errors = [
                     {
@@ -77,15 +80,11 @@ export default {
             const result: LoginResponse = {}
             const { stateToken, newPassword } = request.body;
             if (stateToken && newPassword) {
-                result.accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDAwOTI0OTA4MzM2NjQiLCJleHAiOjE2Nzk5ODU1ODksImlhdCI6MTY3OTk4MTk4OSwianRpIjoidG9rZW46MjAwMDkyNDkwODMzNjY0OjQ4MTIyMzViLTg4YmMtNDY2NS1hMWU5LTcwZDljMDQ0YTViZSJ9.Uu7u-lAi641zdVyLevfEjwbO0og--0G3Ekz0m1HEAlw"
+                result.accessToken = token
+                result.stateToken = token
                 result.expiresIn = 3600
-                result.refreshToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyMDAwOTI0OTA4MzM2NjQiLCJleHAiOjE2Nzk5ODE5ODksImlhdCI6MTY3OTk4MTk4OSwianRpIjoidG9rZW46MjAwMDkyNDkwODMzNjY0OjBiZDkyN2UyLTczN2YtNDBjNy1iZDU0LTg3YzQ1MzEyMmFjMCJ9.ovbpjnG6k9zVsmERZa6LX9VT9wJaXLmm7-yVgwx6C5w"
-                result.user = {
-                    displayName: "admin",
-                    domainId: 198555049289472,
-                    domainName: "wooocoo",
-                    id: 200092490833664
-                }
+                result.refreshToken = refreshToken
+                result.user = user
             } else {
                 result.errors = [
                     {
@@ -106,15 +105,12 @@ export default {
 
     'GET /api/captcha': (request: Request, response: Response) => {
         const captcha = svgCaptcha.create({
-            inverse: false,
             fontSize: 48,
-            noise: 2,
             width: 150,
             height: 50,
             size: 4,
             ignoreChars: "0o1i",
-            color: true,
-            background: "#cc9966"
+            background: "rgba(0, 0, 0, 0.02)"
         })
         response.cookie('captcha', captcha.text.toLowerCase())
         response.type('svg');

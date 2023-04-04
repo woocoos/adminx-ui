@@ -30,12 +30,12 @@ export default defineConfig(() => ({
       importStyle: true,
     }),
   ],
-  // proxy: {
-  //   '/api': {
-  //     target: 'http://jsonplaceholder.typicode.com/',
-  //     changeOrigin: true,
-  //     pathRewrite: { '^/api' : '' },
-  //   },
-  // },
+  proxy: {
+    '/api': {
+      target: 'http://127.0.0.1:10070/',
+      changeOrigin: true,
+      pathRewrite: { '^/api' : '' },
+    },
+  },
   compileDependencies: false,
 }));

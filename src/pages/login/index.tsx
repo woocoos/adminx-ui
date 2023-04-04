@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { definePageConfig, useAuth } from "ice";
-import { message, Alert } from "antd";
+import { definePageConfig } from "ice";
+import { message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { ProFormCheckbox, ProFormText, LoginForm } from "@ant-design/pro-form";
 import styles from "./index.module.css";
 import type { LoginParams, LoginRes } from "@/services/user";
 import { login } from "@/services/user";
+import { graphqlApi } from "@/services/graphql";
 import store from "@/store";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
@@ -22,20 +23,42 @@ const SvgCaptcha = () => {
 export default () => {
   const [, basisDispatcher] = store.useModel("basis");
 
-  async function handleSubmit(values: LoginParams) {
-    values.password = Sha256(values.password).toString();
-    const result = await login(values);
+  function loginSuccess(result: LoginRes, user: any) {
     if (result.accessToken) {
       basisDispatcher.updateToken(result.accessToken)
       basisDispatcher.updateTenantId(`${result.user?.domainId || ''}`)
-      basisDispatcher.updateUser({
-        id: `${result.user?.id || ''}`,
-        displayName: `${result.user?.displayName || ''}`
-      })
+      basisDispatcher.updateUser(user)
       message.success("登录成功！");
       const urlParams = new URL(window.location.href).searchParams;
       location.href = urlParams.get("redirect") || "/";
-      return true;
+    }
+  }
+
+  async function handleSubmit(values: LoginParams) {
+    values.password = Sha256(values.password).toString();
+    const result = await login(values);
+    if (result.accessToken && result.user?.id) {
+      const userInfo = await graphqlApi(`query{
+        node(id:"${result.user.id}"){
+          ... on User{
+            id,displayName,loginProfile{
+              passwordReset
+            }
+          }
+        }
+      }`, {}, {
+        "Authorization": `Bearer ${result.accessToken}`,
+        "X-Tenant-ID": result.user?.domainId
+      })
+      if (userInfo.data?.node?.id) {
+        if (userInfo.data.node.loginProfile?.passwordReset) {
+          // 需要强制设置新密码
+        } else {
+          loginSuccess(result, userInfo.data.node)
+          return true;
+        }
+      }
+
     }
     return false
   }

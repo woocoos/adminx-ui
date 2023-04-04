@@ -1,34 +1,37 @@
 import type { Request, Response } from '@ice/app';
-import { mockServer } from '@graphql-tools/mock';
+import { mockServer, relayStylePaginationMock } from '@graphql-tools/mock';
 import bodyParser from 'body-parser'
 import { readFileSync } from "fs";
 import { join } from "path";
 
 const schema = readFileSync(join(__dirname, "allinone.graphql"), 'utf-8');
 
-// const schema = `
-// type User {
-//     id: ID!
-//     name: String
-//     avatar:String
-//     userType:String
-// }
-// type Query {
-//     viewer:User
-//     userList:[User]
-// }
-// `
-
-const mocks = {
+const mocks: any = {
+    // 由于Node没有任何参数可以进行判断指向哪个__typename 无法进行模拟
+    // Node: {
+    //     __typename: "Org"
+    // },
     User: () => ({
-        userType: "admin",
-        avatar: "https://img.alicdn.com/tfs/TB1.ZBecq67gK0jSZFHXXa9jVXa-904-826.png",
-        name: () => (Math.random() + 1).toString(36).substring(7)
+        id: 1,
+        userType: "account",
+        email: "",
+        displayName: () => "admin",
+        loginProfile: {
+            passwordReset: true
+        }
+    }),
+    Org: () => ({
+        id: 1,
+        name: 'woocoo'
     })
 }
 
 const preserveResolvers = false
 
+/**
+ * 文档
+ * https://the-guild.dev/graphql/tools/docs/api/modules/mock_src
+ */
 export default {
     'POST /api/graphql/query': (request: Request, response: Response) => {
         bodyParser.json()(request, response, async () => {
