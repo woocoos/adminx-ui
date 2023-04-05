@@ -19,7 +19,10 @@ export default createModel({
     locale: "zh-CN",
     token: "",
     tenantId: "",
-    user: {}
+    user: {
+      id: "",
+      displayName: ""
+    }
   } as BasisModelState,
   reducers: {
     updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US") {
@@ -31,8 +34,15 @@ export default createModel({
     updateTenantId(prevState: BasisModelState, payload: string) {
       prevState.tenantId = payload;
     },
-    updateUser(prevState: BasisModelState, payload: BasisUserModelState) {
-      prevState.user = payload;
+    updateUser(prevState: BasisModelState, payload?: BasisUserModelState) {
+      if (payload) {
+        prevState.user = payload
+      } else {
+        prevState.user = {
+          id: '',
+          displayName: '',
+        };
+      }
     },
   },
   effects: () => ({
@@ -58,10 +68,7 @@ export default createModel({
       await localStorage.removeItem("user")
       this.updateToken("")
       this.updateTenantId("")
-      this.updateUser({
-        id: "",
-        displayName: ""
-      })
+      this.updateUser(undefined)
 
       if (!location.pathname.split('/').includes('login')) {
         let href = `/login?redirect=${encodeURIComponent(location.href)}`
@@ -72,6 +79,13 @@ export default createModel({
         //   location.href = href
         // }
       }
-    }
+    },
+    /**
+     * 更新用户信息
+     * @param user 
+     */
+    async saveUser(user: BasisUserModelState) {
+      this.updateUser(await localStorage.setItem("user", user))
+    },
   })
 });
