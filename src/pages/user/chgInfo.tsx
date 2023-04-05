@@ -4,6 +4,7 @@ import {
   ProForm,
   ProFormText,
   ProFormTextArea,
+  useToken,
 } from "@ant-design/pro-components";
 import { Card, message } from "antd";
 import { graphqlApi } from "@/services/graphql";
@@ -19,6 +20,7 @@ interface UserChgInfo {
 
 export default () => {
   const
+    { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [basisState, basisDispatcher] = store.useModel("basis");
@@ -63,6 +65,7 @@ export default () => {
     <PageContainer
       header={{
         title: "基本信息",
+        style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             {

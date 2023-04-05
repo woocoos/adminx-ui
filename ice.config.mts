@@ -27,7 +27,7 @@ export default defineConfig(() => ({
     jsxPlus(),
     icestark({ type: 'framework' }),
     antd({
-      importStyle: true,
+      importStyle: false,
     }),
   ],
   proxy: {

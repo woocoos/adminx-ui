@@ -1,12 +1,9 @@
 body{
   margin:0
 }
-.ant-pro-page-container .ant-page-header {
-  background: white;
-}
 
 .ant-pro .ant-pro-layout .ant-pro-layout-container .ant-pro-layout-content {
-  background: #f0f2f5;
+  /* background: #f0f2f5; */
   min-height: calc(100vh - 56px - 124px);
 }
 

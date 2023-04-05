@@ -1,7 +1,11 @@
 import localforage from 'localforage'
 
+localforage.config({
+    name: 'adminx',
+});
+
 function init() {
-    
+
 }
 
 // 从仓库中获取 key 对应的值并将结果提供给回调函数。如果 key 不存在，getItem() 将返回 null

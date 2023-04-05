@@ -49,7 +49,7 @@ export const icestark = defineFrameworkConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   // 初始化local
-  localStorage.init()
+  // localStorage.init()
   const basis = await basisData()
 
   return {
