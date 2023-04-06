@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { definePageConfig } from "ice";
 import { message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
@@ -6,9 +5,8 @@ import { ProFormCheckbox, ProFormText, LoginForm } from "@ant-design/pro-form";
 import styles from "./index.module.css";
 import type { LoginParams, LoginRes } from "@/services/basis";
 import { login } from "@/services/basis";
-import { graphqlApi } from "@/services/graphql";
+import { getUserInfo } from "@/services/graphql";
 import store from "@/store";
-import { gid } from "@/util";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
 
@@ -35,27 +33,20 @@ export default () => {
     values.password = Sha256(values.password).toString();
     const result = await login(values);
     if (result.accessToken && result.user?.id) {
-      const userInfo = await graphqlApi(`query{
-        node(id:"${gid("user", result.user.id)}"){
-          ... on User{
-            id,displayName,loginProfile{
-              passwordReset
-            }
-          }
-        }
-      }`, {}, {
-        "Authorization": `Bearer ${result.accessToken}`,
-        "X-Tenant-ID": result.user?.domainId
-      })
-      if (userInfo.data?.node?.id) {
-        if (userInfo.data.node.loginProfile?.passwordReset) {
+      const userInfo = await getUserInfo(
+        `${result.user.id}`,
+        {
+          "Authorization": `Bearer ${result.accessToken}`,
+          "X-Tenant-ID": result.user?.domainId
+        })
+      if (userInfo?.id) {
+        if (userInfo.loginProfile?.passwordReset) {
           // 需要强制设置新密码
         } else {
-          await loginSuccess(result, userInfo.data.node)
+          await loginSuccess(result, userInfo)
           return true;
         }
       }
-
     }
     return false
   }
@@ -119,9 +110,9 @@ export default () => {
             marginBottom: 24,
           }}
         >
-          <ProFormCheckbox noStyle name="autoLogin">
+          {/* <ProFormCheckbox noStyle name="autoLogin">
             自动登录
-          </ProFormCheckbox>
+          </ProFormCheckbox> */}
           <a
             style={{
               float: "right",

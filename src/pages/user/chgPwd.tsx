@@ -1,25 +1,45 @@
+import { useRef, useState } from "react";
 import {
   PageContainer,
   ProForm,
   ProFormInstance,
-  ProFormRadio,
   ProFormText,
   useToken,
 } from "@ant-design/pro-components";
-import { Card, Col, message, Row, Space } from "antd";
-import { useRef, useState } from "react";
+import { Card, message } from "antd";
+import store from "@/store";
+import { updatePassword } from "@/services/graphql";
 
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
 
 export default () => {
-  const formRef = useRef<ProFormInstance>();
-  const { token } = useToken();
+  const formRef = useRef<ProFormInstance>(),
+    { token } = useToken(),
+    [saveLoading, setSaveLoading] = useState(false),
+    [saveDisabled, setSaveDisabled] = useState(true),
+    [, basisDispatcher] = store.useModel("basis");
+
+
+  const
+    getRequest = async () => {
+      setSaveLoading(false)
+      setSaveDisabled(true)
+      return {}
+    },
+    onValuesChange = () => {
+      setSaveDisabled(false)
+    },
+    onFinish = async (values) => {
+      setSaveLoading(true)
+      const result = await updatePassword(values.oldPwd, values.newPwd)
+      if (result) {
+        message.success("提交成功");
+        await basisDispatcher.logout()
+        setSaveDisabled(true)
+      }
+      setSaveLoading(false)
+    }
+
+
   return (
     <PageContainer
       header={{
@@ -40,33 +60,20 @@ export default () => {
       }}
     >
       <Card bordered={false}>
-        <ProForm<{
-          oldPwd: string;
-          newPwd?: string;
-          reNewPwd?: string;
-        }>
+        <ProForm
           formRef={formRef}
           submitter={{
-            render: (props, doms) => {
-              return doms;
-            },
+            submitButtonProps: {
+              loading: saveLoading,
+              disabled: saveDisabled,
+            }
           }}
-          onFinish={async (values) => {
-            await waitTime(2000);
-            console.log(values);
-            message.success("提交成功");
-          }}
-          params={{}}
-          request={async () => {
-            await waitTime(100);
-            return {
-              oldPwd: "",
-              newPwd: "",
-              reNewPwd: "",
-            };
-          }}
+          onFinish={onFinish}
+          onReset={getRequest}
+          request={getRequest}
+          onValuesChange={onValuesChange}
         >
-          <ProFormText
+          <ProFormText.Password
             width="lg"
             name="oldPwd"
             label="旧密码"
@@ -78,7 +85,7 @@ export default () => {
               },
             ]}
           />
-          <ProFormText
+          <ProFormText.Password
             width="lg"
             name="newPwd"
             label="新密码"
@@ -90,7 +97,7 @@ export default () => {
               },
             ]}
           />
-          <ProFormText
+          <ProFormText.Password
             name="reNewPwd"
             width="lg"
             label="确认新密码"
@@ -102,8 +109,9 @@ export default () => {
               },
               {
                 validator: (rule, value) => {
-                  if (value != formRef?.current?.getFieldValue("newPwd"))
+                  if (value != formRef?.current?.getFieldValue("newPwd")) {
                     return Promise.reject("确认新密码需与新密码一致");
+                  }
                   return Promise.resolve();
                 },
               },

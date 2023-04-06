@@ -59,6 +59,27 @@ export default createModel({
   },
   effects: () => ({
     /**
+     * 获取缓存数据
+     * @returns 
+     */
+    async initBasis() {
+      const token = await localStorage.getItem<string>("token");
+      const darkMode = await localStorage.getItem<string>("darkMode");
+      const compactMode = await localStorage.getItem<string>("compactMode");
+      const tenantId = await localStorage.getItem<string>("tenantId");
+      const user = await localStorage.getItem<any>("user");
+
+      // TODO：增加jwt判断token的处理
+
+      return {
+        token,
+        darkMode,
+        compactMode,
+        tenantId,
+        user,
+      };
+    },
+    /**
      * 登录
      * @param payload 
      */

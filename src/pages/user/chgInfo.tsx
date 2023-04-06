@@ -7,16 +7,8 @@ import {
   useToken,
 } from "@ant-design/pro-components";
 import { Card, message } from "antd";
-import { graphqlApi } from "@/services/graphql";
+import { getUserInfo, updateUserInfo } from "@/services/graphql";
 import store from "@/store";
-import { gid } from "@/util";
-
-interface UserChgInfo {
-  displayName: string
-  email: string
-  mobile: string
-  comments: string
-}
 
 export default () => {
   const
@@ -27,38 +19,23 @@ export default () => {
 
   const
     getRequest = async () => {
-      const userInfo = await graphqlApi(
-        `query{
-          node(id:"${gid("user", basisState.user.id)}"){
-            ... on User{
-              id,displayName,email,mobile,comments
-            }
-          }
-        }`
-      )
       setSaveLoading(false)
       setSaveDisabled(true)
-      return userInfo?.data?.node
+      const userInfo = await getUserInfo(basisState.user.id)
+      return userInfo || {}
     },
     onValuesChange = () => {
       setSaveDisabled(false)
     },
-    onFinish = async (values: UserChgInfo) => {
+    onFinish = async (values) => {
       setSaveLoading(true)
-      const result = await graphqlApi(
-        `mutation updateUser($input: UpdateUserInput!){
-          action:updateUser(userID:"${basisState.user.id}",input:$input){
-            id,displayName,email,mobile,comments
-          }
-        }`, { input: values }
-      )
-      if (result?.data?.action?.id) {
+      const userInfo = await updateUserInfo(basisState.user.id, values)
+      if (userInfo?.id) {
         message.success("提交成功");
-        await basisDispatcher.saveUser(result.data.action)
+        await basisDispatcher.saveUser(userInfo)
         setSaveDisabled(true)
       }
       setSaveLoading(false)
-
     }
 
   return (
@@ -81,7 +58,7 @@ export default () => {
       }}
     >
       <Card bordered={false}>
-        <ProForm<UserChgInfo>
+        <ProForm
           submitter={{
             submitButtonProps: {
               loading: saveLoading,

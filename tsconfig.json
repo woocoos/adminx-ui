@@ -13,7 +13,7 @@
     "noImplicitAny": false,
     "importHelpers": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
+    "suppressImplicitAnyIndexErrors": false,
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],

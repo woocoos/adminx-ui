@@ -6,9 +6,6 @@ import { defineFrameworkConfig } from '@ice/plugin-icestark/esm/types';
 import FrameworkLayout from '@/components/FrameworkLayout';
 import { message } from 'antd';
 import store from "@/store";
-import { basisData } from "@/services/basis";
-import localStorage from "@/pkg/localStorage";
-
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
@@ -48,9 +45,7 @@ export const icestark = defineFrameworkConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  // 初始化local
-  // localStorage.init()
-  const basis = await basisData()
+  const basis = await store.dispatch.basis.initBasis()
 
   return {
     basis,
