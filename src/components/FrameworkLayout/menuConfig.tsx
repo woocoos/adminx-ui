@@ -30,28 +30,43 @@ const asideMenuConfig: MenuDataItem[] = [
       },
     ],
   },
-  // {
-  //   name: "组织协作",
-  //   icon: <TeamOutlined />,
-  //   children: [
-  //     {
-  //       name: "表单",
-  //       path: "/form",
-  //       framework: true,
-  //     },
-  //   ],
-  // },
-  // {
-  //   name: "系统配置",
-  //   icon: <SettingOutlined />,
-  //   children: [
-  //     {
-  //       name: "列表",
-  //       path: "/list",
-  //       framework: true,
-  //     },
-  //   ],
-  // },
+  {
+    name: "组织协作",
+    icon: <TeamOutlined />,
+    children: [
+      {
+        name: "组织部门管理",
+        path: "/org/department",
+        framework: true,
+      },
+      {
+        name: "组织用户管理",
+        path: "/org/user",
+        framework: true,
+      },
+    ],
+  },
+  {
+    name: "系统配置",
+    icon: <SettingOutlined />,
+    children: [
+      {
+        name: "组织管理",
+        path: "/org/list",
+        framework: true,
+      },
+      {
+        name: "账户管理",
+        path: "/account/list",
+        framework: true,
+      },
+      {
+        name: "应用管理",
+        path: "/app/list",
+        framework: true,
+      },
+    ],
+  },
   // {
   //   name: "用户列表",
   //   path: "/lowcode-preview/user/list",
