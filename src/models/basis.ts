@@ -3,7 +3,7 @@ import localStorage from '@/pkg/localStorage'
 import { LoginRes } from '@/services/basis';
 
 interface BasisModelState {
-  locale: "zh-CN" | "zh-TW" | "en-US"
+  locale: "zh-CN" | "zh-TW" | "en-US" | string
   token: string
   tenantId: string
   darkMode: boolean
@@ -29,7 +29,7 @@ export default createModel({
     compactMode: false,
   } as BasisModelState,
   reducers: {
-    updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US") {
+    updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US" | string) {
       prevState.locale = payload;
     },
     updateToken(prevState: BasisModelState, payload: string) {
@@ -72,6 +72,7 @@ export default createModel({
       // TODO：增加jwt判断token的处理
 
       return {
+        locale: "zh-CN",
         token,
         darkMode,
         compactMode,
@@ -95,7 +96,7 @@ export default createModel({
      * 退出
      * @param isHistory 
      */
-    async logout(isHistory?: boolean) {
+    async logout() {
       await localStorage.removeItem("token")
       await localStorage.removeItem("tenantId")
       await localStorage.removeItem("user")
@@ -104,13 +105,7 @@ export default createModel({
       this.updateUser(undefined)
 
       if (!location.pathname.split('/').includes('login')) {
-        let href = `/login?redirect=${encodeURIComponent(location.href)}`
-        // 主应用调用这个有问题 后续看怎么处理
-        history?.push(href)
-        // if (isHistory) {
-        // } else {
-        //   location.href = href
-        // }
+        history?.push(`/login?redirect=${encodeURIComponent(location.href)}`)
       }
     },
     /**

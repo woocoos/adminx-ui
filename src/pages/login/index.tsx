@@ -10,15 +10,6 @@ import store from "@/store";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
 
-const SvgCaptcha = () => {
-  return (
-    <img src={`/api/captcha?t=${Date.now()}`} height="32px" onClick={(e) => {
-      const svgDom = e.target as HTMLImageElement
-      svgDom.src = `/api/captcha?t=${Date.now()}`
-    }} />
-  )
-}
-
 export default () => {
   const [, basisDispatcher] = store.useModel("basis");
 
@@ -95,7 +86,10 @@ export default () => {
           name="captcha"
           fieldProps={{
             size: "large",
-            addonAfter: <SvgCaptcha />,
+            addonAfter: <img src={`/api/captcha?t=${Date.now()}`} height="32px" onClick={(e) => {
+              const svgDom = e.target as HTMLImageElement
+              svgDom.src = `/api/captcha?t=${Date.now()}`
+            }} />,
           }}
           placeholder={"验证码"}
           rules={[

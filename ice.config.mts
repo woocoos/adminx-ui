@@ -2,7 +2,6 @@ import { defineConfig } from '@ice/app';
 import request from '@ice/plugin-request';
 import store from '@ice/plugin-store';
 import auth from '@ice/plugin-auth';
-import icestark from '@ice/plugin-icestark';
 import antd from '@ice/plugin-antd';
 import jsxPlus from '@ice/plugin-jsx-plus';
 
@@ -25,7 +24,6 @@ export default defineConfig(() => ({
     store(),
     auth(),
     jsxPlus(),
-    icestark({ type: 'framework' }),
     antd({
       importStyle: false,
     }),
