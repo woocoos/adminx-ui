@@ -1,11 +1,11 @@
 import { definePageConfig } from "ice";
 import { message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
-import { ProFormCheckbox, ProFormText, LoginForm } from "@ant-design/pro-form";
+import { ProFormText, LoginForm } from "@ant-design/pro-form";
 import styles from "./index.module.css";
 import type { LoginParams, LoginRes } from "@/services/basis";
 import { login } from "@/services/basis";
-import { getUserInfo } from "@/services/graphql";
+import { getUserInfo } from "@/services/user";
 import store from "@/store";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";

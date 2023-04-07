@@ -8,7 +8,7 @@ import {
 } from "@ant-design/pro-components";
 import { Card, message } from "antd";
 import store from "@/store";
-import { updatePassword } from "@/services/graphql";
+import { updatePassword } from "@/services/user";
 
 
 export default () => {

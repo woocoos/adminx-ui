@@ -1,5 +1,4 @@
 import { request } from 'ice';
-import localStorage from "@/pkg/localStorage";
 
 export interface LoginParams {
   username: string

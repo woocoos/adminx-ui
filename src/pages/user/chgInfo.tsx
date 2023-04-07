@@ -7,7 +7,7 @@ import {
   useToken,
 } from "@ant-design/pro-components";
 import { Card, message } from "antd";
-import { getUserInfo, updateUserInfo } from "@/services/graphql";
+import { getUserInfo, updateUserInfo } from "@/services/user";
 import store from "@/store";
 
 export default () => {

@@ -1,107 +1,56 @@
+import { SortOrder } from 'antd/lib/table/interface';
 import { request } from 'ice';
-import { gid } from "@/util";
-import Sha256 from "crypto-js/sha256";
 
-interface User {
-  id: string
-  displayName: string
-  email: string
-  mobile: string
-  comments: string
-  loginProfile: {
-    passwordReset: boolean
-  }
-}
-interface App {
-  id: string
-  name: string
-  code: string
-  kind: "web" | "native" | "server"
-  redirectURI: string
-  appKey: string
-  appSecret: string
-  scopes: string
-  tokenValidity: number
-  refreshTokenValidity: number
-  logo: string
-  comments: string
-  status: "active" | "inactive" | "processing"
-  createdAt: Date
-  createdBy: string
-  updatedAt: Date
-  updatedBy: string
-}
-
-interface TableParams {
-  pageSize: number;
-  current: number;
-  [appKey: string]: any
-}
-
-interface OrderBy {
+export interface OrderBy {
   direction: "ASC" | "DESC"
   field: string
 }
-interface List<T> {
+
+export interface ListPageInfo {
+  hasNextPage: boolean
+  hasPreviousPage: boolean
+  startCursor: string
+  endCursor: string
+}
+
+export interface List<T> {
   totalCount: number
-  pageInfo: {
-    hasNextPage: boolean
-    hasPreviousPage: boolean
-    startCursor: string
-    endCursor: string
-  }
+  pageInfo: ListPageInfo
   edges: {
     cursor: string
     node: T
   }[]
 }
 
+export interface PagingParams {
+  /**
+   * 返回列表中位于指定游标后面的元素。
+   */
+  after?: string
+  /**
+   * 返回列表中的前n个元素。
+   */
+  first?: number
+  /**
+   * 返回列表中位于指定游标之前的元素。
+   */
+  before?: string
+  /**
+   * 返回列表中的最后n个元素。
+   */
+  last?: number
+}
 
-/**
- * 获取用户信息
- * @param userId 
- * @param headers 
- * @returns 
- */
-export async function getAppList(params?: TableParams, filter?: any, orderBy?: OrderBy) {
-  let where = { ...filter }, pageSize = params?.pageSize, current = params?.current;
-  for (let key in params) {
-    if (!["pageSize", "current"].includes(key) && !Object.keys(filter).includes(key)) {
-      where[key] = params[key]
-    }
-  }
-
-  for (let key in where) {
-    if (Array.isArray(where[key])) {
-      where[`${key}In`] = where[key]
-      delete where[key]
-    }
-  }
-
-  const result = await graphqlApi(
-    `query apps($orderBy:AppOrder,$where:AppWhereInput){
-      list:apps(orderBy: $orderBy,where: $where){
-        totalCount,
-        pageInfo{hasNextPage,hasPreviousPage,startCursor,endCursor}
-        edges{
-          cursor
-          node{
-            id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,refreshTokenValidity,logo,comments,
-            status,createdAt
-          }
-        }
-      }
-    }`,
-    {
-      where,
-    }
-  )
-
-  if (result?.data?.list) {
-    return result?.data?.list as List<App>
-  } else {
-    return null
-  }
+export interface TableParams {
+  pageSize: number;
+  current: number;
+  [appKey: string]: any
+}
+export interface TableSort {
+  [field: string]: SortOrder
+}
+export interface TableFilter {
+  [field: string]: any
 }
 
 /**
@@ -124,72 +73,39 @@ export async function getGID(type: string, id: string | number) {
   }
 }
 
-
 /**
- * 获取用户信息
- * @param userId 
- * @param headers 
+ * 处理 过滤和排序
+ * @param params 
+ * @param filter 
  * @returns 
  */
-export async function getUserInfo(userId: string, headers?: any) {
-  const result = await graphqlApi(
-    `query{
-        node(id:"${gid("user", userId)}"){
-          ... on User{
-            id,displayName,email,mobile,comments,
-            loginProfile{
-              passwordReset
-            }
-          }
-        }
-      }`, {}, headers)
-
-  if (result?.data?.node) {
-    return result?.data?.node as User
-  } else {
-    return null
+export function getGraphqlFilter(params?: TableParams, filter?: TableFilter, sort?: TableSort) {
+  let where: TableFilter = { ...filter }, orderBy: OrderBy | undefined;
+  for (let key in params) {
+    if (!["pageSize", "current"].includes(key) && filter && !Object.keys(filter).includes(key)) {
+      where[key] = params[key]
+    }
   }
+
+  for (let key in where) {
+    if (Array.isArray(where[key])) {
+      where[`${key}In`] = where[key]
+      delete where[key]
+    }
+  }
+  if (sort) {
+    const sortKey = Object.keys(sort)[0]
+    if (sortKey) {
+      orderBy = {
+        field: sortKey,
+        direction: sort[sortKey] === 'descend' ? 'DESC' : 'ASC',
+      }
+    }
+  }
+
+  return { where, orderBy }
 }
 
-/**
- * 更新用户信息
- * @param userId
- * @param input 
- * @returns 
- */
-export async function updateUserInfo(userId: string, input: User) {
-  const result = await graphqlApi(
-    `mutation updateUser($input: UpdateUserInput!){
-        action:updateUser(userID:"${userId}",input:$input){
-          id,displayName,email,mobile,comments
-        }
-      }`, { input })
-
-  if (result?.data?.action) {
-    return result?.data?.action as User
-  } else {
-    return null
-  }
-}
-
-/**
- * 更新密码
- * @param oldPwd
- * @param newPwd 
- * @returns 
- */
-export async function updatePassword(oldPwd: string, newPwd: string) {
-  const result = await graphqlApi(
-    `mutation changePassword{
-        action:changePassword(oldPwd:"${Sha256(oldPwd).toString()}",newPwd:"${Sha256(newPwd).toString()}")
-      }`)
-
-  if (result?.data?.action) {
-    return result?.data?.action as boolean
-  } else {
-    return null
-  }
-}
 
 /**
  * 基础gql接口
