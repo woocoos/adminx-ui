@@ -76,25 +76,25 @@ export const requestConfig = defineRequestConfig(() => {
           },
           onError: (error) => {
             const errRes = error.response as any
-            if (errRes?.data?.errors?.[0]?.message) {
-              message.error(errRes.data.errors[0].message)
-            } else {
-              switch (errRes.status) {
-                case 401:
-                  store.dispatch.basis.logout()
-                  break;
-                case 403:
-                  message.error("无访问权限")
-                  break;
-                case 404:
-                  message.error("找不到方法")
-                  break;
-                case 500:
-                  message.error("服务端系统异常")
-                  break;
-                default:
+            switch (errRes.status) {
+              case 401:
+                store.dispatch.basis.logout()
+                break;
+              case 403:
+                message.error("无访问权限")
+                break;
+              case 404:
+                message.error("找不到方法")
+                break;
+              case 500:
+                message.error("服务端系统异常")
+                break;
+              default:
+                if (errRes?.data?.errors?.[0]?.message) {
+                  message.error(errRes?.data?.errors?.[0]?.message)
+                } else {
                   message.error(errRes.statusText)
-              }
+                }
             }
             // 请求出错：服务端返回错误状态码
             return Promise.reject(error);

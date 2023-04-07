@@ -3,7 +3,7 @@ import localStorage from '@/pkg/localStorage'
 import { LoginRes } from '@/services/basis';
 
 interface BasisModelState {
-  locale: "zh-CN" | "zh-TW" | "en-US" | string
+  locale: "zh-CN" | "zh-TW" | "en-US"
   token: string
   tenantId: string
   darkMode: boolean
@@ -29,7 +29,7 @@ export default createModel({
     compactMode: false,
   } as BasisModelState,
   reducers: {
-    updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US" | string) {
+    updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US") {
       prevState.locale = payload;
     },
     updateToken(prevState: BasisModelState, payload: string) {

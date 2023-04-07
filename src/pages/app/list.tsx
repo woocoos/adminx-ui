@@ -8,18 +8,20 @@ import { getAppList } from "@/services/app";
 import defaultApp from "@/assets/images/default-app.png";
 import { Button } from "antd";
 import GqlPaging from "@/components/GqlPaging";
+import AppCreate from "./components/create";
 import { useRef, useState } from "react";
 import { ListPageInfo, PagingParams, TableSort } from "@/services/graphql";
 
 
 export default () => {
   const { token } = useToken(),
+    // 表格相关
     proTableRef = useRef<ActionType>(),
     [total, setTotal] = useState<number>(),
     [pageInfo, setPageInfo] = useState<ListPageInfo>(),
     [paging, setPaging] = useState<PagingParams>(),
-    // 有需要排序配置  sorter: true 
     columns = [
+      // 有需要排序配置  sorter: true 
       { title: 'LOGO', dataIndex: 'logo', valueType: "image", search: false },
       { title: '名称', dataIndex: 'name', },
       { title: '编码', dataIndex: 'code', },
@@ -46,7 +48,9 @@ export default () => {
         title: '操作', dataIndex: 'actions', flixed: 'right', align: 'center', search: false,
         render: (text, record) => {
           return [
-            <Button key="editor" type="link" size="small">
+            <Button key="editor" type="link" size="small" onClick={() => {
+              setModal({ open: true, title: `编辑：${record.name}`, id: record.id })
+            }}>
               编辑
             </Button>,
             <Button key="permission" type="link" size="small">
@@ -55,7 +59,14 @@ export default () => {
           ]
         }
       },
-    ];
+    ],
+    // 弹出层处理
+    [modal, setModal] = useState({
+      open: false,
+      title: "",
+      id: ""
+    })
+
 
   const
     getRequest = async (params, sort: TableSort, filter) => {
@@ -74,9 +85,16 @@ export default () => {
         setTotal(0)
       }
       return table
-    }, onPaging = (paging: PagingParams) => {
+    },
+    onPaging = (paging: PagingParams) => {
       setPaging(paging)
       proTableRef.current?.reload();
+    },
+    onDrawerClose = (isSuccess: boolean) => {
+      if (isSuccess) {
+        proTableRef.current?.reload();
+      }
+      setModal({ open: false, title: '', id: '' })
     }
 
 
@@ -98,7 +116,9 @@ export default () => {
           ],
         },
         extra: [
-          <Button key="create" type="primary" >
+          <Button key="create" type="primary" onClick={() => {
+            setModal({ open: true, title: '创建应用', id: '' })
+          }}>
             创建应用
           </Button>
         ]
@@ -119,6 +139,12 @@ export default () => {
         pageInfo={pageInfo}
         total={total}
         onChange={onPaging} />
+
+      <AppCreate
+        open={modal.open}
+        title={modal.title}
+        id={modal.id}
+        onClose={onDrawerClose} />
     </PageContainer>
   );
 };
