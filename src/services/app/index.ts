@@ -1,5 +1,5 @@
 import { gid } from "@/util";
-import { List, TableParams, graphqlApi, PagingParams, getGraphqlFilter, TableSort } from "../graphql";
+import { List, TableParams, graphqlApi, PagingParams, getGraphqlFilter, TableSort, JsonFieldAny, setClearInputField } from "../graphql";
 
 interface App {
     id: string
@@ -95,7 +95,7 @@ export async function getAppInfo(appId: string) {
  * @param input 
  * @returns 
  */
-export async function updateAppInfo(appId: string, input: App | any) {
+export async function updateAppInfo(appId: string, input: App | JsonFieldAny) {
 
     delete input['code'];
     const result = await graphqlApi(
@@ -104,7 +104,7 @@ export async function updateAppInfo(appId: string, input: App | any) {
           action:updateApp(appID:"${appId}",input:$input){
             ${AppNodeField}
           }
-        }`, { input })
+        }`, { input: setClearInputField(input) })
 
     if (result?.data?.action) {
         return result?.data?.action as App
@@ -118,7 +118,7 @@ export async function updateAppInfo(appId: string, input: App | any) {
  * @param input 
  * @returns 
  */
-export async function createAppInfo(input: App) {
+export async function createAppInfo(input: App | JsonFieldAny) {
     const result = await graphqlApi(
         `#graphql
         mutation createApp($input: CreateAppInput!){

@@ -5,7 +5,7 @@ import {
     ProFormText,
     ProFormTextArea,
 } from '@ant-design/pro-components';
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 export default (props: {
     open?: boolean
@@ -68,6 +68,7 @@ export default (props: {
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
+            <ProFormText name="logo" label="LOGO" />
             <ProFormText name="name" label="名称"
                 rules={[
                     {

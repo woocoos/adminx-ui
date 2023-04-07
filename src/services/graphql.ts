@@ -49,7 +49,7 @@ export interface TableParams {
 export interface TableSort {
   [field: string]: SortOrder
 }
-export interface TableFilter {
+export interface JsonFieldAny {
   [field: string]: any
 }
 
@@ -79,8 +79,8 @@ export async function getGID(type: string, id: string | number) {
  * @param filter 
  * @returns 
  */
-export function getGraphqlFilter(params?: TableParams, filter?: TableFilter, sort?: TableSort) {
-  let where: TableFilter = { ...filter }, orderBy: OrderBy | undefined;
+export function getGraphqlFilter(params?: TableParams, filter?: JsonFieldAny, sort?: TableSort) {
+  let where: JsonFieldAny = { ...filter }, orderBy: OrderBy | undefined;
   for (let key in params) {
     if (!["pageSize", "current"].includes(key) && filter && !Object.keys(filter).includes(key)) {
       where[key] = params[key]
@@ -104,6 +104,21 @@ export function getGraphqlFilter(params?: TableParams, filter?: TableFilter, sor
   }
 
   return { where, orderBy }
+}
+
+/**
+ * 处理 updateinput中clearField:true
+ * @param input 
+ * @returns 
+ */
+export function setClearInputField(input: JsonFieldAny) {
+  for (let key in input) {
+    if (!input[key]) {
+      const clearKey = `clear${key.slice(0, 1).toUpperCase()}${key.slice(1)}`
+      input[clearKey] = true
+    }
+  }
+  return input
 }
 
 

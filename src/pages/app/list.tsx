@@ -22,22 +22,23 @@ export default () => {
     [paging, setPaging] = useState<PagingParams>(),
     columns = [
       // 有需要排序配置  sorter: true 
-      { title: 'LOGO', dataIndex: 'logo', valueType: "image", search: false },
-      { title: '名称', dataIndex: 'name', },
-      { title: '编码', dataIndex: 'code', },
+      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
+      { title: '名称', dataIndex: 'name', width: 120, },
+      { title: '编码', dataIndex: 'code', width: 120, },
       {
         title: '类型', dataIndex: 'kind',
         filters: true,
         search: false,
+        width: 100,
         valueEnum: {
           "web": { text: 'web', },
           "native": { text: 'native', },
           "server": { text: 'server', },
         },
       },
-      { title: '描述', dataIndex: 'comments', ellipsis: true, search: false },
+      { title: '描述', dataIndex: 'comments', width: 160, search: false },
       {
-        title: '状态', dataIndex: 'status', filters: true, search: false,
+        title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: {
           active: { text: "活跃", status: 'success' },
           inactive: { text: "失活", status: 'default' },
@@ -45,7 +46,8 @@ export default () => {
         },
       },
       {
-        title: '操作', dataIndex: 'actions', flixed: 'right', align: 'center', search: false,
+        title: '操作', dataIndex: 'actions', fixed: 'right',
+        align: 'center', search: false, width: 170,
         render: (text, record) => {
           return [
             <Button key="editor" type="link" size="small" onClick={() => {
@@ -130,6 +132,7 @@ export default () => {
         toolbar={{
           title: "应用列表"
         }}
+        scroll={{ x: 'max-content' }}
         columns={columns}
         request={getRequest}
         pagination={false}
