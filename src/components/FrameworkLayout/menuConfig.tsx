@@ -1,6 +1,5 @@
 import {
   SettingOutlined,
-  WarningOutlined,
   TeamOutlined,
   UserOutlined,
   ControlOutlined
@@ -67,11 +66,6 @@ const asideMenuConfig: MenuDataItem[] = [
       },
     ],
   },
-  // {
-  //   name: "用户列表",
-  //   path: "/lowcode-preview/user/list",
-  //   icon: <SettingOutlined />,
-  // },
 ];
 
 export { asideMenuConfig };

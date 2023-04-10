@@ -1,5 +1,5 @@
 import { gid } from "@/util";
-import { List, TableParams, graphqlApi, PagingParams, getGraphqlFilter, TableSort, JsonFieldAny, setClearInputField } from "../graphql";
+import { TableParams, graphqlApi, getGraphqlFilter, TableSort, JsonFieldAny, setClearInputField, TablePage, getGraphqlPaging, getGraphqlList } from "../graphql";
 
 export interface App {
     id: string
@@ -33,8 +33,12 @@ const AppNodeField = `#graphql
  * @param headers 
  * @returns 
  */
-export async function getAppList(params?: TableParams, filter?: any, sort?: TableSort, paging?: PagingParams) {
-    const { where, orderBy } = getGraphqlFilter(params, filter, sort)
+export async function getAppList(params?: TableParams, filter?: any, sort?: TableSort, page?: TablePage) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        paging = getGraphqlPaging({
+            current: params?.current,
+            pageSize: params?.pageSize,
+        }, page)
 
     const result = await graphqlApi(
         `#graphql
@@ -59,7 +63,7 @@ export async function getAppList(params?: TableParams, filter?: any, sort?: Tabl
     )
 
     if (result?.data?.list) {
-        return result?.data?.list as List<App>
+        return getGraphqlList<App>(result.data.list, paging)
     } else {
         return null
     }
@@ -96,7 +100,6 @@ export async function getAppInfo(appId: string) {
  * @returns 
  */
 export async function updateAppInfo(appId: string, input: App | JsonFieldAny) {
-
     delete input['code'];
     const result = await graphqlApi(
         `#graphql

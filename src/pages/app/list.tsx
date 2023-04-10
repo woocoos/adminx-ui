@@ -7,10 +7,9 @@ import {
 import { getAppList } from "@/services/app";
 import defaultApp from "@/assets/images/default-app.png";
 import { Button } from "antd";
-import GqlPaging from "@/components/GqlPaging";
 import AppCreate from "./components/create";
 import { useRef, useState } from "react";
-import { ListPageInfo, PagingParams, TableSort } from "@/services/graphql";
+import { TableSort, TableParams, TablePage } from "@/services/graphql";
 import { Link } from "ice";
 
 
@@ -18,9 +17,7 @@ export default () => {
   const { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    [total, setTotal] = useState<number>(),
-    [pageInfo, setPageInfo] = useState<ListPageInfo>(),
-    [paging, setPaging] = useState<PagingParams>(),
+    [page, setPage] = useState<TablePage>(),
     columns = [
       // 有需要排序配置  sorter: true 
       { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
@@ -70,26 +67,27 @@ export default () => {
 
 
   const
-    getRequest = async (params, sort: TableSort, filter) => {
+    getRequest = async (params: TableParams, sort: TableSort, filter) => {
       const table = { data: [] as any[], success: true, total: 0 };
-      const result = await getAppList(params, filter, sort, paging);
+      const result = await getAppList(params, filter, sort, page);
+
       if (result) {
         table.data = result.edges.map(item => {
           item.node.logo = item.node.logo || defaultApp
           return item.node
         })
         table.total = result.totalCount
-        setPageInfo(result.pageInfo)
-        setTotal(result.totalCount)
+        setPage({
+          current: params.current,
+          pageSize: params.pageSize,
+          startCursor: result.edges[0].cursor,
+          endCursor: result.edges[table.data.length - 1].cursor,
+        })
       } else {
-        setPageInfo(undefined)
-        setTotal(0)
+        table.total = 0
+        setPage(undefined)
       }
       return table
-    },
-    onPaging = (paging: PagingParams) => {
-      setPaging(paging)
-      proTableRef.current?.reload();
     },
     onDrawerClose = (isSuccess: boolean) => {
       if (isSuccess) {
@@ -134,13 +132,9 @@ export default () => {
         scroll={{ x: 'max-content' }}
         columns={columns as any}
         request={getRequest}
-        pagination={false}
+        // 存在after和before都不包含当前游标bug 因此先不开启页码调整
+        // pagination={{ showSizeChanger: true }}
       />
-      <GqlPaging
-        style={{ background: token.colorBgContainer }}
-        pageInfo={pageInfo}
-        total={total}
-        onChange={onPaging} />
 
       <AppCreate
         open={modal.open}

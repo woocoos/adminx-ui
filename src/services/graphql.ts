@@ -22,13 +22,20 @@ export interface List<T> {
   }[]
 }
 
+
+/**
+ * 游标分页组合图解
+ *  last            first
+ *      <- cursor ->
+ * before          after
+ */
 export interface PagingParams {
   /**
    * 返回列表中位于指定游标后面的元素。
    */
   after?: string
   /**
-   * 返回列表中的前n个元素。
+   * 返回列表中的前n个元素。0 1 2 3
    */
   first?: number
   /**
@@ -36,14 +43,26 @@ export interface PagingParams {
    */
   before?: string
   /**
-   * 返回列表中的最后n个元素。
+   * 返回列表中的最后n个元素。-3 -2 -1 0
    */
   last?: number
+  /**
+   * 方向
+   */
+  direction?: "up" | "down"
+  /**
+   * 页码
+   */
+  pageSize?: number
 }
 
+export interface TablePage {
+  pageSize: number
+  current: number
+  startCursor?: string
+  endCursor?: string
+}
 export interface TableParams {
-  pageSize: number;
-  current: number;
   [appKey: string]: any
 }
 export interface TableSort {
@@ -105,6 +124,59 @@ export function getGraphqlFilter(params?: TableParams, filter?: JsonFieldAny, so
 
   return { where, orderBy }
 }
+
+
+/**
+ * 处理分页参数
+ * @param nPage 
+ * @param oPage 
+ * @returns 
+ */
+export function getGraphqlPaging(nPage: TablePage, oPage?: TablePage) {
+  const paging: PagingParams = {},
+    pageSize = nPage.pageSize;
+  if (oPage) {
+    if (nPage.current > oPage.current) {
+      // 下一页
+      paging.after = oPage.endCursor
+      paging.first = (nPage.current - oPage.current) * pageSize
+      paging.direction = 'down'
+    } else if (nPage.current < oPage.current) {
+      // 上一页
+      paging.before = oPage.startCursor
+      paging.last = (oPage.current - nPage.current) * pageSize
+      paging.direction = 'up'
+    } else {
+      // 页码相等
+      paging.before = oPage.startCursor
+      paging.first = pageSize
+      paging.direction = 'down'
+    }
+  } else {
+    paging.first = pageSize
+    paging.direction = 'down'
+  }
+
+  paging.pageSize = pageSize
+
+  return paging
+}
+
+/**
+ * 处理分页结果
+ * @param list 
+ * @returns 
+ */
+export function getGraphqlList<T>(list: List<T>, paging: PagingParams) {
+  if (paging.pageSize) {
+    const count = list.edges.length % paging.pageSize === 0 ? paging.pageSize : list.edges.length % paging.pageSize
+    list.edges = list.edges.splice(paging.direction === 'up' ? 0 : -count, count)
+    return list
+  } else {
+    return list
+  }
+}
+
 
 /**
  * 处理 updateinput中clearField:true
