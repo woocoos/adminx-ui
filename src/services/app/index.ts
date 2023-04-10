@@ -1,7 +1,7 @@
 import { gid } from "@/util";
 import { List, TableParams, graphqlApi, PagingParams, getGraphqlFilter, TableSort, JsonFieldAny, setClearInputField } from "../graphql";
 
-interface App {
+export interface App {
     id: string
     name: string
     code: string

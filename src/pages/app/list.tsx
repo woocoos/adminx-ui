@@ -11,6 +11,7 @@ import GqlPaging from "@/components/GqlPaging";
 import AppCreate from "./components/create";
 import { useRef, useState } from "react";
 import { ListPageInfo, PagingParams, TableSort } from "@/services/graphql";
+import { Link } from "ice";
 
 
 export default () => {
@@ -50,11 +51,9 @@ export default () => {
         align: 'center', search: false, width: 170,
         render: (text, record) => {
           return [
-            <Button key="editor" type="link" size="small" onClick={() => {
-              setModal({ open: true, title: `编辑：${record.name}`, id: record.id })
-            }}>
+            <Link key="editor" to={`/app/viewer?id=${record.id}`}>
               编辑
-            </Button>,
+            </Link>,
             <Button key="permission" type="link" size="small">
               权限
             </Button>,
@@ -133,7 +132,7 @@ export default () => {
           title: "应用列表"
         }}
         scroll={{ x: 'max-content' }}
-        columns={columns}
+        columns={columns as any}
         request={getRequest}
         pagination={false}
       />
