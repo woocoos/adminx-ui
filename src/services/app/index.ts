@@ -201,11 +201,11 @@ export async function getAppMenus(appId: string) {
     const appGid = gid('app', appId)
     const result = await graphqlApi(
         `#graphql
-        query {
+        query menus($orderBy: AppMenuOrder){
           node(id:"${appGid}"){
             ... on App{        
                 ${AppNodeField}    
-                menus{
+                menus(orderBy:$orderBy){
                     edges{                                        
                         cursor,node{                    
                             ${AppMenuField}
@@ -214,7 +214,12 @@ export async function getAppMenus(appId: string) {
                 }
             }
           }
-        }`)
+        }`, {
+        orderBy: {
+            direction: 'ASC',
+            field: "displaySort"
+        }
+    })
 
     if (result?.data?.node) {
         return result.data.node as App
