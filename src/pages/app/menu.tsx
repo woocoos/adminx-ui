@@ -13,11 +13,11 @@ import { SettingOutlined } from "@ant-design/icons";
 import { useSearchParams } from "ice";
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { App, AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu } from "@/services/app";
-import { formatTreeData, loopTreeData } from "@/util";
+import {  formatTreeData, loopTreeData } from "@/util";
 import { updateAppMenu } from "@/services/app";
 import { TreeMoveAction } from "@/services/graphql";
+import { TreeEditorAction } from "@/util/type";
 
-type TreeEditorAction = 'editor' | 'peer' | 'child'
 type TreeDataState = {
     key: string
     title: string | ReactNode

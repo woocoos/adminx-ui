@@ -137,7 +137,11 @@ export function getGraphqlFilter(params?: TableParams, filter?: JsonFieldAny, so
 export function getGraphqlPaging(nPage: TablePage, oPage?: TablePage) {
   const paging: PagingParams = {},
     pageSize = nPage.pageSize;
-  if (oPage) {
+  
+  if (!nPage.current || nPage.current === 1) {
+    paging.first = pageSize
+    paging.direction = 'down'
+  } else if (oPage) {
     if (nPage.current > oPage.current) {
       // 下一页
       paging.after = oPage.endCursor
