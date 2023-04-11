@@ -4,9 +4,10 @@ import {
   ProTable,
   useToken,
 } from "@ant-design/pro-components";
-import { getAppList } from "@/services/app";
+import { Button, Space, Dropdown, Modal } from "antd";
+import { EllipsisOutlined } from "@ant-design/icons";
+import { App, delAppInfo, getAppList } from "@/services/app";
 import defaultApp from "@/assets/images/default-app.png";
-import { Button } from "antd";
 import AppCreate from "./components/create";
 import { useRef, useState } from "react";
 import { TableSort, TableParams, TablePage } from "@/services/graphql";
@@ -47,14 +48,25 @@ export default () => {
         title: '操作', dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 170,
         render: (text, record) => {
-          return [
+          return <Space>
             <Link key="editor" to={`/app/viewer?id=${record.id}`}>
               编辑
-            </Link>,
-            <Button key="permission" type="link" size="small">
+            </Link>
+            <Link key="power" to={`/app/power?id=${record.id}`} >
               权限
-            </Button>,
-          ]
+            </Link>
+            <Dropdown trigger={['click']} menu={{
+              items: [
+                { key: "strategy", label: <Link to={`/app/strategy?id=${record.id}`} >权限策略</Link> },
+                { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >菜单</Link> },
+                { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >角色</Link> },
+                { key: "resource", label: <Link to={`/app/resource?id=${record.id}`} >资源</Link> },
+                { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
+              ]
+            }} >
+              <a><EllipsisOutlined /></a>
+            </Dropdown>
+          </Space>
         }
       },
     ],
@@ -88,6 +100,19 @@ export default () => {
         setPage(undefined)
       }
       return table
+    },
+    onDelApp = (record: App) => {
+      Modal.confirm({
+        title: "删除",
+        content: `是否删除应用：${record.name}`,
+        onOk: async (close) => {
+          const result = await delAppInfo(record.id)
+          if (result) {
+            proTableRef.current?.reload();
+            close();
+          }
+        }
+      })
     },
     onDrawerClose = (isSuccess: boolean) => {
       if (isSuccess) {
@@ -132,8 +157,8 @@ export default () => {
         scroll={{ x: 'max-content' }}
         columns={columns as any}
         request={getRequest}
-        // 存在after和before都不包含当前游标bug 因此先不开启页码调整
-        // pagination={{ showSizeChanger: true }}
+      // 存在after和before都不包含当前游标bug 因此先不开启页码调整
+      // pagination={{ showSizeChanger: true }}
       />
 
       <AppCreate

@@ -1,0 +1,7 @@
+.tree-setting {
+    display: none;
+}
+
+.ant-tree-node-selected .tree-setting {
+    display: inline-flex;
+}

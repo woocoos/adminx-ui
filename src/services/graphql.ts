@@ -56,6 +56,8 @@ export interface PagingParams {
   pageSize?: number
 }
 
+export type TreeMoveAction = "child" | "up" | "down"
+
 export interface TablePage {
   pageSize: number
   current: number
@@ -167,8 +169,8 @@ export function getGraphqlPaging(nPage: TablePage, oPage?: TablePage) {
  * @param list 
  * @returns 
  */
-export function getGraphqlList<T>(list: List<T>, paging: PagingParams) {
-  if (paging.pageSize) {
+export function getGraphqlList<T>(list: List<T>, paging?: PagingParams) {
+  if (paging?.pageSize) {
     const count = list.edges.length % paging.pageSize === 0 ? paging.pageSize : list.edges.length % paging.pageSize
     list.edges = list.edges.splice(paging.direction === 'up' ? 0 : -count, count)
     return list

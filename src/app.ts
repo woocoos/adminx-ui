@@ -4,6 +4,7 @@ import { defineStoreConfig } from "@ice/plugin-store/esm/types";
 import { defineRequestConfig } from "@ice/plugin-request/esm/types";
 import { message } from 'antd';
 import store from "@/store";
+import "@/assets/styles/index.css"
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
