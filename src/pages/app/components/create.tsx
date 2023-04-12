@@ -1,4 +1,4 @@
-import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/app';
+import { App, createAppInfo, getAppInfo, updateAppInfo } from '@/services/app';
 import {
     DrawerForm,
     ProFormSelect,
@@ -39,7 +39,7 @@ export default (props: {
         onValuesChange = () => {
             setSaveDisabled(false)
         },
-        onFinish = async (values) => {
+        onFinish = async (values: App) => {
             setSaveLoading(true)
             const appInfo = props.id ? await updateAppInfo(props.id, values) : await createAppInfo(values)
             if (appInfo?.id) {

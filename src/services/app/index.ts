@@ -1,5 +1,5 @@
 import { gid } from "@/util";
-import { TableParams, graphqlApi, getGraphqlFilter, TableSort, JsonFieldAny, setClearInputField, TablePage, getGraphqlPaging, getGraphqlList, List, TreeMoveAction } from "../graphql";
+import { TableParams, graphqlApi, getGraphqlFilter, TableSort, setClearInputField, List, TreeMoveAction, graphqlPageApi, TableFilter } from "../graphql";
 
 export interface App {
     id: string
@@ -68,37 +68,30 @@ const AppNodeField = `#graphql
  * @param headers 
  * @returns 
  */
-export async function getAppList(params?: TableParams, filter?: any, sort?: TableSort, page?: TablePage) {
+export async function getAppList(params: TableParams, filter: TableFilter, sort: TableSort) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-        paging = getGraphqlPaging({
-            current: params?.current,
-            pageSize: params?.pageSize,
-        }, page)
-
-    const result = await graphqlApi(
-        `#graphql
-        query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:AppOrder,$where:AppWhereInput){
-            list:apps(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-                totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-                edges{                                        
-                    cursor,node{                    
-                        ${AppNodeField}
+        result = await graphqlPageApi(
+            `#graphql
+            query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:AppOrder,$where:AppWhereInput){
+                list:apps(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${AppNodeField}
+                        }
                     }
                 }
-            }
-        }`,
-        {
-            after: paging?.after,
-            first: paging?.first,
-            before: paging?.before,
-            last: paging?.last,
-            where,
-            orderBy,
-        }
-    )
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
 
     if (result?.data?.list) {
-        return getGraphqlList<App>(result.data.list, paging)
+        return result.data.list as List<App>
     } else {
         return null
     }
@@ -134,7 +127,7 @@ export async function getAppInfo(appId: string) {
  * @param input 
  * @returns 
  */
-export async function updateAppInfo(appId: string, input: App | JsonFieldAny) {
+export async function updateAppInfo(appId: string, input: App | Record<string, any>) {
     delete input['code'];
     const result = await graphqlApi(
         `#graphql
@@ -156,7 +149,7 @@ export async function updateAppInfo(appId: string, input: App | JsonFieldAny) {
  * @param input 
  * @returns 
  */
-export async function createAppInfo(input: App | JsonFieldAny) {
+export async function createAppInfo(input: App | Record<string, any>) {
     const result = await graphqlApi(
         `#graphql
         mutation createApp($input: CreateAppInput!){
@@ -235,7 +228,7 @@ export async function getAppMenus(appId: string) {
  * @param input 
  * @returns 
  */
-export async function updateAppMenu(menuId: string, input: App | JsonFieldAny) {
+export async function updateAppMenu(menuId: string, input: App | Record<string, any>) {
     const result = await graphqlApi(
         `#graphql
         mutation updateAppMenu($input: UpdateAppMenuInput!){
@@ -256,7 +249,7 @@ export async function updateAppMenu(menuId: string, input: App | JsonFieldAny) {
  * @param input 
  * @returns 
  */
-export async function createAppMenu(appId: string, input: AppMenu | JsonFieldAny) {
+export async function createAppMenu(appId: string, input: AppMenu | Record<string, any>) {
     const result = await graphqlApi(
         `#graphql
         mutation createAppMenus($input: [CreateAppMenuInput!]){

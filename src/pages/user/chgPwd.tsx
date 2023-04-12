@@ -10,6 +10,7 @@ import { Card, message } from "antd";
 import store from "@/store";
 import { updatePassword } from "@/services/user";
 
+type FormValues = { oldPwd: string, newPwd: string, reNewPwd: string }
 
 export default () => {
   const formRef = useRef<ProFormInstance>(),
@@ -28,7 +29,7 @@ export default () => {
     onValuesChange = () => {
       setSaveDisabled(false)
     },
-    onFinish = async (values) => {
+    onFinish = async (values: FormValues) => {
       setSaveLoading(true)
       const result = await updatePassword(values.oldPwd, values.newPwd)
       if (result) {

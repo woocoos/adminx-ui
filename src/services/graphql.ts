@@ -59,20 +59,22 @@ export interface PagingParams {
 export type TreeMoveAction = "child" | "up" | "down"
 
 export interface TablePage {
-  pageSize: number
-  current: number
+  pageSize?: number
+  current?: number
   startCursor?: string
   endCursor?: string
 }
+
 export interface TableParams {
-  [appKey: string]: any
-}
-export interface TableSort {
-  [field: string]: SortOrder
-}
-export interface JsonFieldAny {
+  pageSize?: number
+  current?: number
+  keyword?: string
   [field: string]: any
 }
+
+export type TableFilter = Record<string, (string | number)[] | null>
+
+export type TableSort = Record<string, SortOrder>
 
 /**
  * 获取GID
@@ -100,8 +102,8 @@ export async function getGID(type: string, id: string | number) {
  * @param filter 
  * @returns 
  */
-export function getGraphqlFilter(params?: TableParams, filter?: JsonFieldAny, sort?: TableSort) {
-  let where: JsonFieldAny = { ...filter }, orderBy: OrderBy | undefined;
+export function getGraphqlFilter(params: TableParams, filter: TableFilter, sort: TableSort) {
+  let where: Record<string, any> = { ...filter }, orderBy: OrderBy | undefined;
   for (let key in params) {
     if (!["pageSize", "current"].includes(key) && filter && !Object.keys(filter).includes(key)) {
       where[key] = params[key]
@@ -128,72 +130,19 @@ export function getGraphqlFilter(params?: TableParams, filter?: JsonFieldAny, so
 }
 
 
-/**
- * 处理分页参数
- * @param nPage 
- * @param oPage 
- * @returns 
- */
-export function getGraphqlPaging(nPage: TablePage, oPage?: TablePage) {
-  const paging: PagingParams = {},
-    pageSize = nPage.pageSize;
-  
-  if (!nPage.current || nPage.current === 1) {
-    paging.first = pageSize
-    paging.direction = 'down'
-  } else if (oPage) {
-    if (nPage.current > oPage.current) {
-      // 下一页
-      paging.after = oPage.endCursor
-      paging.first = (nPage.current - oPage.current) * pageSize
-      paging.direction = 'down'
-    } else if (nPage.current < oPage.current) {
-      // 上一页
-      paging.before = oPage.startCursor
-      paging.last = (oPage.current - nPage.current) * pageSize
-      paging.direction = 'up'
-    } else {
-      // 页码相等
-      paging.before = oPage.startCursor
-      paging.first = pageSize
-      paging.direction = 'down'
-    }
-  } else {
-    paging.first = pageSize
-    paging.direction = 'down'
-  }
-
-  paging.pageSize = pageSize
-
-  return paging
-}
-
-/**
- * 处理分页结果
- * @param list 
- * @returns 
- */
-export function getGraphqlList<T>(list: List<T>, paging?: PagingParams) {
-  if (paging?.pageSize) {
-    const count = list.edges.length % paging.pageSize === 0 ? paging.pageSize : list.edges.length % paging.pageSize
-    list.edges = list.edges.splice(paging.direction === 'up' ? 0 : -count, count)
-    return list
-  } else {
-    return list
-  }
-}
-
 
 /**
  * 处理 updateinput中clearField:true
  * @param input 
  * @returns 
  */
-export function setClearInputField(input: JsonFieldAny) {
+export function setClearInputField(input: Record<string, any>) {
   for (let key in input) {
     if (!input[key]) {
       const clearKey = `clear${key.slice(0, 1).toUpperCase()}${key.slice(1)}`
-      input[clearKey] = true
+      if (!Object.keys(input).includes(clearKey)) {
+        input[clearKey] = true
+      }
     }
   }
   return input
@@ -207,7 +156,7 @@ export function setClearInputField(input: JsonFieldAny) {
  * @param headers 
  * @returns 
  */
-export async function graphqlApi(query: string, variables?: any, headers?: any) {
+export async function graphqlApi(query: string, variables?: Record<string, any>, headers?: Record<string, any>) {
   return await request({
     url: '/graphql/query',
     method: 'post',
@@ -218,3 +167,22 @@ export async function graphqlApi(query: string, variables?: any, headers?: any) 
     headers
   })
 }
+
+/**
+ * 基础gql接口
+ * @param query 
+ * @param variables 
+ * @param headers 
+ * @returns 
+ */
+export async function graphqlPageApi(query: string, variables: Record<string, any>, current?: number) {
+  return await request({
+    url: `/graphql/query${current ? `?p=${current}` : ''}`,
+    method: 'post',
+    data: {
+      query,
+      variables,
+    },
+  })
+}
+

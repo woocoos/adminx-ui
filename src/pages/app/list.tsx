@@ -10,7 +10,7 @@ import { App, delAppInfo, getAppList } from "@/services/app";
 import defaultApp from "@/assets/images/default-app.png";
 import AppCreate from "./components/create";
 import { useRef, useState } from "react";
-import { TableSort, TableParams, TablePage } from "@/services/graphql";
+import { TableParams, TableSort, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
 
 
@@ -18,7 +18,6 @@ export default () => {
   const { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    [page, setPage] = useState<TablePage>(),
     columns = [
       // 有需要排序配置  sorter: true 
       { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
@@ -79,9 +78,9 @@ export default () => {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter) => {
-      const table = { data: [] as any[], success: true, total: 0 };
-      const result = await getAppList(params, filter, sort, page);
+    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+      const table = { data: [] as App[], success: true, total: 0 };
+      const result = await getAppList(params, filter, sort);
 
       if (result) {
         table.data = result.edges.map(item => {
@@ -89,15 +88,9 @@ export default () => {
           return item.node
         })
         table.total = result.totalCount
-        setPage({
-          current: params.current,
-          pageSize: params.pageSize,
-          startCursor: result.edges[0].cursor,
-          endCursor: result.edges[table.data.length - 1].cursor,
-        })
+
       } else {
         table.total = 0
-        setPage(undefined)
       }
       return table
     },
@@ -157,8 +150,7 @@ export default () => {
         scroll={{ x: 'max-content' }}
         columns={columns as any}
         request={getRequest}
-      // 存在after和before都不包含当前游标bug 因此先不开启页码调整
-      // pagination={{ showSizeChanger: true }}
+        pagination={{ showSizeChanger: true }}
       />
 
       <AppCreate

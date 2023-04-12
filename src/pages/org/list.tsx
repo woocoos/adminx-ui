@@ -7,7 +7,7 @@ import {
 import { Button, Space, Dropdown, Modal } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
-import { TableSort, TableParams, TablePage } from "@/services/graphql";
+import { TableSort, TableParams, TablePage, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
 import { Org, delOrgInfo, getOrgList } from "@/services/org";
 import OrgCreate from "./components/create";
@@ -90,9 +90,9 @@ export default () => {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter) => {
+    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as Org[], success: true, total: 0 };
-      const result = await getOrgList(params, filter, sort, page);
+      const result = await getOrgList(params, filter, sort);
 
       if (result) {
         const list = result.edges.map(item => item.node)

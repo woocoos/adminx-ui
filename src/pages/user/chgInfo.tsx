@@ -7,7 +7,7 @@ import {
   useToken,
 } from "@ant-design/pro-components";
 import { Card, message } from "antd";
-import { getUserInfo, updateUserInfo } from "@/services/user";
+import { User, getUserInfo, updateUserInfo } from "@/services/user";
 import store from "@/store";
 
 export default () => {
@@ -21,21 +21,26 @@ export default () => {
     getRequest = async () => {
       setSaveLoading(false)
       setSaveDisabled(true)
-      const userInfo = await getUserInfo(basisState.user.id)
-      return userInfo || {}
+      if (basisState.user?.id) {
+        const userInfo = await getUserInfo(basisState.user.id)
+        return userInfo || {}
+      }
+      return {}
     },
     onValuesChange = () => {
       setSaveDisabled(false)
     },
-    onFinish = async (values) => {
-      setSaveLoading(true)
-      const userInfo = await updateUserInfo(basisState.user.id, values)
-      if (userInfo?.id) {
-        message.success("提交成功");
-        await basisDispatcher.saveUser(userInfo)
-        setSaveDisabled(true)
+    onFinish = async (values: User) => {
+      if (basisState.user?.id) {
+        setSaveLoading(true)
+        const userInfo = await updateUserInfo(basisState.user.id, values)
+        if (userInfo?.id) {
+          message.success("提交成功");
+          await basisDispatcher.saveUser(userInfo)
+          setSaveDisabled(true)
+        }
+        setSaveLoading(false)
       }
-      setSaveLoading(false)
     }
 
   return (

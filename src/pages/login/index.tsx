@@ -5,7 +5,7 @@ import { ProFormText, LoginForm } from "@ant-design/pro-form";
 import styles from "./index.module.css";
 import type { LoginParams, LoginRes } from "@/services/basis";
 import { login } from "@/services/basis";
-import { getUserInfo } from "@/services/user";
+import { User, getUserInfo } from "@/services/user";
 import store from "@/store";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
@@ -13,7 +13,7 @@ import Sha256 from "crypto-js/sha256";
 export default () => {
   const [, basisDispatcher] = store.useModel("basis");
 
-  async function loginSuccess(result: LoginRes, user: any) {
+  async function loginSuccess(result: LoginRes, user: User) {
     await basisDispatcher.login({ result, user })
     message.success("登录成功！");
     const urlParams = (new URL(window.location.href)).searchParams;
@@ -52,7 +52,7 @@ export default () => {
           username: "admin",
           password: "123456",
         }}
-        onFinish={async (values: LoginParams) => await handleSubmit(values)}
+        onFinish={handleSubmit}
       >
         <ProFormText
           name="username"

@@ -1,5 +1,5 @@
 import { gid } from "@/util";
-import { JsonFieldAny, TablePage, TableParams, TableSort, getGraphqlFilter, getGraphqlList, getGraphqlPaging, graphqlApi, setClearInputField } from "../graphql";
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql";
 
 export interface Org {
     id: string
@@ -34,37 +34,30 @@ const OrgNodeField = `#graphql
  * @param headers 
  * @returns 
  */
-export async function getOrgList(params?: TableParams, filter?: any, sort?: TableSort, page?: TablePage) {
+export async function getOrgList(params: TableParams, filter: TableFilter, sort: TableSort) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-        paging = getGraphqlPaging({
-            current: params?.current,
-            pageSize: params?.pageSize,
-        }, page)
-
-    const result = await graphqlApi(
-        `#graphql
-        query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
-            list:organizations(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-                totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-                edges{                                        
-                    cursor,node{                    
-                        ${OrgNodeField}
+        result = await graphqlPageApi(
+            `#graphql
+            query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
+                list:organizations(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${OrgNodeField}
+                        }
                     }
                 }
-            }
-        }`,
-        {
-            after: paging?.after,
-            first: paging?.first,
-            before: paging?.before,
-            last: paging?.last,
-            where,
-            orderBy,
-        }
-    )
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
 
     if (result?.data?.list) {
-        return getGraphqlList<Org>(result.data.list, paging)
+        return result.data.list as List<Org>
     } else {
         return null
     }
@@ -101,7 +94,7 @@ export async function getOrgInfo(orgId: string) {
  * @param input 
  * @returns 
  */
-export async function updateOrgInfo(orgId: string, input: Org | JsonFieldAny) {
+export async function updateOrgInfo(orgId: string, input: Org | Record<string, any>) {
     delete input['code'];
     const result = await graphqlApi(
         `#graphql
@@ -123,11 +116,32 @@ export async function updateOrgInfo(orgId: string, input: Org | JsonFieldAny) {
  * @param input 
  * @returns 
  */
-export async function createOrgInfo(input: Org | JsonFieldAny) {
+export async function createOrgInfo(input: Org | Record<string, any>) {
     const result = await graphqlApi(
         `#graphql
         mutation createOrganization($input: CreateOrgInput!){
           action:createOrganization(input:$input){
+            ${OrgNodeField}
+          }
+        }`, { input })
+
+    if (result?.data?.action) {
+        return result?.data?.action as Org
+    } else {
+        return null
+    }
+}
+
+/**
+ * 创建根组织信息
+ * @param input 
+ * @returns 
+ */
+export async function createRootOrgInfo(input: { domain: string, name: string }) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation enableDirectory($input: EnableDirectoryInput!){
+          action:enableDirectory(input:$input){
             ${OrgNodeField}
           }
         }`, { input })

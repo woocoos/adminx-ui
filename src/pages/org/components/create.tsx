@@ -1,9 +1,8 @@
-import { createOrgInfo, getOrgInfo, getOrgList, updateOrgInfo } from '@/services/org';
+import { Org, createOrgInfo, getOrgInfo, getOrgList, updateOrgInfo } from '@/services/org';
 import { formatTreeData } from '@/util';
 import { TreeEditorAction } from '@/util/type';
 import {
     DrawerForm,
-    ProFormSelect,
     ProFormText,
     ProFormTextArea,
     ProFormTreeSelect,
@@ -30,7 +29,7 @@ export default (props: {
 
     const
         parentRequest = async () => {
-            const result = await getOrgList(),
+            const result = await getOrgList({}, {}, {}),
                 list: SelectTreeData[] = [
                     {
                         value: "0", title: '顶级组织', children: []
@@ -82,7 +81,7 @@ export default (props: {
         onValuesChange = () => {
             setSaveDisabled(false)
         },
-        onFinish = async (values) => {
+        onFinish = async (values: Org) => {
             setSaveLoading(true)
             let result;
             switch (props.scene) {
