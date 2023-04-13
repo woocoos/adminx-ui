@@ -48,14 +48,8 @@ export default () => {
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
-            {
-              path: "",
-              title: "个人中心",
-            },
-            {
-              path: "",
-              title: "修改密码",
-            },
+            { title: "个人中心", },
+            { title: "修改密码", },
           ],
         },
       }}

@@ -1,11 +1,14 @@
 import { gid } from "@/util";
 import { TableParams, graphqlApi, getGraphqlFilter, TableSort, setClearInputField, List, TreeMoveAction, graphqlPageApi, TableFilter } from "../graphql";
 
+export type AppKind = "web" | "native" | "server"
+export type AppStatus = "active" | "inactive" | "processing"
+
 export interface App {
     id: string
     name: string
     code: string
-    kind: "web" | "native" | "server"
+    kind: AppKind
     redirectURI: string
     appKey: string
     appSecret: string
@@ -14,13 +17,16 @@ export interface App {
     refreshTokenValidity: number
     logo: string
     comments: string
-    status: "active" | "inactive" | "processing"
+    status: AppStatus
     createdAt: Date
     createdBy: string
     updatedAt: Date
     updatedBy: string
     menus?: List<AppMenu>
 }
+
+export type AppActionKind = "restful" | "graphql" | "rpc"
+export type AppActionMethod = "read" | "write" | "list"
 
 export interface AppAction {
     id: string
@@ -30,13 +36,15 @@ export interface AppAction {
     updatedAt: Date
     appID: string
     name: string
-    kind: "restful" | "graphql" | "rpc"
-    method: "read" | "write" | "list"
+    kind: AppActionKind
+    method: AppActionMethod
     comments: string
     app?: App
     menus?: AppMenu[]
     resources?: null
 }
+
+export type AppMenuKind = "dir" | "menu"
 export interface AppMenu {
     id: string
     createdBy: number
@@ -45,7 +53,7 @@ export interface AppMenu {
     updatedAt: Date
     appID: string
     parentID: string
-    kind: "dir" | "menu"
+    kind: AppMenuKind
     name: string
     actionID: string
     comments: string
@@ -63,9 +71,10 @@ const AppNodeField = `#graphql
 `
 
 /**
- * 获取用户信息
- * @param userId 
- * @param headers 
+ * 获取应用信息
+ * @param params 
+ * @param filter 
+ * @param sort 
  * @returns 
  */
 export async function getAppList(params: TableParams, filter: TableFilter, sort: TableSort) {
@@ -149,7 +158,7 @@ export async function updateAppInfo(appId: string, input: App | Record<string, a
  * @param input 
  * @returns 
  */
-export async function createAppInfo(input: App | Record<string, any>) {
+export async function createAppInfo(input: App) {
     const result = await graphqlApi(
         `#graphql
         mutation createApp($input: CreateAppInput!){

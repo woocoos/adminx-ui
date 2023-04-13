@@ -1,32 +1,53 @@
 import { gid } from "@/util";
 import Sha256 from "crypto-js/sha256";
-import { graphqlApi, setClearInputField } from "../graphql";
+import {
+  TableParams, graphqlApi, setClearInputField, TableFilter,
+  TableSort,
+  getGraphqlFilter,
+  graphqlPageApi,
+  List
+} from "../graphql";
+
+export type UserType = "account" | "member"
+export type UserCreationType = "invitation" | "register" | "manual"
+
+type UserStatus = "active" | "inactive" | "processing"
 
 export interface User {
   id: string
+  createdBy: string
+  createdAt: string
+  updatedBy: string
+  updatedAt: string
+  deletedAt: string
   principalName: string
   displayName: string
   email: string
   mobile: string
-  userType: "account" | "member"
-  creationType: "invitation" | "register" | "manual"
+  userType: UserType
+  creationType: UserCreationType
   registerIP: string
-  status: "active" | "inactive" | "processing"
+  status: UserStatus
   comments: string
   loginProfile?: UserLoginProfile
+  passwords?: UserPassword[]
+  password?: UserPassword
+  identities?: UserIdentity
 }
+
+type UserLoginProfileSetKind = "keep" | "customer" | "auto"
 export interface UserLoginProfile {
   id: string
-  createdBy: number
-  createdAt: Date
-  updatedBy: number
-  updatedAt: Date
+  createdBy: string
+  createdAt: string
+  updatedBy: string
+  updatedAt: string
   userID: string
   lastLoginIP: string
   /**
    * 最后登陆时间
    */
-  lastLoginAt: Date
+  lastLoginAt: string
   /**
    * 是否允许使用密码登陆控制台
    */
@@ -34,7 +55,7 @@ export interface UserLoginProfile {
   /**
    * 设置密码:keep-保持不变,customer-客户自行设置,auto-自动生成
    */
-  setKind: "keep" | "customer" | "auto"
+  setKind: UserLoginProfileSetKind
   /**
    * 下次登陆时需要重置密码
    */
@@ -51,9 +72,46 @@ export interface UserLoginProfile {
   /**
    * 多因素验证状态
    */
-  mfaStatus: "active" | "inactive" | "processing"
+  mfaStatus: UserStatus
 }
 
+interface UserPassword {
+  id: string
+  createdBy: string
+  createdAt: Date
+  updatedBy: string
+  updatedAt: Date
+  userID: string
+  scene: "login"
+  status: UserStatus
+}
+
+type UserIdentityKind = "name" | "email" | "phone" | "wechat" | "qq"
+interface UserIdentity {
+  id: string
+  createdBy: string
+  createdAt: Date
+  updatedBy: string
+  updatedAt: Date
+  userID: string
+  kind: UserIdentityKind
+  code: string
+  codeExtend: string
+  status: UserStatus
+}
+
+
+
+const
+  UserNodeField = `#graphql
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+      email,mobile,userType,creationType,registerIP,status,comments`,
+  UserLoginProfileField = `#graphql
+      id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
+      canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
+  `
+
+export type UpdateUserInfoScene = "create" | "base" | "loginProfile"
 
 /**
  * 获取用户信息
@@ -61,16 +119,52 @@ export interface UserLoginProfile {
  * @param headers 
  * @returns 
  */
-export async function getUserInfo(userId: string, headers?: any) {
+export async function getUserList(params: TableParams, filter: TableFilter, sort: TableSort) {
+  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+    result = await graphqlPageApi(
+      `#graphql
+          query users($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:UserOrder,$where:UserWhereInput){
+              list:users(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                  totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                  edges{                                        
+                      cursor,node{                    
+                          ${UserNodeField}
+                      }
+                  }
+              }
+          }`,
+      {
+        first: params.pageSize,
+        where,
+        orderBy,
+      },
+      params.current
+    )
+
+  if (result?.data?.list) {
+    return result.data.list as List<User>
+  } else {
+    return null
+  }
+}
+
+/**
+ * 获取用户信息
+ * @param userId 
+ * @param headers 
+ * @returns 
+ */
+export async function getUserInfo(userId: string, scene?: UpdateUserInfoScene[], headers?: Record<string, any>) {
   const result = await graphqlApi(
     `#graphql
     query{
       node(id:"${gid("user", userId)}"){
         ... on User{
-          id,displayName,email,mobile,comments,
-          loginProfile{
-            id,passwordReset
-          }
+          ${UserNodeField}
+          ${scene?.includes('loginProfile') ? `loginProfile{
+            ${UserLoginProfileField}
+          }`: ''}
+          
         }
       }
     }`,
@@ -86,17 +180,55 @@ export async function getUserInfo(userId: string, headers?: any) {
 }
 
 /**
+ * 创建用户信息
+ * @param rootOrgID
+ * @param input 
+ * @returns 
+ */
+export async function createUserInfo(rootOrgID: string, input: User | Record<string, any>, userType: UserType) {
+  if (input['password']) {
+    input.password = {
+      scene: "login",
+      password: input['password'],
+      status: "active"
+    }
+    delete input['password']
+  }
+  if (!input.status) {
+    input.status = "active"
+  }
+  const result = await graphqlApi(
+    `#graphql
+    mutation createUser($input: CreateUserInput!){
+      action:${userType === 'account' ? "createOrganizationAccount" : "createOrganizationUser"}(
+        rootOrgID:"${rootOrgID}",input:$input
+      ){
+        ${UserNodeField}
+      }
+    }`,
+    { input }
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as User
+  } else {
+    return null
+  }
+}
+
+
+/**
  * 更新用户信息
  * @param userId
  * @param input 
  * @returns 
  */
-export async function updateUserInfo(userId: string, input: User | any) {
+export async function updateUserInfo(userId: string, input: User) {
   const result = await graphqlApi(
     `#graphql
     mutation updateUser($input: UpdateUserInput!){
       action:updateUser(userID:"${userId}",input:$input){
-        id,displayName,email,mobile,comments
+        ${UserNodeField}
       }
     }`,
     {
@@ -106,6 +238,70 @@ export async function updateUserInfo(userId: string, input: User | any) {
 
   if (result?.data?.action) {
     return result?.data?.action as User
+  } else {
+    return null
+  }
+}
+
+/**
+ * 更新用户登录配置
+ * @param userId
+ * @param input 
+ * @returns 
+ */
+export async function updateUserProfile(userId: string, input: User) {
+  const result = await graphqlApi(
+    `#graphql
+    mutation updateLoginProfile($input: UpdateUserLoginProfileInput!){
+      action:updateLoginProfile(userID:"${userId}",input:$input){
+        ${UserLoginProfileField}
+      }
+    }`,
+    {
+      input: setClearInputField(input)
+    }
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as User
+  } else {
+    return null
+  }
+}
+
+/**
+ * 删除用户信息
+ * @param userId 
+ * @returns 
+ */
+export async function delUserInfo(userId: string) {
+  const result = await graphqlApi(
+    `#graphql
+      mutation deleteUser{
+        action:deleteUser(userID: "${userId}")
+      }`)
+
+  if (result?.data?.action) {
+    return result?.data?.action as boolean
+  } else {
+    return null
+  }
+}
+
+/**
+ * 重置用户密码并发送邮件
+ * @param userId 
+ * @returns 
+ */
+export async function resetUserPasswordByEmail(userId: string) {
+  const result = await graphqlApi(
+    `#graphql
+      mutation resetUserPasswordByEmail{
+        action:resetUserPasswordByEmail(userId: "${userId}")
+      }`)
+
+  if (result?.data?.action) {
+    return result?.data?.action as boolean
   } else {
     return null
   }

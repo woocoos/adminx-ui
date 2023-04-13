@@ -157,14 +157,8 @@ export default () => {
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
-            {
-              path: "",
-              title: "系统配置",
-            },
-            {
-              path: "",
-              title: "组织管理",
-            },
+            { title: "系统配置", },
+            { title: "组织管理", },
           ],
         },
         extra: []

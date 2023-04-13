@@ -1,3 +1,4 @@
+import { firstUpper } from '@/util';
 import { SortOrder } from 'antd/lib/table/interface';
 import { request } from 'ice';
 
@@ -21,7 +22,6 @@ export interface List<T> {
     node: T
   }[]
 }
-
 
 /**
  * 游标分页组合图解
@@ -139,7 +139,7 @@ export function getGraphqlFilter(params: TableParams, filter: TableFilter, sort:
 export function setClearInputField(input: Record<string, any>) {
   for (let key in input) {
     if (!input[key]) {
-      const clearKey = `clear${key.slice(0, 1).toUpperCase()}${key.slice(1)}`
+      const clearKey = `clear${firstUpper(key)}`
       if (!Object.keys(input).includes(clearKey)) {
         input[clearKey] = true
       }

@@ -1,6 +1,7 @@
 import { gid } from "@/util";
 import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql";
 
+export type OrgStatus = "active" | "inactive" | "processing"
 export interface Org {
     id: string
     createdBy: number
@@ -14,7 +15,7 @@ export interface Org {
     code: string
     name: string
     profile: string
-    status: "active" | "inactive" | "processing"
+    status: OrgStatus
     path: string
     displaySort: number
     countryCode: string
@@ -30,15 +31,16 @@ const OrgNodeField = `#graphql
 
 /**
  * 获取组织信息
- * @param userId 
- * @param headers 
+ * @param params 
+ * @param filter 
+ * @param sort 
  * @returns 
  */
 export async function getOrgList(params: TableParams, filter: TableFilter, sort: TableSort) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
-            query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
+            query organizations($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
                 list:organizations(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
                     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
                     edges{                                        
@@ -116,7 +118,7 @@ export async function updateOrgInfo(orgId: string, input: Org | Record<string, a
  * @param input 
  * @returns 
  */
-export async function createOrgInfo(input: Org | Record<string, any>) {
+export async function createOrgInfo(input: Org) {
     const result = await graphqlApi(
         `#graphql
         mutation createOrganization($input: CreateOrgInput!){

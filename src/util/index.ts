@@ -20,6 +20,15 @@ export const parseGid = (gid: string) => {
 }
 
 /**
+ * 首字母大写
+ * @param str 
+ * @returns 
+ */
+export const firstUpper = (str: string) => {
+    return str.slice(0, 1).toUpperCase() + str.slice(1)
+}
+
+/**
  * tree数据结构的形成
  * @param allList 
  * @param parentList 

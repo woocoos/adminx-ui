@@ -4,14 +4,13 @@ import {
   ProTable,
   useToken,
 } from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal } from "antd";
+import { Button, Space, Dropdown, Modal, message } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
-import { App, delAppInfo, getAppList } from "@/services/app";
-import defaultApp from "@/assets/images/default-app.png";
-import AppCreate from "./components/create";
 import { useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
+import { User, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
+import AccountCreate from "./components/create";
 
 
 export default () => {
@@ -20,21 +19,10 @@ export default () => {
     proTableRef = useRef<ActionType>(),
     columns = [
       // 有需要排序配置  sorter: true 
-      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
-      { title: '名称', dataIndex: 'name', width: 120, },
-      { title: '编码', dataIndex: 'code', width: 120, },
-      {
-        title: '类型', dataIndex: 'kind',
-        filters: true,
-        search: false,
-        width: 100,
-        valueEnum: {
-          "web": { text: 'web', },
-          "native": { text: 'native', },
-          "server": { text: 'server', },
-        },
-      },
-      { title: '描述', dataIndex: 'comments', width: 160, search: false },
+      { title: '登录账户', dataIndex: 'principalName', width: 90, align: 'center' },
+      { title: '显示名称', dataIndex: 'displayName', width: 120, },
+      { title: '邮箱', dataIndex: 'email', width: 120, },
+      { title: '手机', dataIndex: 'mobile', width: 160 },
       {
         title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: {
@@ -43,23 +31,18 @@ export default () => {
           processing: { text: "处理中", status: 'warning' }
         },
       },
+      { title: '创建时间', dataIndex: 'createdAt', width: 160, valueType: "dateTime", sorter: true },
       {
         title: '操作', dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 170,
+        align: 'center', search: false, width: 120,
         render: (text, record) => {
           return <Space>
-            <Link key="editor" to={`/app/viewer?id=${record.id}`}>
+            <Link key="editor" to={`/account/viewer?id=${record.id}`}>
               编辑
-            </Link>
-            <Link key="power" to={`/app/power?id=${record.id}`} >
-              权限
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: [
-                { key: "strategy", label: <Link to={`/app/strategy?id=${record.id}`} >权限策略</Link> },
-                { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >菜单</Link> },
-                { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >角色</Link> },
-                { key: "resource", label: <Link to={`/app/resource?id=${record.id}`} >资源</Link> },
+                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
                 { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
               ]
             }} >
@@ -73,33 +56,42 @@ export default () => {
     [modal, setModal] = useState({
       open: false,
       title: "",
-      id: ""
     })
 
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as App[], success: true, total: 0 };
-      const result = await getAppList(params, filter, sort);
-
+      const table = { data: [] as User[], success: true, total: 0 };
+      // params.userType = "account"
+      const result = await getUserList(params, filter, sort);
       if (result) {
-        table.data = result.edges.map(item => {
-          item.node.logo = item.node.logo || defaultApp
-          return item.node
-        })
+        table.data = result.edges.map(item => item.node)
         table.total = result.totalCount
-
-      } else {
-        table.total = 0
       }
       return table
     },
-    onDelApp = (record: App) => {
+    onResetPwd = (record: User) => {
+      Modal.confirm({
+        title: `重置密码-${record.displayName}`,
+        content: <>
+          <div>重置后密码将发送邮件至客户邮箱</div>
+          <div>登录密码重置需要客户登录后重置密码后才可使用系统</div>
+        </>,
+        onOk: async (close) => {
+          const result = await resetUserPasswordByEmail(record.id)
+          if (result) {
+            message.success('成功重置密码')
+            close();
+          }
+        }
+      })
+    },
+    onDelApp = (record: User) => {
       Modal.confirm({
         title: "删除",
-        content: `是否删除应用：${record.name}`,
+        content: `是否删除用户：${record.displayName}`,
         onOk: async (close) => {
-          const result = await delAppInfo(record.id)
+          const result = await delUserInfo(record.id)
           if (result) {
             proTableRef.current?.reload();
             close();
@@ -111,26 +103,25 @@ export default () => {
       if (isSuccess) {
         proTableRef.current?.reload();
       }
-      setModal({ open: false, title: '', id: '' })
+      setModal({ open: false, title: '创建账户' })
     }
-
 
   return (
     <PageContainer
       header={{
-        title: "应用管理",
+        title: "账户管理",
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: "系统配置", },
-            { title: "应用管理", },
+            { title: "账户管理", },
           ],
         },
         extra: [
           <Button key="create" type="primary" onClick={() => {
-            setModal({ open: true, title: '创建应用', id: '' })
-          }}>
-            创建应用
+            setModal({ open: true, title: '创建账户' })
+          }} >
+            创建账户
           </Button>
         ]
       }}
@@ -139,18 +130,18 @@ export default () => {
         actionRef={proTableRef}
         rowKey={"id"}
         toolbar={{
-          title: "应用列表"
+          title: "账户列表"
         }}
         scroll={{ x: 'max-content' }}
         columns={columns as any}
         request={getRequest}
         pagination={{ showSizeChanger: true }}
       />
-
-      <AppCreate
+      <AccountCreate
         open={modal.open}
         title={modal.title}
-        id={modal.id}
+        userType="account"
+        scene="create"
         onClose={onDrawerClose} />
     </PageContainer>
   );

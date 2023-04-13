@@ -26,6 +26,7 @@ export default () => {
     if (result.accessToken && result.user?.id) {
       const userInfo = await getUserInfo(
         `${result.user.id}`,
+        ['loginProfile'],
         {
           "Authorization": `Bearer ${result.accessToken}`,
           "X-Tenant-ID": result.user?.domainId
