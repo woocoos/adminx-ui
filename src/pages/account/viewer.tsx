@@ -7,10 +7,11 @@ import {
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import defaultAvatar from "@/assets/images/default-avatar.png";
 import { useSearchParams } from "ice";
-import { useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { Button, Divider } from "antd";
 import UserCreate from "./components/create";
-import { UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
+import UserCreateIdentity from "./components/createIdentity";
+import { EnumUserIdentityKind, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
 
 export default () => {
     const { token } = useToken(),
@@ -36,17 +37,32 @@ export default () => {
             if (isSuccess) {
                 getRequest()
             }
-            setModal({ open: false, title: '', scene: "base", userType: "member" })
+            setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType })
         },
         getRequest = async () => {
             if (id) {
                 setLoading(true)
-                const info = await getUserInfo(id, ['loginProfile'])
+                const info = await getUserInfo(id, ['loginProfile', "identity"])
                 if (info?.id) {
                     setInfo(info)
                     setLoading(false)
                 }
             }
+        }, identityRender = () => {
+            const items: ReactNode[] = []
+            if (info?.identities) {
+                for (let key in info.identities) {
+                    const item = info.identities[key]
+                    items.push(
+                        <ProDescriptions.Item label={EnumUserIdentityKind[item.kind].text} key={key} >
+                            <div>{item.code}</div>
+                            <div>{item.codeExtend}</div>
+                        </ProDescriptions.Item>
+                    )
+                }
+
+            }
+            return items
         }
 
     useEffect(() => {
@@ -71,7 +87,11 @@ export default () => {
         >
             <ProCard loading={loading} >
                 <ProDescriptions title="基本信息" column={2} extra={
-                    <Button onClick={() => setModal({ open: true, title: '修改基本信息', scene: "base", userType: info?.userType || 'member' })}>修改</Button>
+                    <Button onClick={() =>
+                        setModal({ open: true, title: '修改基本信息', scene: "base", userType: info?.userType || 'member' })
+                    }>
+                        修改
+                    </Button>
                 }>
                     <ProDescriptions.Item label=""
                         valueType={{ type: 'image', width: 120 }}
@@ -98,12 +118,21 @@ export default () => {
                             </ProDescriptions.Item>
                         </ProDescriptions>
                     </ProDescriptions.Item>
-
+                </ProDescriptions>
+                <Divider style={{ margin: "0 0 24px 0" }} />
+                <ProDescriptions title="登录凭证" column={3} extra={
+                    <Button onClick={() =>
+                        setModal({ open: true, title: '修改登录凭证', scene: "identity", userType: info?.userType || 'member' })
+                    }>
+                        修改
+                    </Button>
+                }>
+                    {identityRender()}
                 </ProDescriptions>
                 <Divider style={{ margin: "0 0 24px 0" }} />
                 <ProDescriptions title="登陆设置" column={3} extra={
                     <Button onClick={() =>
-                        setModal({ open: true, title: '登陆设置', scene: "loginProfile", userType: info?.userType || 'member' })
+                        setModal({ open: true, title: '修改登陆设置', scene: "loginProfile", userType: info?.userType || 'member' })
                     }>
                         修改
                     </Button>
@@ -134,35 +163,22 @@ export default () => {
                         {info?.loginProfile?.mfaStatus}
                     </ProDescriptions.Item>
                 </ProDescriptions>
-                {/* <Divider style={{ margin: "0 0 24px 0" }} />
-                <ProDescriptions title="登录账号" column={3} extra={
-                    <Button onClick={() =>
-                        setModal({ open: true, title: '修改登录账号' })
-                    }>
-                        修改
-                    </Button>
-                }>
-                    <ProDescriptions.Item label="回调地址"  >
-                        {appInfo?.redirectURI || '-'}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label="权限范围"  >
-                        {appInfo?.scopes || '-'}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label="token有效期"  >
-                        {typeof appInfo?.tokenValidity === 'number' ? appInfo.tokenValidity : '-'}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label="refresh_token有效期"  >
-                        {typeof appInfo?.refreshTokenValidity === 'number' ? appInfo.refreshTokenValidity : '-'}
-                    </ProDescriptions.Item>
-                </ProDescriptions> */}
+
             </ProCard>
 
             <UserCreate
+                x-if={['base', 'loginProfile'].includes(modal.scene)}
                 open={modal.open}
                 title={modal.title}
                 id={id}
                 scene={modal.scene}
                 userType={modal.userType}
+                onClose={onDrawerClose} />
+            <UserCreateIdentity
+                x-if={modal.scene === 'identity'}
+                open={modal.open}
+                title={modal.title}
+                id={id}
                 onClose={onDrawerClose} />
         </PageContainer>
     )

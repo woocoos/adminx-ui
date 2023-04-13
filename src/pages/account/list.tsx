@@ -9,7 +9,7 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
-import { User, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
+import { EnumUserStatus, User, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
 import AccountCreate from "./components/create";
 
 
@@ -25,11 +25,7 @@ export default () => {
       { title: '手机', dataIndex: 'mobile', width: 160 },
       {
         title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
-        valueEnum: {
-          active: { text: "活跃", status: 'success' },
-          inactive: { text: "失活", status: 'default' },
-          processing: { text: "处理中", status: 'warning' }
-        },
+        valueEnum: EnumUserStatus,
       },
       { title: '创建时间', dataIndex: 'createdAt', width: 160, valueType: "dateTime", sorter: true },
       {

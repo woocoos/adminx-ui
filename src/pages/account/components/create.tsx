@@ -1,11 +1,13 @@
-import { UpdateUserInfoScene, User, UserLoginProfile, UserType, createUserInfo, getUserInfo, updateUserInfo, updateUserProfile } from '@/services/user';
+import { UpdateUserInfoScene, User, UserLoginProfile, UserLoginProfileSetKind, UserType, createUserInfo, getUserInfo, updateUserInfo, updateUserProfile } from '@/services/user';
 import store from '@/store';
 import {
     DrawerForm,
     ProFormText,
     ProFormTextArea,
     ProFormSwitch,
+    ProFormRadio,
 } from '@ant-design/pro-components';
+import { Radio } from 'antd';
 import { useState } from "react";
 
 
@@ -20,6 +22,7 @@ export default (props: {
 
     const [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
+        [setKind, setSetKind] = useState<UserLoginProfileSetKind>('auto'),
         [basisState] = store.useModel("basis")
 
     const
@@ -51,7 +54,7 @@ export default (props: {
         },
         onFinish = async (values: User) => {
             setSaveLoading(true)
-            let appInfo: User | null = null
+            let appInfo: User | UserLoginProfile | null = null
             if (props.id) {
                 switch (props.scene) {
                     case "base":
@@ -64,7 +67,7 @@ export default (props: {
                         break;
                 }
             } else {
-                appInfo = await createUserInfo(basisState.tenantId, values, props.userType)
+                appInfo = await createUserInfo(basisState.tenantId, values, props.userType, setKind)
             }
             if (appInfo?.id) {
                 setSaveDisabled(true)
@@ -99,7 +102,14 @@ export default (props: {
                     rules={[
                         { required: true, message: "请输入登陆名称", },
                     ]} />
-                <ProFormText.Password name="password" label="密码"
+                <div>
+                    <Radio.Group value={setKind} options={[
+                        { label: '手动设置密码', value: "customer" },
+                        { label: '自动生成密码', value: "auto" },
+                    ]} onChange={(e) => setSetKind(e.target.value)} />
+                </div>
+                <br />
+                <ProFormText.Password x-if={setKind === 'customer'} name="password" label="密码"
                     rules={[
                         { required: true, message: "请输入密码", },
                     ]} />

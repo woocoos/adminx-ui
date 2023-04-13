@@ -32,10 +32,10 @@ export interface User {
   loginProfile?: UserLoginProfile
   passwords?: UserPassword[]
   password?: UserPassword
-  identities?: UserIdentity
+  identities?: UserIdentity[]
 }
 
-type UserLoginProfileSetKind = "keep" | "customer" | "auto"
+export type UserLoginProfileSetKind = "keep" | "customer" | "auto"
 export interface UserLoginProfile {
   id: string
   createdBy: string
@@ -87,7 +87,7 @@ interface UserPassword {
 }
 
 type UserIdentityKind = "name" | "email" | "phone" | "wechat" | "qq"
-interface UserIdentity {
+export interface UserIdentity {
   id: string
   createdBy: string
   createdAt: Date
@@ -100,7 +100,19 @@ interface UserIdentity {
   status: UserStatus
 }
 
+export const EnumUserIdentityKind = {
+  name: { text: '用户名' },
+  email: { text: '邮件' },
+  phone: { text: '手机' },
+  wechat: { text: '微信' },
+  qq: { text: 'QQ' },
+}
 
+export const EnumUserStatus = {
+  active: { text: "活跃", status: 'success' },
+  inactive: { text: "失活", status: 'default' },
+  processing: { text: "处理中", status: 'warning' }
+}
 
 const
   UserNodeField = `#graphql
@@ -109,9 +121,12 @@ const
   UserLoginProfileField = `#graphql
       id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
       canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
+  `,
+  UserIdentityField = `#graphql
+      id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
   `
 
-export type UpdateUserInfoScene = "create" | "base" | "loginProfile"
+export type UpdateUserInfoScene = "create" | "base" | "loginProfile" | "identity"
 
 /**
  * 获取用户信息
@@ -164,6 +179,9 @@ export async function getUserInfo(userId: string, scene?: UpdateUserInfoScene[],
           ${scene?.includes('loginProfile') ? `loginProfile{
             ${UserLoginProfileField}
           }`: ''}
+          ${scene?.includes("identity") ? `identities{
+            ${UserIdentityField}
+          }`: ''}
           
         }
       }
@@ -185,7 +203,7 @@ export async function getUserInfo(userId: string, scene?: UpdateUserInfoScene[],
  * @param input 
  * @returns 
  */
-export async function createUserInfo(rootOrgID: string, input: User | Record<string, any>, userType: UserType) {
+export async function createUserInfo(rootOrgID: string, input: User | Record<string, any>, userType: UserType, setKind: UserLoginProfileSetKind) {
   if (input['password']) {
     input.password = {
       scene: "login",
@@ -193,6 +211,13 @@ export async function createUserInfo(rootOrgID: string, input: User | Record<str
       status: "active"
     }
     delete input['password']
+  }
+
+  if (setKind) {
+    input.loginProfile = {
+      setKind: setKind,
+      verifyDevice: false,
+    }
   }
   if (!input.status) {
     input.status = "active"
@@ -263,7 +288,54 @@ export async function updateUserProfile(userId: string, input: User) {
   )
 
   if (result?.data?.action) {
-    return result?.data?.action as User
+    return result?.data?.action as UserLoginProfile
+  } else {
+    return null
+  }
+}
+
+/**
+ * 绑定用户凭证
+ * @param userId
+ * @param input 
+ * @returns 
+ */
+export async function bindUserIdentity(userId: string, input: UserIdentity) {
+  input.userID = userId
+  const result = await graphqlApi(
+    `#graphql
+    mutation bindUserIdentity($input: CreateUserIdentityInput!){
+      action:bindUserIdentity(input:$input){
+        ${UserIdentityField}
+      }
+    }`,
+    {
+      input: input
+    }
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as UserIdentity
+  } else {
+    return null
+  }
+}
+
+/**
+ * 删除用户凭证
+ * @param identityId 
+ * @returns 
+ */
+export async function delUserIdentity(identityId: string) {
+  const result = await graphqlApi(
+    `#graphql
+    mutation deleteUserIdentity{
+      action:deleteUserIdentity(id:"${identityId}")
+    }`
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as boolean
   } else {
     return null
   }
