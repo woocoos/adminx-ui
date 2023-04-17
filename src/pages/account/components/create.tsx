@@ -5,7 +5,6 @@ import {
     ProFormText,
     ProFormTextArea,
     ProFormSwitch,
-    ProFormRadio,
 } from '@ant-design/pro-components';
 import { Radio } from 'antd';
 import { useState } from "react";
@@ -15,6 +14,7 @@ export default (props: {
     open?: boolean
     title?: string
     id?: string
+    orgId?: string
     userType: UserType
     scene: UpdateUserInfoScene
     onClose?: (isSuccess?: boolean) => void
@@ -67,7 +67,7 @@ export default (props: {
                         break;
                 }
             } else {
-                appInfo = await createUserInfo(basisState.tenantId, values, props.userType, setKind)
+                appInfo = await createUserInfo(props?.orgId || basisState.tenantId, values, props.userType, setKind)
             }
             if (appInfo?.id) {
                 setSaveDisabled(true)

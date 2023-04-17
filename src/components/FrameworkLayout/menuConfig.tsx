@@ -35,12 +35,12 @@ const asideMenuConfig: MenuDataItem[] = [
     children: [
       {
         name: "组织部门管理",
-        path: "/org/department",
+        path: "/org/departments",
         framework: true,
       },
       {
         name: "组织用户管理",
-        path: "/org/user",
+        path: "/org/users",
         framework: true,
       },
     ],

@@ -85,8 +85,9 @@ export const loopTreeData = <T extends { key: string, children?: Array<T> }>(dat
      * 例子 isTzSet=false dayjs("2022-07-07T20:30:00Z").tz("America/New_York").format("YYYY-MM-DD HH:mm:ss") = "2022-07-07 16:30:00"
      * @returns 
      */
-export const getDate = (date: number | Date | string | dayjs.Dayjs, format: string = "YYYY-MM-DD", tz: string, isTzSet: boolean = false) => {
+export const getDate = (date: number | Date | string | dayjs.Dayjs, format?: string, tz?: string, isTzSet?: boolean) => {
     if (date) {
+        format = format || "YYYY-MM-DD"
         if (tz) {
             if (isTzSet) {
                 return dayjs.tz(date, tz).format(format);
