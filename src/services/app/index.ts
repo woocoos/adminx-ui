@@ -62,6 +62,20 @@ export interface AppMenu {
     action?: AppAction
 }
 
+
+export const EnumAppStatus = {
+    active: { text: "活跃", status: 'success' },
+    inactive: { text: "失活", status: 'default' },
+    processing: { text: "处理中", status: 'warning' }
+}
+
+export const EnumAppKind = {
+    "web": { text: 'web', },
+    "native": { text: 'native', },
+    "server": { text: 'server', },
+}
+
+
 const AppNodeField = `#graphql
     id,name,code,kind,redirectURI,appKey,appSecret,
     scopes,tokenValidity,refreshTokenValidity,logo,comments,
@@ -295,7 +309,7 @@ export async function delAppMenu(menuId: string) {
 
 
 /**
- * 创建应用菜单
+ * 菜单位置移动
  * @param input 
  * @returns 
  */

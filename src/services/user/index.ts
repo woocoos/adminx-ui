@@ -114,6 +114,12 @@ export const EnumUserStatus = {
   processing: { text: "处理中", status: 'warning' }
 }
 
+export const EnumUserLoginProfileMfaStatus = {
+  active: { text: "活跃", status: 'success' },
+  inactive: { text: "失活", status: 'default' },
+  processing: { text: "处理中", status: 'warning' }
+}
+
 const
   UserNodeField = `#graphql
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,

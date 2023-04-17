@@ -1,5 +1,10 @@
 import CryptoJS from "crypto-js"
+import dayjs from 'dayjs'
+import timezone from 'dayjs/plugin/timezone'
+import utc from 'dayjs/plugin/utc'
 
+dayjs.extend(utc)
+dayjs.extend(timezone)
 /**
  * 设置gid
  * @param type 
@@ -68,3 +73,29 @@ export const loopTreeData = <T extends { key: string, children?: Array<T> }>(dat
         }
     }
 };
+
+
+/**
+     * 格式化日期
+     * @param {Date|Number|String} date 
+     * @param {String|null} format  YYYY-MM-DD HH:mm:ss
+     * @param {String|null} tz  时区
+     * @param {Boolean} isTzSet  true将当前时间设置成这个时区，false 将当前时间根据时区转换
+     * 例子 isTzSet=true  dayjs.tz("2022-07-07 16:30:00", "America/New_York").format("YYYY-MM-DDTHH:mm:ssZ") = "2022-07-07T16:30:00-04:00"
+     * 例子 isTzSet=false dayjs("2022-07-07T20:30:00Z").tz("America/New_York").format("YYYY-MM-DD HH:mm:ss") = "2022-07-07 16:30:00"
+     * @returns 
+     */
+export const getDate = (date: number | Date | string | dayjs.Dayjs, format: string = "YYYY-MM-DD", tz: string, isTzSet: boolean = false) => {
+    if (date) {
+        if (tz) {
+            if (isTzSet) {
+                return dayjs.tz(date, tz).format(format);
+            } else {
+                return dayjs(date).tz(tz).format(format);
+            }
+        }
+        return dayjs(date).format(format);
+    } else {
+        return null;
+    }
+}

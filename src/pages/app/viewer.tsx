@@ -8,7 +8,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import defaultApp from "@/assets/images/default-app.png";
 import { useSearchParams } from "ice";
 import { useEffect, useState } from "react";
-import { App, getAppInfo } from "@/services/app";
+import { App, EnumAppKind, EnumAppStatus, getAppInfo } from "@/services/app";
 import { Button, Divider } from "antd";
 import AppCreate from "./components/create";
 
@@ -84,20 +84,12 @@ export default () => {
                                 {appInfo?.code}
                             </ProDescriptions.Item>
                             <ProDescriptions.Item label="类型"
-                                valueEnum={{
-                                    "web": { text: 'web', },
-                                    "native": { text: 'native', },
-                                    "server": { text: 'server', },
-                                }}
+                                valueEnum={EnumAppKind}
                             >
                                 {appInfo?.kind}
                             </ProDescriptions.Item>
                             <ProDescriptions.Item label="状态"
-                                valueEnum={{
-                                    active: { text: "活跃", status: 'success' },
-                                    inactive: { text: "失活", status: 'default' },
-                                    processing: { text: "处理中", status: 'warning' }
-                                }}
+                                valueEnum={EnumAppStatus}
                             >
                                 {appInfo?.status}
                             </ProDescriptions.Item>

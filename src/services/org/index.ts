@@ -1,5 +1,5 @@
 import { gid } from "@/util";
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql";
+import { List, TableFilter, TableParams, TableSort, TreeMoveAction, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql";
 
 export type OrgStatus = "active" | "inactive" | "processing"
 export interface Org {
@@ -22,6 +22,12 @@ export interface Org {
     timezone: String
     parent?: Org
     children?: Org[]
+}
+
+export const EnumOrgStatus = {
+    active: { text: "活跃", status: 'success' },
+    inactive: { text: "失活", status: 'default' },
+    processing: { text: "处理中", status: 'warning' }
 }
 
 const OrgNodeField = `#graphql
@@ -174,3 +180,22 @@ export async function delOrgInfo(orgId: string) {
     }
 }
 
+
+/**
+ * 组织位置移动
+ * @param input 
+ * @returns 
+ */
+export async function moveOrg(sourceId: string, targetId: string, action: TreeMoveAction) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation moveOrganization{
+          action:moveOrganization(sourceID:"${sourceId}",targetId:"${targetId}",action:${action})
+        }`)
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}

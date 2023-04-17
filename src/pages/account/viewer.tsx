@@ -11,7 +11,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { Button, Divider } from "antd";
 import UserCreate from "./components/create";
 import UserCreateIdentity from "./components/createIdentity";
-import { EnumUserIdentityKind, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
+import { EnumUserIdentityKind, EnumUserLoginProfileMfaStatus, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
 
 export default () => {
     const { token } = useToken(),
@@ -74,13 +74,13 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: "用户详情",
+                title: info?.userType === 'account' ? "账户详情" : "用户详情",
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
                         { title: "系统配置", },
-                        { title: "账户管理", },
-                        { title: "用户详情", },
+                        { title: info?.userType === 'account' ? "账户管理" : "用户管理", },
+                        { title: info?.userType === 'account' ? "账户详情" : "用户详情", },
                     ],
                 },
             }}
@@ -155,11 +155,7 @@ export default () => {
                     <ProDescriptions.Item label="多因素验证"  >
                         {info?.loginProfile?.mfaEnabled ? '是' : '否'}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="多因素验证状态" valueEnum={{
-                        active: { text: "活跃", status: 'success' },
-                        inactive: { text: "失活", status: 'default' },
-                        processing: { text: "处理中", status: 'warning' }
-                    }}>
+                    <ProDescriptions.Item label="多因素验证状态" valueEnum={EnumUserLoginProfileMfaStatus}>
                         {info?.loginProfile?.mfaStatus}
                     </ProDescriptions.Item>
                 </ProDescriptions>

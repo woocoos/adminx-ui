@@ -1,6 +1,7 @@
 import {
   ActionType,
   PageContainer,
+  ProColumns,
   ProTable,
   useToken,
 } from "@ant-design/pro-components";
@@ -9,7 +10,7 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import { TableSort, TableParams, TablePage, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
-import { Org, delOrgInfo, getOrgList } from "@/services/org";
+import { EnumOrgStatus, Org, delOrgInfo, getOrgList } from "@/services/org";
 import OrgCreate from "./components/create";
 import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
@@ -20,8 +21,9 @@ export default () => {
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [allList, setAllList] = useState<Org[]>([]),
+    [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     [page, setPage] = useState<TablePage>(),
-    columns = [
+    columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true 
       { title: '名称', dataIndex: 'name', width: 120, },
       { title: '编码', dataIndex: 'code', width: 120, },
@@ -30,11 +32,7 @@ export default () => {
       { title: '管理账户', dataIndex: 'ownerID', width: 120 },
       {
         title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
-        valueEnum: {
-          active: { text: "活跃", status: 'success' },
-          inactive: { text: "失活", status: 'default' },
-          processing: { text: "处理中", status: 'warning' }
-        },
+        valueEnum: EnumOrgStatus,
       },
       {
         title: '操作', dataIndex: 'actions', fixed: 'right',
@@ -105,11 +103,14 @@ export default () => {
           startCursor: result.edges[0].cursor,
           endCursor: result.edges[table.data.length - 1].cursor,
         })
+        setExpandedRowKeys(list.map(item => item.id))
       } else {
         setAllList([])
+        setExpandedRowKeys([])
         table.total = 0
         setPage(undefined)
       }
+
       return table
     },
     onDelApp = (record: Org) => {
@@ -171,10 +172,13 @@ export default () => {
           title: "组织树"
         }}
         expandable={{
-          expandedRowKeys: allList.map(item => item.id)
+          expandedRowKeys: expandedRowKeys,
+          onExpandedRowsChange: (expandedKeys: string[]) => {
+            setExpandedRowKeys(expandedKeys)
+          }
         }}
         scroll={{ x: 'max-content' }}
-        columns={columns as any}
+        columns={columns}
         request={getRequest}
         pagination={false}
       />

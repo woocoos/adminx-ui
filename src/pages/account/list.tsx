@@ -1,6 +1,7 @@
 import {
   ActionType,
   PageContainer,
+  ProColumns,
   ProTable,
   useToken,
 } from "@ant-design/pro-components";
@@ -17,7 +18,7 @@ export default () => {
   const { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    columns = [
+    columns: ProColumns<User>[] = [
       // 有需要排序配置  sorter: true 
       { title: '登录账户', dataIndex: 'principalName', width: 90, align: 'center' },
       { title: '显示名称', dataIndex: 'displayName', width: 120, },
@@ -129,7 +130,7 @@ export default () => {
           title: "账户列表"
         }}
         scroll={{ x: 'max-content' }}
-        columns={columns as any}
+        columns={columns}
         request={getRequest}
         pagination={{ showSizeChanger: true }}
       />

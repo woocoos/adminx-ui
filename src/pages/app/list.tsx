@@ -1,12 +1,13 @@
 import {
   ActionType,
   PageContainer,
+  ProColumns,
   ProTable,
   useToken,
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
-import { App, delAppInfo, getAppList } from "@/services/app";
+import { App, EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from "@/services/app";
 import defaultApp from "@/assets/images/default-app.png";
 import AppCreate from "./components/create";
 import { useRef, useState } from "react";
@@ -18,7 +19,7 @@ export default () => {
   const { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    columns = [
+    columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true 
       { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
       { title: '名称', dataIndex: 'name', width: 120, },
@@ -28,20 +29,12 @@ export default () => {
         filters: true,
         search: false,
         width: 100,
-        valueEnum: {
-          "web": { text: 'web', },
-          "native": { text: 'native', },
-          "server": { text: 'server', },
-        },
+        valueEnum: EnumAppKind,
       },
       { title: '描述', dataIndex: 'comments', width: 160, search: false },
       {
         title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
-        valueEnum: {
-          active: { text: "活跃", status: 'success' },
-          inactive: { text: "失活", status: 'default' },
-          processing: { text: "处理中", status: 'warning' }
-        },
+        valueEnum: EnumAppStatus,
       },
       {
         title: '操作', dataIndex: 'actions', fixed: 'right',
@@ -142,7 +135,7 @@ export default () => {
           title: "应用列表"
         }}
         scroll={{ x: 'max-content' }}
-        columns={columns as any}
+        columns={columns}
         request={getRequest}
         pagination={{ showSizeChanger: true }}
       />
