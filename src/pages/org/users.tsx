@@ -39,13 +39,13 @@ export default () => {
         })
 
     const
-        getMenusRequest = async (isInit?: boolean) => {
-            if (isInit) {
-                setLoading(true)
-            }
+        getMenusRequest = async () => {
+            setLoading(true)
             const orgList = await getOrgList({}, {}, {})
             if (orgList?.edges.length) {
-                setAllOrgList(orgList.edges.map(item => item.node))
+                const ol = orgList.edges.map(item => item.node)
+                setSelectedTreeKeys([ol?.[0]?.id])
+                setAllOrgList(ol)
                 setTreeData(
                     formatTreeData(
                         orgList.edges.map(item => ({
@@ -66,8 +66,8 @@ export default () => {
                 setSelectedTreeKeys([orgInfo.id])
             }
         },
-        onTreeSelect = (selectedKeys) => {
-            setSelectedTreeKeys(selectedKeys)
+        onTreeSelect = (_selectedKeys, { node }) => {
+            setSelectedTreeKeys([node.key])
         },
         proCardtitle = () => {
             const orgInfo = allOrgList.find(item => item.id == selectedTreeKeys[0])
@@ -100,7 +100,7 @@ export default () => {
         }
 
     useEffect(() => {
-        getMenusRequest(true)
+        getMenusRequest()
     }, [])
 
     return (
@@ -142,7 +142,7 @@ export default () => {
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                     </div>
                 </ProCard>
-                <ProCard headerBordered>
+                <ProCard >
                     <OrgUserList
                         ref={userListActionRef}
                         title={proCardtitle()}
