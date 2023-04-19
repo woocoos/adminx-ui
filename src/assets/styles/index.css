@@ -5,3 +5,8 @@
 .ant-tree-node-selected .tree-setting {
     display: inline-flex;
 }
+
+/* 避免编辑器字体被修改 */
+.adminx-editor * {
+    font-family: Consolas, "Courier New", monospace
+}

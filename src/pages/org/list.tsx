@@ -8,7 +8,7 @@ import {
 import { Button, Space, Dropdown, Modal } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
-import { TableSort, TableParams, TablePage, TableFilter } from "@/services/graphql";
+import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
 import { EnumOrgStatus, Org, delOrgInfo, getOrgList } from "@/services/org";
 import OrgCreate from "./components/create";
@@ -22,7 +22,6 @@ export default () => {
     proTableRef = useRef<ActionType>(),
     [allList, setAllList] = useState<Org[]>([]),
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
-    [page, setPage] = useState<TablePage>(),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true 
       { title: '名称', dataIndex: 'name', width: 120, },
@@ -97,18 +96,11 @@ export default () => {
         setAllList(list)
         table.data = formatTreeData(list, undefined, { key: 'id', parentId: "parentID", children: 'children' })
         table.total = result.totalCount
-        setPage({
-          current: params.current,
-          pageSize: params.pageSize,
-          startCursor: result.edges[0].cursor,
-          endCursor: result.edges[table.data.length - 1].cursor,
-        })
         setExpandedRowKeys(list.map(item => item.id))
       } else {
         setAllList([])
         setExpandedRowKeys([])
         table.total = 0
-        setPage(undefined)
       }
 
       return table

@@ -47,7 +47,7 @@ const UserList = (props: UserListProps, ref: any) => {
       { title: '创建时间', dataIndex: 'createdAt', width: 160, valueType: "dateTime", sorter: true },
 
     ],
-    // 弹出层处理
+    // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
     [modal, setModal] = useState({

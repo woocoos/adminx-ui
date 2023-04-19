@@ -1,5 +1,6 @@
 import { gid } from "@/util";
 import { TableParams, graphqlApi, getGraphqlFilter, TableSort, setClearInputField, List, TreeMoveAction, graphqlPageApi, TableFilter } from "../graphql";
+import { AppMenu } from "./menu";
 
 export type AppKind = "web" | "native" | "server"
 export type AppStatus = "active" | "inactive" | "processing"
@@ -25,44 +26,6 @@ export interface App {
     menus?: List<AppMenu>
 }
 
-export type AppActionKind = "restful" | "graphql" | "rpc"
-export type AppActionMethod = "read" | "write" | "list"
-
-export interface AppAction {
-    id: string
-    createdBy: number
-    createdAt: Date
-    updatedBy: number
-    updatedAt: Date
-    appID: string
-    name: string
-    kind: AppActionKind
-    method: AppActionMethod
-    comments: string
-    app?: App
-    menus?: AppMenu[]
-    resources?: null
-}
-
-export type AppMenuKind = "dir" | "menu"
-export interface AppMenu {
-    id: string
-    createdBy: number
-    createdAt: Date
-    updatedBy: number
-    updatedAt: Date
-    appID: string
-    parentID: string
-    kind: AppMenuKind
-    name: string
-    actionID: string
-    comments: string
-    displaySort: number
-    app?: App
-    action?: AppAction
-}
-
-
 export const EnumAppStatus = {
     active: { text: "活跃", status: 'success' },
     inactive: { text: "失活", status: 'default' },
@@ -76,12 +39,10 @@ export const EnumAppKind = {
 }
 
 
-const AppNodeField = `#graphql
+export const AppNodeField = `#graphql
     id,name,code,kind,redirectURI,appKey,appSecret,
     scopes,tokenValidity,refreshTokenValidity,logo,comments,
     status,createdAt
-`, AppMenuField = `#graphql
-    id,appID,parentID,kind,name,actionID,comments,displaySort
 `
 
 /**
@@ -207,122 +168,3 @@ export async function delAppInfo(appId: string) {
     }
 }
 
-
-/**
- * 获取应用菜单
- * @param appId 
- * @returns 
- */
-export async function getAppMenus(appId: string) {
-    const appGid = gid('app', appId)
-    const result = await graphqlApi(
-        `#graphql
-        query menus($orderBy: AppMenuOrder){
-          node(id:"${appGid}"){
-            ... on App{        
-                ${AppNodeField}    
-                menus(orderBy:$orderBy){
-                    edges{                                        
-                        cursor,node{                    
-                            ${AppMenuField}
-                        }
-                    }
-                }
-            }
-          }
-        }`, {
-        orderBy: {
-            direction: 'ASC',
-            field: "displaySort"
-        }
-    })
-
-    if (result?.data?.node) {
-        return result.data.node as App
-    } else {
-        return null
-    }
-}
-
-
-/**
- * 更新应用菜单
- * @param appId
- * @param input 
- * @returns 
- */
-export async function updateAppMenu(menuId: string, input: App | Record<string, any>) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation updateAppMenu($input: UpdateAppMenuInput!){
-          action:updateAppMenu(menuID:"${menuId}",input:$input){
-            ${AppMenuField}
-          }
-        }`, { input: setClearInputField(input) })
-
-    if (result?.data?.action) {
-        return result?.data?.action as App
-    } else {
-        return null
-    }
-}
-
-/**
- * 创建应用菜单
- * @param input 
- * @returns 
- */
-export async function createAppMenu(appId: string, input: AppMenu | Record<string, any>) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation createAppMenus($input: [CreateAppMenuInput!]){
-          action:createAppMenus(appID:"${appId}",input:$input){
-            ${AppMenuField}
-          }
-        }`, { input: [input] })
-
-    if (result?.data?.action?.[0]?.id) {
-        return result.data.action[0] as AppMenu
-    } else {
-        return null
-    }
-}
-
-/**
- * 删除应用菜单
- * @param appId 
- * @returns 
- */
-export async function delAppMenu(menuId: string) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation deleteAppMenu{
-          action:deleteAppMenu(menuID: "${menuId}")
-        }`)
-
-    if (result?.data?.action) {
-        return result?.data?.action as boolean
-    } else {
-        return null
-    }
-}
-
-
-/**
- * 菜单位置移动
- * @param input 
- * @returns 
- */
-export async function moveAppMenu(sourceId: string, targetId: string, action: TreeMoveAction) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation moveAppMenu{
-          action:moveAppMenu(sourceID:"${sourceId}",targetID:"${targetId}",action:${action})
-        }`)
-
-    if (result?.data?.action) {
-        return result?.data?.action as boolean
-    } else {
-        return null
-    }
-}

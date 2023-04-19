@@ -41,15 +41,15 @@ export default () => {
         align: 'center', search: false, width: 170,
         render: (text, record) => {
           return <Space>
-            <Link key="editor" to={`/app/viewer?id=${record.id}`}>
+            <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
               编辑
             </Link>
-            <Link key="power" to={`/app/power?id=${record.id}`} >
+            <Link key="actions" to={`/app/actions?id=${record.id}`} >
               权限
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: [
-                { key: "strategy", label: <Link to={`/app/strategy?id=${record.id}`} >权限策略</Link> },
+                { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >权限策略</Link> },
                 { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >菜单</Link> },
                 { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >角色</Link> },
                 { key: "resource", label: <Link to={`/app/resource?id=${record.id}`} >资源</Link> },

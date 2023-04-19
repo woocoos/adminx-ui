@@ -33,6 +33,7 @@ export const firstUpper = (str: string) => {
     return str.slice(0, 1).toUpperCase() + str.slice(1)
 }
 
+
 /**
  * tree数据结构的形成
  * @param allList 
@@ -40,16 +41,32 @@ export const firstUpper = (str: string) => {
  * @param defineKey 
  * @returns 
  */
-export const formatTreeData = <T>(allList: Array<T>, parentList?: Array<T>, defineKey = { key: "key", parentId: "parentId", children: "children" }) => {
+export const formatTreeData = <T>(
+    allList: Array<T>,
+    parentList?: Array<T>,
+    defineKey?: {
+        key?: string
+        parentId?: string
+        children?: string
+    },
+    parentId?: string | number) => {
+    const dataKey = { key: "key", parentId: "parentId", children: "children" }, pid = parentId == undefined ? "0" : parentId
+
+    if (defineKey) {
+        for (let key in defineKey) {
+            dataKey[key] = defineKey[key]
+        }
+    }
+
     if (!parentList) {
-        parentList = allList.filter(item => item[defineKey.parentId] == '0')
+        parentList = allList.filter(item => item[dataKey.parentId] == pid)
     }
     parentList.forEach((pItem) => {
         let children = allList.filter(
-            (allItem) => allItem[defineKey.parentId] == pItem[defineKey.key]
+            (allItem) => allItem[dataKey.parentId] == pItem[dataKey.key]
         );
         if (children && children.length) {
-            pItem[defineKey.children] = formatTreeData(allList, children, defineKey);
+            pItem[dataKey.children] = formatTreeData(allList, children, dataKey);
         }
     });
     return parentList;
@@ -99,4 +116,15 @@ export const getDate = (date: number | Date | string | dayjs.Dayjs, format?: str
     } else {
         return null;
     }
+}
+
+/**
+  * 生成随机字符串
+  * @param len  几位
+  * @returns {string}
+  */
+export const randomId = (len: number) => {
+    var rdmString = '';
+    for (; rdmString.length < len; rdmString += Math.random().toString(36).substr(2));
+    return rdmString.substr(0, len)
 }
