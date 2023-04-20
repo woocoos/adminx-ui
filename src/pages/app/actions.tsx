@@ -6,7 +6,7 @@ import {
     useToken,
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal, message } from "antd";
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
@@ -20,13 +20,10 @@ export type AppActionListRef = {
 
 const AppActionList = (props: {
     appId?: string
-    hiddenHeader?: boolean
     isMultiple?: boolean
     scene?: "modal"
-    ref?: {
-        current: AppActionListRef
-    }
-}, ref: any) => {
+    ref?: MutableRefObject<AppActionListRef>
+}, ref: MutableRefObject<AppActionListRef>) => {
     const { token } = useToken(),
         [searchParams, setSearchParams] = useSearchParams(),
         appId: string = props?.appId || searchParams.get('id'),
@@ -138,7 +135,7 @@ const AppActionList = (props: {
 
     return <>
         {
-            props?.hiddenHeader == true ? (
+            props?.scene == 'modal' ? (
                 <ProTable
                     actionRef={proTableRef}
                     rowKey={"id"}

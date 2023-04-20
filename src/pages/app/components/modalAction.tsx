@@ -11,7 +11,7 @@ export default (props: {
     appId: string
     onClose: (selectData?: AppAction[]) => void
 }) => {
-    const listRef = useRef<AppActionListRef>()
+    const listRef = useRef<AppActionListRef>(null)
 
     const
         handleOk = () => {
@@ -23,7 +23,7 @@ export default (props: {
 
     return (
         <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <AppActionList ref={listRef} hiddenHeader appId={props.appId} isMultiple={props.isMultiple} scene="modal" />
+            <AppActionList ref={listRef} appId={props.appId} isMultiple={props.isMultiple} scene="modal" />
         </Modal>
     )
 }

@@ -1,6 +1,6 @@
 import { gid } from "@/util"
 import { App } from "."
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from "../graphql"
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 import { AppPolicy, AppPolicyField } from "./policy"
 
 export type AppRole = {
@@ -155,7 +155,7 @@ export async function updateAppRole(appRoleId: string, input: AppRole | Record<s
           action:updateAppRole(roleID:"${appRoleId}",input:$input){
             ${AppRoleField}
           }
-        }`, { input: input })
+        }`, { input: setClearInputField(input) })
 
     if (result?.data?.action?.id) {
         return result.data.action as AppRole

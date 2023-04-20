@@ -6,7 +6,7 @@ import {
 import { Tree, Empty, Input, Button } from "antd";
 import { useEffect, useState, useRef, ReactNode } from "react";
 import OrgUserList, { UserListRef } from "@/pages/account/list";
-import UserModal from "@/pages/account/components/modal";
+import ModalUser from "@/pages/account/components/modalAccount";
 import { formatTreeData, getDate } from "@/util";
 import { Org, getOrgList } from "@/services/org";
 import { User, allotOrgUser } from "@/services/user";
@@ -23,7 +23,7 @@ type TreeDataState = {
 
 export default () => {
     const { token } = useToken(),
-        userListActionRef = useRef<UserListRef>(),
+        userListActionRef = useRef<UserListRef>(null),
         [loading, setLoading] = useState(false),
         [allOrgList, setAllOrgList] = useState<Org[]>([]),
         [treeData, setTreeData] = useState<TreeDataState[]>([]),
@@ -146,11 +146,10 @@ export default () => {
                     <OrgUserList
                         ref={userListActionRef}
                         title={proCardtitle()}
-                        hiddenHeader
                         scene="orgUser"
                         orgId={selectedTreeKeys[0]} />
                 </ProCard>
-                <UserModal x-if={modal.scene === "add"} open={modal.open} title={modal.title} onClose={onUserModalClose} />
+                <ModalUser x-if={modal.scene === "add"} open={modal.open} title={modal.title} onClose={onUserModalClose} />
                 <UserCreate
                     x-if={modal.scene === "create"}
                     open={modal.open}

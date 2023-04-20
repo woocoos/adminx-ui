@@ -1,6 +1,6 @@
 import { gid } from "@/util"
 import { App } from "."
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from "../graphql"
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 
 export type AppAction = {
     id: string
@@ -162,7 +162,7 @@ export async function updateAppAction(appActionId: string, input: AppAction | Re
           action:updateAppAction(actionID:"${appActionId}",input:$input){
             ${AppActionField}
           }
-        }`, { input: input })
+        }`, { input: setClearInputField(input) })
 
     if (result?.data?.action?.id) {
         return result.data.action as AppAction

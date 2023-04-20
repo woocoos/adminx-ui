@@ -7,7 +7,7 @@ import {
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal, message } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
-import { Ref, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
+import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
 import { EnumUserStatus, User, delUserInfo, getOrgUserList, getUserList, removeOrgUser, resetUserPasswordByEmail } from "@/services/user";
@@ -15,13 +15,10 @@ import AccountCreate from "./components/create";
 
 type UserListProps = {
   title?: string
-  hiddenHeader?: boolean
   orgId?: string
   scene?: 'user' | 'orgUser' | 'modal',
   isMultiple?: boolean,
-  ref?: {
-    current: UserListRef
-  }
+  ref?: MutableRefObject<UserListRef>
 }
 
 export type UserListRef = {
@@ -29,7 +26,7 @@ export type UserListRef = {
   reload: () => void
 }
 
-const UserList = (props: UserListProps, ref: any) => {
+const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   const { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
@@ -166,14 +163,14 @@ const UserList = (props: UserListProps, ref: any) => {
   return (
     <>
       {
-        props?.hiddenHeader == true ? (
+        ["modal", "orgUser"].includes(props?.scene || '') ? (
           <ProTable
             actionRef={proTableRef}
             rowKey={"id"}
             toolbar={{
               title: props?.title || "账户列表"
             }}
-            scroll={{ x: 'max-content' }}
+            scroll={{ x: 'max-content', y: 300 }}
             columns={columns}
             request={getRequest}
             pagination={{ showSizeChanger: true }}

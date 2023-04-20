@@ -200,3 +200,44 @@ export async function moveOrg(sourceId: string, targetId: string, action: TreeMo
     }
 }
 
+
+
+/**
+ * 组织分配应用
+ * @param orgId 
+ * @param appId 
+ * @returns 
+ */
+export async function assignOrgApp(orgId: string, appId: string) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation assignOrganizationApp{
+          action:assignOrganizationApp(orgID: "${orgId}",appID: "${appId}")
+        }`)
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}
+
+/**
+ * 取消组织分配应用
+ * @param orgId 
+ * @param appId
+ * @returns 
+ */
+export async function revokeOrgApp(orgId: string, appId: string) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation revokeOrganizationApp{
+          action:revokeOrganizationApp(orgID: "${orgId}",appID: "${appId}")
+        }`)
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}

@@ -11,7 +11,7 @@ export default (props: {
     orgId?: string
     onClose: (selectData?: User[]) => void
 }) => {
-    const listRef = useRef<UserListRef>()
+    const listRef = useRef<UserListRef>(null)
 
     const
         handleOk = () => {
@@ -23,7 +23,7 @@ export default (props: {
 
     return (
         <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <UserList ref={listRef} title='用户列表' orgId={props.orgId} hiddenHeader scene="modal" isMultiple={props.isMultiple} />
+            <UserList ref={listRef} title='用户列表' orgId={props.orgId} scene="modal" isMultiple={props.isMultiple} />
         </Modal>
     )
 }

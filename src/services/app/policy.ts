@@ -1,6 +1,6 @@
 import { gid } from "@/util"
 import { App } from "."
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from "../graphql"
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 
 export type AppPolicy = {
     id: string
@@ -169,7 +169,7 @@ export async function createAppPolicies(appId: string, input: Array<AppPolicy | 
           action:createAppPolicies(appID:"${appId}",input:$input){
             ${AppPolicyField}
           }
-        }`, { input: input })
+        }`, { input: setClearInputField(input) })
 
     if (result?.data?.action?.length) {
         return result.data.action as AppPolicy[]
