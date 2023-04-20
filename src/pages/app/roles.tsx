@@ -6,11 +6,13 @@ import {
     useToken,
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal, message, Alert } from "antd";
+import { EllipsisOutlined } from "@ant-design/icons";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
 import CreateAppRole from "./components/createRole";
+import RolePolicy from "./components/rolePolicy";
 import { AppRole } from "@/services/app/role";
 import { delAppRole, getAppRoleList } from "@/services/app/role";
 
@@ -40,19 +42,33 @@ export default () => {
             },
             {
                 title: '操作', dataIndex: 'actions', fixed: 'right',
-                align: 'center', search: false, width: 80,
+                align: 'center', search: false, width: 120,
                 render: (text, record) => {
                     return <Space>
                         <a key="editor" onClick={() => {
                             setModal({
-                                open: true, title: `编辑:${record.name}`, id: record.id
+                                open: true, title: `编辑:${record.name}`, id: record.id, scene: 'create'
                             })
                         }} >
                             编辑
                         </a>
-                        <a key="del" onClick={() => onDel(record)}>
-                            删除
-                        </a>
+                        <Link key="sq" to="/">
+                            授权
+                        </Link>
+                        <Dropdown trigger={['click']} menu={{
+                            items: [
+                                {
+                                    key: "addPolicy", label: <a onClick={() => {
+                                        setModal({
+                                            open: true, title: `添加权限`, id: record.id, roleInfo: record, scene: "addPolicy"
+                                        })
+                                    }}>添加权限</a>
+                                },
+                                { key: "delete", label: <a onClick={() => onDel(record)}>删除</a> },
+                            ]
+                        }} >
+                            <a><EllipsisOutlined /></a>
+                        </Dropdown>
                     </Space>
                 }
             },
@@ -64,10 +80,13 @@ export default () => {
             open: boolean
             title: string
             id: string
+            roleInfo?: AppRole
+            scene: "create" | "addPolicy"
         }>({
             open: false,
             title: "",
             id: "",
+            scene: 'create'
         })
 
 
@@ -110,7 +129,7 @@ export default () => {
             if (isSuccess) {
                 proTableRef.current?.reload();
             }
-            setModal({ open: false, title: '', id: '', })
+            setModal({ open: false, title: '', id: '', scene: modal.scene })
         }
 
 
@@ -133,7 +152,7 @@ export default () => {
                 extra:
                     <>
                         <Button key="created" type="primary" onClick={() => {
-                            setModal({ open: true, title: '创建角色', id: '', })
+                            setModal({ open: true, title: '创建角色', id: '', scene: 'create' })
                         }}>
                             创建角色
                         </Button>
@@ -163,10 +182,19 @@ export default () => {
                 }}
             />
             <CreateAppRole
+                x-if={modal.scene === 'create'}
                 open={modal.open}
                 title={modal.title}
                 id={modal.id}
                 appId={appInfo?.id}
+                onClose={onDrawerClose}
+            />
+            <RolePolicy
+                x-if={modal.scene === "addPolicy"}
+                open={modal.open}
+                title={modal.title}
+                appInfo={appInfo}
+                roleInfo={modal.roleInfo}
                 onClose={onDrawerClose}
             />
         </PageContainer>
