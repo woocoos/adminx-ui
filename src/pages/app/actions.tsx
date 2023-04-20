@@ -6,18 +6,30 @@ import {
     useToken,
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal, message } from "antd";
-import { useEffect, useRef, useState } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
 import CreateAppAction from "./components/createAction";
 import { AppAction, EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from "@/services/app/action";
 
+export type AppActionListRef = {
+    getSelect: () => AppAction[]
+    reload: () => void
+}
 
-export default () => {
+const AppActionList = (props: {
+    appId?: string
+    hiddenHeader?: boolean
+    isMultiple?: boolean
+    scene?: "modal"
+    ref?: {
+        current: AppActionListRef
+    }
+}, ref: any) => {
     const { token } = useToken(),
         [searchParams, setSearchParams] = useSearchParams(),
-        appId: string = searchParams.get('id'),
+        appId: string = props?.appId || searchParams.get('id'),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
@@ -27,6 +39,23 @@ export default () => {
             { title: '类型', dataIndex: 'kind', width: 120, valueEnum: EnumAppActionKind },
             { title: '方法', dataIndex: 'method', width: 120, valueEnum: EnumAppActionMethod },
             { title: '备注', dataIndex: 'comments', width: 120, search: false, },
+        ],
+        [dataSource, setDataSource] = useState<AppAction[]>([]),
+        // 选中处理
+        [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+        // 弹出层处理
+        [modal, setModal] = useState<{
+            open: boolean
+            title: string
+            id: string
+        }>({
+            open: false,
+            title: "",
+            id: "",
+        })
+
+    if (props?.scene !== 'modal') {
+        columns.push(
             {
                 title: '操作', dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 80,
@@ -45,20 +74,8 @@ export default () => {
                     </Space>
                 }
             },
-        ],
-        // 选中处理
-        [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
-        // 弹出层处理
-        [modal, setModal] = useState<{
-            open: boolean
-            title: string
-            id: string
-        }>({
-            open: false,
-            title: "",
-            id: "",
-        })
-
+        )
+    }
 
     const
         getApp = async () => {
@@ -79,7 +96,8 @@ export default () => {
             } else {
                 table.total = 0
             }
-
+            setSelectedRowKeys([])
+            setDataSource(table.data)
             return table
         },
         onDel = (record: AppAction) => {
@@ -87,30 +105,13 @@ export default () => {
                 title: "删除",
                 content: `是否删除：${record.name}`,
                 onOk: async (close) => {
-                    const result = await delAppAction([record.id])
+                    const result = await delAppAction(record.id)
                     if (result) {
                         proTableRef.current?.reload();
                         close();
                     }
                 }
             })
-        },
-        onDels = () => {
-            if (selectedRowKeys.length) {
-                Modal.confirm({
-                    title: "删除",
-                    content: `是否删除：${selectedRowKeys.length}条权限`,
-                    onOk: async (close) => {
-                        const result = await delAppAction(selectedRowKeys)
-                        if (result) {
-                            proTableRef.current?.reload();
-                            close();
-                        }
-                    }
-                })
-            } else {
-                message.info('未检测到选中数据')
-            }
         },
         onDrawerClose = (isSuccess: boolean) => {
             if (isSuccess) {
@@ -119,56 +120,91 @@ export default () => {
             setModal({ open: false, title: '', id: '', })
         }
 
+    useImperativeHandle(ref, () => {
+        return {
+            getSelect: () => {
+                return dataSource.filter(item => selectedRowKeys.includes(item.id))
+            },
+            reload: () => {
+                proTableRef.current?.reload();
+            }
+        }
+    })
+
 
     useEffect(() => {
         getApp()
     }, [])
 
-    return (
-        <PageContainer
-            header={{
-                title: "应用权限",
-                style: { background: token.colorBgContainer },
-                breadcrumb: {
-                    items: [
-                        { title: "系统配置", },
-                        { title: "应用管理", },
-                        { title: "应用权限", },
-                    ],
-                },
-                extra: [
-                    <Button key="import" onClick={() => {
-                        alert('还未实现')
-                    }}>同步权限</Button>,
-                    <Button key="created" type="primary" onClick={() => {
-                        setModal({ open: true, title: '创建权限', id: '', })
-                    }}>创建权限</Button>,
-                    <Button key="dels" type="primary" danger onClick={onDels}>删除</Button>
-                ]
-            }}
-        >
-            <ProTable
-                actionRef={proTableRef}
-                rowKey={"id"}
-                toolbar={{
-                    title: `应用:${appInfo?.name || "-"}`
-                }}
-                scroll={{ x: 'max-content' }}
-                columns={columns}
-                request={getRequest}
-                rowSelection={{
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                    type: "checkbox"
-                }}
-            />
-            <CreateAppAction
-                open={modal.open}
-                title={modal.title}
-                id={modal.id}
-                appId={appInfo?.id}
-                onClose={onDrawerClose}
-            />
-        </PageContainer>
-    );
+    return <>
+        {
+            props?.hiddenHeader == true ? (
+                <ProTable
+                    actionRef={proTableRef}
+                    rowKey={"id"}
+                    toolbar={{
+                        title: `应用:${appInfo?.name || "-"}`
+                    }}
+                    scroll={{ x: 'max-content', y: 300 }}
+                    columns={columns}
+                    request={getRequest}
+                    rowSelection={{
+                        selectedRowKeys: selectedRowKeys,
+                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                        type: props.isMultiple ? "checkbox" : "radio"
+                    }}
+                />
+            ) : (
+                <PageContainer
+                    header={{
+                        title: "应用权限",
+                        style: { background: token.colorBgContainer },
+                        breadcrumb: {
+                            items: [
+                                { title: "系统配置", },
+                                { title: "应用管理", },
+                                { title: "应用权限", },
+                            ],
+                        },
+                        extra: [
+                            <Button key="import" onClick={
+                                () => {
+                                    alert('还未实现')
+                                }
+                            }>同步权限</Button >,
+                            <Button key="created" type="primary" onClick={() => {
+                                setModal({ open: true, title: '创建权限', id: '', })
+                            }}>创建权限</Button>
+                        ]
+                    }}
+                >
+                    <ProTable
+                        actionRef={proTableRef}
+                        rowKey={"id"}
+                        toolbar={{
+                            title: `应用:${appInfo?.name || "-"}`
+                        }}
+                        scroll={{ x: 'max-content' }}
+                        columns={columns}
+                        request={getRequest}
+                        rowSelection={{
+                            selectedRowKeys: selectedRowKeys,
+                            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                            type: "checkbox"
+                        }}
+                    />
+                    <CreateAppAction
+                        open={modal.open}
+                        title={modal.title}
+                        id={modal.id}
+                        appId={appInfo?.id}
+                        onClose={onDrawerClose}
+                    />
+                </PageContainer >
+            )
+        }
+    </>;
 };
+
+
+export default forwardRef(AppActionList)

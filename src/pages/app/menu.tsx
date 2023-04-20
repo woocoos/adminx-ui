@@ -12,11 +12,14 @@ import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button } from "ant
 import { SettingOutlined } from "@ant-design/icons";
 import { useSearchParams } from "ice";
 import { useEffect, useState, useRef, ReactNode } from "react";
-import {  formatTreeData, loopTreeData } from "@/util";
+import { formatTreeData, loopTreeData } from "@/util";
 import { TreeMoveAction } from "@/services/graphql";
 import { TreeEditorAction } from "@/util/type";
 import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from "@/services/app/menu";
 import { App } from "@/services/app";
+import ModalAction from "@/pages/app/components/modalAction";
+import { AppAction } from "@/services/app/action";
+
 
 type TreeDataState = {
     key: string
@@ -47,8 +50,14 @@ export default () => {
             action: 'editor'
         }),
         [actionTitle, setActionTitle] = useState<string>('新建-顶级菜单'),
+        [formFieldsValue, setFormFieldsValue] = useState<AppMenu>(),
         [saveLoading, setSaveLoading] = useState(false),
-        [saveDisabled, setSaveDisabled] = useState(true)
+        [saveDisabled, setSaveDisabled] = useState(true),
+        [modal, setModal] = useState<{
+            open: boolean
+        }>({
+            open: false
+        })
 
     const
         customerTitleRender = (nodeData: TreeDataState) => {
@@ -129,6 +138,7 @@ export default () => {
                 switch (action) {
                     case 'editor':
                         title = `编辑-${menuInfo.name}`
+                        setFormFieldsValue(menuInfo)
                         formRef.current?.setFieldsValue(menuInfo)
                         break;
                     case 'peer':
@@ -220,7 +230,9 @@ export default () => {
         onFinish = async (values: AppMenu) => {
             if (appInfo) {
                 setSaveLoading(true)
-
+                if (formFieldsValue?.action) {
+                    values.actionID = formFieldsValue.action.id
+                }
                 if (selectedTree.info?.id && selectedTree.action === 'editor') {
                     const ur = await updateAppMenu(selectedTree.info.id, values)
                     if (ur?.id) {
@@ -303,10 +315,7 @@ export default () => {
                             label="名称"
                             placeholder="请输入名称"
                             rules={[
-                                {
-                                    required: true,
-                                    message: "请输入名称",
-                                },
+                                { required: true, message: "请输入名称", },
                             ]}
                         />
                         <ProFormSelect name="kind" label="类型"
@@ -318,16 +327,39 @@ export default () => {
                                 { required: true, message: "请选择类型", },
                             ]} />
                         <ProFormText
-                            name="actionID"
                             label="关联权限"
                             placeholder="请输入关联权限"
-                        />
+                        >
+                            <Input.Search
+                                value={formFieldsValue?.action?.name || ""}
+                                placeholder="请点击搜索进行查找"
+                                onSearch={() => {
+                                    setModal({ open: true })
+                                }}
+                            />
+                        </ProFormText>
                         <ProFormTextArea
                             name="comments"
                             label="备注（选填）"
                             placeholder="请输入备注"
                         />
                     </ProForm>
+                    <ModalAction
+                        open={modal.open}
+                        title="查找权限" appId={appInfo?.id || ''}
+                        onClose={(selectData) => {
+                            const data = selectData?.[0]
+
+                            if (data?.id) {
+                                setFormFieldsValue({
+                                    ...formFieldsValue,
+                                    action: data,
+                                    actionID: data.id
+                                } as any)
+                            }
+                            onValuesChange()
+                            setModal({ open: false })
+                        }} />
                 </ProCard>
             </ProCard>
         </PageContainer>

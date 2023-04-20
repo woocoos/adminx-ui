@@ -176,15 +176,12 @@ export async function updateAppAction(appActionId: string, input: AppAction | Re
  * @param appActionId 
  * @returns 
  */
-export async function delAppAction(appActionIds: string[]) {
+export async function delAppAction(appActionId: string) {
     const result = await graphqlApi(
         `#graphql
-        mutation deleteAppActions($ids:[ID!]!){
-          action:deleteAppActions(actionIDs: $ids)
-        }`,
-        {
-            ids: appActionIds
-        }
+        mutation deleteAppAction{
+          action:deleteAppAction(actionID: "${appActionId}")
+        }`
     )
 
     if (result?.data?.action) {

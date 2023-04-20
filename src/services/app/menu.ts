@@ -22,7 +22,8 @@ export interface AppMenu {
 }
 
 const AppMenuField = `#graphql
-id,appID,parentID,kind,name,actionID,comments,displaySort
+    id,appID,parentID,kind,name,actionID,comments,displaySort,
+    action{ id,name }
 `
 
 /**
