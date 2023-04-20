@@ -10,8 +10,9 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
-import { EnumUserStatus, User, delUserInfo, getOrgUserList, getUserList, removeOrgUser, resetUserPasswordByEmail } from "@/services/user";
+import { EnumUserStatus, User, delUserInfo,  getUserList, resetUserPasswordByEmail } from "@/services/user";
 import AccountCreate from "./components/create";
+import { getOrgUserList, removeOrgUser } from "@/services/org/user";
 
 type UserListProps = {
   title?: string
