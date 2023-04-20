@@ -7,7 +7,7 @@ import {
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
-import { useRef, useState } from "react";
+import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
 import { EnumOrgStatus, Org, delOrgInfo, getOrgList } from "@/services/org";
@@ -15,13 +15,21 @@ import OrgCreate from "./components/create";
 import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
 
+export type OrgListRef = {
+  getSelect: () => Org[]
+  reload: () => void
+}
 
-export default () => {
+const OrgList = (props: {
+  ref?: MutableRefObject<OrgListRef>
+  title?: string
+  scene?: 'modal',
+  isMultiple?: boolean,
+}, ref: MutableRefObject<OrgListRef>) => {
   const { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [allList, setAllList] = useState<Org[]>([]),
-    [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true 
       { title: '名称', dataIndex: 'name', width: 120, },
@@ -33,6 +41,26 @@ export default () => {
         title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: EnumOrgStatus,
       },
+    ],
+    [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
+    [dataSource, setDataSource] = useState<Org[]>([]),
+    // 选中处理
+    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+    // 弹出层处理
+    [modal, setModal] = useState<{
+      open: boolean
+      title: string
+      id: string
+      scene: TreeEditorAction
+    }>({
+      open: false,
+      title: "",
+      id: "",
+      scene: "editor"
+    })
+
+  if (props.scene !== 'modal') {
+    columns.push(
       {
         title: '操作', dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 170,
@@ -71,19 +99,8 @@ export default () => {
           </Space>
         }
       },
-    ],
-    // 弹出层处理
-    [modal, setModal] = useState<{
-      open: boolean
-      title: string
-      id: string
-      scene: TreeEditorAction
-    }>({
-      open: false,
-      title: "",
-      id: "",
-      scene: "editor"
-    })
+    )
+  }
 
 
   const
@@ -102,7 +119,7 @@ export default () => {
         setExpandedRowKeys([])
         table.total = 0
       }
-
+      setDataSource(table.data)
       return table
     },
     onDelApp = (record: Org) => {
@@ -142,44 +159,87 @@ export default () => {
       setModal({ open: true, title: title, id: info.id, scene: action })
     }
 
+  useImperativeHandle(ref, () => {
+    return {
+      getSelect: () => {
+        return dataSource.filter(item => selectedRowKeys.includes(item.id))
+      },
+      reload: () => {
+        proTableRef.current?.reload();
+      }
+    }
+  })
 
   return (
-    <PageContainer
-      header={{
-        title: "组织管理",
-        style: { background: token.colorBgContainer },
-        breadcrumb: {
-          items: [
-            { title: "系统配置", },
-            { title: "组织管理", },
-          ],
-        },
-        extra: []
-      }}
-    >
-      <ProTable
-        actionRef={proTableRef}
-        rowKey={"id"}
-        toolbar={{
-          title: "组织树"
-        }}
-        expandable={{
-          expandedRowKeys: expandedRowKeys,
-          onExpandedRowsChange: (expandedKeys: string[]) => {
-            setExpandedRowKeys(expandedKeys)
-          }
-        }}
-        scroll={{ x: 'max-content' }}
-        columns={columns}
-        request={getRequest}
-        pagination={false}
-      />
-      <OrgCreate
-        open={modal.open}
-        title={modal.title}
-        id={modal.id}
-        scene={modal.scene}
-        onClose={onDrawerClose} />
-    </PageContainer>
+    <>
+      {
+        ['modal'].includes(props.scene || '') ? (
+          <ProTable
+            actionRef={proTableRef}
+            rowKey={"id"}
+            toolbar={{
+              title: props?.title || "组织树"
+            }}
+            expandable={{
+              expandedRowKeys: expandedRowKeys,
+              onExpandedRowsChange: (expandedKeys: string[]) => {
+                setExpandedRowKeys(expandedKeys)
+              }
+            }}
+            scroll={{ x: 'max-content', y: 300 }}
+            columns={columns}
+            request={getRequest}
+            pagination={false}
+            rowSelection={props?.scene === 'modal' ? {
+              selectedRowKeys: selectedRowKeys,
+              onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+              type: props.isMultiple ? "checkbox" : "radio"
+            } : false}
+          />
+        ) : (
+          <PageContainer
+            header={{
+              title: "组织管理",
+              style: { background: token.colorBgContainer },
+              breadcrumb: {
+                items: [
+                  { title: "系统配置", },
+                  { title: "组织管理", },
+                ],
+              },
+              extra: []
+            }}
+          >
+            <ProTable
+              actionRef={proTableRef}
+              rowKey={"id"}
+              toolbar={{
+                title: "组织树"
+              }}
+              expandable={{
+                expandedRowKeys: expandedRowKeys,
+                onExpandedRowsChange: (expandedKeys: string[]) => {
+                  setExpandedRowKeys(expandedKeys)
+                }
+              }}
+              scroll={{ x: 'max-content' }}
+              columns={columns}
+              request={getRequest}
+              pagination={false}
+            />
+            <OrgCreate
+              open={modal.open}
+              title={modal.title}
+              id={modal.id}
+              scene={modal.scene}
+              onClose={onDrawerClose} />
+          </PageContainer>
+        )
+      }
+
+    </>
   );
 };
+
+
+export default forwardRef(OrgList) 

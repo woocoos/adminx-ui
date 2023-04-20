@@ -1,18 +1,18 @@
+import { App } from '@/services/app';
 import { Button, Modal } from 'antd';
-import UserList, { UserListRef } from '@/pages/account/list';
 import { useRef } from 'react';
-import { User } from '@/services/user';
-
+import { AppListRef } from '../list';
+import AppList from '../list';
 
 export default (props: {
     open: boolean
-    title: string
     isMultiple?: boolean
+    title: string
     tableTitle?: string
-    orgId?: string
-    onClose: (selectData?: User[]) => void
+    appId: string
+    onClose: (selectData?: App[]) => void
 }) => {
-    const listRef = useRef<UserListRef>(null)
+    const listRef = useRef<AppListRef>(null)
 
     const
         handleOk = () => {
@@ -24,7 +24,7 @@ export default (props: {
 
     return (
         <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <UserList ref={listRef} title={`${props.tableTitle || '用户列表'}`} orgId={props.orgId} scene="modal" isMultiple={props.isMultiple} />
+            <AppList ref={listRef} title={props.tableTitle} isMultiple={props.isMultiple} scene="modal" />
         </Modal>
     )
 }

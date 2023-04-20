@@ -8,6 +8,7 @@ export default (props: {
     open: boolean
     isMultiple?: boolean
     title: string
+    tableTitle?: string
     appId: string
     onClose: (selectData?: AppAction[]) => void
 }) => {
@@ -23,7 +24,7 @@ export default (props: {
 
     return (
         <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <AppActionList ref={listRef} appId={props.appId} isMultiple={props.isMultiple} scene="modal" />
+            <AppActionList ref={listRef} title={props.tableTitle} appId={props.appId} isMultiple={props.isMultiple} scene="modal" />
         </Modal>
     )
 }

@@ -20,6 +20,7 @@ export type AppActionListRef = {
 
 const AppActionList = (props: {
     appId?: string
+    title?: string
     isMultiple?: boolean
     scene?: "modal"
     ref?: MutableRefObject<AppActionListRef>
@@ -140,7 +141,7 @@ const AppActionList = (props: {
                     actionRef={proTableRef}
                     rowKey={"id"}
                     toolbar={{
-                        title: `应用:${appInfo?.name || "-"}`
+                        title: props?.title || `应用:${appInfo?.name || "-"}`
                     }}
                     scroll={{ x: 'max-content', y: 300 }}
                     columns={columns}
