@@ -1,7 +1,7 @@
-import { AppAction, EnumAppActionKind, EnumAppActionMethod, createAppAction, getAppActionInfo, updateAppAction } from '@/services/app/action';
+import { AppRole, createAppRole, getAppRoleInfo, updateAppRole } from '@/services/app/role';
 import {
     DrawerForm,
-    ProFormSelect,
+    ProFormRadio,
     ProFormText,
     ProFormTextArea,
 } from '@ant-design/pro-components';
@@ -28,19 +28,22 @@ export default (props: {
             setSaveLoading(false)
             setSaveDisabled(true)
             if (props.id) {
-                const info = await getAppActionInfo(props.id)
+                const info = await getAppRoleInfo(props.id)
                 if (info?.id) {
                     return info
                 }
             }
-            return {}
+            return {
+                autoGrant: true,
+                editable: true
+            }
         },
         onValuesChange = () => {
             setSaveDisabled(false)
         },
-        onFinish = async (values: AppAction) => {
+        onFinish = async (values: AppRole) => {
             setSaveLoading(true)
-            const info = props.id ? await updateAppAction(props.id, values) : await createAppAction(props?.appId || "", values)
+            const info = props.id ? await updateAppRole(props.id, values) : await createAppRole(props?.appId || "", values)
             if (info?.id) {
                 setSaveDisabled(true)
                 props.onClose?.(true)
@@ -73,16 +76,14 @@ export default (props: {
                 rules={[
                     { required: true, message: "请输入名称", },
                 ]} />
-            <ProFormSelect name="kind" label="类型"
-                valueEnum={EnumAppActionKind}
-                rules={[
-                    { required: true, message: "请输入类型", },
-                ]} />
-            <ProFormSelect name="method" label="操作方法"
-                valueEnum={EnumAppActionMethod}
-                rules={[
-                    { required: true, message: "请输入类型", },
-                ]} />
+            <ProFormRadio.Group name="autoGrant" label="自动授权" options={[
+                { label: '是', value: true },
+                { label: '否', value: false },
+            ]} />
+            <ProFormRadio.Group name="editable" label="授权后编辑" options={[
+                { label: '是', value: true },
+                { label: '否', value: false },
+            ]} />
             <ProFormTextArea
                 name="comments"
                 label="描述"

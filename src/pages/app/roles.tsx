@@ -10,7 +10,9 @@ import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
-import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "@/services/app/policy";
+import CreateAppRole from "./components/createRole";
+import { AppRole } from "@/services/app/role";
+import { delAppRole, getAppRoleList } from "@/services/app/role";
 
 
 export default () => {
@@ -20,29 +22,34 @@ export default () => {
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
-        columns: ProColumns<AppPolicy>[] = [
+        columns: ProColumns<AppRole>[] = [
             // 有需要排序配置  sorter: true 
             { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '版本', dataIndex: 'version', width: 120, },
+            { title: '描述', dataIndex: 'comments', width: 120, search: false, },
             {
                 title: '自动授权', dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
                 render: (text, record) => {
                     return record.autoGrant ? '是' : '否'
                 }
             },
-            { title: '状态', dataIndex: 'status', width: 120, valueEnum: EnumAppPolicyStatus },
-            { title: '描述', dataIndex: 'comments', width: 120, search: false, },
+            {
+                title: '授权后编辑', dataIndex: 'editable', width: 120, search: false, sorter: true,
+                render: (text, record) => {
+                    return record.editable ? '是' : '否'
+                }
+            },
             {
                 title: '操作', dataIndex: 'actions', fixed: 'right',
-                align: 'center', search: false, width: 110,
+                align: 'center', search: false, width: 80,
                 render: (text, record) => {
                     return <Space>
-                        <Link key="editor" to={`/app/policy/viewer?id=${record.id}`} >
+                        <a key="editor" onClick={() => {
+                            setModal({
+                                open: true, title: `编辑:${record.name}`, id: record.id
+                            })
+                        }} >
                             编辑
-                        </Link>
-                        <Link key="org" to={`/app/policy/org?id=${record.id}`} >
-                            授权
-                        </Link>
+                        </a>
                         <a key="del" onClick={() => onDel(record)}>
                             删除
                         </a>
@@ -74,8 +81,8 @@ export default () => {
             }
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as AppPolicy[], success: true, total: 0 };
-            const result = await getAppPolicyList(appId, params, filter, sort);
+            const table = { data: [] as AppRole[], success: true, total: 0 };
+            const result = await getAppRoleList(appId, params, filter, sort);
 
             if (result) {
                 table.data = result
@@ -86,18 +93,24 @@ export default () => {
 
             return table
         },
-        onDel = (record: AppPolicy) => {
+        onDel = (record: AppRole) => {
             Modal.confirm({
                 title: "删除",
                 content: `是否删除：${record.name}`,
                 onOk: async (close) => {
-                    const result = await delAppPolicy(record.id)
+                    const result = await delAppRole(record.id)
                     if (result) {
                         proTableRef.current?.reload();
                         close();
                     }
                 }
             })
+        },
+        onDrawerClose = (isSuccess: boolean) => {
+            if (isSuccess) {
+                proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: '', id: '', })
         }
 
 
@@ -108,28 +121,30 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: "权限策略",
+                title: "应用角色",
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
                         { title: "系统配置", },
                         { title: "应用管理", },
-                        { title: "权限策略", },
+                        { title: "应用角色", },
                     ],
                 },
-                extra: <>
-                    <Button key="created" type="primary">
-                        <Link to={`/app/policy/viewer?appId=${appId}`}>创建权限策略</Link>
-                    </Button>
-                </>,
+                extra:
+                    <>
+                        <Button key="created" type="primary" onClick={() => {
+                            setModal({ open: true, title: '创建角色', id: '', })
+                        }}>
+                            创建角色
+                        </Button>
+                    </>,
                 children: <Alert showIcon message={
                     <>
-                        <div key="1">权限策略相当于一组权限集，目前支持两种类型的权限策略</div>
-                        <div key="2">系统策略：统一由系统创建，您只能使用而不能删除，系统策略的版本更新由系统维护</div>
-                        <div key="3">自定义策略：您可以自主创建、更新和删除，自定义策略的版本更新由您自己维护</div>
+                        <div key="1">应用角色是应用权限策略的一组集合，应用授权给租户时，由角色决定租户拥有应用哪些权限</div>
+                        <div key="2">自动授权：应用授权给租户时，将自动授权类型的角色全部授权给租户，并将角色授权给该租户的管理者</div>
+                        <div key="3">手动授权：在应用授权给租户后，系统管理员可将非自动授权角色，通过xxx功能将角色授权给租户</div>
                     </>
                 } />
-
             }}
         >
             <ProTable
@@ -146,6 +161,13 @@ export default () => {
                     onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
                     type: "checkbox"
                 }}
+            />
+            <CreateAppRole
+                open={modal.open}
+                title={modal.title}
+                id={modal.id}
+                appId={appInfo?.id}
+                onClose={onDrawerClose}
             />
         </PageContainer>
     );

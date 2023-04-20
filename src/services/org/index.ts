@@ -30,7 +30,7 @@ export const EnumOrgStatus = {
     processing: { text: "处理中", status: 'warning' }
 }
 
-const OrgNodeField = `#graphql
+export const OrgNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone
     `

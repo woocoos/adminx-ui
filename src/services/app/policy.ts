@@ -40,7 +40,7 @@ export const EnumPolicyRuleEffect = {
     deny: { text: "拒绝", status: 'default' },
 }
 
-const AppPolicyField = `#graphql
+export const AppPolicyField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,
     version,autoGrant,status,rules{ effect,actions,resources,conditions }
 `
