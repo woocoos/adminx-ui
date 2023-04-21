@@ -1,12 +1,13 @@
 import { Button, Modal } from 'antd';
 import UserList, { UserListRef } from '@/pages/account/list';
 import { useRef } from 'react';
-import { User } from '@/services/user';
+import { User, UserType } from '@/services/user';
 
 
 export default (props: {
     open: boolean
     title: string
+    userType: UserType
     isMultiple?: boolean
     tableTitle?: string
     orgId?: string
@@ -23,8 +24,18 @@ export default (props: {
         }
 
     return (
-        <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <UserList ref={listRef} title={`${props.tableTitle || '用户列表'}`} orgId={props.orgId} scene="modal" isMultiple={props.isMultiple} />
+        <Modal title={props.title}
+            open={props.open}
+            onOk={handleOk}
+            onCancel={handleCancel}
+            width={900}
+        >
+            <UserList ref={listRef}
+                title={props.tableTitle}
+                orgId={props.orgId}
+                scene="modal"
+                isMultiple={props.isMultiple}
+            />
         </Modal>
     )
 }

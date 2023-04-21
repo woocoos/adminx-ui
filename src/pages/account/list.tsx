@@ -10,7 +10,7 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
-import { EnumUserStatus, User, delUserInfo,  getUserList, resetUserPasswordByEmail } from "@/services/user";
+import { EnumUserStatus, User, UserType, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
 import AccountCreate from "./components/create";
 import { getOrgUserList, removeOrgUser } from "@/services/org/user";
 
@@ -18,6 +18,7 @@ type UserListProps = {
   title?: string
   orgId?: string
   scene?: 'user' | 'orgUser' | 'modal',
+  userType?: UserType
   isMultiple?: boolean,
   ref?: MutableRefObject<UserListRef>
 }
@@ -29,6 +30,7 @@ export type UserListRef = {
 
 const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   const { token } = useToken(),
+    userType = props.userType || "account",
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [dataSource, setDataSource] = useState<User[]>([]),
@@ -84,7 +86,6 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as User[], success: true, total: 0 };
-      // params.userType = "account"
       const result = props?.orgId ?
         await getOrgUserList(props.orgId, params, filter, sort) :
         await getUserList(params, filter, sort);
@@ -169,7 +170,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             actionRef={proTableRef}
             rowKey={"id"}
             toolbar={{
-              title: props?.title || "账户列表"
+              title: props?.title || userType === 'account' ? "账户列表" : "用户列表"
             }}
             scroll={{ x: 'max-content', y: 300 }}
             columns={columns}
@@ -205,7 +206,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               actionRef={proTableRef}
               rowKey={"id"}
               toolbar={{
-                title: props?.title || "账户列表"
+                title: props?.title || userType === 'account' ? "账户列表" : "用户列表"
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}

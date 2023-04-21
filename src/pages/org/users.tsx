@@ -8,9 +8,12 @@ import { useEffect, useState, useRef, ReactNode } from "react";
 import OrgUserList, { UserListRef } from "@/pages/account/list";
 import ModalUser from "@/pages/account/components/modalAccount";
 import { formatTreeData, getDate } from "@/util";
-import { Org, getOrgList } from "@/services/org";
-import { User, allotOrgUser } from "@/services/user";
+import { Org, getOrgPathList } from "@/services/org";
+import { User } from "@/services/user";
 import UserCreate from "@/pages/account/components/create";
+import { allotOrgUser } from "@/services/org/user";
+import store from "@/store";
+import { useSearchParams } from "ice";
 
 type TreeDataState = {
     key: string
@@ -23,6 +26,8 @@ type TreeDataState = {
 
 export default () => {
     const { token } = useToken(),
+        [basisState] = store.useModel("basis"),
+        [searchParams, setSearchParams] = useSearchParams(),
         userListActionRef = useRef<UserListRef>(null),
         [loading, setLoading] = useState(false),
         [allOrgList, setAllOrgList] = useState<Org[]>([]),
@@ -41,23 +46,25 @@ export default () => {
     const
         getMenusRequest = async () => {
             setLoading(true)
-            const orgList = await getOrgList({}, {}, {})
-            if (orgList?.edges.length) {
-                const ol = orgList.edges.map(item => item.node)
-                setSelectedTreeKeys([ol?.[0]?.id])
-                setAllOrgList(ol)
-                setTreeData(
-                    formatTreeData(
-                        orgList.edges.map(item => ({
-                            key: item.node.id,
-                            title: item.node.name,
-                            parentId: item.node.parentID,
-                            node: item.node
-                        }))
-                    )
-                )
-
+            const orgList = await getOrgPathList(searchParams.get("id") || basisState.tenantId, "org")
+            if (orgList[0]?.id) {
+                setSelectedTreeKeys([orgList[0].id])
+            } else {
+                setSelectedTreeKeys([])
             }
+
+            setAllOrgList(orgList)
+            setTreeData(
+                formatTreeData(
+                    orgList.map(item => ({
+                        key: item.id,
+                        title: item.name,
+                        parentId: item.parentID,
+                        node: item
+                    }))
+                )
+            )
+
             setLoading(false)
         },
         onSearch = (keyword: string) => {

@@ -1,4 +1,6 @@
-import { Org, createOrgInfo, getOrgInfo, getOrgList, updateOrgInfo } from '@/services/org';
+import InputAccount from '@/pages/account/components/inputAccount';
+import { Org, OrgKind, createOrgInfo, getOrgInfo, getOrgList, updateOrgInfo } from '@/services/org';
+import { User } from '@/services/user';
 import { formatTreeData } from '@/util';
 import { TreeEditorAction } from '@/util/type';
 import {
@@ -7,6 +9,7 @@ import {
     ProFormTextArea,
     ProFormTreeSelect,
 } from '@ant-design/pro-components';
+import { Input } from 'antd';
 import { useEffect, useState } from "react";
 
 type SelectTreeData = {
@@ -20,12 +23,14 @@ export default (props: {
     open?: boolean
     title?: string
     id?: string
+    kind: OrgKind
     scene?: TreeEditorAction
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
     const [saveLoading, setSaveLoading] = useState(false),
-        [saveDisabled, setSaveDisabled] = useState(true)
+        [saveDisabled, setSaveDisabled] = useState(true),
+        [owner, setOwner] = useState<User>()
 
     const
         parentRequest = async () => {
@@ -64,12 +69,15 @@ export default (props: {
                     switch (props.scene) {
                         case "editor":
                             result = orgInfo
+                            setOwner(orgInfo.owner)
                             break;
                         case "peer":
                             result = { parentID: orgInfo.parentID }
+                            setOwner(undefined)
                             break;
                         case "child":
                             result = { parentID: orgInfo.id }
+                            setOwner(undefined)
                             break;
                         default:
                             break;
@@ -83,16 +91,19 @@ export default (props: {
         },
         onFinish = async (values: Org) => {
             setSaveLoading(true)
-            let result;
+            let result: Org | null = null;
+            if (owner) {
+                values.ownerID = owner.id
+            }
             switch (props.scene) {
                 case "editor":
-                    result = props.id ? await updateOrgInfo(props.id, values) : await createOrgInfo(values)
+                    result = props.id ? await updateOrgInfo(props.id, values) : await createOrgInfo(values, props.kind)
                     break;
                 case "peer":
-                    result = await createOrgInfo(values)
+                    result = await createOrgInfo(values, props.kind)
                     break;
                 case "child":
-                    result = await createOrgInfo(values)
+                    result = await createOrgInfo(values, props.kind)
                     break;
                 default:
                     break;
@@ -138,7 +149,15 @@ export default (props: {
                 ]} />
             <ProFormText name="domain" label="域" tooltip="域不可随意修改,一旦修改会导致用户登录账号发生变更" />
             <ProFormText name="countryCode" label="国家/地区" />
-            <ProFormText name="ownerID" label="管理账户" tooltip="设置后不允许修改" />
+            <ProFormText label="管理账户" tooltip="设置后不允许修改" >
+                <InputAccount value={owner}
+                    userType="account"
+                    onChange={(value) => {
+                        setOwner(value)
+                        onValuesChange()
+                    }}
+                />
+            </ProFormText>
             <ProFormTextArea
                 name="profile"
                 label="组织介绍"

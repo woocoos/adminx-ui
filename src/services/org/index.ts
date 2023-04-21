@@ -1,7 +1,14 @@
 import { gid } from "@/util";
 import { List, TableFilter, TableParams, TableSort, TreeMoveAction, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql";
+import { User, UserNodeField } from "../user";
 
 export type OrgStatus = "active" | "inactive" | "processing"
+
+/**
+ * root：组织
+ * org:部门
+ */
+export type OrgKind = "root" | "org"
 export interface Org {
     id: string
     createdBy: number
@@ -10,6 +17,7 @@ export interface Org {
     updatedAt: Date
     deletedAt: Date
     ownerID: string
+    kind: OrgKind
     parentID: string
     domain: string
     code: string
@@ -21,6 +29,7 @@ export interface Org {
     countryCode: string
     timezone: String
     parent?: Org
+    owner?: User
     children?: Org[]
 }
 
@@ -31,8 +40,11 @@ export const EnumOrgStatus = {
 }
 
 export const OrgNodeField = `#graphql
-    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner{
+        ${UserNodeField}
+    }
     `
 
 /**
@@ -43,6 +55,9 @@ export const OrgNodeField = `#graphql
  * @returns 
  */
 export async function getOrgList(params: TableParams, filter: TableFilter, sort: TableSort) {
+    if (Object.keys(sort).length === 0) {
+        sort.displaySort = "ascend"
+    }
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
@@ -69,6 +84,23 @@ export async function getOrgList(params: TableParams, filter: TableFilter, sort:
     } else {
         return null
     }
+}
+
+/**
+ * 通过path获取整个组织树结构
+ * @param orgId 
+ * @returns 
+ */
+export async function getOrgPathList(orgId: string, kind: OrgKind) {
+    const topOrg = await getOrgInfo(orgId), orgList: Org[] = []
+    if (topOrg?.id) {
+        orgList.push(topOrg);
+        const result = await getOrgList({ pathHasPrefix: `${topOrg.path}/`, kind: kind }, {}, {})
+        if (result?.edges) {
+            orgList.push(...result.edges.map(item => item.node));
+        }
+    }
+    return orgList
 }
 
 
@@ -124,7 +156,7 @@ export async function updateOrgInfo(orgId: string, input: Org | Record<string, a
  * @param input 
  * @returns 
  */
-export async function createOrgInfo(input: Org) {
+export async function createOrgInfo(input: Org, kind: OrgKind) {
     const result = await graphqlApi(
         `#graphql
         mutation createOrganization($input: CreateOrgInput!){
