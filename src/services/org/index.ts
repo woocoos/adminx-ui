@@ -37,6 +37,9 @@ export const EnumOrgStatus = {
     active: { text: "活跃", status: 'success' },
     inactive: { text: "失活", status: 'default' },
     processing: { text: "处理中", status: 'warning' }
+}, EnumOrgKind = {
+    root: { text: "组织" },
+    org: { text: "部门" },
 }
 
 export const OrgNodeField = `#graphql

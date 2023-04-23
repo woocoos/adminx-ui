@@ -45,6 +45,42 @@ export async function getOrgUserList(orgId: string, params: TableParams, filter:
 }
 
 /**
+ * 组织下的角色用户
+ * @param orgId 
+ * @param userId 
+ * @param headers 
+ * @returns 
+ */
+export async function getOrgRoleUserList(roleId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query orgRoleUsers($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:UserOrder,$where:UserWhereInput){
+                list:orgRoleUsers(roleID:"${roleId}"after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${UserNodeField}
+                        }
+                    }
+                }
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.node?.list) {
+        return result.data.node.list as List<User>
+    } else {
+        return null
+    }
+}
+
+/**
  * 分配用户给组织
  * @param input 
  * @returns 

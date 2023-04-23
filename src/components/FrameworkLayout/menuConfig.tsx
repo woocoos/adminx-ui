@@ -43,6 +43,16 @@ const asideMenuConfig: MenuDataItem[] = [
         path: "/org/users",
         framework: true,
       },
+      {
+        name: "用户组",
+        path: "/org/groups",
+        framework: true,
+      },
+      {
+        name: "角色",
+        path: "/org/roles",
+        framework: true,
+      },
     ],
   },
   {

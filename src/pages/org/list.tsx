@@ -10,7 +10,7 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link } from "ice";
-import { EnumOrgStatus, Org, OrgKind, delOrgInfo, getOrgList, getOrgPathList } from "@/services/org";
+import { EnumOrgKind, EnumOrgStatus, Org, OrgKind, delOrgInfo, getOrgList, getOrgPathList } from "@/services/org";
 import OrgCreate from "./components/create";
 import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
@@ -37,6 +37,7 @@ const OrgList = (props: {
       // 有需要排序配置  sorter: true 
       { title: '名称', dataIndex: 'name', width: 120, },
       { title: '编码', dataIndex: 'code', width: 120, },
+      { title: '类型', dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
       { title: '域', dataIndex: 'domain', width: 120, },
       { title: '国家/地区', dataIndex: 'countryCode', width: 120 },
       {
@@ -95,7 +96,7 @@ const OrgList = (props: {
             </> : <></>}
             {
               kind == 'root' ? (<>
-                <Link key="userGroup" to={`/org/user-group`}>
+                <Link key="userGroup" to={`/org/groups?id=${record.id}`}>
                   用户组
                 </Link>
                 <Dropdown trigger={['click']} menu={{

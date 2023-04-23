@@ -1,5 +1,5 @@
 import { gid } from "@/util"
-import { graphqlApi, setClearInputField } from "../graphql"
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 
 export type OrgRole = {
     id: string
@@ -13,11 +13,88 @@ export type OrgRole = {
     comments: string
 }
 
+/**
+ * group:组
+ * role:角色
+ */
 export type OrgRoleKind = "group" | "role"
 
 const OrgRoleNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments
 `
+
+/**
+ * 获取组织用户组
+ * @param params 
+ * @param filter 
+ * @param sort 
+ * @returns 
+ */
+export async function getOrgGroupList(params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query orgGroups($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+                list:orgGroups(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${OrgRoleNodeField}
+                        }
+                    }
+                }
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.list) {
+        return result.data.list as List<OrgRole>
+    } else {
+        return null
+    }
+}
+
+/**
+ * 获取组织用户组
+ * @param params 
+ * @param filter 
+ * @param sort 
+ * @returns 
+ */
+export async function getOrgRoleList(params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query orgRoles($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+                list:orgRoles(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${OrgRoleNodeField}
+                        }
+                    }
+                }
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.list) {
+        return result.data.list as List<OrgRole>
+    } else {
+        return null
+    }
+}
+
 
 /**
  * 获取用户信息

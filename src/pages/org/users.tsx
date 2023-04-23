@@ -156,7 +156,7 @@ export default () => {
                         scene="orgUser"
                         orgId={selectedTreeKeys[0]} />
                 </ProCard>
-                <ModalUser x-if={modal.scene === "add"} open={modal.open} title={modal.title} onClose={onUserModalClose} />
+                <ModalUser x-if={modal.scene === "add"} open={modal.open} title={modal.title} onClose={onUserModalClose} userType={"member"} />
                 <UserCreate
                     x-if={modal.scene === "create"}
                     open={modal.open}
