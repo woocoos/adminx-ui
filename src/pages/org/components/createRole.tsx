@@ -48,10 +48,14 @@ export default (props: {
         },
         onFinish = async (values: OrgRole) => {
             setSaveLoading(true)
-            values.orgID = props.orgId
             values.kind = props.kind
-            const result = props.id ? await updateOrgRole(props.id, values) : await createOrgRole(values)
-
+            let result: OrgRole | null
+            if (props.id) {
+                result = await updateOrgRole(props.id, values)
+            } else {
+                values.orgID = props.orgId
+                result = await createOrgRole(values)
+            }
 
             if (result?.id) {
                 setSaveDisabled(true)

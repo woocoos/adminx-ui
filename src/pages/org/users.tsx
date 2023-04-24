@@ -151,6 +151,7 @@ export default () => {
                 </ProCard>
                 <ProCard >
                     <OrgUserList
+                        x-if={selectedTreeKeys[0]}
                         ref={userListActionRef}
                         title={proCardtitle()}
                         scene="orgUser"

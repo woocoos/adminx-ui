@@ -8,16 +8,19 @@ import {
 import { Button, Space, Dropdown, Modal, message } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { TableParams, TableSort, TableFilter } from "@/services/graphql";
+import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
 import { Link } from "ice";
 import { EnumUserStatus, User, UserType, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
 import AccountCreate from "./components/create";
-import { getOrgUserList, removeOrgUser } from "@/services/org/user";
+import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from "@/services/org/user";
+import { assignOrgRoleUser, revokeOrgRoleUser } from "@/services/org/role";
+import ModalAccount from "@/pages/account/components/modalAccount";
 
 type UserListProps = {
   title?: string
   orgId?: string
-  scene?: 'user' | 'orgUser' | 'modal',
+  roleId?: string
+  scene?: 'user' | 'orgUser' | 'modal' | "roleUser",
   userType?: UserType
   isMultiple?: boolean,
   ref?: MutableRefObject<UserListRef>
@@ -63,12 +66,15 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         render: (text, record) => {
           return <Space>
             <Link key="editor" to={`/account/viewer?id=${record.id}`}>
-              编辑
+              详情
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: props?.scene === 'orgUser' ? [
                 { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
                 { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>移除</a> },
+              ] : props.scene === "roleUser" ? [
+                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
+                { key: "delete", label: <a onClick={() => onRemoveRole(record)}>移除</a> },
               ] : [
                 { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
                 { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
@@ -82,13 +88,19 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     )
   }
 
-
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as User[], success: true, total: 0 };
-      const result = props?.orgId ?
-        await getOrgUserList(props.orgId, params, filter, sort) :
-        await getUserList(params, filter, sort);
+      let result: List<User> | null
+      if (props?.roleId) {
+        result = await getOrgRoleUserList(props.roleId, params, filter, sort)
+      } else if (props?.orgId) {
+        result = await getOrgUserList(props.orgId, params, filter, sort)
+      } else {
+        params['userType'] = userType
+        result = await getUserList(params, filter, sort);
+      }
+
       if (result) {
         table.data = result.edges.map(item => item.node)
         table.total = result.totalCount
@@ -127,11 +139,26 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     },
     onRemoveOrg = (record: User) => {
       Modal.confirm({
-        title: "从组织中移除",
-        content: `是否从组织中移除用户：${record.displayName}`,
+        title: "移除",
+        content: `是否移除用户：${record.displayName}`,
         onOk: async (close) => {
           if (props?.orgId) {
-            const result = await removeOrgUser(props?.orgId, record.id)
+            const result = await removeOrgUser(props.orgId, record.id)
+            if (result) {
+              proTableRef.current?.reload();
+              close();
+            }
+          }
+        }
+      })
+    },
+    onRemoveRole = (record: User) => {
+      Modal.confirm({
+        title: "移除",
+        content: `是否移除用户：${record.displayName}`,
+        onOk: async (close) => {
+          if (props?.roleId) {
+            const result = await revokeOrgRoleUser(props.roleId, record.id)
             if (result) {
               proTableRef.current?.reload();
               close();
@@ -165,23 +192,48 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   return (
     <>
       {
-        ["modal", "orgUser"].includes(props?.scene || '') ? (
-          <ProTable
-            actionRef={proTableRef}
-            rowKey={"id"}
-            toolbar={{
-              title: props?.title || userType === 'account' ? "账户列表" : "用户列表"
-            }}
-            scroll={{ x: 'max-content', y: 300 }}
-            columns={columns}
-            request={getRequest}
-            pagination={{ showSizeChanger: true }}
-            rowSelection={props?.scene === 'modal' ? {
-              selectedRowKeys: selectedRowKeys,
-              onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-              type: props.isMultiple ? "checkbox" : "radio"
-            } : false}
-          />
+        ["modal", "orgUser", "roleUser"].includes(props?.scene || '') ? (
+          <>
+            <ProTable
+              actionRef={proTableRef}
+              rowKey={"id"}
+              toolbar={{
+                title: props?.title || userType === 'account' ? "账户列表" : "用户列表",
+                actions: props.scene === "roleUser" ? [
+                  <Button type="primary" onClick={() => {
+                    setModal({ open: true, title: '添加成员' })
+                  }}>添加</Button>
+                ] : []
+              }}
+              scroll={{ x: 'max-content', y: 300 }}
+              columns={columns}
+              request={getRequest}
+              pagination={{ showSizeChanger: true }}
+              rowSelection={props?.scene === 'modal' ? {
+                selectedRowKeys: selectedRowKeys,
+                onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                type: props.isMultiple ? "checkbox" : "radio"
+              } : false}
+            />
+            {props.scene === "roleUser" ?
+              <ModalAccount
+                open={modal.open}
+                title={modal.title}
+                userType={userType}
+                onClose={async (selectData) => {
+                  const sdata = selectData?.[0]
+                  if (sdata && props.roleId) {
+                    const result = await assignOrgRoleUser({
+                      orgRoleID: props.roleId,
+                      userID: sdata.id
+                    })
+                    if (result) {
+                      proTableRef.current?.reload();
+                    }
+                  }
+                  setModal({ open: false, title: '' })
+                }} /> : ''}
+          </>
         ) : (
           <PageContainer
             header={{

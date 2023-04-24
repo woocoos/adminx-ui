@@ -11,7 +11,6 @@ import { forwardRef, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import CreateOrgRole from "./components/createRole";
-import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
 import { OrgRole, OrgRoleKind, delOrgRole, getOrgGroupList, getOrgRoleList } from "@/services/org/role";
 import store from "@/store";
@@ -37,8 +36,7 @@ const OrgRoleList = (props: {
                 align: 'center', search: false, width: 90,
                 render: (text, record) => {
                     return <Space>
-                        <a>添加用户</a>
-                        <a>权限</a>
+                        <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>查看</Link>
                         <a onClick={() => {
                             onDel(record)
                         }}>删除</a>

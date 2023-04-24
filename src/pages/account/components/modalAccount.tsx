@@ -33,6 +33,7 @@ export default (props: {
             <UserList ref={listRef}
                 title={props.tableTitle}
                 orgId={props.orgId}
+                userType={props.userType}
                 scene="modal"
                 isMultiple={props.isMultiple}
             />
