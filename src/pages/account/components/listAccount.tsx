@@ -171,12 +171,6 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           }
         }
       })
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '创建账户', scene: "create" })
     }
 
   useImperativeHandle(ref, () => {
@@ -237,20 +231,20 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                   { title: "账户管理", },
                 ],
               },
-              extra: [
-                <Button key="create" type="primary" onClick={() => {
-                  setModal({ open: true, title: '创建', scene: "create" })
-                }} >
-                  创建
-                </Button>
-              ]
             }}
           >
             <ProTable
               actionRef={proTableRef}
               rowKey={"id"}
               toolbar={{
-                title: props?.title || (props.userType === 'account' ? "账户列表" : "用户列表")
+                title: props?.title || (props.userType === 'account' ? "账户列表" : "用户列表"),
+                actions: [
+                  <Button type="primary" onClick={() => {
+                    setModal({ open: true, title: `创建${props.userType === 'account' ? '账户' : '用户'}`, scene: "create" })
+                  }}>
+                    创建{props.userType === 'account' ? '账户' : '用户'}
+                  </Button>
+                ]
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}
@@ -269,7 +263,12 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             orgId={props.orgId}
             userType={props.userType || "member"}
             scene="create"
-            onClose={onDrawerClose} />
+            onClose={(isSuccess) => {
+              if (isSuccess) {
+                proTableRef.current?.reload();
+              }
+              setModal({ open: false, title: '', scene: modal.scene })
+            }} />
         </> : ''
       }
       {
