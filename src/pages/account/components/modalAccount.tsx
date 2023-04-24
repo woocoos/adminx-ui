@@ -1,5 +1,5 @@
 import { Button, Modal } from 'antd';
-import UserList, { UserListRef } from '@/pages/account/list';
+import UserList, { UserListRef } from './listAccount';
 import { useRef } from 'react';
 import { User, UserType } from '@/services/user';
 
@@ -7,7 +7,7 @@ import { User, UserType } from '@/services/user';
 export default (props: {
     open: boolean
     title: string
-    userType: UserType
+    userType?: UserType
     isMultiple?: boolean
     tableTitle?: string
     orgId?: string

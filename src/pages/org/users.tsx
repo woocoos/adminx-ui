@@ -5,13 +5,9 @@ import {
 } from "@ant-design/pro-components";
 import { Tree, Empty, Input, Button } from "antd";
 import { useEffect, useState, useRef, ReactNode } from "react";
-import OrgUserList, { UserListRef } from "@/pages/account/list";
-import ModalUser from "@/pages/account/components/modalAccount";
-import { formatTreeData, getDate } from "@/util";
+import UserList, { UserListRef } from "@/pages/account/components/listAccount";
+import { formatTreeData } from "@/util";
 import { Org, getOrgPathList } from "@/services/org";
-import { User } from "@/services/user";
-import UserCreate from "@/pages/account/components/create";
-import { allotOrgUser } from "@/services/org/user";
 import store from "@/store";
 import { useSearchParams } from "ice";
 
@@ -32,16 +28,7 @@ export default () => {
         [loading, setLoading] = useState(false),
         [allOrgList, setAllOrgList] = useState<Org[]>([]),
         [treeData, setTreeData] = useState<TreeDataState[]>([]),
-        [selectedTreeKeys, setSelectedTreeKeys] = useState<string[]>([]),
-        [modal, setModal] = useState<{
-            open: boolean
-            title: string
-            scene: "create" | "add"
-        }>({
-            open: false,
-            title: '',
-            scene: "add"
-        })
+        [selectedTreeKeys, setSelectedTreeKeys] = useState<string[]>([])
 
     const
         getMenusRequest = async () => {
@@ -82,28 +69,6 @@ export default () => {
                 return `${orgInfo.name}-用户列表`
             }
             return "用户列表"
-        },
-        onUserModalClose = async (selectData?: User[]) => {
-            setModal({ open: false, title: "", scene: modal.scene })
-            const suInfo = selectData?.[0], orgInfo = allOrgList.find(item => item.id == selectedTreeKeys[0])
-            if (suInfo && orgInfo) {
-                const result = await allotOrgUser({
-                    joinedAt: getDate(Date.now(), 'YYYY-MM-DDTHH:mm:ssZ') as string,
-                    displayName: suInfo.displayName,
-                    orgID: orgInfo.id,
-                    userID: suInfo.id,
-                })
-
-                if (result) {
-                    userListActionRef.current?.reload()
-                }
-            }
-        },
-        onDrawerClose = (isSuccess: boolean) => {
-            if (isSuccess) {
-                userListActionRef.current?.reload();
-            }
-            setModal({ open: false, title: "", scene: modal.scene })
         }
 
     useEffect(() => {
@@ -122,18 +87,6 @@ export default () => {
                         { title: "组织用户管理", },
                     ],
                 },
-                extra: selectedTreeKeys[0] ? [
-                    <Button key="createUser" onClick={() => {
-                        setModal({
-                            open: true, title: "创建用户", scene: 'create'
-                        })
-                    }}>创建用户</Button>,
-                    <Button key="addUser" onClick={() => {
-                        setModal({
-                            open: true, title: "添加用户", scene: 'add'
-                        })
-                    }}>添加用户</Button>
-                ] : []
             }}
         >
             <ProCard split="vertical">
@@ -150,22 +103,13 @@ export default () => {
                     </div>
                 </ProCard>
                 <ProCard >
-                    <OrgUserList
+                    <UserList
                         x-if={selectedTreeKeys[0]}
                         ref={userListActionRef}
                         title={proCardtitle()}
                         scene="orgUser"
                         orgId={selectedTreeKeys[0]} />
                 </ProCard>
-                <ModalUser x-if={modal.scene === "add"} open={modal.open} title={modal.title} onClose={onUserModalClose} userType={"member"} />
-                <UserCreate
-                    x-if={modal.scene === "create"}
-                    open={modal.open}
-                    title={modal.title}
-                    orgId={selectedTreeKeys[0]}
-                    userType="member"
-                    scene="create"
-                    onClose={onDrawerClose} />
             </ProCard>
         </PageContainer>
     )

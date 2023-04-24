@@ -3,7 +3,7 @@ import { PageContainer, ProCard, ProDescriptions, useToken } from "@ant-design/p
 import { Button } from "antd"
 import { useSearchParams } from "ice"
 import { useEffect, useState } from "react"
-import UserList from "@/pages/account/list";
+import UserList from "@/pages/account/components/listAccount";
 import CreateOrgRole from "../components/createRole";
 
 export default () => {
@@ -89,7 +89,7 @@ export default () => {
                             label: `成员管理`,
                             key: 'member',
                             children: info ? <>
-                                <UserList scene="roleUser" title="成员列表" userType="member" roleId={info.id} />
+                                <UserList scene="roleUser" title="成员列表" roleId={info.id} />
                             </> : '',
                         },
                         {
