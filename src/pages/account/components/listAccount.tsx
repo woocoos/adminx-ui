@@ -69,18 +69,26 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         title: '操作', dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 120,
         render: (text, record) => {
-          return <Space>
+          return props.scene === "roleUser" ? <Space>
+            <a onClick={() => onRemoveRole(record)}>移除</a>
+          </Space> : props?.scene === 'orgUser' ? <Space>
             <Link key="editor" to={`/account/viewer?id=${record.id}`}>
               详情
             </Link>
             <Dropdown trigger={['click']} menu={{
-              items: props?.scene === 'orgUser' ? [
+              items: [
                 { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
                 { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>移除</a> },
-              ] : props.scene === "roleUser" ? [
-                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
-                { key: "delete", label: <a onClick={() => onRemoveRole(record)}>移除</a> },
-              ] : [
+              ]
+            }} >
+              <a><EllipsisOutlined /></a>
+            </Dropdown>
+          </Space> : <Space>
+            <Link key="editor" to={`/account/viewer?id=${record.id}`}>
+              详情
+            </Link>
+            <Dropdown trigger={['click']} menu={{
+              items: [
                 { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
                 { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
               ]

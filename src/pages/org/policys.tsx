@@ -9,39 +9,38 @@ import { Button, Space, Dropdown, Modal, message, Alert } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
-import { App, getAppInfo } from "@/services/app";
-import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "@/services/app/policy";
+import { Org, getOrgInfo } from "@/services/org";
+import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from "@/services/org/policy";
 
 
 export default () => {
     const { token } = useToken(),
         [searchParams, setSearchParams] = useSearchParams(),
-        appId: string = searchParams.get('id'),
-        [appInfo, setAppInfo] = useState<App>(),
+        [orgInfo, setOrgInfo] = useState<Org>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
-        columns: ProColumns<AppPolicy>[] = [
+        columns: ProColumns<OrgPolicy>[] = [
             // 有需要排序配置  sorter: true 
             { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '版本', dataIndex: 'version', width: 120, },
-            {
-                title: '自动授权', dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
-                render: (text, record) => {
-                    return record.autoGrant ? '是' : '否'
-                }
-            },
-            { title: '状态', dataIndex: 'status', width: 120, valueEnum: EnumAppPolicyStatus },
             { title: '描述', dataIndex: 'comments', width: 120, search: false, },
+            {
+                title: '策略类型', dataIndex: 'appPolicyID', width: 120, search: false,
+                render: (text, record) => (<span>{record.appPolicyID ? '系统策略' : '自定义策略'}</span>)
+            },
             {
                 title: '操作', dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
-                    return <Space>
-                        <Link key="editor" to={`/app/policy/viewer?id=${record.id}`} >
+                    return record.appPolicyID ? <Space>
+                        <Link key="editor" to={`/org/policy/references?id=${record.id}`} >
+                            引用记录
+                        </Link>
+                    </Space> : <Space>
+                        <Link key="editor" to={`/org/policy/viewer?id=${record.id}`} >
                             编辑
                         </Link>
-                        <Link key="org" to={`/app/policy/org?id=${record.id}`} >
-                            授权
+                        <Link key="reference" to={`/org/policy/references?id=${record.id}`} >
+                            引用记录
                         </Link>
                         <a key="del" onClick={() => onDel(record)}>
                             删除
@@ -51,47 +50,40 @@ export default () => {
             },
         ],
         // 选中处理
-        [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
-        // 弹出层处理
-        [modal, setModal] = useState<{
-            open: boolean
-            title: string
-            id: string
-        }>({
-            open: false,
-            title: "",
-            id: "",
-        })
+        [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
 
 
     const
-        getApp = async () => {
-            if (appId) {
-                const result = await getAppInfo(appId)
+        getOrg = async () => {
+            let result: Org | null = null
+            const orgId = searchParams.get('id');
+            if (orgId) {
+                result = await getOrgInfo(orgId)
                 if (result?.id) {
-                    setAppInfo(result)
+                    setOrgInfo(result)
                 }
             }
+            return result;
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as AppPolicy[], success: true, total: 0 };
-            const result = await getAppPolicyList(appId, params, filter, sort);
-
-            if (result) {
-                table.data = result
-                table.total = result.length
-            } else {
-                table.total = 0
+            const table = { data: [] as OrgPolicy[], success: true, total: 0 }, info = await getOrg();
+            if (info?.id) {
+                const result = await getOrgPolicyList(info?.id, params, filter, sort)
+                if (result) {
+                    table.data = result.edges.map(item => item.node)
+                    table.total = result.totalCount
+                } else {
+                    table.total = 0
+                }
             }
-
             return table
         },
-        onDel = (record: AppPolicy) => {
+        onDel = (record: OrgPolicy) => {
             Modal.confirm({
                 title: "删除",
                 content: `是否删除：${record.name}`,
                 onOk: async (close) => {
-                    const result = await delAppPolicy(record.id)
+                    const result = await delOrgPolicy(record.id)
                     if (result) {
                         proTableRef.current?.reload();
                         close();
@@ -99,11 +91,6 @@ export default () => {
                 }
             })
         }
-
-
-    useEffect(() => {
-        getApp()
-    }, [])
 
     return (
         <PageContainer
@@ -113,7 +100,7 @@ export default () => {
                 breadcrumb: {
                     items: [
                         { title: "系统配置", },
-                        { title: "应用管理", },
+                        { title: "组织管理", },
                         { title: "权限策略", },
                     ],
                 },
@@ -131,10 +118,12 @@ export default () => {
                 actionRef={proTableRef}
                 rowKey={"id"}
                 toolbar={{
-                    title: `应用:${appInfo?.name || "-"}`,
+                    title: `组织:${orgInfo?.name || "-"}`,
                     actions: [
-                        <Button key="created" type="primary">
-                            <Link to={`/app/policy/viewer?appId=${appId}`}>创建权限策略</Link>
+                        <Button type="primary">
+                            <Link key="editor" to={`/org/policy/viewer?orgId=${orgInfo?.id}`} >
+                                自定义策略
+                            </Link>
                         </Button>
                     ]
                 }}

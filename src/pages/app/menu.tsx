@@ -18,8 +18,6 @@ import { TreeEditorAction } from "@/util/type";
 import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from "@/services/app/menu";
 import { App } from "@/services/app";
 import ModalAction from "@/pages/app/components/modalAction";
-import { AppAction } from "@/services/app/action";
-
 
 type TreeDataState = {
     key: string

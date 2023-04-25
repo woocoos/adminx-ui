@@ -101,8 +101,8 @@ const OrgList = (props: {
                 </Link>
                 <Dropdown trigger={['click']} menu={{
                   items: [
-                    { key: "policy", label: <a >权限策略</a> },
-                    { key: "app", label: <a >授权应用</a> },
+                    { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>权限策略</Link> },
+                    { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>授权应用</Link> },
                     { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >组织部门管理</Link> },
                     { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>组织用户管理</Link> },
                   ]

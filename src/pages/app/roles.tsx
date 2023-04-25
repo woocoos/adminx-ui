@@ -149,14 +149,6 @@ export default () => {
                         { title: "应用角色", },
                     ],
                 },
-                extra:
-                    <>
-                        <Button key="created" type="primary" onClick={() => {
-                            setModal({ open: true, title: '创建角色', id: '', scene: 'create' })
-                        }}>
-                            创建角色
-                        </Button>
-                    </>,
                 children: <Alert showIcon message={
                     <>
                         <div key="1">应用角色是应用权限策略的一组集合，应用授权给租户时，由角色决定租户拥有应用哪些权限</div>
@@ -170,7 +162,14 @@ export default () => {
                 actionRef={proTableRef}
                 rowKey={"id"}
                 toolbar={{
-                    title: `应用:${appInfo?.name || "-"}`
+                    title: `应用:${appInfo?.name || "-"}`,
+                    actions: [
+                        <Button key="created" type="primary" onClick={() => {
+                            setModal({ open: true, title: '创建角色', id: '', scene: 'create' })
+                        }}>
+                            创建角色
+                        </Button>
+                    ]
                 }}
                 scroll={{ x: 'max-content' }}
                 columns={columns}

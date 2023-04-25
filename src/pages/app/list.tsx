@@ -11,8 +11,10 @@ import { App, EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from "@/servi
 import defaultApp from "@/assets/images/default-app.png";
 import AppCreate from "./components/create";
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { TableParams, TableSort, TableFilter } from "@/services/graphql";
+import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
 import { Link } from "ice";
+import { assignOrgApp, getOrgAppList, revokeOrgApp } from "@/services/org/app";
+import ModalApp from "./components/modalApp"
 
 export type AppListRef = {
   getSelect: () => App[]
@@ -22,7 +24,8 @@ export type AppListRef = {
 const AppList = (props: {
   ref?: MutableRefObject<AppListRef>
   title?: string
-  scene?: 'modal',
+  orgId?: string
+  scene?: 'modal' | "orgApp",
   isMultiple?: boolean,
 }, ref: MutableRefObject<AppListRef>) => {
   const { token } = useToken(),
@@ -62,7 +65,11 @@ const AppList = (props: {
         title: '操作', dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 170,
         render: (text, record) => {
-          return <Space>
+          return props.scene === 'orgApp' ? <Space>
+            <a onClick={() => {
+              revokeOrg(record)
+            }}>解除授权</a>
+          </Space> : <Space>
             <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
               编辑
             </Link>
@@ -90,7 +97,13 @@ const AppList = (props: {
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as App[], success: true, total: 0 };
-      const result = await getAppList(params, filter, sort);
+      let result: List<App> | null = null;
+
+      if (props.orgId) {
+        result = await getOrgAppList(props.orgId, params, filter, sort)
+      } else {
+        result = await getAppList(params, filter, sort)
+      }
 
       if (result) {
         table.data = result.edges.map(item => {
@@ -118,6 +131,21 @@ const AppList = (props: {
         }
       })
     },
+    revokeOrg = (record: App) => {
+      Modal.confirm({
+        title: "解除授权",
+        content: `是否解除授权应用：${record.name}`,
+        onOk: async (close) => {
+          if (props.orgId) {
+            const result = await revokeOrgApp(props.orgId, record.id)
+            if (result) {
+              proTableRef.current?.reload();
+              close();
+            }
+          }
+        }
+      })
+    },
     onDrawerClose = (isSuccess: boolean) => {
       if (isSuccess) {
         proTableRef.current?.reload();
@@ -139,23 +167,46 @@ const AppList = (props: {
   return (
     <>
       {
-        ['modal'].includes(props.scene || '') ? (
-          <ProTable
-            actionRef={proTableRef}
-            rowKey={"id"}
-            toolbar={{
-              title: props?.title || "应用列表"
-            }}
-            scroll={{ x: 'max-content', y: 300 }}
-            columns={columns}
-            request={getRequest}
-            pagination={{ showSizeChanger: true }}
-            rowSelection={props?.scene === 'modal' ? {
-              selectedRowKeys: selectedRowKeys,
-              onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-              type: props.isMultiple ? "checkbox" : "radio"
-            } : false}
-          />
+        ['modal', 'orgApp'].includes(props.scene || '') ? (
+          <>
+            <ProTable
+              actionRef={proTableRef}
+              rowKey={"id"}
+              toolbar={{
+                title: props?.title || "应用列表",
+                actions: props.scene === 'orgApp' ? [
+                  <Button type="primary" onClick={() => {
+                    setModal({ open: true, title: '查找应用', id: '' })
+                  }}>授权应用</Button>
+                ] : []
+              }}
+              scroll={{ x: 'max-content', y: 300 }}
+              columns={columns}
+              request={getRequest}
+              pagination={{ showSizeChanger: true }}
+              rowSelection={props?.scene === 'modal' ? {
+                selectedRowKeys: selectedRowKeys,
+                onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                type: props.isMultiple ? "checkbox" : "radio"
+              } : false}
+            />
+            {props.scene === 'orgApp' ? (
+              <ModalApp
+                open={modal.open}
+                title={modal.title}
+                onClose={async (selectData) => {
+                  const sdata = selectData?.[0]
+                  if (sdata && props.orgId) {
+                    const result = await assignOrgApp(props.orgId, sdata.id)
+                    if (result) {
+                      proTableRef.current?.reload();
+                    }
+                  }
+                  setModal({ open: false, title: modal.title, id: '' })
+                }}
+              />) : ""}
+
+          </>
         ) : (
           <PageContainer
             header={{
@@ -167,22 +218,22 @@ const AppList = (props: {
                   { title: "应用管理", },
                 ],
               },
-              extra: [
-                <Button key="create" type="primary" onClick={
-                  () => {
-                    setModal({ open: true, title: '创建应用', id: '' })
-                  }
-                }>
-                  创建应用
-                </Button >
-              ]
             }}
           >
             <ProTable
               actionRef={proTableRef}
               rowKey={"id"}
               toolbar={{
-                title: "应用列表"
+                title: "应用列表",
+                actions: [
+                  <Button key="create" type="primary" onClick={
+                    () => {
+                      setModal({ open: true, title: '创建应用', id: '' })
+                    }
+                  }>
+                    创建应用
+                  </Button >
+                ]
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}

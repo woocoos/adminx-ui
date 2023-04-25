@@ -1,7 +1,7 @@
 import { gid } from "@/util"
 import { Org } from "."
 import { PolicyRule } from "../app/policy"
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from "../graphql"
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 import { Permission } from "../permission"
 
 export type OrgPolicy = {
@@ -21,7 +21,8 @@ export type OrgPolicy = {
 
 
 const OrgPolicyNodeField = `#graphql
-    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments,
+    rules{ effect,actions,resources,conditions }
 `
 
 
@@ -35,7 +36,7 @@ export async function getOrgPolicyList(orgId: string, params: TableParams, filte
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
-            query orgPolicy($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:UserOrder,$where:UserWhereInput){
+            query orgPolicy($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
                 node(id:"${gid("org", orgId)}"){
                     ... on Org{
                         list:policies(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
@@ -58,8 +59,8 @@ export async function getOrgPolicyList(orgId: string, params: TableParams, filte
             params.current
         )
 
-    if (result?.data?.list) {
-        return result.data.list as List<OrgPolicy>
+    if (result?.data?.node?.list) {
+        return result.data.node.list as List<OrgPolicy>
     } else {
         return null
     }
@@ -85,6 +86,73 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
 
     if (result?.data?.node) {
         return result?.data?.node as OrgPolicy
+    } else {
+        return null
+    }
+}
+
+
+/**
+ * 创建组织策略
+ * @param input 
+ * @returns 
+ */
+export async function createOrgPolicy(input: OrgPolicy) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation createOrganizationPolicy($input: CreateOrgPolicyInput!){
+          action:createOrganizationPolicy(input:$input){
+            ${OrgPolicyNodeField}
+          }
+        }`, {
+        input
+    })
+
+    if (result?.data?.action) {
+        return result?.data?.action as OrgPolicy
+    } else {
+        return null
+    }
+}
+
+/**
+ * 更新组织策略
+ * @param orgPolicyId 
+ * @param input 
+ * @returns 
+ */
+export async function updateOrgPolicy(orgPolicyId: string, input: OrgPolicy | Record<string, any>) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation updateOrganizationPolicy($input: UpdateOrgPolicyInput!){
+          action:updateOrganizationPolicy(orgPolicyID:"${orgPolicyId}",input:$input){
+            ${OrgPolicyNodeField}
+          }
+        }`, {
+        input: setClearInputField(input)
+    })
+
+    if (result?.data?.action) {
+        return result?.data?.action as OrgPolicy
+    } else {
+        return null
+    }
+}
+
+/**
+ * 更新组织策略
+ * @param orgPolicyId 
+ * @returns 
+ */
+export async function delOrgPolicy(orgPolicyId: string) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation deleteOrganizationPolicy{
+          action:deleteOrganizationPolicy(orgPolicyID:"${orgPolicyId}")
+        }`)
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
     } else {
         return null
     }

@@ -108,15 +108,6 @@ const OrgRoleList = (props: {
                             { title: "用户组", },
                         ],
                     },
-                    extra: <>
-                        <Button
-                            type="primary" onClick={() => {
-                                setModal({ open: true, title: `创建${kind == "role" ? '角色' : '用户组'}`, id: "", scene: "editor" })
-
-                            }}>
-                            创建{kind == "role" ? '角色' : '用户组'}
-                        </Button>
-                    </>,
                     children: <Alert showIcon message={kind == 'role' ? <>
                         <div>角色不同于用户组的职责划分，而是向您信任的实体（例如：用户）进行授权的一种安全方法</div>
                     </> : <>
@@ -130,7 +121,15 @@ const OrgRoleList = (props: {
                     actionRef={proTableRef}
                     rowKey={"id"}
                     toolbar={{
-                        title: kind == "role" ? '角色列表' : '用户组列表'
+                        title: kind == "role" ? '角色列表' : '用户组列表',
+                        actions: [
+                            <Button
+                                type="primary" onClick={() => {
+                                    setModal({ open: true, title: `创建${kind == "role" ? '角色' : '用户组'}`, id: "", scene: "editor" })
+                                }}>
+                                创建{kind == "role" ? '角色' : '用户组'}
+                            </Button>
+                        ]
                     }}
                     scroll={{ x: 'max-content' }}
                     columns={columns}

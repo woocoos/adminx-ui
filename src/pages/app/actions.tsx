@@ -164,23 +164,24 @@ const AppActionList = (props: {
                                 { title: "应用权限", },
                             ],
                         },
-                        extra: [
-                            <Button key="import" onClick={
-                                () => {
-                                    alert('还未实现')
-                                }
-                            }>同步权限</Button >,
-                            <Button key="created" type="primary" onClick={() => {
-                                setModal({ open: true, title: '创建权限', id: '', })
-                            }}>创建权限</Button>
-                        ]
+
                     }}
                 >
                     <ProTable
                         actionRef={proTableRef}
                         rowKey={"id"}
                         toolbar={{
-                            title: `应用:${appInfo?.name || "-"}`
+                            title: `应用:${appInfo?.name || "-"}`,
+                            actions: [
+                                <Button key="import" onClick={
+                                    () => {
+                                        alert('还未实现')
+                                    }
+                                }>同步权限</Button >,
+                                <Button key="created" type="primary" onClick={() => {
+                                    setModal({ open: true, title: '创建权限', id: '', })
+                                }}>创建权限</Button>
+                            ]
                         }}
                         scroll={{ x: 'max-content' }}
                         columns={columns}

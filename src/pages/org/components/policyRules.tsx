@@ -3,20 +3,22 @@ import { ProCard } from "@ant-design/pro-components"
 import { Divider, Radio, Tabs, Row, Col, Button, Transfer, Tree, List, Popconfirm } from "antd"
 import { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { AppAction } from "@/services/app/action";
+import { AppAction, getAppActionList } from "@/services/app/action";
 import TransferTreeAndList, { TransferTreeAndListdataSource } from "@/components/Transfer/TransferTreeAndList";
 import { App } from "@/services/app";
 import Editor from '@monaco-editor/react';
+import InputApp from "@/pages/app/components/inputApp";
 
 const RuleItem = (props: {
+    orgId: string
     rule: PolicyRule
-    appActions: AppAction[],
-    appInfo?: App,
     onChange?: (rule: PolicyRule) => void
     onCopy?: () => void
     onDel?: () => void
 }) => {
     const [effect, setEffect] = useState<PolicyRuleEffect>(props.rule.effect || 'allow'),
+        [appInfo, setAppInfo] = useState<App>(),
+        [appActions, setAppActions] = useState<AppAction[]>([]),
         [action, setAction] = useState<"all" | "customer">(props.rule.actions?.[0] === "*" ? "all" : 'customer'),
         [actions, setActions] = useState<string[]>(props.rule.actions || []),
         [resource, setResource] = useState<"all" | "customer">(props.rule.resources?.[0] === "*" ? "all" : 'customer'),
@@ -28,6 +30,7 @@ const RuleItem = (props: {
             resources: [],
             conditions: []
         },
+        [stretch0, setStretch0] = useState<boolean>(false),
         [stretch1, setStretch1] = useState<boolean>(false),
         [stretch2, setStretch2] = useState<boolean>(false),
         [stretch3, setStretch3] = useState<boolean>(false)
@@ -35,8 +38,8 @@ const RuleItem = (props: {
     const
         getTitle = () => {
             const titles: string[] = [];
-            if (props.appInfo) {
-                titles.push(props.appInfo.name)
+            if (appInfo) {
+                titles.push(appInfo.name)
             }
             if (actions[0] === '*') {
                 titles.push('全部操作')
@@ -48,18 +51,18 @@ const RuleItem = (props: {
         },
         getAppActionsData = () => {
             const data: TransferTreeAndListdataSource<AppAction>[] = [],
-                readList: TransferTreeAndListdataSource<AppAction>[] = props.appActions.filter(item => item.method === 'read').map(item => ({
-                    key: `${props.appInfo?.code}:${item.name}`,
+                readList: TransferTreeAndListdataSource<AppAction>[] = appActions.filter(item => item.method === 'read').map(item => ({
+                    key: `${appInfo?.code}:${item.name}`,
                     title: item.name,
                     parentId: item.method,
                     node: item
-                })), writeList: TransferTreeAndListdataSource<AppAction>[] = props.appActions.filter(item => item.method === 'write').map(item => ({
-                    key: `${props.appInfo?.code}:${item.name}`,
+                })), writeList: TransferTreeAndListdataSource<AppAction>[] = appActions.filter(item => item.method === 'write').map(item => ({
+                    key: `${appInfo?.code}:${item.name}`,
                     parentId: item.method,
                     title: item.name,
                     node: item
-                })), listList: TransferTreeAndListdataSource<AppAction>[] = props.appActions.filter(item => item.method === 'list').map(item => ({
-                    key: `${props.appInfo?.code}:${item.name}`,
+                })), listList: TransferTreeAndListdataSource<AppAction>[] = appActions.filter(item => item.method === 'list').map(item => ({
+                    key: `${appInfo?.code}:${item.name}`,
                     title: item.name,
                     parentId: item.method,
                     node: item
@@ -123,32 +126,55 @@ const RuleItem = (props: {
             <Row >
                 <Col style={rowColStyle}>效果</Col>
                 <Col flex="auto">
-                    <Radio.Group value={effect} options={[
-                        { label: "允许", value: "allow" },
-                        { label: "拒绝", value: "deny" },
-                    ]} onChange={(e) => {
-                        setEffect(e.target.value)
-                        newRule.effect = e.target.value
-                        props.onChange?.(newRule)
-                    }} />
-                </Col>
-            </Row>
-            <Divider style={{ margin: "10px 0" }} />
-            <Row >
-                <Col style={rowColStyle}>应用</Col>
-                <Col flex="auto">
-                    {props.appInfo?.name}
+                    <Radio.Group
+                        value={effect}
+                        options={[
+                            { label: "允许", value: "allow" },
+                            { label: "拒绝", value: "deny" },
+                        ]}
+                        onChange={(e) => {
+                            setEffect(e.target.value)
+                            newRule.effect = e.target.value
+                            props.onChange?.(newRule)
+                        }}
+                    />
                 </Col>
             </Row>
             <Divider style={{ margin: "10px 0" }} />
             <Row >
                 <Col style={rowColStyle}>
-                    <CaretUpOutlined x-if={stretch1} onClick={() => {
-                        setStretch1(false)
-                    }} />
-                    <CaretDownOutlined x-else onClick={() => {
-                        setStretch1(true)
-                    }} />
+                    <CaretUpOutlined x-if={stretch0} onClick={() => { setStretch0(false) }} />
+                    <CaretDownOutlined x-else onClick={() => { setStretch0(true) }} />
+                    应用
+                </Col>
+                <Col flex="auto">
+                    <a>{appInfo?.name || '-'}</a>
+                    <div x-if={stretch0} style={{ background: "rgba(0, 0, 0, 0.02)", padding: "10px" }}>
+                        <div style={{ width: "260px", }}>
+                            <InputApp
+                                value={appInfo}
+
+                                onChange={async (info) => {
+                                    setAppInfo(info)
+                                    if (info?.id) {
+                                        const actionsList = await getAppActionList(info.id, {}, {}, {})
+                                        if (actionsList?.totalCount) {
+                                            setAppActions(actionsList.edges.map(item => item.node))
+                                        }
+                                    } else {
+                                        setAppActions([])
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                </Col>
+            </Row>
+            <Divider style={{ margin: "10px 0" }} />
+            <Row >
+                <Col style={rowColStyle}>
+                    <CaretUpOutlined x-if={stretch1} onClick={() => { setStretch1(false) }} />
+                    <CaretDownOutlined x-else onClick={() => { setStretch1(true) }} />
                     操作
                 </Col>
                 <Col flex="auto">
@@ -157,18 +183,22 @@ const RuleItem = (props: {
                     </div>
                     <div x-if={stretch1}>
                         <div>
-                            <Radio.Group value={action} options={[
-                                { label: "全部操作(*)", value: "all" },
-                                { label: "指定", value: "customer" },
-                            ]} onChange={(e) => {
-                                setAction(e.target.value)
-                                if (e.target.value == 'all') {
-                                    newRule.actions = ["*"]
-                                } else {
-                                    newRule.actions = []
-                                }
-                                props.onChange?.(newRule)
-                            }} />
+                            <Radio.Group
+                                value={action}
+                                options={[
+                                    { label: "全部操作(*)", value: "all" },
+                                    { label: "指定", value: "customer" },
+                                ]}
+                                onChange={(e) => {
+                                    setAction(e.target.value)
+                                    if (e.target.value == 'all') {
+                                        newRule.actions = ["*"]
+                                    } else {
+                                        newRule.actions = []
+                                    }
+                                    props.onChange?.(newRule)
+                                }}
+                            />
                         </div>
                         {
                             action != "all" ? <>
@@ -187,7 +217,8 @@ const RuleItem = (props: {
                                         newRule.actions = nValues
                                         setActions(nValues)
                                         props.onChange?.(newRule)
-                                    }} />
+                                    }}
+                                />
                             </> : ""
                         }
                     </div>
@@ -196,12 +227,8 @@ const RuleItem = (props: {
             <Divider style={{ margin: "10px 0" }} />
             <Row >
                 <Col style={rowColStyle}>
-                    <CaretUpOutlined x-if={stretch2} onClick={() => {
-                        setStretch2(false)
-                    }} />
-                    <CaretDownOutlined x-else onClick={() => {
-                        setStretch2(true)
-                    }} />
+                    <CaretUpOutlined x-if={stretch2} onClick={() => { setStretch2(false) }} />
+                    <CaretDownOutlined x-else onClick={() => { setStretch2(true) }} />
                     资源
                 </Col>
                 <Col flex="auto">
@@ -209,30 +236,30 @@ const RuleItem = (props: {
                         <a>{resource === 'all' ? '全部资源' : `${resources.length}个资源`}</a>
                     </div>
                     <div x-if={stretch2}>
-                        <Radio.Group value={resource} options={[
-                            { label: "全部资源", value: "all" },
-                            { label: "指定资源", value: "customer" },
-                        ]} onChange={(e) => {
-                            setResource(e.target.value)
-                            if (e.target.value == 'all') {
-                                newRule.resources = ['*']
-                            } else {
-                                newRule.resources = []
-                            }
-                            props.onChange?.(newRule)
-                        }} />
+                        <Radio.Group
+                            value={resource}
+                            options={[
+                                { label: "全部资源", value: "all" },
+                                { label: "指定资源", value: "customer" },
+                            ]}
+                            onChange={(e) => {
+                                setResource(e.target.value)
+                                if (e.target.value == 'all') {
+                                    newRule.resources = ['*']
+                                } else {
+                                    newRule.resources = []
+                                }
+                                props.onChange?.(newRule)
+                            }}
+                        />
                     </div>
                 </Col>
             </Row>
             <Divider style={{ margin: "10px 0" }} />
             <Row >
                 <Col style={rowColStyle}>
-                    <CaretUpOutlined x-if={stretch3} onClick={() => {
-                        setStretch3(false)
-                    }} />
-                    <CaretDownOutlined x-else onClick={() => {
-                        setStretch3(true)
-                    }} />
+                    <CaretUpOutlined x-if={stretch3} onClick={() => { setStretch3(false) }} />
+                    <CaretDownOutlined x-else onClick={() => { setStretch3(true) }} />
                     条件
                 </Col>
                 <Col flex="auto">
@@ -245,9 +272,8 @@ const RuleItem = (props: {
 }
 
 export default (props: {
-    appInfo?: App,
+    orgId: string
     rules: PolicyRule[],
-    appActions: AppAction[],
     onChange?: (rules: PolicyRule[]) => void
 }) => {
     return (
@@ -262,9 +288,8 @@ export default (props: {
                                     <div key={`ruleItemdiv${index}`} >
                                         <RuleItem
                                             key={`ruleItem${index}`}
+                                            orgId={props.orgId}
                                             rule={item}
-                                            appInfo={props.appInfo}
-                                            appActions={props.appActions}
                                             onChange={(rule) => {
                                                 props.rules[index] = rule
                                                 props.onChange?.(props.rules)

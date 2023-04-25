@@ -1,17 +1,15 @@
-import { AppPolicy, EnumAppPolicyStatus, PolicyRule, createAppPolicy, getAppPolicyInfo, updateAppPolicy } from "@/services/app/policy";
 import {
     PageContainer, ProCard, ProForm,
     ProFormInstance,
-    ProFormSwitch, ProFormText, ProFormTextArea,
-    ProFormSelect,
-    useToken
+    ProFormText, ProFormTextArea, useToken
 } from "@ant-design/pro-components";
 import { message } from "antd";
 import { useSearchParams } from "ice";
 import { useEffect, useRef, useState } from "react";
 import PolicyRules from "../components/policyRules";
-import { AppAction, getAppActionList } from "@/services/app/action";
-import { App, getAppInfo } from "@/services/app";
+import { Org, getOrgInfo } from "@/services/org";
+import { PolicyRule } from "@/services/app/policy";
+import { OrgPolicy, createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from "@/services/org/policy";
 
 export default () => {
     const { token } = useToken(),
@@ -19,20 +17,15 @@ export default () => {
         formRef = useRef<ProFormInstance>(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
-        [appInfo, setAppInfo] = useState<App>(),
+        [orgInfo, setOrgInfo] = useState<Org>(),
         [rules, setRules] = useState<PolicyRule[]>([]),
-        [appActions, setAppActions] = useState<AppAction[]>([]),
         policyId: string = searchParams.get('id')
 
     const
-        getBase = async (appId: string) => {
-            const info = await getAppInfo(appId)
+        getBase = async (orgId: string) => {
+            const info = await getOrgInfo(orgId)
             if (info?.id) {
-                setAppInfo(info)
-                const result = await getAppActionList(info.id, {}, {}, {});
-                if (result?.edges) {
-                    setAppActions(result?.edges.map(item => item.node))
-                }
+                setOrgInfo(info)
             }
         },
         onValuesChange = () => {
@@ -42,26 +35,27 @@ export default () => {
             setSaveLoading(false)
             setSaveDisabled(true)
             if (policyId) {
-                const result = await getAppPolicyInfo(policyId)
+                const result = await getOrgPolicyInfo(policyId)
                 if (result?.id) {
                     setRules(result.rules || [])
-                    getBase(result.appID)
+                    getBase(result.orgID)
                     return result
                 }
             } else {
-                getBase(searchParams.get('appId'))
+                getBase(searchParams.get('orgId'))
             }
             return {}
         },
-        onFinish = async (values: AppPolicy) => {
-            let result: AppPolicy | null;
+        onFinish = async (values: OrgPolicy) => {
+            let result: OrgPolicy | null;
             setSaveLoading(true)
             if (policyId) {
                 values.rules = rules
-                result = await updateAppPolicy(policyId, values)
+                result = await updateOrgPolicy(policyId, values)
             } else {
                 values.rules = rules
-                result = await createAppPolicy(searchParams.get('appId'), values)
+                values.orgID = orgInfo?.id || ''
+                result = await createOrgPolicy(values)
             }
 
             if (result?.id) {
@@ -84,11 +78,10 @@ export default () => {
                 breadcrumb: {
                     items: [
                         { title: "系统配置", },
-                        { title: "应用管理", },
+                        { title: "组织管理", },
                         { title: "权限策略", },
                     ],
                 },
-                extra: <></>,
             }}
         >
             <ProCard>
@@ -117,38 +110,22 @@ export default () => {
                             { required: true, message: "请输入名称", },
                         ]}
                     />
-                    <ProFormText
-                        colProps={{ md: 6 }}
-                        name="version"
-                        label="版本"
-                        placeholder="请输入版本"
-                        rules={[
-                            { required: true, message: "请输入版本", },
-                        ]}
-                    />
-                    <ProFormSelect
-                        colProps={{ md: 6 }}
-                        name="status"
-                        label="状态"
-                        valueEnum={EnumAppPolicyStatus}
-                    />
-                    <ProFormSwitch
-                        colProps={{ md: 6 }}
-                        name="autoGrant"
-                        label="自动授予" />
                     <ProFormText>
-                        <PolicyRules rules={rules} onChange={(rules) => {
-                            setRules([...rules])
-                            onValuesChange()
-                        }} appInfo={appInfo} appActions={appActions} />
+                        {orgInfo?.id ? <PolicyRules
+                            orgId={orgInfo?.id}
+                            rules={rules}
+                            onChange={(rules) => {
+                                setRules([...rules])
+                                onValuesChange()
+                            }}
+                        /> : ''}
                     </ProFormText>
                     <ProFormTextArea
                         colProps={{ md: 12 }}
                         name="comments"
-                        label="备注（选填）"
-                        placeholder="请输入备注"
+                        label="描述（选填）"
+                        placeholder="请输入描述"
                     />
-
                 </ProForm>
             </ProCard>
         </PageContainer>

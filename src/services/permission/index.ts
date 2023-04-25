@@ -1,7 +1,8 @@
 import { gid } from "@/util"
-import { graphqlApi, setClearInputField } from "../graphql"
+import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 import { Org } from "../org"
 import { User } from "../user"
+import { OrgPolicy } from "../org/policy"
 
 export type Permission = {
     id: string
@@ -19,7 +20,7 @@ export type Permission = {
     status: PermissionStatus
     org?: Org
     user?: User
-    orgPolicy?: any
+    orgPolicy?: OrgPolicy
 }
 
 export type PermissionPrincipalKind = "user" | "role"
@@ -43,6 +44,86 @@ export const PermissionNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,userID,roleID,orgPolicyID,startAt,endAt,status
 `
 
+
+/**
+ * 权限策略引用列表
+ * @param orgPolicyId 
+ * @param params 
+ * @param filter 
+ * @param sort 
+ * @returns 
+ */
+export async function getOrgPolicyReferenceList(orgPolicyId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query orgPolicyReferences($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+                list:orgPolicyReferences(policyID:"${orgPolicyId}",after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${PermissionNodeField}
+                        }
+                    }
+                }
+                
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.list) {
+        return result.data.list as List<Permission>
+    } else {
+        return null
+    }
+}
+
+
+/**
+ * 组织授权列表
+ * @param orgId 
+ * @param params 
+ * @param filter 
+ * @param sort 
+ * @returns 
+ */
+export async function getOrgPermissionList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query orgpPrmissions($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+                node(id:"${gid("org", orgId)}"){
+                  ... on Org{
+                    list:permissions(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                        edges{                                        
+                            cursor,node{                    
+                                ${PermissionNodeField}
+                            }
+                        }
+                    }
+                  }
+                }
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.node?.list) {
+        return result.data.node.list as List<Permission>
+    } else {
+        return null
+    }
+}
 
 
 /**

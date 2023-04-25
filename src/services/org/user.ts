@@ -73,8 +73,8 @@ export async function getOrgRoleUserList(roleId: string, params: TableParams, fi
             params.current
         )
 
-    if (result?.data?.node?.list) {
-        return result.data.node.list as List<User>
+    if (result?.data?.list) {
+        return result.data.list as List<User>
     } else {
         return null
     }
