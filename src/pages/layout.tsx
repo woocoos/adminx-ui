@@ -57,7 +57,7 @@ export default function Layout() {
           <>
             <I18nDropdown />
             <AvatarDropdown
-              avatar={basisState.user?.avatar || defaultAvatar}
+              avatar={defaultAvatar}
               name={basisState.user?.displayName || ""}
             />
             <DarkMode />
