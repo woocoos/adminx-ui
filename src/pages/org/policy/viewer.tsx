@@ -46,26 +46,53 @@ export default () => {
             }
             return {}
         },
+        verifyRules = () => {
+            let errMsg = '';
+            if (rules.length) {
+                for (let i in rules) {
+                    const item = rules[i];
+                    if (item.actions.length) {
+                        const appCode = item.actions[0].split(':')[0]
+                        const action = item.actions.find(key => key.split(':')[0] != appCode)
+                        if (action) {
+                            errMsg = '有操作的应用不是统一'
+                        }
+                    } else {
+                        errMsg = '有操作未选择'
+                    }
+                    if (errMsg.length) {
+                        break;
+                    }
+                }
+            }
+            if (errMsg) {
+                message.warning(errMsg)
+            }
+            return errMsg
+        },
         onFinish = async (values: OrgPolicy) => {
             let result: OrgPolicy | null;
-            setSaveLoading(true)
-            if (policyId) {
-                values.rules = rules
-                result = await updateOrgPolicy(policyId, values)
-            } else {
-                values.rules = rules
-                values.orgID = orgInfo?.id || ''
-                result = await createOrgPolicy(values)
+            if (verifyRules()) {
+                return;
             }
+            // setSaveLoading(true)
+            // if (policyId) {
+            //     values.rules = rules
+            //     result = await updateOrgPolicy(policyId, values)
+            // } else {
+            //     values.rules = rules
+            //     values.orgID = orgInfo?.id || ''
+            //     result = await createOrgPolicy(values)
+            // }
 
-            if (result?.id) {
-                message.success("操作成功");
-                if (!policyId) {
-                    setSearchParams({ id: result.id })
-                }
-                await getRequest()
-            }
-            setSaveLoading(false)
+            // if (result?.id) {
+            //     message.success("操作成功");
+            //     if (!policyId) {
+            //         setSearchParams({ id: result.id })
+            //     }
+            //     await getRequest()
+            // }
+            // setSaveLoading(false)
         }
 
 

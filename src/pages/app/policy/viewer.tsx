@@ -137,10 +137,14 @@ export default () => {
                         name="autoGrant"
                         label="自动授予" />
                     <ProFormText>
-                        <PolicyRules rules={rules} onChange={(rules) => {
-                            setRules([...rules])
-                            onValuesChange()
-                        }} appInfo={appInfo} appActions={appActions} />
+                        {appInfo ? <PolicyRules
+                            rules={rules}
+                            onChange={(rules) => {
+                                setRules([...rules])
+                                onValuesChange()
+                            }}
+                            appInfo={appInfo}
+                            appActions={appActions} /> : ''}
                     </ProFormText>
                     <ProFormTextArea
                         colProps={{ md: 12 }}

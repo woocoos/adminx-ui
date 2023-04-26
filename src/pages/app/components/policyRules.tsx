@@ -4,20 +4,20 @@ import { Divider, Radio, Tabs, Row, Col, Button, Transfer, Tree, List, Popconfir
 import { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import { AppAction } from "@/services/app/action";
-import TransferTreeAndList, { TransferTreeAndListdataSource } from "@/components/Transfer/TransferTreeAndList";
+import ActionsTransfer from "@/components/ActionsTransfer";
 import { App } from "@/services/app";
 import Editor from '@monaco-editor/react';
 
 const RuleItem = (props: {
     rule: PolicyRule
     appActions: AppAction[],
-    appInfo?: App,
+    appInfo: App,
     onChange?: (rule: PolicyRule) => void
     onCopy?: () => void
     onDel?: () => void
 }) => {
     const [effect, setEffect] = useState<PolicyRuleEffect>(props.rule.effect || 'allow'),
-        [action, setAction] = useState<"all" | "customer">(props.rule.actions?.[0] === "*" ? "all" : 'customer'),
+        [action, setAction] = useState<"all" | "customer">(props.rule.actions?.[0] === `*` ? "all" : 'customer'),
         [actions, setActions] = useState<string[]>(props.rule.actions || []),
         [resource, setResource] = useState<"all" | "customer">(props.rule.resources?.[0] === "*" ? "all" : 'customer'),
         [resources, setResources] = useState<string[]>([]),
@@ -35,9 +35,7 @@ const RuleItem = (props: {
     const
         getTitle = () => {
             const titles: string[] = [];
-            if (props.appInfo) {
-                titles.push(props.appInfo.name)
-            }
+            titles.push(props.appInfo.name)
             if (actions[0] === '*') {
                 titles.push('全部操作')
             } else {
@@ -45,49 +43,8 @@ const RuleItem = (props: {
 
             }
             return titles.join('/')
-        },
-        getAppActionsData = () => {
-            const data: TransferTreeAndListdataSource<AppAction>[] = [],
-                readList: TransferTreeAndListdataSource<AppAction>[] = props.appActions.filter(item => item.method === 'read').map(item => ({
-                    key: `${props.appInfo?.code}:${item.name}`,
-                    title: item.name,
-                    parentId: item.method,
-                    node: item
-                })), writeList: TransferTreeAndListdataSource<AppAction>[] = props.appActions.filter(item => item.method === 'write').map(item => ({
-                    key: `${props.appInfo?.code}:${item.name}`,
-                    parentId: item.method,
-                    title: item.name,
-                    node: item
-                })), listList: TransferTreeAndListdataSource<AppAction>[] = props.appActions.filter(item => item.method === 'list').map(item => ({
-                    key: `${props.appInfo?.code}:${item.name}`,
-                    title: item.name,
-                    parentId: item.method,
-                    node: item
-                }))
-
-            if (readList.length) {
-                data.push({
-                    key: "read",
-                    title: "读操作",
-                    parentId: "0",
-                })
-            }
-            if (writeList.length) {
-                data.push({
-                    key: "write",
-                    title: "写操作",
-                    parentId: "0",
-                })
-            }
-            if (listList.length) {
-                data.push({
-                    key: "list",
-                    title: "列表操作",
-                    parentId: "0",
-                })
-            }
-            return data.concat(readList, writeList, listList)
         }
+
 
     const rowColStyle: CSSProperties = { width: "70px", paddingRight: "20px", textAlign: "right" }
 
@@ -137,7 +94,7 @@ const RuleItem = (props: {
             <Row >
                 <Col style={rowColStyle}>应用</Col>
                 <Col flex="auto">
-                    {props.appInfo?.name}
+                    {props.appInfo.name}
                 </Col>
             </Row>
             <Divider style={{ margin: "10px 0" }} />
@@ -173,21 +130,14 @@ const RuleItem = (props: {
                         {
                             action != "all" ? <>
                                 <br />
-                                <TransferTreeAndList
+                                <ActionsTransfer
                                     targetKeys={actions}
-                                    dataSource={getAppActionsData()}
-                                    render={(item) => (
-                                        <div>
-                                            <div>{item.title}</div>
-                                            <div x-if={item.node?.comments}>{item.node?.comments}</div>
-                                        </div>
-                                    )}
+                                    dataSource={props.appActions}
                                     onChange={(values) => {
-                                        const nValues = values.filter(v => !['read', 'write', 'list'].includes(v))
-                                        newRule.actions = nValues
-                                        setActions(nValues)
-                                        props.onChange?.(newRule)
-                                    }} />
+                                        setActions(values);
+                                        newRule.actions = values;
+                                        props.onChange?.(newRule);
+                                    }} appCode={props.appInfo.code} />
                             </> : ""
                         }
                     </div>
@@ -245,7 +195,7 @@ const RuleItem = (props: {
 }
 
 export default (props: {
-    appInfo?: App,
+    appInfo: App,
     rules: PolicyRule[],
     appActions: AppAction[],
     onChange?: (rules: PolicyRule[]) => void
@@ -301,12 +251,12 @@ export default (props: {
                         </>
                 },
                 {
-                    label: "脚本编辑", key: "json", children:
+                    label: "脚本编辑", key: "json", children: <>
                         <Editor
                             className="adminx-editor"
                             height="400px"
                             defaultLanguage="json"
-                            defaultValue={JSON.stringify(props.rules, null, 4)}
+                            value={JSON.stringify(props.rules, null, 4)}
                             onChange={(value) => {
                                 try {
                                     if (value) {
@@ -317,6 +267,7 @@ export default (props: {
                                 }
                             }}
                         />
+                    </>
                 },
             ]}
         />

@@ -21,6 +21,7 @@ export default (props: {
             <Input.Search
                 value={props.value?.name || ''}
                 disabled={props.disabled}
+                placeholder="点击搜索应用"
                 suffix={props.value && props.disabled != true ?
                     <CloseCircleFilled
                         style={{ fontSize: "12px", cursor: "pointer", color: "rgba(0, 0, 0, 0.25)" }}

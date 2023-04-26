@@ -27,9 +27,9 @@ export const EnumAppActionKind = {
 }
 
 export const EnumAppActionMethod = {
-    read: { text: 'read' },
-    write: { text: 'write' },
-    list: { text: 'list' },
+    read: { text: '读操作' },
+    write: { text: '写操作' },
+    list: { text: '列表操作' },
 }
 
 const AppActionField = `#graphql
