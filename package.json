@@ -1,12 +1,12 @@
 {
   "name": "adminx-ui",
   "version": "0.1.0",
-  "description": "ice.js 3 Pro 模板（基于 Ant Design）",
+  "description": "ice.js 3 Pro 模板(基于 Ant Design)",
   "dependencies": {
     "@ant-design/pro-components": "^2.4.2",
     "@ice/runtime": "^1.0.5",
     "@monaco-editor/react": "^4.5.0",
-    "antd": "^5.1.6",
+    "antd": "^5.4.5",
     "crypto-js": "^4.1.1",
     "dayjs": "^1.11.7",
     "i18next": "^22.4.9",
@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@graphql-tools/mock": "^8.7.16",
-    "@ice/app": "^3.0.6",
+    "@ice/app": "^3.1.6",
     "@ice/plugin-antd": "^1.0.1",
     "@ice/plugin-auth": "^1.0.0",
     "@ice/plugin-icestark": "^1.0.2",
