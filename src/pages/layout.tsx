@@ -12,12 +12,20 @@ import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
 import defaultAvatar from "@/assets/images/default-avatar.png";
 
-export default function Layout() {
-  const [basisState] = store.useModel("basis");
 
-  const [algorithm, setAlgorithm] = useState<MappingAlgorithm[]>([
-    theme.defaultAlgorithm,
-  ]);
+export default function Layout() {
+  const [basisState] = store.useModel("basis"),
+    [algorithm, setAlgorithm] = useState<MappingAlgorithm[]>([
+      theme.defaultAlgorithm,
+    ]);
+
+  const
+    requestMenus = async () => {
+      return asideMenuConfig
+    }
+
+
+
   useEffect(() => {
     let algorithms: MappingAlgorithm[] = [];
     setAlgorithm([]);
@@ -36,7 +44,6 @@ export default function Layout() {
     return <Outlet />;
   }
 
-
   return (
     <ConfigProvider
       theme={{
@@ -44,8 +51,11 @@ export default function Layout() {
       }}
     >
       <ProLayout
-        menu={{ defaultOpenAll: true }}
         className={styles.layout}
+        menu={{
+          locale: true,
+          request: requestMenus
+        }}
         logo={<img src={logo} alt="logo" />}
         title="Adminx"
         location={{
@@ -63,13 +73,7 @@ export default function Layout() {
             <DarkMode />
           </>
         )}
-        menuDataRender={() => asideMenuConfig}
-        menuItemRender={(item, defaultDom) => {
-          if (!item.path) {
-            return defaultDom;
-          }
-          return <Link to={item.path}>{defaultDom}</Link>;
-        }}
+        menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
       >
         <Outlet />
       </ProLayout>

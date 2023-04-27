@@ -1,5 +1,5 @@
 import { createModel, history } from 'ice';
-import localStorage from '@/pkg/localStorage'
+import localStore from '@/pkg/localStore'
 import { LoginRes } from '@/services/basis';
 import { User } from '@/services/user';
 
@@ -36,11 +36,11 @@ export default createModel({
       prevState.user = payload
     },
     updateDarkMode(prevState: BasisModelState, payload: boolean) {
-      localStorage.setItem("darkMode", payload)
+      localStore.setItem("darkMode", payload)
       prevState.darkMode = payload;
     },
     updateCompactMode(prevState: BasisModelState, payload: boolean) {
-      localStorage.setItem("compactMode", payload)
+      localStore.setItem("compactMode", payload)
       prevState.compactMode = payload;
     },
   },
@@ -50,11 +50,11 @@ export default createModel({
      * @returns 
      */
     async initBasis() {
-      const token = await localStorage.getItem<string>("token");
-      const darkMode = await localStorage.getItem<string>("darkMode");
-      const compactMode = await localStorage.getItem<string>("compactMode");
-      const tenantId = await localStorage.getItem<string>("tenantId");
-      const user = await localStorage.getItem<User>("user");
+      const token = await localStore.getItem<string>("token");
+      const darkMode = await localStore.getItem<string>("darkMode");
+      const compactMode = await localStore.getItem<string>("compactMode");
+      const tenantId = await localStore.getItem<string>("tenantId");
+      const user = await localStore.getItem<User>("user");
 
       // TODO：增加jwt判断token的处理
 
@@ -74,9 +74,9 @@ export default createModel({
     async login(payload: { result: LoginRes, user: User }) {
       const { result, user } = payload
       if (result.accessToken) {
-        this.updateToken(await localStorage.setItem("token", result.accessToken))
-        this.updateTenantId(await localStorage.setItem("tenantId", `${result.user?.domainId || ''}`))
-        this.updateUser(await localStorage.setItem("user", user))
+        this.updateToken(await localStore.setItem("token", result.accessToken))
+        this.updateTenantId(await localStore.setItem("tenantId", `${result.user?.domainId || ''}`))
+        this.updateUser(await localStore.setItem("user", user))
       }
     },
     /**
@@ -84,9 +84,9 @@ export default createModel({
      * @param isHistory 
      */
     async logout() {
-      await localStorage.removeItem("token")
-      await localStorage.removeItem("tenantId")
-      await localStorage.removeItem("user")
+      await localStore.removeItem("token")
+      await localStore.removeItem("tenantId")
+      await localStore.removeItem("user")
       this.updateToken("")
       this.updateTenantId("")
       this.updateUser(undefined)
@@ -100,7 +100,7 @@ export default createModel({
      * @param user 
      */
     async saveUser(user: User) {
-      this.updateUser(await localStorage.setItem("user", user))
+      this.updateUser(await localStore.setItem("user", user))
     },
   })
 });

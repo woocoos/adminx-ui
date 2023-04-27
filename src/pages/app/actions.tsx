@@ -27,7 +27,7 @@ const AppActionList = (props: {
 }, ref: MutableRefObject<AppActionListRef>) => {
     const { token } = useToken(),
         [searchParams, setSearchParams] = useSearchParams(),
-        appId: string = props?.appId || searchParams.get('id'),
+        appId = props?.appId || searchParams.get('id'),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
@@ -77,22 +77,24 @@ const AppActionList = (props: {
 
     const
         getApp = async () => {
+            let info: App | null = null
             if (appId) {
-                const result = await getAppInfo(appId)
-                if (result?.id) {
-                    setAppInfo(result)
+                info = await getAppInfo(appId)
+                if (info?.id) {
+                    setAppInfo(info)
                 }
             }
+            return info
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as AppAction[], success: true, total: 0 };
-            const result = await getAppActionList(appId, params, filter, sort);
-
-            if (result) {
-                table.data = result.edges.map(item => item.node)
-                table.total = result.totalCount
-            } else {
-                table.total = 0
+            const table = { data: [] as AppAction[], success: true, total: 0 },
+                info = await getApp();
+            if (info) {
+                const result = await getAppActionList(info.id, params, filter, sort);
+                if (result) {
+                    table.data = result.edges.map(item => item.node)
+                    table.total = result.totalCount
+                }
             }
             setSelectedRowKeys([])
             setDataSource(table.data)
@@ -129,10 +131,6 @@ const AppActionList = (props: {
         }
     })
 
-
-    useEffect(() => {
-        getApp()
-    }, [])
 
     return <>
         {

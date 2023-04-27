@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "description": "ice.js 3 Pro 模板(基于 Ant Design)",
   "dependencies": {
-    "@ant-design/pro-components": "^2.4.2",
-    "@ice/runtime": "^1.0.5",
+    "@ant-design/pro-components": "^2.4.9",
+    "@ice/runtime": "^1.1.6",
     "@monaco-editor/react": "^4.5.0",
     "antd": "^5.4.5",
     "crypto-js": "^4.1.1",

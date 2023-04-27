@@ -20,7 +20,6 @@ import { delAppRole, getAppRoleList } from "@/services/app/role";
 export default () => {
     const { token } = useToken(),
         [searchParams, setSearchParams] = useSearchParams(),
-        appId: string = searchParams.get('id'),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
@@ -92,22 +91,27 @@ export default () => {
 
     const
         getApp = async () => {
+            let info: App | null = null, appId = searchParams.get('id')
             if (appId) {
-                const result = await getAppInfo(appId)
-                if (result?.id) {
-                    setAppInfo(result)
+                info = await getAppInfo(appId)
+                if (info?.id) {
+                    setAppInfo(info)
                 }
             }
+            return info
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as AppRole[], success: true, total: 0 };
-            const result = await getAppRoleList(appId, params, filter, sort);
+            const table = { data: [] as AppRole[], success: true, total: 0 },
+                info = await getApp();
+            if (info) {
+                const result = await getAppRoleList(info.id, params, filter, sort);
 
-            if (result) {
-                table.data = result
-                table.total = result.length
-            } else {
-                table.total = 0
+                if (result) {
+                    table.data = result
+                    table.total = result.length
+                } else {
+                    table.total = 0
+                }
             }
 
             return table
@@ -132,10 +136,6 @@ export default () => {
             setModal({ open: false, title: '', id: '', scene: modal.scene })
         }
 
-
-    useEffect(() => {
-        getApp()
-    }, [])
 
     return (
         <PageContainer

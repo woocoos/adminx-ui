@@ -13,7 +13,7 @@ import { useState } from "react";
 export default (props: {
     open?: boolean
     title?: string
-    id?: string
+    id?: string | null
     orgId?: string
     userType: UserType
     scene: UpdateUserInfoScene

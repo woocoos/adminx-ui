@@ -19,7 +19,7 @@ export default () => {
         [saveDisabled, setSaveDisabled] = useState(true),
         [orgInfo, setOrgInfo] = useState<Org>(),
         [rules, setRules] = useState<PolicyRule[]>([]),
-        policyId: string = searchParams.get('id')
+        policyId = searchParams.get('id')
 
     const
         getBase = async (orgId: string) => {
@@ -42,7 +42,10 @@ export default () => {
                     return result
                 }
             } else {
-                getBase(searchParams.get('orgId'))
+                const orgId = searchParams.get('orgId')
+                if (orgId) {
+                    getBase(orgId)
+                }
             }
             return {}
         },
@@ -71,28 +74,28 @@ export default () => {
             return errMsg
         },
         onFinish = async (values: OrgPolicy) => {
-            let result: OrgPolicy | null;
             if (verifyRules()) {
                 return;
             }
-            // setSaveLoading(true)
-            // if (policyId) {
-            //     values.rules = rules
-            //     result = await updateOrgPolicy(policyId, values)
-            // } else {
-            //     values.rules = rules
-            //     values.orgID = orgInfo?.id || ''
-            //     result = await createOrgPolicy(values)
-            // }
+            let result: OrgPolicy | null;
+            setSaveLoading(true)
+            if (policyId) {
+                values.rules = rules
+                result = await updateOrgPolicy(policyId, values)
+            } else {
+                values.rules = rules
+                values.orgID = orgInfo?.id || ''
+                result = await createOrgPolicy(values)
+            }
 
-            // if (result?.id) {
-            //     message.success("操作成功");
-            //     if (!policyId) {
-            //         setSearchParams({ id: result.id })
-            //     }
-            //     await getRequest()
-            // }
-            // setSaveLoading(false)
+            if (result?.id) {
+                message.success("操作成功");
+                if (!policyId) {
+                    setSearchParams({ id: result.id })
+                }
+                await getRequest()
+            }
+            setSaveLoading(false)
         }
 
 

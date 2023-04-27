@@ -5,6 +5,8 @@ import { defineRequestConfig } from "@ice/plugin-request/esm/types";
 import { message } from 'antd';
 import store from "@/store";
 import "@/assets/styles/index.css"
+import localStore from "@/pkg/localStore";
+import { User } from "./services/user";
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
@@ -16,10 +18,24 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  const basis = await store.dispatch.basis.initBasis()
+  const token = await localStore.getItem<string>("token");
+  const darkMode = await localStore.getItem<string>("darkMode");
+  const compactMode = await localStore.getItem<string>("compactMode");
+  const tenantId = await localStore.getItem<string>("tenantId");
+  const user = await localStore.getItem<User>("user");
+
+  // TODO：增加jwt判断token的处理
+
 
   return {
-    basis,
+    basis: {
+      locale: "zh-CN",
+      token,
+      darkMode,
+      compactMode,
+      tenantId,
+      user,
+    },
   }
 });
 

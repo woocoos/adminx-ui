@@ -11,7 +11,7 @@ import { useState } from "react";
 export default (props: {
     open?: boolean
     title?: string
-    id?: string
+    id?: string | null
     scene?: 'conf'
     onClose?: (isSuccess?: boolean) => void
 }) => {

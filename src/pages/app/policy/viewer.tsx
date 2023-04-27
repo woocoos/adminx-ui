@@ -22,7 +22,7 @@ export default () => {
         [appInfo, setAppInfo] = useState<App>(),
         [rules, setRules] = useState<PolicyRule[]>([]),
         [appActions, setAppActions] = useState<AppAction[]>([]),
-        policyId: string = searchParams.get('id')
+        policyId = searchParams.get('id')
 
     const
         getBase = async (appId: string) => {
@@ -49,19 +49,56 @@ export default () => {
                     return result
                 }
             } else {
-                getBase(searchParams.get('appId'))
+                const appId = searchParams.get('appId')
+                if (appId) {
+                    getBase(appId)
+                }
             }
             return {}
         },
+        verifyRules = () => {
+            let errMsg = '';
+            if (appInfo) {
+                const appCode = appInfo.code;
+                if (rules.length) {
+                    for (let i in rules) {
+                        const item = rules[i];
+                        if (item.actions.length) {
+                            const action = item.actions.find(key => key.split(':')[0] != appCode)
+                            if (action) {
+                                errMsg = `有操作的配置与应用${appInfo.name}不匹配`
+                            }
+                        } else {
+                            errMsg = '有操作未选择'
+                        }
+                        if (errMsg.length) {
+                            break;
+                        }
+                    }
+                }
+            } else {
+                errMsg = '未找到应用'
+            }
+            if (errMsg) {
+                message.warning(errMsg)
+            }
+            return errMsg
+        },
         onFinish = async (values: AppPolicy) => {
-            let result: AppPolicy | null;
+            if (verifyRules()) {
+                return;
+            }
+            let result: AppPolicy | null = null;
             setSaveLoading(true)
             if (policyId) {
                 values.rules = rules
                 result = await updateAppPolicy(policyId, values)
             } else {
                 values.rules = rules
-                result = await createAppPolicy(searchParams.get('appId'), values)
+                const appId = searchParams.get('appId')
+                if (appId) {
+                    result = await createAppPolicy(appId, values)
+                }
             }
 
             if (result?.id) {
