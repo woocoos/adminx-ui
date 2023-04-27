@@ -51,7 +51,7 @@ export default () => {
                         }} >
                             编辑
                         </a>
-                        <Link key="sq" to="/">
+                        <Link key="sq" to={`/app/role/accredits?id=${record.id}`}>
                             授权
                         </Link>
                         <Dropdown trigger={['click']} menu={{

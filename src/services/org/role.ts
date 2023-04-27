@@ -239,3 +239,47 @@ export async function revokeOrgRoleUser(orgRoleId: string, userId: string) {
     }
 }
 
+
+
+/**
+ * 分配应用角色到组织
+ * @param orgId 
+ * @param appRoleId 
+ * @returns 
+ */
+export async function assignOrgAppRole(orgId: string, appRoleId: string) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation assignOrganizationAppRole{
+          action:assignOrganizationAppRole(orgID:"${orgId}",appRoleID:"${appRoleId}")
+        }`
+    )
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}
+
+
+/**
+ * 取消分配到组织应用角色
+ * @param orgRoleId 
+ * @returns 
+ */
+export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation revokeOrganizationAppRole{
+          action:revokeOrganizationAppRole(orgID:"${orgId}",appRoleID:"${appRoleId}")
+        }`
+    )
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}
+

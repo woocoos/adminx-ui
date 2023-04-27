@@ -10,6 +10,7 @@ export default (props: {
     isMultiple?: boolean
     title: string
     orgId?: string
+    appId?: string
     tableTitle?: string
     onClose: (selectData?: Org[]) => void
 }) => {
@@ -25,7 +26,7 @@ export default (props: {
 
     return (
         <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <OrgList ref={listRef} title={props.tableTitle} scene="modal" isMultiple={props.isMultiple} />
+            <OrgList ref={listRef} title={props.tableTitle} scene="modal" isMultiple={props.isMultiple} appId={props.appId} />
         </Modal>
     )
 }

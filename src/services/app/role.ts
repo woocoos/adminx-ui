@@ -1,5 +1,5 @@
 import { gid } from "@/util"
-import { App } from "."
+import { App, AppNodeField } from "."
 import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 import { AppPolicy, AppPolicyField } from "./policy"
 
@@ -91,20 +91,23 @@ export async function getAppRoleList(appId: string, params: TableParams, filter:
 }
 
 
-type AppRoleSecen = "policies"
+
 
 /**
  * 获取应用角色
  * @param appRoleId 
  * @returns 
  */
-export async function getAppRoleInfo(appRoleId: string, scene?: AppRoleSecen[]) {
+export async function getAppRoleInfo(appRoleId: string, scene?: Array<"policies" | "app">) {
     const result = await graphqlApi(
         `#graphql
         query node{
           node(id:"${gid('app_role', appRoleId)}"){
             ... on AppRole{        
                ${AppRoleField}
+               ${scene?.includes('app') ? `app{
+                    ${AppNodeField}
+                }`: ''}
                ${scene?.includes('policies') ? `policies{
                     ${AppPolicyField}
                 }`: ''}

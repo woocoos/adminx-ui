@@ -1,5 +1,5 @@
 import { gid } from "@/util"
-import { App } from "."
+import { App, AppNodeField } from "."
 import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 
 export type AppPolicy = {
@@ -117,13 +117,18 @@ export async function getAppPolicyList(appId: string, params: TableParams, filte
  * @param appPolicyId 
  * @returns 
  */
-export async function getAppPolicyInfo(appPolicyId: string) {
+export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<"app">) {
     const result = await graphqlApi(
         `#graphql
         query node{
           node(id:"${gid('app_policy', appPolicyId)}"){
             ... on AppPolicy{        
                ${AppPolicyField}
+               ${scene?.includes('app') ? `
+                app{
+                    ${AppNodeField}
+                }
+               ` : ''}
             }
           }
         }`)

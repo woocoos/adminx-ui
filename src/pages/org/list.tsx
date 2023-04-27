@@ -14,6 +14,7 @@ import { EnumOrgKind, EnumOrgStatus, Org, OrgKind, delOrgInfo, getOrgList, getOr
 import OrgCreate from "./components/create";
 import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
+import { getAppOrgList } from "@/services/app/org";
 
 export type OrgListRef = {
   getSelect: () => Org[]
@@ -26,6 +27,7 @@ const OrgList = (props: {
   scene?: 'modal'
   isMultiple?: boolean
   tenantId?: string
+  appId?: string
   kind?: OrgKind
 }, ref: MutableRefObject<OrgListRef>) => {
 
@@ -38,10 +40,11 @@ const OrgList = (props: {
       { title: '名称', dataIndex: 'name', width: 120, },
       { title: '编码', dataIndex: 'code', width: 120, },
       { title: '类型', dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
-      { title: '域', dataIndex: 'domain', width: 120, },
-      { title: '国家/地区', dataIndex: 'countryCode', width: 120 },
+      { title: '域', dataIndex: 'domain', width: 120, search: false, },
+      { title: '国家/地区', dataIndex: 'countryCode', width: 120, search: false, },
       {
-        title: '管理账户', dataIndex: 'owner', width: 120, render: (text, record) => {
+        title: '管理账户', dataIndex: 'owner', width: 120, search: false,
+        render: (text, record) => {
           return <div>{record?.owner?.displayName || '-'}</div>
         }
       },
@@ -50,6 +53,7 @@ const OrgList = (props: {
         valueEnum: EnumOrgStatus,
       },
     ],
+    [allList, setAllList] = useState<Org[]>([]),
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     [dataSource, setDataSource] = useState<Org[]>([]),
     // 选中处理
@@ -137,25 +141,34 @@ const OrgList = (props: {
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as Org[], success: true, total: 0 };
-      let list: Org[] = [];
-      if (kind === 'org') {
-        if (props.tenantId) {
-          list = await getOrgPathList(props.tenantId, kind)
-          table.total = list.length
+      setExpandedRowKeys([])
+      if (props.appId) {
+        const data = await getAppOrgList(props.appId, params, filter, sort)
+        if (data?.totalCount) {
+          table.data = data.edges.map(item => item.node)
+          table.total = data.totalCount
         }
+        setAllList(table.data)
       } else {
-        const result = await getOrgList({ kind: kind }, {}, {});
-        if (result) {
-          list = result.edges.map(item => item.node)
-          table.total = result.totalCount
+        let list: Org[] = [];
+        if (kind === 'org') {
+          if (props.tenantId) {
+            list = await getOrgPathList(props.tenantId, kind)
+            table.total = list.length
+          }
+        } else {
+          const result = await getOrgList({ kind: kind }, {}, {});
+          if (result) {
+            list = result.edges.map(item => item.node)
+            table.total = result.totalCount
+          }
         }
-      }
 
-      if (list.length) {
-        table.data = formatTreeData(list, undefined, { key: 'id', parentId: "parentID" })
-        setExpandedRowKeys(list.map(item => item.id))
-      } else {
-        setExpandedRowKeys([])
+        if (list.length) {
+          table.data = formatTreeData(list, undefined, { key: 'id', parentId: "parentID" })
+          setExpandedRowKeys(list.map(item => item.id))
+        }
+        setAllList(list)
       }
       setDataSource(table.data)
       return table
@@ -200,7 +213,7 @@ const OrgList = (props: {
   useImperativeHandle(ref, () => {
     return {
       getSelect: () => {
-        return dataSource.filter(item => selectedRowKeys.includes(item.id))
+        return allList.filter(item => selectedRowKeys.includes(item.id))
       },
       reload: (resetPageIndex?: boolean) => {
         proTableRef.current?.reload(resetPageIndex);
@@ -215,7 +228,7 @@ const OrgList = (props: {
           <ProTable
             actionRef={proTableRef}
             rowKey={"id"}
-            search={false}
+            search={props.appId ? undefined : false}
             toolbar={{
               title: props?.title || (kind === 'org' ? "组织部门树" : "组织树")
             }}

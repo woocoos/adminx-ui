@@ -39,7 +39,7 @@ export default () => {
                         <Link key="editor" to={`/app/policy/viewer?id=${record.id}`} >
                             编辑
                         </Link>
-                        <Link key="org" to={`/app/policy/org?id=${record.id}`} >
+                        <Link key="org" to={`/app/policy/accredits?id=${record.id}`} >
                             授权
                         </Link>
                         <a key="del" onClick={() => onDel(record)}>
