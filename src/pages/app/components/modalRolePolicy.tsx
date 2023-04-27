@@ -1,6 +1,6 @@
 import { App, } from '@/services/app';
 import { AppPolicy, getAppPolicyList } from '@/services/app/policy';
-import { AppRole, getAppRoleInfo, updateAppRole } from '@/services/app/role';
+import { AppRole, assignAppRolePolicy } from '@/services/app/role';
 import { Col, Drawer, Input, List, Row, Space, Table, Tag, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
@@ -23,7 +23,6 @@ export default (props: {
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
         [loading, setLoading] = useState<boolean>(false),
-        [oldPolicyIds, setOldPolicyIds] = useState<string[]>([]),
         [selectedPolicys, setSelectedPolicys] = useState<AppPolicy[]>([]),
         [dataSource, setdataSource] = useState<AppPolicy[]>([])
 
@@ -34,14 +33,6 @@ export default (props: {
                 const result = await getAppPolicyList(props.appInfo.id, { status: "active" }, {}, {})
                 if (result?.length) {
                     setdataSource(result);
-                }
-            }
-            if (props.roleInfo?.id) {
-                const result = await getAppRoleInfo(props.roleInfo.id, ["policies"])
-                if (result?.id) {
-                    const policyIds = result.policies?.map(item => item.id) || []
-                    setOldPolicyIds(policyIds)
-                    setSelectedPolicys(result.policies || [])
                 }
             }
             setLoading(false);
@@ -60,33 +51,10 @@ export default (props: {
             }
         },
         onFinish = async () => {
-            const input: {
-                name?: string
-                autoGrant?: boolean
-                editable?: boolean
-                addPolicyIDs: string[]
-                removePolicyIDs: string[]
-                clearPolicies: boolean
-            } = {
-                name: props.roleInfo?.name,
-                autoGrant: props.roleInfo?.autoGrant,
-                editable: props.roleInfo?.editable,
-                addPolicyIDs: [],
-                removePolicyIDs: [],
-                clearPolicies: false
-            };
-
-            if (selectedPolicys.length === 0) {
-                input.clearPolicies = true
-            } else {
-                const allIds = selectedPolicys.map(item => item.id)
-                input.addPolicyIDs = allIds.filter(id => !oldPolicyIds.includes(id))
-                input.removePolicyIDs = oldPolicyIds.filter(oid => !allIds.includes(oid))
-            }
             if (props.roleInfo?.id) {
                 setSaveLoading(true)
-                const result = await updateAppRole(props.roleInfo.id, input)
-                if (result?.id) {
+                const result = await assignAppRolePolicy(props.roleInfo.appID, props.roleInfo.id, selectedPolicys.map(item => item.id))
+                if (result) {
                     message.success('操作成功')
                     props.onClose?.(true)
                 }

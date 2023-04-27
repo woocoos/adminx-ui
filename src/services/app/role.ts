@@ -185,3 +185,30 @@ export async function delAppRole(appRoleId: string) {
         return null
     }
 }
+
+
+/**
+ * 角色添加策略
+ * @param appRoleId 
+ * @returns 
+ */
+export async function assignAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs: string[]) {
+    const result = await graphqlApi(
+        `#graphql
+        mutation assignAppRolePolicy($policyIds:[ID!]){
+          action:assignAppRolePolicy(appID: "${appId}",roleID: "${appRoleId}",policyIDs:$policyIds)
+        }`,
+        {
+            policyIds: appPolicyIDs
+        }
+    )
+
+    if (result?.data?.action) {
+        return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}
+
+
+
