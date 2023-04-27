@@ -5,7 +5,7 @@ import {
     ProTable,
     useToken,
 } from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal, Alert } from "antd";
+import { Button, Space, Dropdown, Modal, Alert, Input } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
@@ -23,7 +23,8 @@ export default () => {
         columns: ProColumns<Permission>[] = [
             // 有需要排序配置  sorter: true 
             {
-                title: '名称', dataIndex: 'roleID', width: 120, render: (text, record) => {
+                title: '名称', dataIndex: 'keyword', width: 120,
+                render: (text, record) => {
                     return record.role?.name
                 }
             },
@@ -60,6 +61,10 @@ export default () => {
                 const info = await getOrgPolicyInfo(orgPolicyId)
                 if (info?.id) {
                     setOrgPolicy(info)
+                    if (params.keyword) {
+                        params.hasRoleWith = { nameContains: params.keyword }
+                    }
+                    delete params.keyword
                     const result = await getOrgPolicyReferenceList(orgPolicyId, params, filter, sort);
                     if (result) {
                         table.data = result.edges.map(item => item.node)

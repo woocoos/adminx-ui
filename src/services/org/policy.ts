@@ -20,7 +20,7 @@ export type OrgPolicy = {
 }
 
 
-const OrgPolicyNodeField = `#graphql
+export const OrgPolicyNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments,
     rules{ effect,actions,resources,conditions }
 `
@@ -28,8 +28,10 @@ const OrgPolicyNodeField = `#graphql
 
 /**
  * 组织策略
- * @param userId 
- * @param headers 
+ * @param orgId 
+ * @param params 
+ * @param filter
+ * @param sort
  * @returns 
  */
 export async function getOrgPolicyList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {

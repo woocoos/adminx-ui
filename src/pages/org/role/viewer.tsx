@@ -5,6 +5,7 @@ import { useSearchParams } from "ice"
 import { useEffect, useState } from "react"
 import UserList from "@/pages/account/components/listAccount";
 import CreateOrgRole from "../components/createRole";
+import ListRolePermission from "../components/listRolePermission"
 
 export default () => {
     const { token } = useToken(),
@@ -95,7 +96,7 @@ export default () => {
                         {
                             label: `权限管理`,
                             key: 'policy',
-                            children: `2`,
+                            children: info ? <ListRolePermission orgRoleInfo={info} /> : '',
                         },
                     ],
                 }}

@@ -5,7 +5,7 @@ import {
     ProTable,
     useToken,
 } from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal, message, Alert } from "antd";
+import { Button, Space, Dropdown, Modal, message, Alert, Select } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
@@ -26,7 +26,15 @@ export default () => {
             { title: '名称', dataIndex: 'name', width: 120, },
             { title: '描述', dataIndex: 'comments', width: 120, search: false, },
             {
-                title: '策略类型', dataIndex: 'appPolicyID', width: 120, search: false,
+                title: '策略类型', dataIndex: 'type', width: 120,
+                renderFormItem(schema, config, form) {
+                    return <Select allowClear options={[
+                        { label: '系统策略', value: 'sys' },
+                        { label: '自定义策略', value: 'cust' },
+                    ]} onChange={(value) => {
+                        form.setFieldValue("type", value)
+                    }} />
+                },
                 render: (text, record) => (<span>{record.appPolicyID ? '系统策略' : '自定义策略'}</span>)
             },
             {
@@ -70,6 +78,11 @@ export default () => {
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as OrgPolicy[], success: true, total: 0 }, info = await getOrg();
             if (info?.id) {
+                if (params.type) {
+                    params.appPolicyIDNotNil = params.type === 'sys' ? true : undefined
+                    params.appPolicyIDIsNil = params.type === 'cust' ? true : undefined
+                }
+                delete params.type
                 const result = await getOrgPolicyList(info?.id, params, filter, sort)
                 if (result) {
                     table.data = result.edges.map(item => item.node)

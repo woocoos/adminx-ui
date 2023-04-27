@@ -2,7 +2,7 @@ import { gid } from "@/util"
 import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 import { Org } from "../org"
 import { User } from "../user"
-import { OrgPolicy } from "../org/policy"
+import { OrgPolicy, OrgPolicyNodeField } from "../org/policy"
 import { OrgRole, OrgRoleNodeField } from "../org/role"
 
 export type Permission = {
@@ -46,6 +46,9 @@ export const PermissionNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,userID,roleID,orgPolicyID,startAt,endAt,status,
     role{
         ${OrgRoleNodeField}
+    }
+    orgPolicy{
+        ${OrgPolicyNodeField}
     }
 `
 
@@ -160,7 +163,15 @@ export async function getPermissionInfo(permissionId: string) {
  * @param input 
  * @returns 
  */
-export async function createPermission(input: Permission | Record<string, any>) {
+export async function createPermission(input: {
+    principalKind: PermissionPrincipalKind
+    orgID: string
+    orgPolicyID: string
+    userID?: string
+    roleID?: string
+    startAt?: string
+    endAt?: string
+}) {
     const result = await graphqlApi(
         `#graphql
         mutation createPermission($input: CreatePermissionInput!){
@@ -187,7 +198,7 @@ export async function createPermission(input: Permission | Record<string, any>) 
 export async function updatePermission(permissionId: string, input: Permission | Record<string, any>) {
     const result = await graphqlApi(
         `#graphql
-        mutation updatePermission($input: CreatePermissionInput!){
+        mutation updatePermission($input: UpdatePermissionInput!){
           action:updatePermission(permissionID:"${permissionId}",input:$input){
             ${PermissionNodeField}
           }

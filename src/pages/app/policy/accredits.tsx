@@ -85,8 +85,8 @@ export default () => {
         onDel = (record: Org) => {
             if (appPolicyInfo) {
                 Modal.confirm({
-                    title: "删除",
-                    content: `是否删除：${record.name}`,
+                    title: "解除授权",
+                    content: `是否解除授权：${record.name}`,
                     onOk: async (close) => {
                         const result = await revokeOrgAppPolicy(record.id, appPolicyInfo.id)
                         if (result) {
