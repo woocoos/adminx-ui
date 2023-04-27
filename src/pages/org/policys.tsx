@@ -11,10 +11,12 @@ import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { Org, getOrgInfo } from "@/services/org";
 import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from "@/services/org/policy";
+import store from "@/store";
 
 
 export default () => {
     const { token } = useToken(),
+        [basisState] = store.useModel("basis"),
         [searchParams, setSearchParams] = useSearchParams(),
         [orgInfo, setOrgInfo] = useState<Org>(),
         // 表格相关
@@ -56,7 +58,7 @@ export default () => {
     const
         getOrg = async () => {
             let result: Org | null = null
-            const orgId = searchParams.get('id');
+            const orgId = searchParams.get('id') || basisState.tenantId;
             if (orgId) {
                 result = await getOrgInfo(orgId)
                 if (result?.id) {
@@ -92,15 +94,22 @@ export default () => {
             })
         }
 
+    useEffect(() => {
+        proTableRef.current?.reload(true);
+    }, [searchParams])
+
     return (
         <PageContainer
             header={{
                 title: "权限策略",
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
-                    items: [
+                    items: searchParams.get('id') ? [
                         { title: "系统配置", },
                         { title: "组织管理", },
+                        { title: "权限策略", },
+                    ] : [
+                        { title: "组织协作", },
                         { title: "权限策略", },
                     ],
                 },

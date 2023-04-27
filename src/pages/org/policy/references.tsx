@@ -5,7 +5,7 @@ import {
     ProTable,
     useToken,
 } from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal } from "antd";
+import { Button, Space, Dropdown, Modal, Alert } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
@@ -22,7 +22,11 @@ export default () => {
         [orgPolicyInfo, setOrgPolicy] = useState<OrgPolicy>(),
         columns: ProColumns<Permission>[] = [
             // 有需要排序配置  sorter: true 
-            { title: '名称', dataIndex: 'roleID', width: 120, },
+            {
+                title: '名称', dataIndex: 'roleID', width: 120, render: (text, record) => {
+                    return record.role?.name
+                }
+            },
             {
                 title: '类型', dataIndex: 'principalKind',
                 filters: true,
@@ -30,10 +34,10 @@ export default () => {
                 width: 100,
                 valueEnum: EnumPermissionPrincipalKind,
             },
-            {
-                title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
-                valueEnum: EnumPermissionStatus,
-            },
+            // {
+            //     title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
+            //     valueEnum: EnumPermissionStatus,
+            // },
             {
                 title: '操作', dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 170,
@@ -96,6 +100,7 @@ export default () => {
                             { title: "引用记录", },
                         ],
                     },
+                    children: <Alert showIcon message="引用记录用于查看权限策略的授权情况" />
                 }}
             >
                 <ProTable

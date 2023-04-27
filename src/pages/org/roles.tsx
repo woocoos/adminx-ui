@@ -7,7 +7,7 @@ import {
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal, Alert } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
-import { forwardRef, useRef, useState } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import CreateOrgRole from "./components/createRole";
@@ -91,6 +91,9 @@ const OrgRoleList = (props: {
             setModal({ open: false, title: '', id: '', scene: 'editor' })
         }
 
+    useEffect(() => {
+        proTableRef.current?.reload(true);
+    }, [searchParams])
 
     return (
         <>

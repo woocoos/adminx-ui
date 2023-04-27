@@ -19,7 +19,7 @@ export type OrgRole = {
  */
 export type OrgRoleKind = "group" | "role"
 
-const OrgRoleNodeField = `#graphql
+export const OrgRoleNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments
 `
 

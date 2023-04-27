@@ -3,6 +3,7 @@ import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi
 import { Org } from "../org"
 import { User } from "../user"
 import { OrgPolicy } from "../org/policy"
+import { OrgRole, OrgRoleNodeField } from "../org/role"
 
 export type Permission = {
     id: string
@@ -20,6 +21,7 @@ export type Permission = {
     status: PermissionStatus
     org?: Org
     user?: User
+    role?: OrgRole
     orgPolicy?: OrgPolicy
 }
 
@@ -41,7 +43,10 @@ export const EnumPermissionStatus = {
 
 
 export const PermissionNodeField = `#graphql
-    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,userID,roleID,orgPolicyID,startAt,endAt,status
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,userID,roleID,orgPolicyID,startAt,endAt,status,
+    role{
+        ${OrgRoleNodeField}
+    }
 `
 
 

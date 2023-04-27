@@ -44,6 +44,11 @@ const asideMenuConfig: MenuDataItem[] = [
         framework: true,
       },
       {
+        name: "权限策略",
+        path: "/org/policys",
+        framework: true,
+      },
+      {
         name: "用户组",
         path: "/org/groups",
         framework: true,

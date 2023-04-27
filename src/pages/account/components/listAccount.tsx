@@ -29,7 +29,7 @@ type UserListProps = {
 
 export type UserListRef = {
   getSelect: () => User[]
-  reload: () => void
+  reload: (resetPageIndex?: boolean) => void
 }
 
 const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
@@ -186,14 +186,14 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       getSelect: () => {
         return dataSource.filter(item => selectedRowKeys.includes(item.id))
       },
-      reload: () => {
-        proTableRef.current?.reload();
+      reload: (resetPageIndex?: boolean) => {
+        proTableRef.current?.reload(resetPageIndex);
       }
     }
   })
 
   useEffect(() => {
-    proTableRef.current?.reload();
+    proTableRef.current?.reload(true);
   }, [props?.orgId])
 
   return (

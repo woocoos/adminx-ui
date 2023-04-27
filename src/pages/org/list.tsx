@@ -17,7 +17,7 @@ import { TreeEditorAction } from "@/util/type";
 
 export type OrgListRef = {
   getSelect: () => Org[]
-  reload: () => void
+  reload: (resetPageIndex: boolean) => void
 }
 
 const OrgList = (props: {
@@ -202,8 +202,8 @@ const OrgList = (props: {
       getSelect: () => {
         return dataSource.filter(item => selectedRowKeys.includes(item.id))
       },
-      reload: () => {
-        proTableRef.current?.reload();
+      reload: (resetPageIndex?: boolean) => {
+        proTableRef.current?.reload(resetPageIndex);
       }
     }
   })

@@ -18,7 +18,7 @@ import ModalApp from "./components/modalApp"
 
 export type AppListRef = {
   getSelect: () => App[]
-  reload: () => void
+  reload: (resetPageIndex?: boolean) => void
 }
 
 const AppList = (props: {
@@ -158,8 +158,8 @@ const AppList = (props: {
       getSelect: () => {
         return dataSource.filter(item => selectedRowKeys.includes(item.id))
       },
-      reload: () => {
-        proTableRef.current?.reload();
+      reload: (resetPageIndex?: boolean) => {
+        proTableRef.current?.reload(resetPageIndex);
       }
     }
   })
