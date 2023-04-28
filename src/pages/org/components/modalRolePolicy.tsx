@@ -5,13 +5,16 @@ import { CloseOutlined } from "@ant-design/icons";
 import { DrawerForm } from '@ant-design/pro-components';
 import { OrgPolicy, getOrgPolicyList } from '@/services/org/policy';
 import { OrgRole } from '@/services/org/role';
-import { createPermission } from '@/services/permission';
+import { Permission, createPermission } from '@/services/permission';
 import { useTranslation } from 'react-i18next';
+import { User } from '@/services/user';
 
 export default (props: {
     open: boolean
     title?: string
-    orgRoleInfo: OrgRole
+    orgId: string,
+    userInfo?: User
+    orgRoleInfo?: OrgRole
     onClose: (isSuccess?: boolean) => void
 }) => {
 
@@ -32,7 +35,7 @@ export default (props: {
         getRequest = async () => {
             setLoading(true);
             setAllList([])
-            const result = await getOrgPolicyList(props.orgRoleInfo.orgID, {}, {}, {})
+            const result = await getOrgPolicyList(props.orgId, {}, {}, {})
             if (result?.totalCount) {
                 const data = result.edges.map(item => item.node)
                 setAllList(data)
@@ -56,15 +59,25 @@ export default (props: {
         },
         onFinish = async () => {
             setSaveLoading(true)
-            let isTree = false;
+            let isTree = false, result: Permission | null = null;
             for (let i in allList) {
                 const item = allList[i]
-                const result = await createPermission({
-                    principalKind: "role",
-                    orgID: props.orgRoleInfo.orgID,
-                    orgPolicyID: item.id,
-                    roleID: props.orgRoleInfo.id,
-                })
+                if (props.orgRoleInfo) {
+                    result = await createPermission({
+                        principalKind: "role",
+                        orgID: props.orgId,
+                        orgPolicyID: item.id,
+                        roleID: props.orgRoleInfo.id,
+                    })
+                } else if (props.userInfo) {
+                    result = await createPermission({
+                        principalKind: "user",
+                        orgID: props.orgId,
+                        orgPolicyID: item.id,
+                        userID: props.userInfo.id,
+                    })
+                }
+
                 if (result?.id) {
                     isTree = true
                 }
@@ -102,17 +115,29 @@ export default (props: {
             onOpenChange={onOpenChange}
         >
             <Space direction="vertical">
-                <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user group')}：</div>
-                <div>
-                    <Input value={props.orgRoleInfo.name} />
-                </div>
+                {
+                    props.orgRoleInfo ? <>
+                        <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user group')}：</div>
+                        <div>
+                            <Input value={props.orgRoleInfo.name} />
+                        </div>
+                    </> : ''
+                }
+                {
+                    props.userInfo ? <>
+                        <div>{t('user')}：</div>
+                        <div>
+                            <Input value={props.userInfo.displayName} />
+                        </div>
+                    </> : ''
+                }
                 <div>
                     {t('policy')}
                 </div>
                 <Row gutter={20}>
                     <Col span="16">
                         <div>
-                            <Input.Search placeholder={`t("search {{field}}", { field: t('keyword') })`} onSearch={onSearch} />
+                            <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
                         </div>
                         <br />
                         <Table

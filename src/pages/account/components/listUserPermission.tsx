@@ -9,17 +9,19 @@ import {
 import { Button, Space, Dropdown, Modal, message, Alert, Select } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Permission, delPermssion, getOrgPermissionList } from "@/services/permission";
-import ModalRolePolicy from "./modalRolePolicy";
-import { OrgRole } from "@/services/org/role";
+import { Permission, PermissionPrincipalKind, delPermssion, getOrgPermissionList, getUserPermissionList } from "@/services/permission";
+import ModalRolePolicy from "@/pages/org/components/modalRolePolicy";
 import { useTranslation } from "react-i18next";
+import store from "@/store";
+import { User } from "@/services/user";
 
 
 export default (props: {
-    orgRoleInfo: OrgRole
+    userInfo: User
+    principalKind: PermissionPrincipalKind
 }) => {
-    const { token } = useToken(),
-        { t } = useTranslation(),
+    const { t } = useTranslation(),
+        [basisState] = store.useModel("basis"),
         // 表格相关
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<Permission>[] = [
@@ -50,17 +52,7 @@ export default (props: {
                     return record.orgPolicy?.appPolicyID ? t('System strategy') : t('Custom policy')
                 }
             },
-            {
-                title: t('operation'), dataIndex: 'actions', fixed: 'right',
-                align: 'center', search: false, width: 110,
-                render: (text, record) => {
-                    return <Space>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('disauthorization')}
-                        </a>
-                    </Space>
-                }
-            },
+
         ],
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -73,12 +65,37 @@ export default (props: {
             title: "",
         })
 
+    if (props.principalKind === 'role') {
+        columns.unshift({
+            title: t('user group'), dataIndex: 'userGroupName', width: 120,
+            render: (text, record) => {
+                return record.role?.name
+            }
+        })
+    } else if (props.principalKind === "user") {
+        columns.push({
+            title: t('operation'), dataIndex: 'actions', fixed: 'right',
+            align: 'center', search: false, width: 110,
+            render: (text, record) => {
+                return <Space>
+                    <a key="del" onClick={() => onDel(record)}>
+                        {t('disauthorization')}
+                    </a>
+                </Space>
+            }
+        })
+    }
+
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as Permission[], success: true, total: 0 };
-            params.principalKind = "role"
-            params.roleID = props.orgRoleInfo.id
+            params.principalKind = props.principalKind
+            if (params.userGroupName) {
+                params.hasRoleWith = {
+                    nameContains: params.userGroupName || null,
+                }
+            }
             if (params.name || params.comments || params.type) {
                 params.hasOrgPolicyWith = {
                     nameContains: params.name || null,
@@ -87,10 +104,11 @@ export default (props: {
                     appPolicyIDIsNil: params.type === 'cust' ? true : undefined
                 }
             }
+            delete params.userGroupName
             delete params.name
             delete params.comments
             delete params.type
-            const result = await getOrgPermissionList(props.orgRoleInfo.orgID, params, filter, sort);
+            const result = await getUserPermissionList(props.userInfo.id, params, filter, sort);
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
@@ -103,7 +121,7 @@ export default (props: {
                 title: t('disauthorization'),
                 content: `${t('confirm disauthorization')}：${record.orgPolicy?.name}?`,
                 onOk: async (close) => {
-                    const result = await delPermssion(record.id, props.orgRoleInfo.orgID)
+                    const result = await delPermssion(record.id, record.orgID)
                     if (result) {
                         proTableRef.current?.reload();
                         message.success(t('submit success'))
@@ -124,13 +142,13 @@ export default (props: {
                 }}
                 toolbar={{
                     title: t("{{field}} list", { field: t('policy') }),
-                    actions: [
+                    actions: props.principalKind === 'user' ? [
                         <Button type="primary" onClick={() => {
                             setModal({ open: true, title: '' })
                         }} >
                             {t("add {{field}}", { field: t('authorization') })}
                         </Button>
-                    ]
+                    ] : []
                 }}
                 scroll={{ x: 'max-content' }}
                 columns={columns}
@@ -142,8 +160,8 @@ export default (props: {
                 }}
             />
             <ModalRolePolicy
-                orgId={props.orgRoleInfo.orgID}
-                orgRoleInfo={props.orgRoleInfo}
+                orgId={basisState.tenantId}
+                userInfo={props.userInfo}
                 open={modal.open}
                 title={`${t("add {{field}}", { field: t('permission') })}`}
                 onClose={(isSuccess) => {

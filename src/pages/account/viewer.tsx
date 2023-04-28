@@ -7,12 +7,13 @@ import {
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import defaultAvatar from "@/assets/images/default-avatar.png";
 import { useSearchParams } from "ice";
-import { ReactNode, useEffect, useState } from "react";
+import { Children, ReactNode, useEffect, useState } from "react";
 import { Button, Divider } from "antd";
 import UserCreate from "./components/create";
 import UserCreateIdentity from "./components/createIdentity";
-import { EnumUserIdentityKind, EnumUserLoginProfileMfaStatus, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
+import { EnumUserIdentityKind, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
 import { useTranslation } from "react-i18next";
+import ListUserPermission from "./components/listUserPermission";
 
 export default () => {
     const { token } = useToken(),
@@ -121,45 +122,79 @@ export default () => {
                         </ProDescriptions>
                     </ProDescriptions.Item>
                 </ProDescriptions>
-                <Divider style={{ margin: "0 0 24px 0" }} />
-                <ProDescriptions title={t('Login credentials')} column={3} extra={
-                    <Button onClick={() =>
-                        setModal({ open: true, title: t('amend {{field}}', { field: t('login credentials') }), scene: "identity", userType: info?.userType || 'member' })
-                    }>
-                        {t('amend')}
-                    </Button>
-                }>
-                    {identityRender()}
-                </ProDescriptions>
-                <Divider style={{ margin: "0 0 24px 0" }} />
-                <ProDescriptions title={t('Login Settings')} column={3} extra={
-                    <Button onClick={() =>
-                        setModal({ open: true, title: t('amend {{field}}', { field: t('login Settings') }), scene: "loginProfile", userType: info?.userType || 'member' })
-                    }>
-                        {t('amend')}
-                    </Button>
-                }>
-                    <ProDescriptions.Item label={t("last login IP")}  >
-                        {info?.loginProfile?.lastLoginIP || '-'}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label={t('last landing time')} valueType="dateTime">
-                        {info?.loginProfile?.lastLoginAt}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label={t('allow password login')}  >
-                        {info?.loginProfile?.canLogin ? t('yes') : t('no')}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label={t('reset password on next login')}  >
-                        {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label={t('equipment certification')}  >
-                        {info?.loginProfile?.verifyDevice ? t('yes') : t('no')}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label={t('MFA')}  >
-                        {info?.loginProfile?.mfaEnabled ? t('yes') : t('no')}
-                    </ProDescriptions.Item>
-                </ProDescriptions>
 
             </ProCard>
+            {info ? <ProCard
+                tabs={{
+                    items: [
+                        {
+                            label: t("{{field}} management", { field: t('certification') }),
+                            key: 'certification',
+                            children: <>
+                                <ProDescriptions title={t('Login credentials')} column={3} extra={
+                                    <Button onClick={() =>
+                                        setModal({ open: true, title: t('amend {{field}}', { field: t('login credentials') }), scene: "identity", userType: info?.userType || 'member' })
+                                    }>
+                                        {t('amend')}
+                                    </Button>
+                                }>
+                                    {identityRender()}
+                                </ProDescriptions>
+                                <Divider style={{ margin: "0 0 24px 0" }} />
+                                <ProDescriptions title={t('Login Settings')} column={3} extra={
+                                    <Button onClick={() =>
+                                        setModal({ open: true, title: t('amend {{field}}', { field: t('login Settings') }), scene: "loginProfile", userType: info?.userType || 'member' })
+                                    }>
+                                        {t('amend')}
+                                    </Button>
+                                }>
+                                    <ProDescriptions.Item label={t("last login IP")}  >
+                                        {info?.loginProfile?.lastLoginIP || '-'}
+                                    </ProDescriptions.Item>
+                                    <ProDescriptions.Item label={t('last landing time')} valueType="dateTime">
+                                        {info?.loginProfile?.lastLoginAt}
+                                    </ProDescriptions.Item>
+                                    <ProDescriptions.Item label={t('allow password login')}  >
+                                        {info?.loginProfile?.canLogin ? t('yes') : t('no')}
+                                    </ProDescriptions.Item>
+                                    <ProDescriptions.Item label={t('reset password on next login')}  >
+                                        {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
+                                    </ProDescriptions.Item>
+                                    <ProDescriptions.Item label={t('equipment certification')}  >
+                                        {info?.loginProfile?.verifyDevice ? t('yes') : t('no')}
+                                    </ProDescriptions.Item>
+                                    <ProDescriptions.Item label={t('MFA')}  >
+                                        {info?.loginProfile?.mfaEnabled ? t('yes') : t('no')}
+                                    </ProDescriptions.Item>
+                                </ProDescriptions>
+                            </>
+                            ,
+                        }, {
+                            label: t('joined group'),
+                            key: 'group',
+
+                        }, {
+                            label: t("{{field}} management", { field: t('permission') }),
+                            key: 'permission',
+                            children: <ProCard tabs={{
+                                items: [
+                                    {
+                                        label: t('personal authority'),
+                                        key: 'user-permission',
+                                        children: <ListUserPermission userInfo={info} principalKind="user" />
+                                    }, {
+                                        label: t('inherit user group permissions'),
+                                        key: 'group-permission',
+                                        children: <ListUserPermission userInfo={info} principalKind="role" />
+                                    }
+                                ]
+                            }}
+                            />
+                        }
+                    ],
+                }}
+            /> : ''}
+
 
             <UserCreate
                 x-if={['base', 'loginProfile'].includes(modal.scene)}
