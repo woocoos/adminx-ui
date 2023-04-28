@@ -8,6 +8,7 @@ import "@/assets/styles/index.css"
 import localStore from "@/pkg/localStore";
 import { User } from "./services/user";
 import { browserLanguage } from "./util";
+import jwt_decode, { JwtPayload } from "jwt-decode";
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
@@ -27,8 +28,17 @@ export const dataLoader = defineDataLoader(async () => {
     tenantId = await localStore.getItem<string>("tenantId"),
     user = await localStore.getItem<User>("user");
 
-  // TODO：增加jwt判断token的处理
-
+  if (token) {
+    // 增加jwt判断token过期的处理
+    try {
+      const jwt = jwt_decode<JwtPayload>(token)
+      if ((jwt.exp || 0) * 1000 < Date.now()) {
+        token = ""
+      }
+    } catch (err) {
+      token = ''
+    }
+  }
   if (!locale) {
     locale = browserLanguage()
   }

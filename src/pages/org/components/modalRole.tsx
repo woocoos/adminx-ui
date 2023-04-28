@@ -1,11 +1,12 @@
 import { Button, Modal } from 'antd';
 import { useRef } from 'react';
 import { OrgRoleListRef } from '../roles';
-import { OrgRole } from '@/services/org/role';
+import { OrgRole, OrgRoleKind } from '@/services/org/role';
 import OrgRoleList from '../roles';
 
 
 export default (props: {
+    kind: OrgRoleKind
     open: boolean
     title: string
     isMultiple?: boolean
@@ -35,6 +36,7 @@ export default (props: {
                 title={props.tableTitle}
                 orgId={props.orgId}
                 scene="modal"
+                kind={props.kind}
                 isMultiple={props.isMultiple}
             />
         </Modal>
