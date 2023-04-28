@@ -12,9 +12,11 @@ import { Button, Divider } from "antd";
 import UserCreate from "./components/create";
 import UserCreateIdentity from "./components/createIdentity";
 import { EnumUserIdentityKind, EnumUserLoginProfileMfaStatus, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
+import { useTranslation } from "react-i18next";
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         id = searchParams.get('id'),
         [showEys, setShowEys] = useState(false),
@@ -74,23 +76,23 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: info?.userType === 'account' ? "账户详情" : "用户详情",
+                title: t("{{field}} detail", { field: t(info?.userType || '') }),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: info?.userType === 'account' ? "账户管理" : "用户管理", },
-                        { title: info?.userType === 'account' ? "账户详情" : "用户详情", },
+                        { title: t('System configuration') },
+                        { title: t("{{field}} management", { field: t(info?.userType || '') }) },
+                        { title: t("{{field}} detail", { field: t(info?.userType || '') }) },
                     ],
                 },
             }}
         >
             <ProCard loading={loading} >
-                <ProDescriptions title="基本信息" column={2} extra={
+                <ProDescriptions title={t('Basic information')} column={2} extra={
                     <Button onClick={() =>
-                        setModal({ open: true, title: '修改基本信息', scene: "base", userType: info?.userType || 'member' })
+                        setModal({ open: true, title: t('amend {{field}}', { field: t("basic information") }), scene: "base", userType: info?.userType || 'member' })
                     }>
-                        修改
+                        {t('amend')}
                     </Button>
                 }>
                     <ProDescriptions.Item label=""
@@ -101,62 +103,59 @@ export default () => {
                     </ProDescriptions.Item>
                     <ProDescriptions.Item label="" >
                         <ProDescriptions column={2}>
-                            <ProDescriptions.Item label="显示名称"  >
+                            <ProDescriptions.Item label={t('display name')}  >
                                 {info?.displayName}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="手机"  >
+                            <ProDescriptions.Item label={t('mobile')}  >
                                 {info?.mobile}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="邮箱">
+                            <ProDescriptions.Item label={t('email')}>
                                 {info?.email}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="创建时间" valueType="dateTime" >
+                            <ProDescriptions.Item label={t('created at')} valueType="dateTime" >
                                 {info?.createdAt}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="简介"  >
+                            <ProDescriptions.Item label={t('introduction')}  >
                                 {info?.comments}
                             </ProDescriptions.Item>
                         </ProDescriptions>
                     </ProDescriptions.Item>
                 </ProDescriptions>
                 <Divider style={{ margin: "0 0 24px 0" }} />
-                <ProDescriptions title="登录凭证" column={3} extra={
+                <ProDescriptions title={t('Login credentials')} column={3} extra={
                     <Button onClick={() =>
-                        setModal({ open: true, title: '修改登录凭证', scene: "identity", userType: info?.userType || 'member' })
+                        setModal({ open: true, title: t('amend {{field}}', { field: t('login credentials') }), scene: "identity", userType: info?.userType || 'member' })
                     }>
-                        修改
+                        {t('amend')}
                     </Button>
                 }>
                     {identityRender()}
                 </ProDescriptions>
                 <Divider style={{ margin: "0 0 24px 0" }} />
-                <ProDescriptions title="登陆设置" column={3} extra={
+                <ProDescriptions title={t('Login Settings')} column={3} extra={
                     <Button onClick={() =>
-                        setModal({ open: true, title: '修改登陆设置', scene: "loginProfile", userType: info?.userType || 'member' })
+                        setModal({ open: true, title: t('amend {{field}}', { field: t('login Settings') }), scene: "loginProfile", userType: info?.userType || 'member' })
                     }>
-                        修改
+                        {t('amend')}
                     </Button>
                 }>
-                    <ProDescriptions.Item label="最后登录IP"  >
+                    <ProDescriptions.Item label={t("last login IP")}  >
                         {info?.loginProfile?.lastLoginIP || '-'}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="最后登陆时间" valueType="dateTime">
+                    <ProDescriptions.Item label={t('last landing time')} valueType="dateTime">
                         {info?.loginProfile?.lastLoginAt}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="允许密码登陆"  >
-                        {info?.loginProfile?.canLogin ? '是' : '否'}
+                    <ProDescriptions.Item label={t('allow password login')}  >
+                        {info?.loginProfile?.canLogin ? t('yes') : t('no')}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="下次登陆重置密码"  >
-                        {info?.loginProfile?.passwordReset ? '是' : '否'}
+                    <ProDescriptions.Item label={t('reset password on next login')}  >
+                        {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="设备认证"  >
-                        {info?.loginProfile?.verifyDevice ? '是' : '否'}
+                    <ProDescriptions.Item label={t('equipment certification')}  >
+                        {info?.loginProfile?.verifyDevice ? t('yes') : t('no')}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="多因素验证"  >
-                        {info?.loginProfile?.mfaEnabled ? '是' : '否'}
-                    </ProDescriptions.Item>
-                    <ProDescriptions.Item label="多因素验证状态" valueEnum={EnumUserLoginProfileMfaStatus}>
-                        {info?.loginProfile?.mfaStatus}
+                    <ProDescriptions.Item label={t('MFA')}  >
+                        {info?.loginProfile?.mfaEnabled ? t('yes') : t('no')}
                     </ProDescriptions.Item>
                 </ProDescriptions>
 

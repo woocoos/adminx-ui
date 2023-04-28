@@ -5,6 +5,7 @@ import {
 } from '@ant-design/pro-components';
 import { Drawer, Popconfirm, message } from 'antd';
 import { useRef, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 
 export default (props: {
@@ -15,15 +16,16 @@ export default (props: {
 }) => {
 
     const proTableRef = useRef<ActionType>(),
+        { t } = useTranslation(),
         [loading, setLoading] = useState(false),
         // 是否操作过
         [isAction, setIsAction] = useState(false),
         columns: ProColumns<UserIdentity>[] = [
             {
-                title: '类型',
+                title: t('type'),
                 dataIndex: 'kind',
                 formItemProps: {
-                    rules: [{ required: true, message: '此项为必填项' }],
+                    rules: [{ required: true, message: `${t('this field is required')}` }],
                 },
                 valueType: 'select',
                 valueEnum: EnumUserIdentityKind
@@ -33,12 +35,12 @@ export default (props: {
                 dataIndex: 'code',
                 formItemProps: (form, row) => {
                     const rowData = form.getFieldValue(row.entity.id), rules: any[] = [
-                        { required: true, message: '此项为必填项' }
+                        { required: true, message: `${t('this field is required')}` }
                     ]
                     if (rowData?.kind === 'email') {
                         rules.push({
                             type: 'email',
-                            message: '邮箱格式不正确'
+                            message: `${t('formal error')}`
                         })
                     }
                     return {
@@ -51,29 +53,29 @@ export default (props: {
                 dataIndex: 'codeExtend',
             },
             {
-                title: '状态',
+                title: t('state'),
                 dataIndex: 'status',
                 valueType: 'select',
                 valueEnum: EnumUserStatus
             },
             {
-                title: '操作',
+                title: t('operation'),
                 valueType: 'option',
                 width: 200,
                 render: (_text, record) => [
                     <Popconfirm
                         key="editable"
-                        title="删除"
-                        description="确认是否删除?"
+                        title={t('delete')}
+                        description={`${t('confirm delete')}?`}
                         onConfirm={async () => {
                             setIsAction(true)
                             if (await delUserIdentity(record.id)) {
-                                message.success('操作成功')
+                                message.success(t('submit success'))
                                 proTableRef.current?.reload();
                             }
                         }}
                     >
-                        <a> 删除 </a>
+                        <a> {t('delete')} </a>
                     </Popconfirm>
 
                 ],
@@ -127,7 +129,7 @@ export default (props: {
                             delete input.index
                             const result = await bindUserIdentity(props.id, input)
                             if (result?.id) {
-                                message.success('操作成功')
+                                message.success(t('submit success'))
                                 proTableRef.current?.reload();
                             }
                             setIsAction(true)

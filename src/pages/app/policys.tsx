@@ -11,39 +11,41 @@ import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
 import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "@/services/app/policy";
+import { useTranslation } from "react-i18next";
 
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<AppPolicy>[] = [
             // 有需要排序配置  sorter: true 
-            { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '版本', dataIndex: 'version', width: 120, },
+            { title: t('name'), dataIndex: 'name', width: 120, },
+            { title: t('version'), dataIndex: 'version', width: 120, },
             {
-                title: '自动授权', dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
+                title: t('automatic authorization'), dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
                 render: (text, record) => {
-                    return record.autoGrant ? '是' : '否'
+                    return record.autoGrant ? t('yes') : t('no')
                 }
             },
-            { title: '状态', dataIndex: 'status', width: 120, valueEnum: EnumAppPolicyStatus },
-            { title: '描述', dataIndex: 'comments', width: 120, search: false, },
+            { title: t('status'), dataIndex: 'status', width: 120, valueEnum: EnumAppPolicyStatus },
+            { title: t('description'), dataIndex: 'comments', width: 120, search: false, },
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
                         <Link key="editor" to={`/app/policy/viewer?id=${record.id}`} >
-                            编辑
+                            {t('edit')}
                         </Link>
                         <Link key="org" to={`/app/policy/accredits?id=${record.id}`} >
-                            授权
+                            {t('authorization')}
                         </Link>
                         <a key="del" onClick={() => onDel(record)}>
-                            删除
+                            {t('delete')}
                         </a>
                     </Space>
                 }
@@ -92,8 +94,8 @@ export default () => {
         },
         onDel = (record: AppPolicy) => {
             Modal.confirm({
-                title: "删除",
-                content: `是否删除：${record.name}`,
+                title: t('delete'),
+                content: `${t('confirm delete')}：${record.name}`,
                 onOk: async (close) => {
                     const result = await delAppPolicy(record.id)
                     if (result) {
@@ -107,20 +109,20 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: "权限策略",
+                title: t('policy'),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "应用管理", },
-                        { title: "权限策略", },
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
+                        { title: t('policy'), },
                     ],
                 },
                 children: <Alert showIcon message={
                     <>
-                        <div key="1">权限策略相当于一组权限集，目前支持两种类型的权限策略</div>
-                        <div key="2">系统策略：统一由系统创建，您只能使用而不能删除，系统策略的版本更新由系统维护</div>
-                        <div key="3">自定义策略：您可以自主创建、更新和删除，自定义策略的版本更新由您自己维护</div>
+                        <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
+                        <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
+                        <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
                     </>
                 } />
 
@@ -129,11 +131,17 @@ export default () => {
             <ProTable
                 actionRef={proTableRef}
                 rowKey={"id"}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                }}
                 toolbar={{
-                    title: `应用:${appInfo?.name || "-"}`,
+                    title: `${t('app')}:${appInfo?.name || "-"}`,
                     actions: [
                         <Button key="created" type="primary">
-                            <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>创建权限策略</Link>
+                            <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
+                                {t("create {{field}}", { field: t('policy') })}
+                            </Link>
                         </Button>
                     ]
                 }}

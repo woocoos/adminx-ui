@@ -10,6 +10,7 @@ import { formatTreeData } from "@/util";
 import { Org, getOrgPathList } from "@/services/org";
 import store from "@/store";
 import { useSearchParams } from "ice";
+import { useTranslation } from "react-i18next";
 
 type TreeDataState = {
     key: string
@@ -22,6 +23,7 @@ type TreeDataState = {
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [basisState] = store.useModel("basis"),
         [searchParams, setSearchParams] = useSearchParams(),
         userListActionRef = useRef<UserListRef>(null),
@@ -66,9 +68,9 @@ export default () => {
         proCardtitle = () => {
             const orgInfo = allOrgList.find(item => item.id == selectedTreeKeys[0])
             if (orgInfo) {
-                return `${orgInfo.name}-用户列表`
+                return `${orgInfo.name}-${t("{{field}} list", { field: t('user') })}`
             }
-            return "用户列表"
+            return `${t("{{field}} list", { field: t('user') })}`
         }
 
     useEffect(() => {
@@ -78,20 +80,19 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: `组织用户管理`,
+                title: t('organizational user management'),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "组织协作", },
-                        { title: "组织用户管理", },
+                        { title: t('organization and cooperation'), },
+                        { title: t('organizational user management'), },
                     ],
                 },
             }}
         >
             <ProCard split="vertical">
                 <ProCard title={
-                    <Input.Search placeholder="关键字搜索" onSearch={onSearch} />
+                    <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
                 } colSpan="280px" loading={loading}>
                     <Tree x-if={treeData.length != 0}
                         treeData={treeData}

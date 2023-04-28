@@ -6,6 +6,7 @@ import { ColumnsType } from 'antd/es/table';
 import { useEffect, useState } from 'react';
 import { CloseOutlined } from "@ant-design/icons";
 import { DrawerForm } from '@ant-design/pro-components';
+import { useTranslation } from 'react-i18next';
 
 export default (props: {
     open?: boolean
@@ -15,10 +16,10 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const
+    const { t } = useTranslation(),
         columns: ColumnsType<AppPolicy> = [
-            { title: '权限策略', dataIndex: 'name' },
-            { title: '描述', dataIndex: 'comments' },
+            { title: t('policy'), dataIndex: 'name' },
+            { title: t('description'), dataIndex: 'comments' },
         ],
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
@@ -55,7 +56,7 @@ export default (props: {
                 setSaveLoading(true)
                 const result = await assignAppRolePolicy(props.roleInfo.appID, props.roleInfo.id, selectedPolicys.map(item => item.id))
                 if (result) {
-                    message.success('操作成功')
+                    message.success(t('submit success'))
                     props.onClose?.(true)
                 }
             }
@@ -69,6 +70,10 @@ export default (props: {
             title={props.title}
             open={props.open}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -85,19 +90,19 @@ export default (props: {
         >
             <Space direction="vertical">
                 <div>
-                    应用：<Tag>{props.appInfo?.name}</Tag>
+                    {t('app')}：<Tag>{props.appInfo?.name}</Tag>
                 </div>
-                <div>角色：</div>
+                <div>{t('role')}：</div>
                 <div>
                     <Input value={props.roleInfo?.name} />
                 </div>
                 <div>
-                    权限策略
+                    {t('policy')}
                 </div>
                 <Row gutter={20}>
                     <Col span="16">
                         <div>
-                            <Input.Search placeholder='关键字搜索' onSearch={onSearch} />
+                            <Input.Search placeholder={`${t('search {{field}}', { field: t('keyword') })}`} onSearch={onSearch} />
                         </div>
                         <br />
                         <Table
@@ -146,10 +151,10 @@ export default (props: {
                         <div style={{ paddingBottom: "30px" }}>
                             <Row>
                                 <Col flex="auto">
-                                    已选择（{selectedPolicys.length}）
+                                    {t('selected')}（{selectedPolicys.length}）
                                 </Col>
                                 <Col >
-                                    <a>清空</a>
+                                    <a>{t('empty')}</a>
                                 </Col>
                             </Row>
                         </div>

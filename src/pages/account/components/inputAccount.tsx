@@ -3,6 +3,7 @@ import { Input } from "antd"
 import ModalAccount from "./modalAccount"
 import { useState } from "react"
 import { CloseCircleFilled } from "@ant-design/icons";
+import { useTranslation } from "react-i18next";
 
 export default (props: {
     value?: User,
@@ -10,11 +11,13 @@ export default (props: {
     userType: UserType
     onChange?: (value?: User) => void
 }) => {
-    const [modal, setModal] = useState<{
-        open: boolean
-    }>({
-        open: false
-    })
+    const
+        { t } = useTranslation(),
+        [modal, setModal] = useState<{
+            open: boolean
+        }>({
+            open: false
+        })
 
     return (
         <>
@@ -35,7 +38,7 @@ export default (props: {
             />
             <ModalAccount
                 open={modal.open}
-                title={"搜索账户"}
+                title={t("search {{field}}", { field: t('account') })}
                 userType={props.userType}
                 onClose={(selectData) => {
                     if (selectData?.length) {

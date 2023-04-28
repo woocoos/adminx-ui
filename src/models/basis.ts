@@ -4,7 +4,7 @@ import { LoginRes } from '@/services/basis';
 import { User } from '@/services/user';
 
 interface BasisModelState {
-  locale: "zh-CN" | "zh-TW" | "en-US"
+  locale: string
   token: string
   tenantId: string
   darkMode: boolean
@@ -23,7 +23,8 @@ export default createModel({
     compactMode: false,
   } as BasisModelState,
   reducers: {
-    updateLocale(prevState: BasisModelState, payload: "zh-CN" | "zh-TW" | "en-US") {
+    updateLocale(prevState: BasisModelState, payload: string) {
+      localStore.setItem("locale", payload)
       prevState.locale = payload;
     },
     updateToken(prevState: BasisModelState, payload: string) {
@@ -45,28 +46,28 @@ export default createModel({
     },
   },
   effects: () => ({
-    /**
-     * 获取缓存数据
-     * @returns 
-     */
-    async initBasis() {
-      const token = await localStore.getItem<string>("token");
-      const darkMode = await localStore.getItem<string>("darkMode");
-      const compactMode = await localStore.getItem<string>("compactMode");
-      const tenantId = await localStore.getItem<string>("tenantId");
-      const user = await localStore.getItem<User>("user");
+    // /**
+    //  * 获取缓存数据 (废弃)
+    //  * @returns 
+    //  */
+    // async initBasis() {
+    //   const token = await localStore.getItem<string>("token");
+    //   const darkMode = await localStore.getItem<string>("darkMode");
+    //   const compactMode = await localStore.getItem<string>("compactMode");
+    //   const tenantId = await localStore.getItem<string>("tenantId");
+    //   const user = await localStore.getItem<User>("user");
 
-      // TODO：增加jwt判断token的处理
+    //   // TODO：增加jwt判断token的处理
 
-      return {
-        locale: "zh-CN",
-        token,
-        darkMode,
-        compactMode,
-        tenantId,
-        user,
-      };
-    },
+    //   return {
+    //     locale: "zh-CN",
+    //     token,
+    //     darkMode,
+    //     compactMode,
+    //     tenantId,
+    //     user,
+    //   };
+    // },
     /**
      * 登录
      * @param payload 

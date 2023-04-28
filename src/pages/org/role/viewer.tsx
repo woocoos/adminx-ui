@@ -6,9 +6,11 @@ import { useEffect, useState } from "react"
 import UserList from "@/pages/account/components/listAccount";
 import CreateOrgRole from "../components/createRole";
 import ListRolePermission from "../components/listRolePermission"
+import { useTranslation } from "react-i18next"
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         [loading, setLoading] = useState(false),
         [info, setInfo] = useState<OrgRole>(),
@@ -48,28 +50,28 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: info?.kind === 'role' ? "角色详情" : "用户组详情",
+                title: info?.kind === 'role' ? t("{{field}} detail", { field: t('role') }) : t("{{field}} detail", { field: t('user group') }),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "组织协助", },
-                        { title: info?.kind === 'role' ? "角色详情" : "用户组详情" },
+                        { title: t('organization and cooperation'), },
+                        { title: info?.kind === 'role' ? t("{{field}} detail", { field: t('role') }) : t("{{field}} detail", { field: t('user group') }) },
                     ],
                 },
             }}
         >
             <ProCard loading={loading} >
-                <ProDescriptions title="基本信息" column={1} extra={
+                <ProDescriptions title={t("Basic information")} column={1} extra={
                     <Button onClick={() => {
-                        setModal({ open: true, title: '修改基本信息', scene: "base" })
+                        setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }), scene: "base" })
                     }}>
-                        修改
+                        {t('amend')}
                     </Button>
                 }>
-                    <ProDescriptions.Item label="名称"  >
+                    <ProDescriptions.Item label={t('name')}  >
                         {info?.name}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="简介"  >
+                    <ProDescriptions.Item label={t('introduction')}  >
                         {info?.comments}
                     </ProDescriptions.Item>
                 </ProDescriptions>
@@ -87,14 +89,14 @@ export default () => {
                 tabs={{
                     items: [
                         {
-                            label: `成员管理`,
+                            label: t("{{field}} management", { field: t('member') }),
                             key: 'member',
                             children: info ? <>
-                                <UserList scene="roleUser" title="成员列表" roleId={info.id} />
+                                <UserList scene="roleUser" title={`${t("{{field}} list", { field: t('member') })}`} roleId={info.id} />
                             </> : '',
                         },
                         {
-                            label: `权限管理`,
+                            label: t("{{field}} management", { field: t('permission') }),
                             key: 'policy',
                             children: info ? <ListRolePermission orgRoleInfo={info} /> : '',
                         },

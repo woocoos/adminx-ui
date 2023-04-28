@@ -16,6 +16,7 @@ import { allotOrgUser, getOrgRoleUserList, getOrgUserList, removeOrgUser } from 
 import { assignOrgRoleUser, revokeOrgRoleUser } from "@/services/org/role";
 import ModalAccount from "@/pages/account/components/modalAccount";
 import { getDate } from "@/util";
+import { useTranslation } from "react-i18next";
 
 type UserListProps = {
   title?: string
@@ -34,20 +35,21 @@ export type UserListRef = {
 
 const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   const { token } = useToken(),
+    { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [dataSource, setDataSource] = useState<User[]>([]),
     columns: ProColumns<User>[] = [
       // 有需要排序配置  sorter: true 
-      { title: '登录账户', dataIndex: 'principalName', width: 90, },
-      { title: '显示名称', dataIndex: 'displayName', width: 120, },
-      { title: '邮箱', dataIndex: 'email', width: 120, },
-      { title: '手机', dataIndex: 'mobile', width: 160 },
+      { title: t("principal name"), dataIndex: 'principalName', width: 90, },
+      { title: t('display name'), dataIndex: 'displayName', width: 120, },
+      { title: t('email'), dataIndex: 'email', width: 120, },
+      { title: t('mobile'), dataIndex: 'mobile', width: 160 },
       {
-        title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
+        title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: EnumUserStatus,
       },
-      { title: '创建时间', dataIndex: 'createdAt', width: 160, valueType: "dateTime", sorter: true },
+      { title: t('created at'), dataIndex: 'createdAt', width: 160, valueType: "dateTime", sorter: true },
 
     ],
     // 选中处理
@@ -66,31 +68,31 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   if (props?.scene !== 'modal') {
     columns.push(
       {
-        title: '操作', dataIndex: 'actions', fixed: 'right',
+        title: t('operation'), dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 120,
         render: (text, record) => {
           return props.scene === "roleUser" ? <Space>
-            <a onClick={() => onRemoveRole(record)}>移除</a>
+            <a onClick={() => onRemoveRole(record)}>{t("remove")}</a>
           </Space> : props?.scene === 'orgUser' ? <Space>
             <Link key="editor" to={`/account/viewer?id=${record.id}`}>
-              详情
+              {t('detail')}
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: [
-                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
-                { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>移除</a> },
+                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> },
+                { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> },
               ]
             }} >
               <a><EllipsisOutlined /></a>
             </Dropdown>
           </Space> : <Space>
             <Link key="editor" to={`/account/viewer?id=${record.id}`}>
-              详情
+              {t('detail')}
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: [
-                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>重置密码</a> },
-                { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
+                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> },
+                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
               ]
             }} >
               <a><EllipsisOutlined /></a>
@@ -123,15 +125,15 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     },
     onResetPwd = (record: User) => {
       Modal.confirm({
-        title: `重置密码-${record.displayName}`,
+        title: `${t('reset password')} ${record.displayName}`,
         content: <>
-          <div>重置后密码将发送邮件至客户邮箱</div>
-          <div>登录密码重置需要客户登录后重置密码后才可使用系统</div>
+          <div>{t("After the password is reset, an email will be sent to the customer's email address")}</div>
+          <div>{t("The login password must be reset after the user logs in to the system")}</div>
         </>,
         onOk: async (close) => {
           const result = await resetUserPasswordByEmail(record.id)
           if (result) {
-            message.success('成功重置密码')
+            message.success(t('submit success'))
             close();
           }
         }
@@ -139,12 +141,13 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     },
     onDelApp = (record: User) => {
       Modal.confirm({
-        title: "删除",
-        content: `是否删除用户：${record.displayName}`,
+        title: t('delete'),
+        content: `${t("confirm delete")}：${record.displayName} ?`,
         onOk: async (close) => {
           const result = await delUserInfo(record.id)
           if (result) {
             proTableRef.current?.reload();
+            message.success(t('submit success'))
             close();
           }
         }
@@ -152,13 +155,14 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     },
     onRemoveOrg = (record: User) => {
       Modal.confirm({
-        title: "移除",
-        content: `是否移除用户：${record.displayName}`,
+        title: t('remove'),
+        content: `${t('confirm remove')}：${record.displayName} ?`,
         onOk: async (close) => {
           if (props?.orgId) {
             const result = await removeOrgUser(props.orgId, record.id)
             if (result) {
               proTableRef.current?.reload();
+              message.success(t('submit success'))
               close();
             }
           }
@@ -167,13 +171,14 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     },
     onRemoveRole = (record: User) => {
       Modal.confirm({
-        title: "移除",
-        content: `是否移除用户：${record.displayName}`,
+        title: t('remove'),
+        content: `${t('confirm remove')}：${record.displayName}`,
         onOk: async (close) => {
           if (props?.roleId) {
             const result = await revokeOrgRoleUser(props.roleId, record.id)
             if (result) {
               proTableRef.current?.reload();
+              message.success(t('submit success'))
               close();
             }
           }
@@ -202,20 +207,30 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         ["modal", "orgUser", "roleUser"].includes(props?.scene || '') ? (
           <ProTable
             actionRef={proTableRef}
+            search={{
+              searchText: `${t('query')}`,
+              resetText: `${t('reset')}`,
+            }}
             rowKey={"id"}
             toolbar={{
-              title: props.title || (props.userType === 'account' ? "账户列表" : "用户列表"),
+              title: props.title || t("{{field}} list", { field: t(props.userType || '') }),
               actions: props.scene === "roleUser" ? [
                 <Button type="primary" onClick={() => {
-                  setModal({ open: true, title: '添加成员', scene: "add" })
-                }}>添加成员</Button>
+                  setModal({ open: true, title: t('add {{field}}', { field: t('member') }), scene: "add" })
+                }}>
+                  {t('add {{field}}', { field: t('member') })}
+                </Button>
               ] : props.scene === "orgUser" ? [
                 <Button type="primary" onClick={() => {
-                  setModal({ open: true, title: '创建用户', scene: "create" })
-                }}>创建用户</Button>,
+                  setModal({ open: true, title: t('create {{field}}', { field: t('user') }), scene: "create" })
+                }}>
+                  {t('create {{field}}', { field: t('user') })}
+                </Button>,
                 <Button type="primary" onClick={() => {
-                  setModal({ open: true, title: '添加用户', scene: "add" })
-                }}>添加用户</Button>
+                  setModal({ open: true, title: t('add {{field}}', { field: t('user') }), scene: "add" })
+                }}>
+                  {t('add {{field}}', { field: t('user') })}
+                </Button>
               ] : []
             }}
             scroll={{ x: 'max-content', y: 300 }}
@@ -231,26 +246,30 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         ) : (
           <PageContainer
             header={{
-              title: "账户管理",
+              title: t('{{field}} management', { field: t(props.userType || '') }),
               style: { background: token.colorBgContainer },
               breadcrumb: {
                 items: [
-                  { title: "系统配置", },
-                  { title: "账户管理", },
+                  { title: t('System configuration'), },
+                  { title: t('{{field}} management', { field: t(props.userType || '') }), },
                 ],
               },
             }}
           >
             <ProTable
               actionRef={proTableRef}
+              search={{
+                searchText: `${t('query')}`,
+                resetText: `${t('reset')}`,
+              }}
               rowKey={"id"}
               toolbar={{
-                title: props?.title || (props.userType === 'account' ? "账户列表" : "用户列表"),
+                title: props?.title || t("{{field}} list", { field: t(props.userType || '') }),
                 actions: [
                   <Button type="primary" onClick={() => {
-                    setModal({ open: true, title: `创建${props.userType === 'account' ? '账户' : '用户'}`, scene: "create" })
+                    setModal({ open: true, title: t('create {{field}}', { field: t(props.userType || '') }), scene: "create" })
                   }}>
-                    创建{props.userType === 'account' ? '账户' : '用户'}
+                    {t('create {{field}}', { field: t(props.userType || '') })}
                   </Button>
                 ]
               }}

@@ -5,6 +5,7 @@ import type { MenuInfo } from "rc-menu/lib/interface";
 import styles from "./index.module.css";
 import { logout } from "@/services/basis";
 import store from "@/store";
+import { useTranslation } from "react-i18next";
 
 interface AvatarDropdownProps {
   name: string;
@@ -12,9 +13,8 @@ interface AvatarDropdownProps {
 }
 
 const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
-  const [, basisDispatcher] = store.useModel("basis");
-
-
+  const { t } = useTranslation(),
+    [, basisDispatcher] = store.useModel("basis");
 
   const onMenuClick = useCallback((event: MenuInfo) => {
     const { key } = event;
@@ -29,7 +29,7 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
     items: [
       {
         key: "logout",
-        label: "退出登录",
+        label: t('logout'),
         icon: <LogoutOutlined />,
         onClick: onMenuClick,
         className: styles.menu,

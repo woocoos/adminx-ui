@@ -16,31 +16,33 @@ import { Org } from "@/services/org";
 import { assignOrgAppPolicy, revokeOrgAppPolicy } from "@/services/org/policy";
 import ModalOrg from "@/pages/org/components/modalOrg";
 import { getAppPolicyAssignedOrgList } from "@/services/app/org";
+import { useTranslation } from "react-i18next";
 
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         [appPolicyInfo, setAppPolicyInfo] = useState<AppPolicy>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<Org>[] = [
             // 有需要排序配置  sorter: true 
-            { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '简介', dataIndex: 'profile', width: 120, },
+            { title: t('name'), dataIndex: 'name', width: 120, },
+            { title: t('introduction'), dataIndex: 'profile', width: 120, },
             {
-                title: '管理用户', dataIndex: 'owner', width: 120, search: false,
+                title: t('manage user'), dataIndex: 'owner', width: 120, search: false,
                 render: (text, record) => {
                     return record.owner?.displayName
                 }
             },
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
                         <a key="del" onClick={() => onDel(record)}>
-                            解除授权
+                            {t('disauthorization')}
                         </a>
                     </Space>
                 }
@@ -85,8 +87,8 @@ export default () => {
         onDel = (record: Org) => {
             if (appPolicyInfo) {
                 Modal.confirm({
-                    title: "解除授权",
-                    content: `是否解除授权：${record.name}`,
+                    title: t('disauthorization'),
+                    content: `${t('confirm disauthorization')}：${record.name}`,
                     onOk: async (close) => {
                         const result = await revokeOrgAppPolicy(record.id, appPolicyInfo.id)
                         if (result) {
@@ -101,33 +103,37 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: "应用权限策略授权",
+                title: t('apply permission policy authorization'),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "应用管理", },
-                        { title: "权限策略", },
-                        { title: "应用权限策略授权", },
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
+                        { title: t('policy'), },
+                        { title: t('apply permission policy authorization'), },
                     ],
                 },
-                children: <Alert showIcon message="权限策略授权给组织，组织就拥有对应权限策略的权限" />
+                children: <Alert showIcon message={t('After a permission policy is granted to an organization, the organization has the permission of the policy')} />
 
             }}
         >
             <ProTable
                 actionRef={proTableRef}
                 rowKey={"id"}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                }}
                 toolbar={{
                     title: <Space>
-                        <span>应用：{appPolicyInfo?.app?.name || "-"}</span>
-                        <span>权限策略：{appPolicyInfo?.name || "-"}</span>
+                        <span>{t('app')}：{appPolicyInfo?.app?.name || "-"}</span>
+                        <span>{t('policy')}：{appPolicyInfo?.name || "-"}</span>
                     </Space>,
                     actions: [
                         <Button type="primary" onClick={() => {
                             setModal({ open: true, title: '' })
                         }} >
-                            增加组织授权
+                            {t('add {{field}}', { field: t('organizational authorization') })}
                         </Button>
                     ]
                 }}
@@ -143,8 +149,8 @@ export default () => {
             <ModalOrg
                 x-if={appPolicyInfo}
                 open={modal.open}
-                title="组织选择"
-                tableTitle={`应用：${appPolicyInfo?.app?.name} 的授权组织列表`}
+                title={t('search {{field}}', { field: t('organization') })}
+                tableTitle={`${t('app')}：${appPolicyInfo?.app?.name} ${t("{{field}} list", { field: t('authorized organization') })}`}
                 appId={appPolicyInfo?.appID}
                 onClose={async (selectData) => {
                     const sdata = selectData?.[0];
@@ -152,7 +158,7 @@ export default () => {
                         const result = await assignOrgAppPolicy(sdata.id, appPolicyInfo.id)
                         if (result) {
                             proTableRef.current?.reload();
-                            message.success('操作成功')
+                            message.success(t('submit success'))
                         }
                     }
                     setModal({ open: false, title: '' })

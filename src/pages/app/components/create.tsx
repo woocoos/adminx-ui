@@ -7,6 +7,7 @@ import {
     ProFormDigit
 } from '@ant-design/pro-components';
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default (props: {
     open?: boolean
@@ -16,7 +17,8 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const [saveLoading, setSaveLoading] = useState(false),
+    const { t } = useTranslation(),
+        [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
 
     const
@@ -57,6 +59,10 @@ export default (props: {
                 destroyOnClose: true,
             }}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -71,37 +77,37 @@ export default (props: {
             onOpenChange={onOpenChange}
         >
             <div x-if={props.scene == 'conf'}>
-                <ProFormText name="redirectURI" label="回调地址"
+                <ProFormText name="redirectURI" label={t('callback address')}
                     rules={[
-                        { type: "url", message: "地址格式错误", },
+                        { type: "url", message: `${t('formal error')}`, },
                     ]} />
-                <ProFormText name="scopes" label="权限范围" />
-                <ProFormDigit name="tokenValidity" label="token有效期" />
-                <ProFormDigit name="refreshTokenValidity" label="refresh_token有效期" />
+                <ProFormText name="scopes" label={t('scope of authority')} />
+                <ProFormDigit name="tokenValidity" label={`token ${t('validity period')}`} />
+                <ProFormDigit name="refreshTokenValidity" label={`refresh_token ${t('validity period')}`} />
             </div>
             <div x-else>
                 <ProFormText name="logo" label="LOGO" />
-                <ProFormText name="name" label="名称"
+                <ProFormText name="name" label={t("name")}
                     rules={[
-                        { required: true, message: "请输入名称", },
+                        { required: true, message: `${t('"Please enter {{field}}"', { field: t('name') })}`, },
                     ]} />
-                <ProFormText name="code" label="编码"
+                <ProFormText name="code" label={t('code')}
                     disabled={!!props.id}
                     rules={[
-                        { required: true, message: "请输入编码", },
+                        { required: true, message: `${t('"Please enter {{field}}"', { field: t('code') })}`, },
                     ]} />
-                <ProFormSelect name="kind" label="类型"
+                <ProFormSelect name="kind" label={t('type')}
                     options={[
                         { value: "web", label: "web" },
                         { value: "native", label: "native" },
                         { value: "server", label: "server" },
                     ]} rules={[
-                        { required: true, message: "请输入类型", },
+                        { required: true, message: `${t('"Please enter {{field}}"', { field: t('type') })}`, },
                     ]} />
                 <ProFormTextArea
                     name="comments"
-                    label="描述"
-                    placeholder="请输入应用简介"
+                    label={t('description')}
+                    placeholder={`${t('"Please enter {{field}}"', { field: t('description') })}`}
                 />
             </div>
         </DrawerForm>

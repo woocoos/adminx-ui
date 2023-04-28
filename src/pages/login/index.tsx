@@ -9,13 +9,15 @@ import { User, getUserInfo } from "@/services/user";
 import store from "@/store";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
+import { useTranslation } from "react-i18next";
 
 export default () => {
-  const [, basisDispatcher] = store.useModel("basis");
+  const { t } = useTranslation(),
+    [, basisDispatcher] = store.useModel("basis");
 
   async function loginSuccess(result: LoginRes, user: User) {
     await basisDispatcher.login({ result, user })
-    message.success("登录成功！");
+    message.success(t("login success"));
     const urlParams = (new URL(window.location.href)).searchParams;
     location.replace(urlParams.get("redirect") || "/");
   }
@@ -48,7 +50,7 @@ export default () => {
       <LoginForm
         title="Adminx Pro"
         logo={<img alt="logo" src={logo} />}
-        subTitle="后台管理系统"
+        subTitle={t('Management system')}
         initialValues={{
           username: "admin",
           password: "123456",
@@ -61,11 +63,11 @@ export default () => {
             size: "large",
             prefix: <UserOutlined className={"prefixIcon"} />,
           }}
-          placeholder={"用户名: admin or user"}
+          placeholder={`${t("Please enter {{field}}", { field: t('principal name') })}`}
           rules={[
             {
               required: true,
-              message: "请输入用户名!",
+              message: `${t("Please enter {{field}}", { field: t('principal name') })}`,
             },
           ]}
         />
@@ -75,11 +77,11 @@ export default () => {
             size: "large",
             prefix: <LockOutlined className={"prefixIcon"} />,
           }}
-          placeholder={"密码: ice"}
+          placeholder={`${t("Please enter {{field}}", { field: t('password') })}`}
           rules={[
             {
               required: true,
-              message: "请输入密码！",
+              message: `${t("Please enter {{field}}", { field: t('password') })}`,
             },
           ]}
         />
@@ -92,11 +94,11 @@ export default () => {
               svgDom.src = `/api/captcha?t=${Date.now()}`
             }} />,
           }}
-          placeholder={"验证码"}
+          placeholder={`${t('verification code')}`}
           rules={[
             {
               required: true,
-              message: "请输入验证码!",
+              message: `${t("Please enter {{field}}", { field: t('verification code') })}`,
             },
           ]}
         />
@@ -105,15 +107,12 @@ export default () => {
             marginBottom: 24,
           }}
         >
-          {/* <ProFormCheckbox noStyle name="autoLogin">
-            自动登录
-          </ProFormCheckbox> */}
           <a
             style={{
               float: "right",
             }}
           >
-            忘记密码
+            {t('forget your password')}
           </a>
         </div>
       </LoginForm>
@@ -122,7 +121,8 @@ export default () => {
 };
 
 export const pageConfig = definePageConfig(() => {
+  const { t } = useTranslation();
   return {
-    title: "登录",
+    title: `${t('login')}`,
   };
 });

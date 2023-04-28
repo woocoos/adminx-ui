@@ -1,10 +1,10 @@
-import { formatTreeData, } from "@/util"
-import { Checkbox, Col, Input, List, Row, Space, Tree } from "antd"
-import { ReactNode, useEffect, useState } from "react"
+import { Col, Input, Row } from "antd"
+import { useEffect, useState } from "react"
 import { SwapOutlined, CloseOutlined } from "@ant-design/icons";
 import { ProCard } from "@ant-design/pro-components";
 import { AppAction } from "@/services/app/action";
 import CardTree from "./cardTree";
+import { useTranslation } from "react-i18next";
 
 
 
@@ -16,7 +16,8 @@ export default function (props: {
     onChange?: (targetKeys: string[]) => void
 }) {
 
-    const [dataSource, setDataSource] = useState<AppAction[]>([...props.dataSource])
+    const { t } = useTranslation(),
+        [dataSource, setDataSource] = useState<AppAction[]>([...props.dataSource])
 
     useEffect(() => {
         setDataSource([...props.dataSource])
@@ -30,10 +31,10 @@ export default function (props: {
                         type="inner"
                         size="small"
                         bordered
-                        title={props.titles?.[0] || '全部操作'}
+                        title={props.titles?.[0] || t('all')}
                     >
                         <Input.Search
-                            placeholder="筛选操作"
+                            placeholder={`${t("filter operation")}`}
                             onSearch={(value) => {
                                 if (value) {
                                     setDataSource(props.dataSource.filter(item => item.name.indexOf(value) > -1 || item.comments.indexOf(value) > -1))
@@ -78,7 +79,7 @@ export default function (props: {
                         type="inner"
                         size="small"
                         bordered
-                        title={props.titles?.[1] || '已选操作'}
+                        title={props.titles?.[1] || t('selected')}
                     >
                         <div style={{ overflow: 'auto', height: '342px' }}>
                             {

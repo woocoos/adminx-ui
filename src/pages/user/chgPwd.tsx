@@ -9,11 +9,13 @@ import {
 import { Card, message } from "antd";
 import store from "@/store";
 import { updatePassword } from "@/services/user";
+import { useTranslation } from "react-i18next";
 
 type FormValues = { oldPwd: string, newPwd: string, reNewPwd: string }
 
 export default () => {
   const formRef = useRef<ProFormInstance>(),
+    { t } = useTranslation(),
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
@@ -33,7 +35,7 @@ export default () => {
       setSaveLoading(true)
       const result = await updatePassword(values.oldPwd, values.newPwd)
       if (result) {
-        message.success("提交成功");
+        message.success(t('submit success'));
         await basisDispatcher.logout()
         setSaveDisabled(true)
       }
@@ -44,12 +46,12 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: "修改密码",
+        title: t("Change password"),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
-            { title: "个人中心", },
-            { title: "修改密码", },
+            { title: t("Individual center"), },
+            { title: t('Change password'), },
           ],
         },
       }}
@@ -58,6 +60,10 @@ export default () => {
         <ProForm
           formRef={formRef}
           submitter={{
+            searchConfig: {
+              submitText: t('submit'),
+              resetText: t('reset')
+            },
             submitButtonProps: {
               loading: saveLoading,
               disabled: saveDisabled,
@@ -71,41 +77,41 @@ export default () => {
           <ProFormText.Password
             width="lg"
             name="oldPwd"
-            label="旧密码"
-            placeholder="请输入旧密码"
+            label={t("old password")}
+            placeholder={`${t("Please enter {{field}}", { field: t("old password") })}`}
             rules={[
               {
                 required: true,
-                message: "请输入旧密码",
+                message: `${t("Please enter {{field}}", { field: t("old password") })}`,
               },
             ]}
           />
           <ProFormText.Password
             width="lg"
             name="newPwd"
-            label="新密码"
-            placeholder="请输入新密码"
+            label={t("new password")}
+            placeholder={`${t("Please enter {{field}}", { field: t("new password") })}`}
             rules={[
               {
                 required: true,
-                message: "请输入新密码",
+                message: `${t("Please enter {{field}}", { field: t("new password") })}`,
               },
             ]}
           />
           <ProFormText.Password
             name="reNewPwd"
             width="lg"
-            label="确认新密码"
-            placeholder="请输入确认新密码"
+            label={t('confirm new password')}
+            placeholder={`${t("Please enter {{field}}", { field: t("confirm new password") })}`}
             rules={[
               {
                 required: true,
-                message: "请输入确认新密码",
+                message: `${t("Please enter {{field}}", { field: t("confirm new password") })}`,
               },
               {
                 validator: (rule, value) => {
                   if (value != formRef?.current?.getFieldValue("newPwd")) {
-                    return Promise.reject("确认新密码需与新密码一致");
+                    return Promise.reject(t("confirm the new password must be the same as the new password"));
                   }
                   return Promise.resolve();
                 },

@@ -12,49 +12,51 @@ import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Permission, delPermssion, getOrgPermissionList } from "@/services/permission";
 import ModalRolePolicy from "./modalRolePolicy";
 import { OrgRole } from "@/services/org/role";
+import { useTranslation } from "react-i18next";
 
 
 export default (props: {
     orgRoleInfo: OrgRole
 }) => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<Permission>[] = [
             // 有需要排序配置  sorter: true 
             {
-                title: '名称', dataIndex: 'name', width: 120,
+                title: t('name'), dataIndex: 'name', width: 120,
                 render: (text, record) => {
                     return record.orgPolicy?.name
                 }
             },
             {
-                title: '描述', dataIndex: 'comments', width: 120,
+                title: t('description'), dataIndex: 'comments', width: 120,
                 render: (text, record) => {
                     return record.orgPolicy?.comments
                 }
             },
             {
-                title: '策略类型', dataIndex: 'type', width: 120,
+                title: t('policy type'), dataIndex: 'type', width: 120,
                 renderFormItem(schema, config, form) {
                     return <Select allowClear options={[
-                        { label: '系统策略', value: 'sys' },
-                        { label: '自定义策略', value: 'cust' },
+                        { label: t('System strategy'), value: 'sys' },
+                        { label: t('Custom policy'), value: 'cust' },
                     ]} onChange={(value) => {
                         form.setFieldValue("type", value)
                     }} />
                 },
                 render: (text, record) => {
-                    return record.orgPolicy?.appPolicyID ? '系统策略' : '自定义策略'
+                    return record.orgPolicy?.appPolicyID ? t('System strategy') : t('Custom policy')
                 }
             },
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
                         <a key="del" onClick={() => onDel(record)}>
-                            解除授权
+                            {t('disauthorization')}
                         </a>
                     </Space>
                 }
@@ -98,12 +100,13 @@ export default (props: {
         },
         onDel = (record: Permission) => {
             Modal.confirm({
-                title: "解除授权",
-                content: `是否解除授权：${record.orgPolicy?.name}`,
+                title: t('disauthorization'),
+                content: `${t('confirm disauthorization')}：${record.orgPolicy?.name}?`,
                 onOk: async (close) => {
                     const result = await delPermssion(record.id, props.orgRoleInfo.orgID)
                     if (result) {
                         proTableRef.current?.reload();
+                        message.success(t('submit success'))
                         close();
                     }
                 }
@@ -115,13 +118,17 @@ export default (props: {
             <ProTable
                 actionRef={proTableRef}
                 rowKey={"id"}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                }}
                 toolbar={{
-                    title: "权限策略列表",
+                    title: t("{{field}} list", { field: t('policy') }),
                     actions: [
                         <Button type="primary" onClick={() => {
                             setModal({ open: true, title: '' })
                         }} >
-                            增加授权
+                            {t("add {{field}}", { field: t('authorization') })}
                         </Button>
                     ]
                 }}
@@ -137,7 +144,7 @@ export default (props: {
             <ModalRolePolicy
                 orgRoleInfo={props.orgRoleInfo}
                 open={modal.open}
-                title="添加权限"
+                title={`${t("add {{field}}", { field: t('permission') })}`}
                 onClose={(isSuccess) => {
                     if (isSuccess) {
                         proTableRef.current?.reload();

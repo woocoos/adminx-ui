@@ -3,9 +3,10 @@ import { Org, getOrgInfo } from '@/services/org'
 import { PageContainer, useToken } from '@ant-design/pro-components'
 import { useSearchParams } from 'ice'
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export default () => {
-    const
+    const { t } = useTranslation(),
         { token } = useToken(),
         [searchParams, setSearchParams] = useSearchParams(),
         [info, setInfo] = useState<Org>()
@@ -26,17 +27,17 @@ export default () => {
 
     return <PageContainer
         header={{
-            title: "授权应用",
+            title: t('Authorized application'),
             style: { background: token.colorBgContainer },
             breadcrumb: {
                 items: [
-                    { title: "系统配置", },
-                    { title: "组织管理", },
-                    { title: "授权应用", },
+                    { title: t('System configuration'), },
+                    { title: t("{{field}} management", { field: t('organization') }), },
+                    { title: t('Authorized application'), },
                 ],
             },
         }}
     >
-        <AppList x-if={info?.id} scene="orgApp" title={`组织：${info?.name}`} orgId={info?.id} />
+        <AppList x-if={info?.id} scene="orgApp" title={`${t('organization')}：${info?.name}`} orgId={info?.id} />
     </PageContainer>
 }

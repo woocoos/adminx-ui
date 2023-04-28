@@ -12,6 +12,7 @@ import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
 import CreateAppAction from "./components/createAction";
 import { AppAction, EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from "@/services/app/action";
+import { useTranslation } from "react-i18next";
 
 export type AppActionListRef = {
     getSelect: () => AppAction[]
@@ -26,6 +27,7 @@ const AppActionList = (props: {
     ref?: MutableRefObject<AppActionListRef>
 }, ref: MutableRefObject<AppActionListRef>) => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         appId = props?.appId || searchParams.get('id'),
         [appInfo, setAppInfo] = useState<App>(),
@@ -33,10 +35,10 @@ const AppActionList = (props: {
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<AppAction>[] = [
             // 有需要排序配置  sorter: true 
-            { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '类型', dataIndex: 'kind', width: 120, valueEnum: EnumAppActionKind },
-            { title: '方法', dataIndex: 'method', width: 120, valueEnum: EnumAppActionMethod },
-            { title: '备注', dataIndex: 'comments', width: 120, search: false, },
+            { title: t('name'), dataIndex: 'name', width: 120, },
+            { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumAppActionKind },
+            { title: t('method'), dataIndex: 'method', width: 120, valueEnum: EnumAppActionMethod },
+            { title: t('remarks'), dataIndex: 'comments', width: 120, search: false, },
         ],
         [dataSource, setDataSource] = useState<AppAction[]>([]),
         // 选中处理
@@ -55,19 +57,19 @@ const AppActionList = (props: {
     if (props?.scene !== 'modal') {
         columns.push(
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 80,
                 render: (text, record) => {
                     return <Space>
                         <a key="editor" onClick={() => {
                             setModal({
-                                open: true, title: `编辑:${record.name}`, id: record.id
+                                open: true, title: `${t('edit')}:${record.name}`, id: record.id
                             })
                         }} >
-                            编辑
+                            {t('edit')}
                         </a>
                         <a key="del" onClick={() => onDel(record)}>
-                            删除
+                            {t('delete')}
                         </a>
                     </Space>
                 }
@@ -102,8 +104,8 @@ const AppActionList = (props: {
         },
         onDel = (record: AppAction) => {
             Modal.confirm({
-                title: "删除",
-                content: `是否删除：${record.name}`,
+                title: t('delete'),
+                content: `${t('confirm delete')}：${record.name}?`,
                 onOk: async (close) => {
                     const result = await delAppAction(record.id)
                     if (result) {
@@ -138,8 +140,12 @@ const AppActionList = (props: {
                 <ProTable
                     actionRef={proTableRef}
                     rowKey={"id"}
+                    search={{
+                        searchText: `${t('query')}`,
+                        resetText: `${t('reset')}`,
+                    }}
                     toolbar={{
-                        title: props?.title || `应用:${appInfo?.name || "-"}`
+                        title: props?.title || `${t('app')}:${appInfo?.name || "-"}`
                     }}
                     scroll={{ x: 'max-content', y: 300 }}
                     columns={columns}
@@ -153,13 +159,13 @@ const AppActionList = (props: {
             ) : (
                 <PageContainer
                     header={{
-                        title: "应用权限",
+                        title: t('Application permission'),
                         style: { background: token.colorBgContainer },
                         breadcrumb: {
                             items: [
-                                { title: "系统配置", },
-                                { title: "应用管理", },
-                                { title: "应用权限", },
+                                { title: t('System configuration'), },
+                                { title: t("{{field}} management", { field: t('app') }), },
+                                { title: t('Application permission'), },
                             ],
                         },
 
@@ -167,18 +173,26 @@ const AppActionList = (props: {
                 >
                     <ProTable
                         actionRef={proTableRef}
+                        search={{
+                            searchText: `${t('query')}`,
+                            resetText: `${t('reset')}`,
+                        }}
                         rowKey={"id"}
                         toolbar={{
-                            title: `应用:${appInfo?.name || "-"}`,
+                            title: `${t('app')}:${appInfo?.name || "-"}`,
                             actions: [
                                 <Button key="import" onClick={
                                     () => {
                                         alert('还未实现')
                                     }
-                                }>同步权限</Button >,
+                                }>
+                                    {t('synchronization permission')}
+                                </Button >,
                                 <Button key="created" type="primary" onClick={() => {
-                                    setModal({ open: true, title: '创建权限', id: '', })
-                                }}>创建权限</Button>
+                                    setModal({ open: true, title: t("create {{field}}", { field: t('permission') }), id: '', })
+                                }}>
+                                    {t("create {{field}}", { field: t('permission') })}
+                                </Button>
                             ]
                         }}
                         scroll={{ x: 'max-content' }}

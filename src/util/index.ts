@@ -33,6 +33,22 @@ export const firstUpper = (str: string) => {
     return str.slice(0, 1).toUpperCase() + str.slice(1)
 }
 
+// zh-CN
+export const browserLanguage = () => {
+    let locale = ''
+    switch (navigator.language) {
+        case 'zh':
+            locale = 'zh-CN'
+            break;
+        case 'en':
+            locale = 'en-US'
+            break;
+        default:
+            locale = navigator.language
+            break;
+    }
+    return locale
+}
 
 /**
  * tree数据结构的形成

@@ -15,55 +15,59 @@ import CreateAppRole from "./components/createRole";
 import ModalRolePolicy from "./components/modalRolePolicy";
 import { AppRole } from "@/services/app/role";
 import { delAppRole, getAppRoleList } from "@/services/app/role";
+import { useTranslation } from "react-i18next";
 
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<AppRole>[] = [
             // 有需要排序配置  sorter: true 
-            { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '描述', dataIndex: 'comments', width: 120, search: false, },
+            { title: t('name'), dataIndex: 'name', width: 120, },
+            { title: t('description'), dataIndex: 'comments', width: 120, search: false, },
             {
-                title: '自动授权', dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
+                title: t('automatic authorization'), dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
                 render: (text, record) => {
-                    return record.autoGrant ? '是' : '否'
+                    return record.autoGrant ? t('yes') : t('no')
                 }
             },
             {
-                title: '授权后编辑', dataIndex: 'editable', width: 120, search: false, sorter: true,
+                title: t('post-authorization editing'), dataIndex: 'editable', width: 120, search: false, sorter: true,
                 render: (text, record) => {
-                    return record.editable ? '是' : '否'
+                    return record.editable ? t('yes') : t('no')
                 }
             },
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 120,
                 render: (text, record) => {
                     return <Space>
                         <a key="editor" onClick={() => {
                             setModal({
-                                open: true, title: `编辑:${record.name}`, id: record.id, scene: 'create'
+                                open: true, title: `${t('edit')}:${record.name}`, id: record.id, scene: 'create'
                             })
                         }} >
-                            编辑
+                            {t('edit')}
                         </a>
                         <Link key="sq" to={`/app/role/accredits?id=${record.id}`}>
-                            授权
+                            {t('authorization')}
                         </Link>
                         <Dropdown trigger={['click']} menu={{
                             items: [
                                 {
                                     key: "addPolicy", label: <a onClick={() => {
                                         setModal({
-                                            open: true, title: `添加权限`, id: record.id, roleInfo: record, scene: "addPolicy"
+                                            open: true, title: t("add {{field}}", { field: t('permission') }), id: record.id, roleInfo: record, scene: "addPolicy"
                                         })
-                                    }}>添加权限</a>
+                                    }}>
+                                        {t("add {{field}}", { field: t('permission') })}
+                                    </a>
                                 },
-                                { key: "delete", label: <a onClick={() => onDel(record)}>删除</a> },
+                                { key: "delete", label: <a onClick={() => onDel(record)}>{t('delete')}</a> },
                             ]
                         }} >
                             <a><EllipsisOutlined /></a>
@@ -118,8 +122,8 @@ export default () => {
         },
         onDel = (record: AppRole) => {
             Modal.confirm({
-                title: "删除",
-                content: `是否删除：${record.name}`,
+                title: t('delete'),
+                content: `${t("confirm delete")}：${record.name}`,
                 onOk: async (close) => {
                     const result = await delAppRole(record.id)
                     if (result) {
@@ -140,34 +144,38 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: "应用角色",
+                title: t('Application role'),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "应用管理", },
-                        { title: "应用角色", },
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
+                        { title: t('Application role'), },
                     ],
                 },
                 children: <Alert showIcon message={
                     <>
-                        <div key="1">应用角色是应用权限策略的一组集合，应用授权给租户时，由角色决定租户拥有应用哪些权限</div>
-                        <div key="2">自动授权：应用授权给租户时，将自动授权类型的角色全部授权给租户，并将角色授权给该租户的管理者</div>
-                        <div key="3">手动授权：在应用授权给租户后，系统管理员可将非自动授权角色，通过xxx功能将角色授权给租户</div>
+                        <div key="1">{t('An application role is a set of application permission policies. When an application is authorized to a tenant, the role determines the application permission granted to the tenant')}</div>
+                        <div key="2">{t('automatic authorization')}：{t('When an application is authorized to a tenant, all roles of the automatic authorization type are authorized to the tenant and the administrator of the tenant')}</div>
+                        <div key="3">{t('manual authorization')}：{t("After an application is authorized to a tenant, the system administrator can use the xxx function to authorize the non-automatic role to the tenant")}</div>
                     </>
                 } />
             }}
         >
             <ProTable
                 actionRef={proTableRef}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                }}
                 rowKey={"id"}
                 toolbar={{
-                    title: `应用:${appInfo?.name || "-"}`,
+                    title: `${t('app')}:${appInfo?.name || "-"}`,
                     actions: [
                         <Button key="created" type="primary" onClick={() => {
-                            setModal({ open: true, title: '创建角色', id: '', scene: 'create' })
+                            setModal({ open: true, title: t("create {{field}}", { field: t('role') }), id: '', scene: 'create' })
                         }}>
-                            创建角色
+                            {t("create {{field}}", { field: t('role') })}
                         </Button>
                     ]
                 }}

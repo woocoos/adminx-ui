@@ -1,10 +1,12 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 import enUS from "./locales/en-US";
+import zhCN from "./locales/zh-CN";
 
 // 多语言文件
 const resources = {
   "en-US": enUS,
+  "zh-CN": zhCN,
 };
 
 

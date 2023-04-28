@@ -6,6 +6,7 @@ import {
     ProFormTextArea,
 } from '@ant-design/pro-components';
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default (props: {
     open?: boolean
@@ -15,7 +16,8 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const [saveLoading, setSaveLoading] = useState(false),
+    const { t } = useTranslation(),
+        [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
 
     const
@@ -56,6 +58,10 @@ export default (props: {
                 destroyOnClose: true,
             }}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -69,24 +75,24 @@ export default (props: {
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
-            <ProFormText name="name" label="名称"
+            <ProFormText name="name" label={t('name')}
                 rules={[
-                    { required: true, message: "请输入名称", },
+                    { required: true, message: `${t("Please enter {{field}}"), { field: t('name') }}`, },
                 ]} />
-            <ProFormSelect name="kind" label="类型"
+            <ProFormSelect name="kind" label={t('type')}
                 valueEnum={EnumAppActionKind}
                 rules={[
-                    { required: true, message: "请输入类型", },
+                    { required: true, message: `${t("Please enter {{field}}"), { field: t('type') }}`, },
                 ]} />
-            <ProFormSelect name="method" label="操作方法"
+            <ProFormSelect name="method" label={t('method')}
                 valueEnum={EnumAppActionMethod}
                 rules={[
-                    { required: true, message: "请输入类型", },
+                    { required: true, message: `${t("Please enter {{field}}"), { field: t('method') }}`, },
                 ]} />
             <ProFormTextArea
                 name="comments"
-                label="描述"
-                placeholder="请输入描述"
+                label={t('description')}
+                placeholder={`${t("Please enter {{field}}"), { field: t('description') }}`}
             />
         </DrawerForm>
     );

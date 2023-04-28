@@ -11,9 +11,11 @@ import { useEffect, useState } from "react";
 import { App, EnumAppKind, EnumAppStatus, getAppInfo } from "@/services/app";
 import { Button, Divider } from "antd";
 import AppCreate from "./components/create";
+import { useTranslation } from "react-i18next";
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         id = searchParams.get('id'),
         [showEys, setShowEys] = useState(false),
@@ -55,19 +57,19 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: "应用管理",
+                title: t("{{field}} management", { field: t('app') }),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "应用管理", },
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
                     ],
                 },
             }}
         >
             <ProCard loading={loading} >
-                <ProDescriptions title="基本信息" column={2} extra={
-                    <Button onClick={() => setModal({ open: true, title: '修改基本信息' })}>修改</Button>
+                <ProDescriptions title={t("Basic information")} column={2} extra={
+                    <Button onClick={() => setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }) })}>修改</Button>
                 }>
                     <ProDescriptions.Item label=""
                         valueType={{ type: 'image', width: 120 }}
@@ -77,18 +79,18 @@ export default () => {
                     </ProDescriptions.Item>
                     <ProDescriptions.Item label="" >
                         <ProDescriptions column={2}>
-                            <ProDescriptions.Item label="名称"  >
+                            <ProDescriptions.Item label={t('name')}  >
                                 {appInfo?.name}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="编码"  >
+                            <ProDescriptions.Item label={t('code')}  >
                                 {appInfo?.code}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="类型"
+                            <ProDescriptions.Item label={t('type')}
                                 valueEnum={EnumAppKind}
                             >
                                 {appInfo?.kind}
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="状态"
+                            <ProDescriptions.Item label={t('status')}
                                 valueEnum={EnumAppStatus}
                             >
                                 {appInfo?.status}
@@ -105,7 +107,7 @@ export default () => {
                                         : "-"
                                 }
                             </ProDescriptions.Item>
-                            <ProDescriptions.Item label="描述"  >
+                            <ProDescriptions.Item label={t('description')}  >
                                 {appInfo?.comments}
                             </ProDescriptions.Item>
                         </ProDescriptions>
@@ -113,19 +115,19 @@ export default () => {
 
                 </ProDescriptions>
                 <Divider style={{ margin: "0 0 24px 0" }} />
-                <ProDescriptions title="应用配置" column={2} extra={
-                    <Button onClick={() => setModal({ open: true, title: '修改应用配置', scene: 'conf' })}>修改</Button>
+                <ProDescriptions title={t('Application configuration')} column={2} extra={
+                    <Button onClick={() => setModal({ open: true, title: t("amend {{field}}", { field: t("application configuration") }), scene: 'conf' })}>修改</Button>
                 }>
-                    <ProDescriptions.Item label="回调地址"  >
+                    <ProDescriptions.Item label={t('callback address')}  >
                         {appInfo?.redirectURI || '-'}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="权限范围"  >
+                    <ProDescriptions.Item label={t('scope of authority')}  >
                         {appInfo?.scopes || '-'}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="token有效期"  >
+                    <ProDescriptions.Item label={`token ${t('validity period')}`}  >
                         {typeof appInfo?.tokenValidity === 'number' ? appInfo.tokenValidity : '-'}
                     </ProDescriptions.Item>
-                    <ProDescriptions.Item label="refresh_token有效期"  >
+                    <ProDescriptions.Item label={`refresh_token ${t('validity period')}`}  >
                         {typeof appInfo?.refreshTokenValidity === 'number' ? appInfo.refreshTokenValidity : '-'}
                     </ProDescriptions.Item>
                 </ProDescriptions>

@@ -8,6 +8,7 @@ import ActionsTransfer from "@/components/ActionsTransfer";
 import { App, getAppList } from "@/services/app";
 import Editor from '@monaco-editor/react';
 import InputApp from "@/pages/app/components/inputApp";
+import { useTranslation } from "react-i18next";
 
 const RuleItem = (props: {
     orgId: string
@@ -16,7 +17,8 @@ const RuleItem = (props: {
     onCopy?: () => void
     onDel?: () => void
 }) => {
-    const [effect, setEffect] = useState<PolicyRuleEffect>(props.rule.effect || 'allow'),
+    const { t } = useTranslation(),
+        [effect, setEffect] = useState<PolicyRuleEffect>(props.rule.effect || 'allow'),
         [appInfo, setAppInfo] = useState<App>(),
         [appActions, setAppActions] = useState<AppAction[]>([]),
         [action, setAction] = useState<"all" | "customer">(props.rule.actions?.[0]?.indexOf(":*") > -1 ? "all" : 'customer'),
@@ -62,13 +64,12 @@ const RuleItem = (props: {
             if (appInfo) {
                 titles.push(appInfo.name)
                 if (actions[0]?.indexOf(':*') > -1) {
-                    titles.push('全部操作')
+                    titles.push(t('full operation'))
                 } else {
-                    titles.push(`${actions.length}个操作`)
-
+                    titles.push(t('{{num}} operations', { num: actions.length }))
                 }
             } else {
-                titles.push('选择应用')
+                titles.push(t("Please select {{field}}", { field: t('app') }))
             }
 
             return titles.join('/')
@@ -91,34 +92,34 @@ const RuleItem = (props: {
             extra={
                 <>
                     <Popconfirm
-                        title="复制"
-                        description="确定使用当前规则?"
+                        title={t('copy')}
+                        description={`${t('confirm copy')}?`}
                         onConfirm={() => {
                             props.onCopy?.()
                         }}
                     >
-                        <a>复制</a>
+                        <a>{t('copy')}</a>
                     </Popconfirm>
                     <Divider type="vertical" />
                     <Popconfirm
-                        title="删除"
-                        description="确定删除当前规则?"
+                        title={t('delete')}
+                        description={`${t('confirm delete')}?`}
                         onConfirm={() => {
                             props.onDel?.()
                         }}
                     >
-                        <a>删除</a>
+                        <a>{t('delete')}</a>
                     </Popconfirm>
                 </>
             }>
             <Row >
-                <Col style={rowColStyle()}>效果</Col>
+                <Col style={rowColStyle()}>{t('effect')}</Col>
                 <Col flex="auto">
                     <Radio.Group
                         value={effect}
                         options={[
-                            { label: "允许", value: "allow" },
-                            { label: "拒绝", value: "deny" },
+                            { label: t('allow'), value: "allow" },
+                            { label: t('deny'), value: "deny" },
                         ]}
                         onChange={(e) => {
                             setEffect(e.target.value)
@@ -131,7 +132,7 @@ const RuleItem = (props: {
             <Divider style={{ margin: "10px 0" }} />
             <Row >
                 <Col style={rowColStyle()}>
-                    应用
+                    {t('app')}
                 </Col>
                 <Col flex="auto">
                     <div style={{ width: "260px", }}>
@@ -147,20 +148,20 @@ const RuleItem = (props: {
                 <Col style={rowColStyle()}>
                     <CaretUpOutlined x-if={stretch1} onClick={() => { setStretch1(false) }} />
                     <CaretDownOutlined x-else onClick={() => { setStretch1(true) }} />
-                    操作
+                    {t('operation')}
                 </Col>
                 <Col flex="auto">
                     <div x-if={appInfo}>
                         <div>
-                            <a>{action === 'all' ? '全部操作' : `${actions.length}个操作`}</a>
+                            <a>{action === 'all' ? t('full operation') : t('{{num}} operations', { num: actions.length })}</a>
                         </div>
                         <div x-if={stretch1}>
                             <div>
                                 <Radio.Group
                                     value={action}
                                     options={[
-                                        { label: "全部操作(*)", value: "all" },
-                                        { label: "指定", value: "customer" },
+                                        { label: `${t('full operation')}(*)`, value: "all" },
+                                        { label: t('specify'), value: "customer" },
                                     ]}
                                     onChange={(e) => {
                                         setAction(e.target.value)
@@ -191,7 +192,7 @@ const RuleItem = (props: {
                         </div>
                     </div>
                     <div x-else>
-                        选择应用
+                        {t("Please select {{field}}", { field: t('app') })}
                     </div>
                 </Col>
             </Row>
@@ -200,19 +201,21 @@ const RuleItem = (props: {
                 <Col style={rowColStyle()}>
                     <CaretUpOutlined x-if={stretch2} onClick={() => { setStretch2(false) }} />
                     <CaretDownOutlined x-else onClick={() => { setStretch2(true) }} />
-                    资源
+                    {t('resources')}
                 </Col>
                 <Col flex="auto">
                     <div x-if={appInfo}>
                         <div>
-                            <a>{resource === 'all' ? '全部资源' : `${resources.length}个资源`}</a>
+                            <a>
+                                {resource === 'all' ? t('total resources') : t("{{num}} resources", { num: resources.length })}
+                            </a>
                         </div>
                         <div x-if={stretch2}>
                             <Radio.Group
                                 value={resource}
                                 options={[
-                                    { label: "全部资源", value: "all" },
-                                    { label: "指定资源", value: "customer" },
+                                    { label: t('total resources'), value: "all" },
+                                    { label: t('specify'), value: "customer" },
                                 ]}
                                 onChange={(e) => {
                                     setResource(e.target.value)
@@ -227,7 +230,7 @@ const RuleItem = (props: {
                         </div>
                     </div>
                     <div x-else>
-                        选择应用
+                        {t("Please select {{field}}", { field: t('app') })}
                     </div>
                 </Col>
             </Row>
@@ -236,16 +239,16 @@ const RuleItem = (props: {
                 <Col style={rowColStyle()}>
                     <CaretUpOutlined x-if={stretch3} onClick={() => { setStretch3(false) }} />
                     <CaretDownOutlined x-else onClick={() => { setStretch3(true) }} />
-                    条件
+                    {t('condition')}
                 </Col>
                 <Col flex="auto">
                     <div x-if={appInfo}>
                         <div>
-                            <a>{`${conditions.length}个条件`}</a>
+                            <a>{t("{{num}} conditions", { num: conditions.length })}</a>
                         </div>
                     </div>
                     <div x-else>
-                        选择应用
+                        {t("Please select {{field}}", { field: t('app') })}
                     </div>
                 </Col>
             </Row>
@@ -257,12 +260,14 @@ export default (props: {
     rules: PolicyRule[],
     onChange?: (rules: PolicyRule[]) => void
 }) => {
+    const { t } = useTranslation();
+
     return (
         <Tabs
             defaultActiveKey="ui"
             items={[
                 {
-                    label: "可视化编辑", key: "ui", children:
+                    label: t('visual editing'), key: "ui", children:
                         <>
                             {
                                 props.rules?.map((item, index) =>
@@ -302,12 +307,12 @@ export default (props: {
                                     })
                                     props.onChange?.(props.rules)
                                 }} >
-                                添加语句
+                                {t('add statement')}
                             </Button>
                         </>
                 },
                 {
-                    label: "脚本编辑", key: "json", children:
+                    label: t('script editing'), key: "json", children:
                         <Editor
                             className="adminx-editor"
                             height="400px"

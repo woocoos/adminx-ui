@@ -8,6 +8,7 @@ import {
 } from '@ant-design/pro-components';
 import { Radio } from 'antd';
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 
 export default (props: {
@@ -20,7 +21,8 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const [saveLoading, setSaveLoading] = useState(false),
+    const { t } = useTranslation(),
+        [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
         [setKind, setSetKind] = useState<UserLoginProfileSetKind>('auto'),
         [basisState] = store.useModel("basis")
@@ -84,6 +86,10 @@ export default (props: {
                 destroyOnClose: true,
             }}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -98,44 +104,44 @@ export default (props: {
             onOpenChange={onOpenChange}
         >
             <div x-if={['create'].includes(props.scene)}>
-                <ProFormText name="principalName" label="登陆名称"
+                <ProFormText name="principalName" label={t("principal name")}
                     rules={[
-                        { required: true, message: "请输入登陆名称", },
+                        { required: true, message: `${t("Please enter {{field}}", { field: t("principal name") })}`, },
                     ]} />
                 <div>
                     <Radio.Group value={setKind} options={[
-                        { label: '手动设置密码', value: "customer" },
-                        { label: '自动生成密码', value: "auto" },
+                        { label: t('manually set password'), value: "customer" },
+                        { label: t("automatic password generation"), value: "auto" },
                     ]} onChange={(e) => setSetKind(e.target.value)} />
                 </div>
                 <br />
-                <ProFormText.Password x-if={setKind === 'customer'} name="password" label="密码"
+                <ProFormText.Password x-if={setKind === 'customer'} name="password" label={t('password')}
                     rules={[
-                        { required: true, message: "请输入密码", },
+                        { required: true, message: `${t("Please enter {{field}}", { field: t("password") })}`, },
                     ]} />
             </div>
             <div x-if={['create', "base"].includes(props.scene)}>
-                <ProFormText name="displayName" label="显示名"
+                <ProFormText name="displayName" label={t('display name')}
                     rules={[
-                        { required: true, message: "请输入显示名", },
+                        { required: true, message: `${t("Please enter {{field}}", { field: t("display name") })}`, },
                     ]} />
-                <ProFormText name="email" label="邮箱"
+                <ProFormText name="email" label={t('email')}
                     rules={[
-                        { required: true, message: "请输入编码", },
-                        { type: "email", message: "邮箱格式错误", },
+                        { required: true, message: `${t("Please enter {{field}}", { field: t("email") })}`, },
+                        { type: "email", message: `${t("formal error")}`, },
                     ]} />
-                <ProFormText name="mobile" label="手机" />
+                <ProFormText name="mobile" label={t('mobile')} />
                 <ProFormTextArea
                     name="comments"
-                    label="简介"
-                    placeholder="请输入简介"
+                    label={t('introduction')}
+                    placeholder={`${t("Please enter {{field}}", { field: t("introduction") })}`}
                 />
             </div>
             <div x-if={['loginProfile'].includes(props.scene)}>
-                <ProFormSwitch name="canLogin" label="允许密码登陆" />
-                <ProFormSwitch name="passwordReset" label="下次登陆重置密码" />
-                <ProFormSwitch name="verifyDevice" label="设备认证" />
-                <ProFormSwitch name="mfaEnabled" label="多因素验证" />
+                <ProFormSwitch name="canLogin" label={t('allow password login')} />
+                <ProFormSwitch name="passwordReset" label={t('reset password on next login')} />
+                <ProFormSwitch name="verifyDevice" label={t('equipment certification')} />
+                <ProFormSwitch name="mfaEnabled" label={t('MFA')} />
             </div>
         </DrawerForm>
     );

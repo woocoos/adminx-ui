@@ -7,6 +7,7 @@ import store from "@/store";
 import "@/assets/styles/index.css"
 import localStore from "@/pkg/localStore";
 import { User } from "./services/user";
+import { browserLanguage } from "./util";
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
@@ -18,18 +19,23 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  const token = await localStore.getItem<string>("token");
-  const darkMode = await localStore.getItem<string>("darkMode");
-  const compactMode = await localStore.getItem<string>("compactMode");
-  const tenantId = await localStore.getItem<string>("tenantId");
-  const user = await localStore.getItem<User>("user");
+  let locale = await localStore.getItem<string>("locale"),
+    token = await localStore.getItem<string>("token");
+
+  const darkMode = await localStore.getItem<string>("darkMode"),
+    compactMode = await localStore.getItem<string>("compactMode"),
+    tenantId = await localStore.getItem<string>("tenantId"),
+    user = await localStore.getItem<User>("user");
 
   // TODO：增加jwt判断token的处理
 
+  if (!locale) {
+    locale = browserLanguage()
+  }
 
   return {
     basis: {
-      locale: "zh-CN",
+      locale,
       token,
       darkMode,
       compactMode,

@@ -9,9 +9,11 @@ import {
 import { Card, message } from "antd";
 import { User, getUserInfo, updateUserInfo } from "@/services/user";
 import store from "@/store";
+import { useTranslation } from "react-i18next";
 
 export default () => {
   const
+    { t } = useTranslation(),
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
@@ -35,7 +37,7 @@ export default () => {
         setSaveLoading(true)
         const userInfo = await updateUserInfo(basisState.user.id, values)
         if (userInfo?.id) {
-          message.success("提交成功");
+          message.success(t('submit success'));
           await basisDispatcher.saveUser(userInfo)
           setSaveDisabled(true)
         }
@@ -46,12 +48,12 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: "基本信息",
+        title: t("Basic information"),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
-            { title: "个人中心", },
-            { title: "基本信息", },
+            { title: t("Individual center"), },
+            { title: t("Basic information"), },
           ],
         },
       }}
@@ -59,10 +61,14 @@ export default () => {
       <Card bordered={false}>
         <ProForm
           submitter={{
+            searchConfig: {
+              submitText: t('submit'),
+              resetText: t('reset')
+            },
             submitButtonProps: {
               loading: saveLoading,
               disabled: saveDisabled,
-            }
+            },
           }}
           onFinish={onFinish}
           onReset={getRequest}
@@ -72,42 +78,42 @@ export default () => {
           <ProFormText
             width="lg"
             name="displayName"
-            label="显示名称"
-            placeholder="请输入显示名称"
+            label={t("display name")}
+            placeholder={`${t("Please enter {{field}}", { field: t("display name") })}`}
             rules={[
               {
                 required: true,
-                message: "请输入显示名称",
+                message: `${t("Please enter {{field}}", { field: t("display name") })}`,
               },
             ]}
           />
           <ProFormText
             width="lg"
             name="email"
-            label="邮箱"
-            placeholder="请输入邮箱"
+            label={t("email")}
+            placeholder={`${t("Please enter {{field}}", { field: t("email") })}`}
             rules={[
               {
                 required: true,
-                message: "请输入邮箱",
+                message: `${t("Please enter {{field}}", { field: t("email") })}`,
               },
               {
                 type: "email",
-                message: "邮箱格式错误",
+                message: `${t("formal error")}`,
               },
             ]}
           />
           <ProFormText
             name="mobile"
             width="lg"
-            label="手机"
-            placeholder="请输入手机"
+            label={t("mobile")}
+            placeholder={`${t("Please enter {{field}}", { field: t("mobile") })}`}
           />
           <ProFormTextArea
             name="comments"
             width="lg"
-            label="个人简介"
-            placeholder="请输入个人简介"
+            label={t("introduction")}
+            placeholder={`${t("Please enter {{field}}", { field: t("introduction") })}`}
           />
         </ProForm>
       </Card>

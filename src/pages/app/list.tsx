@@ -15,6 +15,7 @@ import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
 import { Link } from "ice";
 import { assignOrgApp, getOrgAppList, revokeOrgApp } from "@/services/org/app";
 import ModalApp from "./components/modalApp"
+import { useTranslation } from "react-i18next";
 
 export type AppListRef = {
   getSelect: () => App[]
@@ -29,23 +30,24 @@ const AppList = (props: {
   isMultiple?: boolean,
 }, ref: MutableRefObject<AppListRef>) => {
   const { token } = useToken(),
+    { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true 
       { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
-      { title: '名称', dataIndex: 'name', width: 120, },
-      { title: '编码', dataIndex: 'code', width: 120, },
+      { title: t('name'), dataIndex: 'name', width: 120, },
+      { title: t('code'), dataIndex: 'code', width: 120, },
       {
-        title: '类型', dataIndex: 'kind',
+        title: t('type'), dataIndex: 'kind',
         filters: true,
         search: false,
         width: 100,
         valueEnum: EnumAppKind,
       },
-      { title: '描述', dataIndex: 'comments', width: 160, search: false },
+      { title: t('description'), dataIndex: 'comments', width: 160, search: false },
       {
-        title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
+        title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: EnumAppStatus,
       },
     ],
@@ -62,27 +64,29 @@ const AppList = (props: {
   if (!['modal'].includes(props.scene || '')) {
     columns.push(
       {
-        title: '操作', dataIndex: 'actions', fixed: 'right',
+        title: t('operation'), dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 170,
         render: (text, record) => {
           return props.scene === 'orgApp' ? <Space>
             <a onClick={() => {
               revokeOrg(record)
-            }}>解除授权</a>
+            }}>
+              {t('disauthorization')}
+            </a>
           </Space> : <Space>
             <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
-              编辑
+              {t('edit')}
             </Link>
             <Link key="actions" to={`/app/actions?id=${record.id}`} >
-              权限
+              {t('permission')}
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: [
-                { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >权限策略</Link> },
-                { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >菜单</Link> },
-                { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >角色</Link> },
-                { key: "resource", label: <Link to={`/app/resource?id=${record.id}`} >资源</Link> },
-                { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
+                { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
+                { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
+                { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
+                { key: "resource", label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
+                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
               ]
             }} >
               <a><EllipsisOutlined /></a>
@@ -120,8 +124,8 @@ const AppList = (props: {
     },
     onDelApp = (record: App) => {
       Modal.confirm({
-        title: "删除",
-        content: `是否删除应用：${record.name}`,
+        title: t('delete'),
+        content: `${t('confirm delete')}：${record.name}?`,
         onOk: async (close) => {
           const result = await delAppInfo(record.id)
           if (result) {
@@ -133,8 +137,8 @@ const AppList = (props: {
     },
     revokeOrg = (record: App) => {
       Modal.confirm({
-        title: "解除授权",
-        content: `是否解除授权应用：${record.name}`,
+        title: t('disauthorization'),
+        content: `${t('confirm disauthorization')}：${record.name}?`,
         onOk: async (close) => {
           if (props.orgId) {
             const result = await revokeOrgApp(props.orgId, record.id)
@@ -172,12 +176,18 @@ const AppList = (props: {
             <ProTable
               actionRef={proTableRef}
               rowKey={"id"}
+              search={{
+                searchText: `${t('query')}`,
+                resetText: `${t('reset')}`,
+              }}
               toolbar={{
-                title: props?.title || "应用列表",
+                title: props?.title || t("{{field}} list", { field: t('app') }),
                 actions: props.scene === 'orgApp' ? [
                   <Button type="primary" onClick={() => {
-                    setModal({ open: true, title: '查找应用', id: '' })
-                  }}>授权应用</Button>
+                    setModal({ open: true, title: t("search {{field}}", { field: t("app") }), id: '' })
+                  }}>
+                    {t('Authorized application')}
+                  </Button>
                 ] : []
               }}
               scroll={{ x: 'max-content', y: 300 }}
@@ -210,12 +220,12 @@ const AppList = (props: {
         ) : (
           <PageContainer
             header={{
-              title: "应用管理",
+              title: t("{{field}} management", { field: t('app') }),
               style: { background: token.colorBgContainer },
               breadcrumb: {
                 items: [
-                  { title: "系统配置", },
-                  { title: "应用管理", },
+                  { title: t('System configuration'), },
+                  { title: t("{{field}} management", { field: t('app') }), },
                 ],
               },
             }}
@@ -223,15 +233,19 @@ const AppList = (props: {
             <ProTable
               actionRef={proTableRef}
               rowKey={"id"}
+              search={{
+                searchText: `${t('query')}`,
+                resetText: `${t('reset')}`,
+              }}
               toolbar={{
-                title: "应用列表",
+                title: t("{{field}} list", { field: t('app') }),
                 actions: [
                   <Button key="create" type="primary" onClick={
                     () => {
-                      setModal({ open: true, title: '创建应用', id: '' })
+                      setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
                     }
                   }>
-                    创建应用
+                    {t("create {{field}}", { field: t('app') })}
                   </Button >
                 ]
               }}

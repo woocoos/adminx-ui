@@ -6,6 +6,7 @@ import {
     ProFormTextArea,
 } from '@ant-design/pro-components';
 import { useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default (props: {
     open?: boolean
@@ -15,7 +16,8 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const [saveLoading, setSaveLoading] = useState(false),
+    const { t } = useTranslation(),
+        [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
 
     const
@@ -59,6 +61,10 @@ export default (props: {
                 destroyOnClose: true,
             }}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -72,22 +78,22 @@ export default (props: {
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
-            <ProFormText name="name" label="名称"
+            <ProFormText name="name" label={t('name')}
                 rules={[
-                    { required: true, message: "请输入名称", },
+                    { required: true, message: `${t("Please enter {{field}}"), { field: t('name') }}`, },
                 ]} />
-            <ProFormRadio.Group name="autoGrant" label="自动授权" options={[
-                { label: '是', value: true },
-                { label: '否', value: false },
+            <ProFormRadio.Group name="autoGrant" label={t('automatic authorization')} options={[
+                { label: t('yes'), value: true },
+                { label: t('no'), value: false },
             ]} />
-            <ProFormRadio.Group name="editable" label="授权后编辑" options={[
-                { label: '是', value: true },
-                { label: '否', value: false },
+            <ProFormRadio.Group name="editable" label={t('post-authorization editing')} options={[
+                { label: t('yes'), value: true },
+                { label: t('no'), value: false },
             ]} />
             <ProFormTextArea
                 name="comments"
-                label="描述"
-                placeholder="请输入描述"
+                label={t('description')}
+                placeholder={`${t("Please enter {{field}}"), { field: t('description') }}`}
             />
         </DrawerForm>
     );

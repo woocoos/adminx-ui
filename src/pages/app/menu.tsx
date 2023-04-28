@@ -18,6 +18,7 @@ import { TreeEditorAction } from "@/util/type";
 import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from "@/services/app/menu";
 import { App } from "@/services/app";
 import ModalAction from "@/pages/app/components/modalAction";
+import { useTranslation } from "react-i18next";
 
 type TreeDataState = {
     key: string
@@ -34,6 +35,7 @@ type TreeSelectedData = {
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         formRef = useRef<ProFormInstance>(),
         [searchParams, setSearchParams] = useSearchParams(),
         id = searchParams.get('id'),
@@ -47,7 +49,7 @@ export default () => {
             info: undefined,
             action: 'editor'
         }),
-        [actionTitle, setActionTitle] = useState<string>('新建-顶级菜单'),
+        [actionTitle, setActionTitle] = useState<string>(`${t('created')}-${t('top menu')}`),
         [formFieldsValue, setFormFieldsValue] = useState<AppMenu>(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
@@ -65,18 +67,22 @@ export default () => {
                     <Dropdown menu={{
                         items: [
                             {
-                                key: 'create', label: "新建", children: [
+                                key: 'create', label: t('created'), children: [
                                     {
                                         key: 'peer', label: <a onClick={(e) => {
                                             e.stopPropagation();
                                             editorMenuAction(nodeData.node, 'peer')
-                                        }}>同层</a>
+                                        }}>
+                                            {t('same level')}
+                                        </a>
                                     },
                                     {
                                         key: 'child', label: <a onClick={(e) => {
                                             e.stopPropagation();
                                             editorMenuAction(nodeData.node, 'child')
-                                        }}>子层</a>
+                                        }}>
+                                            {t('sublayer')}
+                                        </a>
                                     }
                                 ]
                             },
@@ -85,7 +91,9 @@ export default () => {
                                     if (nodeData.node) {
                                         onDelMenu(nodeData.node)
                                     }
-                                }}>删除</a>
+                                }}>
+                                    {t('delete')}
+                                </a>
                             },
                         ]
                     }} >
@@ -135,16 +143,16 @@ export default () => {
                 setSelectedTree({ keys: [menuInfo.id], info: menuInfo, action: action })
                 switch (action) {
                     case 'editor':
-                        title = `编辑-${menuInfo.name}`
+                        title = `${t('edit')}-${menuInfo.name}`
                         setFormFieldsValue(menuInfo)
                         formRef.current?.setFieldsValue(menuInfo)
                         break;
                     case 'peer':
-                        title = `新建-${menuInfo.name}-同层`
+                        title = `${t('created')}-${menuInfo.name}-${t('same level')}`
                         formRef.current?.resetFields()
                         break;
                     case 'child':
-                        title = `新建-${menuInfo.name}-子层`
+                        title = `${t('created')}-${menuInfo.name}-${t('sublayer')}`
                         formRef.current?.resetFields()
                         break;
                     default:
@@ -153,7 +161,7 @@ export default () => {
                 setActionTitle(title)
             } else {
                 setSelectedTree({ keys: [], info: undefined, action: action })
-                setActionTitle(`新建-顶级菜单`)
+                setActionTitle(`${t('created')}-${t('top menu')}`)
                 formRef.current?.resetFields()
             }
         },
@@ -205,13 +213,14 @@ export default () => {
         },
         onDelMenu = (menuInfo: AppMenu) => {
             Modal.confirm({
-                title: "删除",
-                content: `是否删除菜单：${menuInfo.name}`,
+                title: t('delete'),
+                content: `${t('confirm delete')}：${menuInfo.name}`,
                 onOk: async (close) => {
                     const result = await delAppMenu(menuInfo.id)
                     if (result) {
                         editorMenuAction(undefined, 'editor')
                         await getMenusRequest();
+                        message.success(t('submit success'));
                         close();
                     }
                 }
@@ -234,7 +243,7 @@ export default () => {
                 if (selectedTree.info?.id && selectedTree.action === 'editor') {
                     const ur = await updateAppMenu(selectedTree.info.id, values)
                     if (ur?.id) {
-                        message.success("提交成功");
+                        message.success(t('submit success'));
                         await getMenusRequest()
                         setSaveDisabled(true)
                     }
@@ -246,7 +255,7 @@ export default () => {
                     }
                     const cr = await createAppMenu(appInfo.id, values)
                     if (cr?.id) {
-                        message.success("提交成功");
+                        message.success(t('submit success'));
                         await getMenusRequest()
                         setSaveDisabled(true)
                         editorMenuAction(cr, 'editor')
@@ -263,23 +272,23 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: `${appInfo?.name} - 菜单管理`,
+                title: `${appInfo?.name} - ${t("{{field}} management", { field: t('menu') })}`,
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "应用管理", },
-                        { title: "菜单管理", },
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
+                        { title: t("{{field}} management", { field: t('menu') }), },
                     ],
                 },
                 extra: <Button onClick={() => {
                     setTreeDraggable(!treeDraggable)
-                }}>{treeDraggable ? '关闭' : '启动'}菜单移动</Button>
+                }}>{treeDraggable ? t('close') : t('open')}{t('move')}</Button>
             }}
         >
             <ProCard split="vertical">
                 <ProCard title={
-                    <Input.Search placeholder="关键字搜索" onSearch={onSearch} />
+                    <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
                 } colSpan="30%" loading={loading}>
                     <Tree x-if={treeData.length != 0}
                         draggable={treeDraggable}
@@ -298,6 +307,10 @@ export default () => {
                         formRef={formRef}
                         style={{ maxWidth: 400 }}
                         submitter={{
+                            searchConfig: {
+                                submitText: t('submit'),
+                                resetText: t('reset')
+                            },
                             submitButtonProps: {
                                 loading: saveLoading,
                                 disabled: saveDisabled,
@@ -310,27 +323,27 @@ export default () => {
                     >
                         <ProFormText
                             name="name"
-                            label="名称"
-                            placeholder="请输入名称"
+                            label={t('name')}
+                            placeholder={`${t("Please enter {{field}}", { field: t('name') })}`}
                             rules={[
-                                { required: true, message: "请输入名称", },
+                                { required: true, message: `${t("Please enter {{field}}", { field: t('name') })}`, },
                             ]}
                         />
-                        <ProFormSelect name="kind" label="类型"
-                            placeholder="请选择类型"
+                        <ProFormSelect name="kind" label={t('type')}
+                            placeholder={`${t("Please enter {{field}}", { field: t('type') })}`}
                             options={[
-                                { value: "dir", label: "目录" },
-                                { value: "menu", label: "菜单项" },
+                                { value: "dir", label: t('directory') },
+                                { value: "menu", label: t('menu') },
                             ]} rules={[
-                                { required: true, message: "请选择类型", },
+                                { required: true, message: `${t("Please enter {{field}}", { field: t('type') })}`, },
                             ]} />
                         <ProFormText
-                            label="关联权限"
-                            placeholder="请输入关联权限"
+                            label={t('permission')}
+                            placeholder={`${t("Please enter {{field}}", { field: t('permission') })}`}
                         >
                             <Input.Search
                                 value={formFieldsValue?.action?.name || ""}
-                                placeholder="请点击搜索进行查找"
+                                placeholder={`${t("click search {{field}}", { field: t('permission') })}`}
                                 onSearch={() => {
                                     setModal({ open: true })
                                 }}
@@ -338,13 +351,14 @@ export default () => {
                         </ProFormText>
                         <ProFormTextArea
                             name="comments"
-                            label="备注（选填）"
-                            placeholder="请输入备注"
+                            label={t('remarks')}
+                            placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
                         />
                     </ProForm>
                     <ModalAction
                         open={modal.open}
-                        title="查找权限" appId={appInfo?.id || ''}
+                        title={t("search {{field}}", { field: t('permission') })}
+                        appId={appInfo?.id || ''}
                         onClose={(selectData) => {
                             const data = selectData?.[0]
 

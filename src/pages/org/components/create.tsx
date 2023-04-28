@@ -9,8 +9,8 @@ import {
     ProFormTextArea,
     ProFormTreeSelect,
 } from '@ant-design/pro-components';
-import { Input } from 'antd';
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 type SelectTreeData = {
     value: string
@@ -28,7 +28,8 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const [saveLoading, setSaveLoading] = useState(false),
+    const { t } = useTranslation(),
+        [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
         [owner, setOwner] = useState<User>()
 
@@ -37,7 +38,7 @@ export default (props: {
             const result = await getOrgList({}, {}, {}),
                 list: SelectTreeData[] = [
                     {
-                        value: "0", title: '顶级组织', children: []
+                        value: "0", title: t("top organization"), children: []
                     }
                 ]
             if (result) {
@@ -125,6 +126,10 @@ export default (props: {
                 destroyOnClose: true,
             }}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -138,18 +143,18 @@ export default (props: {
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
-            <ProFormText name="name" label="名称"
+            <ProFormText name="name" label={t('name')}
                 rules={[
-                    { required: true, message: "请输入名称", },
+                    { required: true, message: `${t("Please enter {{field}}", { field: t("name") })}`, },
                 ]} />
-            <ProFormTreeSelect name="parentID" label="上级组织"
+            <ProFormTreeSelect name="parentID" label={t('parent organization')}
                 disabled={!!props.id}
                 request={parentRequest} rules={[
-                    { required: true, message: "请选择上级组织", },
+                    { required: true, message: `${t("Please enter {{field}}", { field: t("parent organization") })}`, },
                 ]} />
-            <ProFormText name="domain" label="域" tooltip="域不可随意修改,一旦修改会导致用户登录账号发生变更" />
-            <ProFormText name="countryCode" label="国家/地区" />
-            <ProFormText label="管理账户" tooltip="设置后不允许修改" >
+            <ProFormText name="domain" label={t('domain')} tooltip={t('The domain cannot be modified at will. Otherwise, the user login account will be changed')} />
+            <ProFormText name="countryCode" label={t('country/region')} />
+            <ProFormText label={t('manage account')} tooltip={t('The Settings cannot be modified')} >
                 <InputAccount value={owner}
                     userType="account"
                     onChange={(value) => {
@@ -160,8 +165,8 @@ export default (props: {
             </ProFormText>
             <ProFormTextArea
                 name="profile"
-                label="组织介绍"
-                placeholder="请输入组织介绍"
+                label={t('description')}
+                placeholder={`${t("Please enter {{field}}", { field: t("description") })}`}
             />
         </DrawerForm>
     );

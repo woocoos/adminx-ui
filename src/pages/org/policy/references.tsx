@@ -10,12 +10,14 @@ import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
-import { EnumPermissionPrincipalKind, EnumPermissionStatus, Permission, delPermssion } from "@/services/permission";
+import { EnumPermissionPrincipalKind, Permission, delPermssion } from "@/services/permission";
 import { getOrgPolicyReferenceList } from "@/services/permission";
 import { OrgPolicy, getOrgPolicyInfo } from "@/services/org/policy";
+import { useTranslation } from "react-i18next";
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
         [searchParams, setSearchParams] = useSearchParams(),
@@ -23,30 +25,32 @@ export default () => {
         columns: ProColumns<Permission>[] = [
             // 有需要排序配置  sorter: true 
             {
-                title: '名称', dataIndex: 'keyword', width: 120,
+                title: t('name'), dataIndex: 'keyword', width: 120,
                 render: (text, record) => {
                     return record.role?.name
                 }
             },
             {
-                title: '类型', dataIndex: 'principalKind',
+                title: t('type'), dataIndex: 'principalKind',
                 filters: true,
                 search: false,
                 width: 100,
                 valueEnum: EnumPermissionPrincipalKind,
             },
             // {
-            //     title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
+            //     title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
             //     valueEnum: EnumPermissionStatus,
             // },
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 170,
                 render: (text, record) => {
                     return <Space>
                         <a onClick={() => {
                             revokeOrg(record)
-                        }}>解除授权</a>
+                        }}>
+                            {t('disauthorization')}
+                        </a>
                     </Space>
                 }
             }
@@ -79,8 +83,8 @@ export default () => {
         },
         revokeOrg = (record: Permission) => {
             Modal.confirm({
-                title: "解除授权",
-                content: `是否解除授权${EnumPermissionPrincipalKind[record.principalKind].text}：${record.roleID}`,
+                title: t('disauthorization'),
+                content: `${t('confirm disauthorization')}${EnumPermissionPrincipalKind[record.principalKind].text}：${record.role?.name}?`,
                 onOk: async (close) => {
                     const result = await delPermssion(record.id, record.orgID)
                     if (result) {
@@ -95,24 +99,28 @@ export default () => {
         <>
             <PageContainer
                 header={{
-                    title: "引用记录",
+                    title: t('reference record'),
                     style: { background: token.colorBgContainer },
                     breadcrumb: {
                         items: [
-                            { title: "系统配置", },
-                            { title: "组织管理", },
-                            { title: "权限策略", },
-                            { title: "引用记录", },
+                            { title: t('System configuration'), },
+                            { title: t("{{field}} management", { field: t('organization') }), },
+                            { title: t('policy'), },
+                            { title: t('reference record'), },
                         ],
                     },
-                    children: <Alert showIcon message="引用记录用于查看权限策略的授权情况" />
+                    children: <Alert showIcon message={t('Reference records are used to view the authorization status of the permission policy')} />
                 }}
             >
                 <ProTable
                     actionRef={proTableRef}
+                    search={{
+                        searchText: `${t('query')}`,
+                        resetText: `${t('reset')}`,
+                    }}
                     rowKey={"id"}
                     toolbar={{
-                        title: `权限策略：${orgPolicyInfo?.name || '-'}`,
+                        title: `${t('policy')}：${orgPolicyInfo?.name || '-'}`,
                     }}
                     scroll={{ x: 'max-content' }}
                     columns={columns}

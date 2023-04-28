@@ -6,6 +6,7 @@ import { DrawerForm } from '@ant-design/pro-components';
 import { OrgPolicy, getOrgPolicyList } from '@/services/org/policy';
 import { OrgRole } from '@/services/org/role';
 import { createPermission } from '@/services/permission';
+import { useTranslation } from 'react-i18next';
 
 export default (props: {
     open: boolean
@@ -15,9 +16,10 @@ export default (props: {
 }) => {
 
     const
+        { t } = useTranslation(),
         columns: ColumnsType<OrgPolicy> = [
-            { title: '权限策略', dataIndex: 'name' },
-            { title: '描述', dataIndex: 'comments' },
+            { title: t('policy'), dataIndex: 'name' },
+            { title: t('description'), dataIndex: 'comments' },
         ],
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
@@ -68,7 +70,7 @@ export default (props: {
                 }
             }
             if (isTree) {
-                message.success('操作成功')
+                message.success(t('submit success'))
                 props.onClose?.(true)
             }
             setSaveLoading(false)
@@ -81,6 +83,10 @@ export default (props: {
             title={props.title}
             open={props.open}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -96,17 +102,17 @@ export default (props: {
             onOpenChange={onOpenChange}
         >
             <Space direction="vertical">
-                <div>{props.orgRoleInfo.kind === 'role' ? '角色' : '用户组'}：</div>
+                <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user group')}：</div>
                 <div>
                     <Input value={props.orgRoleInfo.name} />
                 </div>
                 <div>
-                    权限策略
+                    {t('policy')}
                 </div>
                 <Row gutter={20}>
                     <Col span="16">
                         <div>
-                            <Input.Search placeholder='关键字搜索' onSearch={onSearch} />
+                            <Input.Search placeholder={`t("search {{field}}", { field: t('keyword') })`} onSearch={onSearch} />
                         </div>
                         <br />
                         <Table
@@ -155,10 +161,10 @@ export default (props: {
                         <div style={{ paddingBottom: "30px" }}>
                             <Row>
                                 <Col flex="auto">
-                                    已选择（{selectedPolicys.length}）
+                                    {t('selected')}（{selectedPolicys.length}）
                                 </Col>
                                 <Col >
-                                    <a>清空</a>
+                                    <a>{t('empty')}</a>
                                 </Col>
                             </Row>
                         </div>

@@ -10,9 +10,11 @@ import PolicyRules from "../components/policyRules";
 import { Org, getOrgInfo } from "@/services/org";
 import { PolicyRule } from "@/services/app/policy";
 import { OrgPolicy, createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from "@/services/org/policy";
+import { useTranslation } from "react-i18next";
 
 export default () => {
     const { token } = useToken(),
+        { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         formRef = useRef<ProFormInstance>(),
         [saveLoading, setSaveLoading] = useState(false),
@@ -58,10 +60,10 @@ export default () => {
                         const appCode = item.actions[0].split(':')[0]
                         const action = item.actions.find(key => key.split(':')[0] != appCode)
                         if (action) {
-                            errMsg = '有操作的应用不是统一'
+                            errMsg = t("{{field}} mismatch", { field: t("app code") })
                         }
                     } else {
-                        errMsg = '有操作未选择'
+                        errMsg = t('this {{field}} is required', { field: t('operation') })
                     }
                     if (errMsg.length) {
                         break;
@@ -89,7 +91,7 @@ export default () => {
             }
 
             if (result?.id) {
-                message.success("操作成功");
+                message.success(t('submit success'));
                 if (!policyId) {
                     setSearchParams({ id: result.id })
                 }
@@ -103,13 +105,13 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: `${policyId ? "" : "创建"}权限策略`,
+                title: `${policyId ? t('policy') : t("create {{field}}", { field: t('policy') })}`,
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
-                        { title: "系统配置", },
-                        { title: "组织管理", },
-                        { title: "权限策略", },
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('organization') }), },
+                        { title: t('policy'), },
                     ],
                 },
             }}
@@ -120,6 +122,10 @@ export default () => {
                     grid
                     formRef={formRef}
                     submitter={{
+                        searchConfig: {
+                            submitText: t('submit'),
+                            resetText: t('reset')
+                        },
                         submitButtonProps: {
                             loading: saveLoading,
                             disabled: saveDisabled,
@@ -134,10 +140,10 @@ export default () => {
                     <ProFormText
                         colProps={{ md: 6 }}
                         name="name"
-                        label="名称"
-                        placeholder="请输入名称"
+                        label={t('name')}
+                        placeholder={`${t("Please enter {{field}}", { field: t('name') })}`}
                         rules={[
-                            { required: true, message: "请输入名称", },
+                            { required: true, message: `${t("Please enter {{field}}", { field: t('name') })}`, },
                         ]}
                     />
                     <ProFormText>
@@ -153,8 +159,8 @@ export default () => {
                     <ProFormTextArea
                         colProps={{ md: 12 }}
                         name="comments"
-                        label="描述（选填）"
-                        placeholder="请输入描述"
+                        label={t('remarks')}
+                        placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
                     />
                 </ProForm>
             </ProCard>

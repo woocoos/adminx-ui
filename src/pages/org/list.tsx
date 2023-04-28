@@ -15,6 +15,7 @@ import OrgCreate from "./components/create";
 import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
 import { getAppOrgList } from "@/services/app/org";
+import { useTranslation } from "react-i18next";
 
 export type OrgListRef = {
   getSelect: () => Org[]
@@ -32,24 +33,25 @@ const OrgList = (props: {
 }, ref: MutableRefObject<OrgListRef>) => {
 
   const { token } = useToken(),
+    { t } = useTranslation(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     kind = props.kind || 'root',
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true 
-      { title: '名称', dataIndex: 'name', width: 120, },
-      { title: '编码', dataIndex: 'code', width: 120, },
-      { title: '类型', dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
-      { title: '域', dataIndex: 'domain', width: 120, search: false, },
-      { title: '国家/地区', dataIndex: 'countryCode', width: 120, search: false, },
+      { title: t('name'), dataIndex: 'name', width: 120, },
+      { title: t('code'), dataIndex: 'code', width: 120, },
+      { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
+      { title: t('domain'), dataIndex: 'domain', width: 120, search: false, },
+      { title: t('country/region'), dataIndex: 'countryCode', width: 120, search: false, },
       {
-        title: '管理账户', dataIndex: 'owner', width: 120, search: false,
+        title: t('manage account'), dataIndex: 'owner', width: 120, search: false,
         render: (text, record) => {
           return <div>{record?.owner?.displayName || '-'}</div>
         }
       },
       {
-        title: '状态', dataIndex: 'status', filters: true, search: false, width: 100,
+        title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: EnumOrgStatus,
       },
     ],
@@ -74,41 +76,45 @@ const OrgList = (props: {
   if (props.scene !== 'modal') {
     columns.push(
       {
-        title: '操作', dataIndex: 'actions', fixed: 'right',
+        title: t('operation'), dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 170,
         render: (text, record) => {
           const createAction = [
             {
               key: 'child', label: <a onClick={(e) => {
                 editorAction(record, 'child')
-              }}>子层</a>
+              }}>
+                {t('sublayer')}
+              </a>
             }
           ]
           if (record.parentID != '0') {
             createAction.unshift({
               key: 'peer', label: <a onClick={(e) => {
                 editorAction(record, 'peer')
-              }}>同层</a>
+              }}>
+                {t('same level')}
+              </a>
             })
           }
 
           return <Space>
             {record.kind === kind ? <>
               <a key="editor" onClick={() => editorAction(record, 'editor')}>
-                编辑
+                {t('edit')}
               </a>
             </> : <></>}
             {
               kind == 'root' ? (<>
                 <Link key="userGroup" to={`/org/groups?id=${record.id}`}>
-                  用户组
+                  {t('user group')}
                 </Link>
                 <Dropdown trigger={['click']} menu={{
                   items: [
-                    { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>权限策略</Link> },
-                    { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>授权应用</Link> },
-                    { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >组织部门管理</Link> },
-                    { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>组织用户管理</Link> },
+                    { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>{t('policy')}</Link> },
+                    { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>{t('authorized application')}</Link> },
+                    { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >{t('organizational department management')}</Link> },
+                    { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>{t('organizational user management')}</Link> },
                   ]
                 }} >
                   <a><EllipsisOutlined /></a>
@@ -118,12 +124,12 @@ const OrgList = (props: {
                 <Dropdown trigger={['click']} menu={{
                   items: record.kind === kind ? [
                     {
-                      key: 'create', label: "新建", children: createAction
+                      key: 'create', label: t('created'), children: createAction
                     },
-                    { key: "delete", label: <a onClick={() => onDelApp(record)}>删除</a> },
+                    { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
                   ] : [
                     {
-                      key: 'create', label: "新建", children: createAction
+                      key: 'create', label: t('created'), children: createAction
                     },
                   ]
                 }} >
@@ -175,8 +181,8 @@ const OrgList = (props: {
     },
     onDelApp = (record: Org) => {
       Modal.confirm({
-        title: "删除",
-        content: `是否删除组织：${record.name}`,
+        title: t('delete'),
+        content: `${t('confirm delete')}：${record.name}?`,
         onOk: async (close) => {
           const result = await delOrgInfo(record.id)
           if (result) {
@@ -196,13 +202,13 @@ const OrgList = (props: {
       let title = "";
       switch (action) {
         case "child":
-          title = `创建-${info.name}-子层`
+          title = `${t('created')}-${info.name}-${t('sublayer')}`
           break;
         case "peer":
-          title = `创建-${info.name}-同层`
+          title = `${t('created')}-${info.name}-${t('same level')}`
           break;
         case "editor":
-          title = `编辑-${info.name}`
+          title = `${t('edit')}-${info.name}`
           break;
         default:
           break;
@@ -228,9 +234,12 @@ const OrgList = (props: {
           <ProTable
             actionRef={proTableRef}
             rowKey={"id"}
-            search={props.appId ? undefined : false}
+            search={props.appId ? {
+              searchText: `${t('query')}`,
+              resetText: `${t('reset')}`,
+            } : false}
             toolbar={{
-              title: props?.title || (kind === 'org' ? "组织部门树" : "组织树")
+              title: props?.title || (kind === 'org' ? t('organizational branch tree') : t('organizational tree'))
             }}
             expandable={{
               expandedRowKeys: expandedRowKeys,
@@ -251,24 +260,24 @@ const OrgList = (props: {
         ) : (
           <PageContainer
             header={{
-              title: kind == 'org' ? "组织部门管理" : "组织管理",
+              title: kind == 'org' ? t('organizational department management') : t("{{field}} management", { field: t('organization') }),
               style: { background: token.colorBgContainer },
               breadcrumb: {
                 items: kind == 'org' ? [
-                  { title: "组织协作", },
-                  { title: "组织部门管理", },
+                  { title: t('organization and cooperation'), },
+                  { title: t('organizational department management'), },
                 ] : [
-                  { title: "系统配置", },
-                  { title: "组织管理", },
+                  { title: t('System configuration'), },
+                  { title: t("{{field}} management", { field: t('organization') }), },
                 ],
               },
               extra: kind == 'org' ? <></> : <>
                 {/* <Button
                   type="primary" onClick={() => {
-                    setModal({ open: true, title: "创建组织", id: "", scene: "editor" })
+                    setModal({ open: true, title:t("create {{field}}", { field: t('organization') }) , id: "", scene: "editor" })
 
                   }}>
-                  创建组织
+                  { t("create {{field}}", { field: t('organization') })}
                 </Button> */}
               </>
             }}
@@ -278,7 +287,7 @@ const OrgList = (props: {
               rowKey={"id"}
               search={false}
               toolbar={{
-                title: kind === 'org' ? "组织部门树" : "组织树"
+                title: kind === 'org' ? t('organizational branch tree') : t('organizational tree')
               }}
               expandable={{
                 expandedRowKeys: expandedRowKeys,

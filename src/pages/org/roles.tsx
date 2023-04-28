@@ -5,7 +5,7 @@ import {
     ProTable,
     useToken,
 } from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal, Alert } from "antd";
+import { Button, Space, Dropdown, Modal, Alert, message } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { forwardRef, useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
@@ -14,13 +14,15 @@ import CreateOrgRole from "./components/createRole";
 import { TreeEditorAction } from "@/util/type";
 import { OrgRole, OrgRoleKind, delOrgRole, getOrgGroupList, getOrgRoleList } from "@/services/org/role";
 import store from "@/store";
+import { useTranslation } from "react-i18next";
 
 const OrgRoleList = (props: {
     kind?: OrgRoleKind,
     orgId?: string
 }) => {
 
-    const { token } = useToken(),
+    const { t } = useTranslation(),
+        { token } = useToken(),
         [basisState] = store.useModel("basis"),
         [searchParams, setSearchParams] = useSearchParams(),
         // 表格相关
@@ -29,17 +31,21 @@ const OrgRoleList = (props: {
         orgId: string = props.orgId || searchParams.get('id') || basisState.tenantId,
         columns: ProColumns<OrgRole>[] = [
             // 有需要排序配置  sorter: true 
-            { title: '名称', dataIndex: 'name', width: 120, },
-            { title: '备注', dataIndex: 'comments', width: 120, search: false, },
+            { title: t('name'), dataIndex: 'name', width: 120, },
+            { title: t('remarks'), dataIndex: 'comments', width: 120, search: false, },
             {
-                title: '操作', dataIndex: 'actions', fixed: 'right',
+                title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 90,
                 render: (text, record) => {
                     return <Space>
-                        <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>查看</Link>
+                        <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
+                            {t('view')}
+                        </Link>
                         <a onClick={() => {
                             onDel(record)
-                        }}>删除</a>
+                        }}>
+                            {t('delete')}
+                        </a>
                     </Space>
                 }
             },
@@ -73,12 +79,13 @@ const OrgRoleList = (props: {
         },
         onDel = (record: OrgRole) => {
             Modal.confirm({
-                title: "删除",
-                content: `是否删除：${record.name}`,
+                title: t('delete'),
+                content: `${t('confirm delete')}：${record.name}?`,
                 onOk: async (close) => {
                     const result = await delOrgRole(record.id)
                     if (result) {
                         proTableRef.current?.reload();
+                        message.success('submit success')
                         close();
                     }
                 }
@@ -100,37 +107,41 @@ const OrgRoleList = (props: {
 
             <PageContainer
                 header={{
-                    title: kind == 'role' ? "角色" : "用户组",
+                    title: kind == 'role' ? t('role') : t('user group'),
                     style: { background: token.colorBgContainer },
                     breadcrumb: {
                         items: kind == 'role' ? [
-                            { title: "组织协作", },
-                            { title: "角色", },
+                            { title: t('organization and cooperation'), },
+                            { title: t('role'), },
                         ] : [
-                            { title: "组织协作", },
-                            { title: "用户组", },
+                            { title: t('organization and cooperation'), },
+                            { title: t('user group'), },
                         ],
                     },
                     children: <Alert showIcon message={kind == 'role' ? <>
-                        <div>角色不同于用户组的职责划分，而是向您信任的实体（例如：用户）进行授权的一种安全方法</div>
+                        <div>{t('Roles are not the division of responsibilities of user groups, but a secure way to authorize entities that you trust, such as users')}</div>
                     </> : <>
-                        <div>通过用户组对职责相同的用户进行分类并授权，可以更加高效地管理用户及其权限</div>
-                        <div>对一个用户组进行授权后，用户组内的所有用户会自动继承该用户组的权限</div>
-                        <div>如果一个用户被加入到多个用户组，那么该用户将会继承多个用户组的权限</div>
+                        <div>{t('Users and their rights can be managed more efficiently by classifying and authorizing users with the same responsibilities through user groups')}</div>
+                        <div>{t('After a user group is authorized, all users in the user group automatically inherit the rights of the user group')}</div>
+                        <div>{t('If a user is added to multiple user groups, the user inherits the rights of multiple user groups')}</div>
                     </>} />
                 }}
             >
                 <ProTable
                     actionRef={proTableRef}
+                    search={{
+                        searchText: `${t('query')}`,
+                        resetText: `${t('reset')}`,
+                    }}
                     rowKey={"id"}
                     toolbar={{
-                        title: kind == "role" ? '角色列表' : '用户组列表',
+                        title: kind == "role" ? t("{{field}} list", { field: t('role') }) : t("{{field}} list", { field: t('user group') }),
                         actions: [
                             <Button
                                 type="primary" onClick={() => {
-                                    setModal({ open: true, title: `创建${kind == "role" ? '角色' : '用户组'}`, id: "", scene: "editor" })
+                                    setModal({ open: true, title: `${kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}`, id: "", scene: "editor" })
                                 }}>
-                                创建{kind == "role" ? '角色' : '用户组'}
+                                {kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}
                             </Button>
                         ]
                     }}

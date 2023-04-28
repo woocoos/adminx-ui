@@ -3,6 +3,7 @@ import ModalApp from "./modalApp"
 import { useState } from "react"
 import { CloseCircleFilled } from "@ant-design/icons";
 import { App } from "@/services/app";
+import { useTranslation } from "react-i18next";
 
 export default (props: {
     value?: App,
@@ -10,18 +11,19 @@ export default (props: {
     disabled?: boolean
     onChange?: (value?: App) => void
 }) => {
-    const [modal, setModal] = useState<{
-        open: boolean
-    }>({
-        open: false
-    })
+    const { t } = useTranslation(),
+        [modal, setModal] = useState<{
+            open: boolean
+        }>({
+            open: false
+        })
 
     return (
         <>
             <Input.Search
                 value={props.value?.name || ''}
                 disabled={props.disabled}
-                placeholder="点击搜索应用"
+                placeholder={`${t("click search {{field}}", { field: t("app") })}`}
                 suffix={props.value && props.disabled != true ?
                     <CloseCircleFilled
                         style={{ fontSize: "12px", cursor: "pointer", color: "rgba(0, 0, 0, 0.25)" }}
@@ -36,7 +38,7 @@ export default (props: {
             />
             <ModalApp
                 open={modal.open}
-                title={"搜索应用"}
+                title={`${t("search {{field}}", { field: t('app') })}`}
                 orgId={props.orgId}
                 onClose={(selectData) => {
                     if (selectData?.length) {

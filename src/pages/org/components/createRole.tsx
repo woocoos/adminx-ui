@@ -1,16 +1,13 @@
 import InputAccount from '@/pages/account/components/inputAccount';
 import { OrgRole, OrgRoleKind, createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/org/role';
 import { User } from '@/services/user';
-import { formatTreeData } from '@/util';
-import { TreeEditorAction } from '@/util/type';
 import {
     DrawerForm,
     ProFormText,
     ProFormTextArea,
-    ProFormTreeSelect,
 } from '@ant-design/pro-components';
-import { Input } from 'antd';
 import { useEffect, useState } from "react";
+import { useTranslation } from 'react-i18next';
 
 export default (props: {
     open?: boolean
@@ -21,9 +18,10 @@ export default (props: {
     onClose?: (isSuccess?: boolean) => void
 }) => {
 
-    const [saveLoading, setSaveLoading] = useState(false),
-        [saveDisabled, setSaveDisabled] = useState(true),
-        [owner, setOwner] = useState<User>()
+    const
+        { t } = useTranslation(),
+        [saveLoading, setSaveLoading] = useState(false),
+        [saveDisabled, setSaveDisabled] = useState(true)
 
     const
         onOpenChange = (open: boolean) => {
@@ -73,6 +71,10 @@ export default (props: {
                 destroyOnClose: true,
             }}
             submitter={{
+                searchConfig: {
+                    submitText: t('submit'),
+                    resetText: t('reset')
+                },
                 submitButtonProps: {
                     loading: saveLoading,
                     disabled: saveDisabled,
@@ -86,14 +88,14 @@ export default (props: {
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
-            <ProFormText name="name" label="名称"
+            <ProFormText name="name" label={t('name')}
                 rules={[
-                    { required: true, message: "请输入名称", },
+                    { required: true, message: `${t("Please enter {{field}}", { field: t("name") })}`, },
                 ]} />
             <ProFormTextArea
                 name="comments"
-                label="备注"
-                placeholder="请输入备注"
+                label={t('remarks')}
+                placeholder={`${t("Please enter {{field}}", { field: t("remarks") })}`}
             />
         </DrawerForm>
     );
