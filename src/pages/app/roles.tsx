@@ -12,10 +12,11 @@ import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
 import CreateAppRole from "./components/createRole";
-import ModalRolePolicy from "./components/modalRolePolicy";
+
 import { AppRole } from "@/services/app/role";
 import { delAppRole, getAppRoleList } from "@/services/app/role";
 import { useTranslation } from "react-i18next";
+import DrawerRolePolicy from "./components/drawerRolePolicy";
 
 
 export default () => {
@@ -196,7 +197,7 @@ export default () => {
                 appId={appInfo?.id}
                 onClose={onDrawerClose}
             />
-            <ModalRolePolicy
+            <DrawerRolePolicy
                 x-if={modal.scene === "addPolicy"}
                 open={modal.open}
                 title={modal.title}

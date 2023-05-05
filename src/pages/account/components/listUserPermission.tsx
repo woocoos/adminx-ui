@@ -10,7 +10,7 @@ import { Button, Space, Dropdown, Modal, message, Alert, Select } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Permission, PermissionPrincipalKind, delPermssion, getOrgPermissionList, getUserPermissionList } from "@/services/permission";
-import ModalRolePolicy from "@/pages/org/components/modalRolePolicy";
+import DrawerRolePolicy from "@/pages/org/components/drawerRolePolicy";
 import { useTranslation } from "react-i18next";
 import store from "@/store";
 import { User } from "@/services/user";
@@ -159,7 +159,7 @@ export default (props: {
                     type: "checkbox"
                 }}
             />
-            <ModalRolePolicy
+            <DrawerRolePolicy
                 orgId={basisState.tenantId}
                 userInfo={props.userInfo}
                 open={modal.open}

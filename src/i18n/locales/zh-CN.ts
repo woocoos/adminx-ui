@@ -180,7 +180,7 @@ export default {
         "joined group": "加入的组",
         "personal authority": "个人权限",
         "inherit user group permissions": "继承用户组权限",
-        // "": "",
+        "after a user is added to a user group, the user has all the permissions of the group": "用户加入到用户组后，将拥有该组所有权限",
         // "": "",
     },
 };

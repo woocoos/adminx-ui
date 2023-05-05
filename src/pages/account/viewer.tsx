@@ -14,6 +14,7 @@ import UserCreateIdentity from "./components/createIdentity";
 import { EnumUserIdentityKind, UpdateUserInfoScene, User, UserType, getUserInfo } from "@/services/user";
 import { useTranslation } from "react-i18next";
 import ListUserPermission from "./components/listUserPermission";
+import ListUserJoinGroup from "./components/listUserJoinGroup";
 
 export default () => {
     const { token } = useToken(),
@@ -172,6 +173,7 @@ export default () => {
                         }, {
                             label: t('joined group'),
                             key: 'group',
+                            children: <ListUserJoinGroup userInfo={info} />
 
                         }, {
                             label: t("{{field}} management", { field: t('permission') }),

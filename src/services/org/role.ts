@@ -60,6 +60,43 @@ export async function getOrgGroupList(params: TableParams, filter: TableFilter, 
 }
 
 /**
+ * 获取用户加入的用户组
+ * @param userId 
+ * @param params 
+ * @param filter 
+ * @param sort 
+ * @returns 
+ */
+export async function getUserJoinGroupList(userId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query userGroups($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+                list:userGroups(userID:"${userId}"after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${OrgRoleNodeField}
+                        }
+                    }
+                }
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.list) {
+        return result.data.list as List<OrgRole>
+    } else {
+        return null
+    }
+}
+
+/**
  * 获取组织用户组
  * @param params 
  * @param filter 

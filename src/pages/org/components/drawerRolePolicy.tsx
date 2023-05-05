@@ -1,13 +1,14 @@
 import { Col, Drawer, Input, List, Row, Space, Table, Tag, message } from 'antd';
 import { ColumnsType } from 'antd/es/table';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CloseOutlined } from "@ant-design/icons";
-import { DrawerForm } from '@ant-design/pro-components';
+import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { OrgPolicy, getOrgPolicyList } from '@/services/org/policy';
 import { OrgRole } from '@/services/org/role';
 import { Permission, createPermission } from '@/services/permission';
 import { useTranslation } from 'react-i18next';
 import { User } from '@/services/user';
+import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 
 export default (props: {
     open: boolean
@@ -20,48 +21,41 @@ export default (props: {
 
     const
         { t } = useTranslation(),
-        columns: ColumnsType<OrgPolicy> = [
+        proTableRef = useRef<ActionType>(),
+        columns: ProColumns<OrgPolicy>[] = [
             { title: t('policy'), dataIndex: 'name' },
             { title: t('description'), dataIndex: 'comments' },
         ],
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
-        [loading, setLoading] = useState<boolean>(false),
-        [selectedPolicys, setSelectedPolicys] = useState<OrgPolicy[]>([]),
-        [allList, setAllList] = useState<OrgPolicy[]>([]),
+        [keyword, setKeyword] = useState<string>(),
+        [selectedDatas, setSelectedDatas] = useState<OrgPolicy[]>([]),
         [dataSource, setdataSource] = useState<OrgPolicy[]>([])
 
     const
-        getRequest = async () => {
-            setLoading(true);
-            setAllList([])
-            const result = await getOrgPolicyList(props.orgId, {}, {}, {})
-            if (result?.totalCount) {
-                const data = result.edges.map(item => item.node)
-                setAllList(data)
-                setdataSource(data)
+        getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+            const table = { data: [] as OrgPolicy[], success: true, total: 0 };
+            if (keyword) {
+                params.nameContains = keyword
             }
-
-            setLoading(false);
-            return {}
+            const result = await getOrgPolicyList(props.orgId, params, filter, sort)
+            if (result?.totalCount) {
+                table.data = result.edges.map(item => item.node)
+                table.total = result.totalCount
+            }
+            setdataSource(table.data)
+            return table
         },
         onOpenChange = (open: boolean) => {
             if (!open) {
                 props.onClose?.()
             }
         },
-        onSearch = (keyword: string) => {
-            if (keyword) {
-                setdataSource(allList.filter(item => item.name.indexOf(keyword) > -1 || item.comments.indexOf(keyword) > -1))
-            } else {
-                getRequest()
-            }
-        },
         onFinish = async () => {
             setSaveLoading(true)
             let isTree = false, result: Permission | null = null;
-            for (let i in allList) {
-                const item = allList[i]
+            for (let i in selectedDatas) {
+                const item = selectedDatas[i]
                 if (props.orgRoleInfo) {
                     result = await createPermission({
                         principalKind: "role",
@@ -109,8 +103,6 @@ export default (props: {
                 width: 800,
                 destroyOnClose: true,
             }}
-            onReset={getRequest}
-            request={getRequest}
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
@@ -137,48 +129,41 @@ export default (props: {
                 <Row gutter={20}>
                     <Col span="16">
                         <div>
-                            <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
+                            <Input.Search
+                                value={keyword}
+                                placeholder={`${t("search {{field}}", { field: t('keyword') })}`}
+                                onChange={(e) => {
+                                    setKeyword(e.target.value);
+                                }}
+                                onSearch={() => {
+                                    proTableRef.current?.reload(true);
+                                }}
+                            />
                         </div>
                         <br />
-                        <Table
+                        <ProTable
+                            className='innerTable'
                             columns={columns}
-                            dataSource={dataSource}
+                            actionRef={proTableRef}
+                            request={getRequest}
+                            search={false}
+                            toolbar={{
+                                settings: []
+                            }}
                             scroll={{ y: 500 }}
                             rowKey="id"
                             size="small"
-                            loading={loading}
                             pagination={false}
                             rowSelection={{
-                                type: "checkbox",
-                                selectedRowKeys: selectedPolicys.map(item => item.id),
-                                onSelectAll: (selected) => {
-                                    const allIds = selectedPolicys.map(item => item.id)
-                                    if (selected) {
-                                        const addList = dataSource.filter(item => !allIds.includes(item.id))
-                                        setSelectedPolicys([...selectedPolicys, ...addList])
-                                    } else {
-                                        dataSource.forEach(item => {
-                                            const index = selectedPolicys.findIndex(p => p.id == item.id)
-                                            if (index > -1) {
-                                                selectedPolicys.splice(index, 1)
-                                            }
-                                        })
-                                        setSelectedPolicys([...selectedPolicys])
-                                    }
+                                selectedRowKeys: selectedDatas.map(item => item.id),
+                                onChange: (selectedRowKeys: string[]) => {
+                                    const allIds = dataSource.map(item => item.id),
+                                        oldDatas = selectedDatas.filter(sItem => !allIds.includes(sItem.id)),
+                                        newDatas = selectedRowKeys.length ? dataSource.filter(item => selectedRowKeys.includes(item.id)) : [];
+                                    setSelectedDatas([...oldDatas, ...newDatas])
                                     setSaveDisabled(false)
                                 },
-                                onSelect: (record, selected) => {
-                                    if (selected) {
-                                        setSelectedPolicys([...selectedPolicys, record])
-                                    } else {
-                                        const index = selectedPolicys.findIndex(p => p.id == record.id)
-                                        if (index > -1) {
-                                            selectedPolicys.splice(index, 1)
-                                            setSelectedPolicys([...selectedPolicys])
-                                        }
-                                    }
-                                    setSaveDisabled(false)
-                                }
+                                type: "checkbox"
                             }}
                         />
                     </Col>
@@ -186,7 +171,7 @@ export default (props: {
                         <div style={{ paddingBottom: "30px" }}>
                             <Row>
                                 <Col flex="auto">
-                                    {t('selected')}（{selectedPolicys.length}）
+                                    {t('selected')}（{selectedDatas.length}）
                                 </Col>
                                 <Col >
                                     <a>{t('empty')}</a>
@@ -198,13 +183,13 @@ export default (props: {
                                 style={{ overflow: "auto", height: "500px" }}
                                 bordered
                                 size="small"
-                                dataSource={selectedPolicys}
+                                dataSource={selectedDatas}
                                 renderItem={(item) => <List.Item extra={
                                     <a onClick={() => {
-                                        const index = selectedPolicys.findIndex(p => p.id == item.id)
+                                        const index = selectedDatas.findIndex(p => p.id == item.id)
                                         if (index > -1) {
-                                            selectedPolicys.splice(index, 1)
-                                            setSelectedPolicys([...selectedPolicys])
+                                            selectedDatas.splice(index, 1)
+                                            setSelectedDatas([...selectedDatas])
                                         }
                                         setSaveDisabled(false)
                                     }}>

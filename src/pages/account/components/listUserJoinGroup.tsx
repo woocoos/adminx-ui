@@ -9,46 +9,30 @@ import {
 import { Button, Space, Dropdown, Modal, message, Alert, Select } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Permission, delPermssion, getOrgPermissionList } from "@/services/permission";
-import DrawerRolePolicy from "./drawerRolePolicy";
-import { OrgRole } from "@/services/org/role";
 import { useTranslation } from "react-i18next";
+import store from "@/store";
+import { User } from "@/services/user";
+import { OrgRole, getUserJoinGroupList, revokeOrgRoleUser } from "@/services/org/role";
+import DrawerRole from "@/pages/org/components/drawerRole";
 
 
 export default (props: {
-    orgRoleInfo: OrgRole
+    userInfo: User
 }) => {
-    const { token } = useToken(),
-        { t } = useTranslation(),
+    const { t } = useTranslation(),
+        [basisState] = store.useModel("basis"),
         // 表格相关
         proTableRef = useRef<ActionType>(),
-        columns: ProColumns<Permission>[] = [
+        columns: ProColumns<OrgRole>[] = [
             // 有需要排序配置  sorter: true 
             {
                 title: t('name'), dataIndex: 'name', width: 120,
-                render: (text, record) => {
-                    return record.orgPolicy?.name
-                }
             },
             {
                 title: t('description'), dataIndex: 'comments', width: 120,
-                render: (text, record) => {
-                    return record.orgPolicy?.comments
-                }
             },
             {
-                title: t('policy type'), dataIndex: 'type', width: 120,
-                renderFormItem(schema, config, form) {
-                    return <Select allowClear options={[
-                        { label: t('System strategy'), value: 'sys' },
-                        { label: t('Custom policy'), value: 'cust' },
-                    ]} onChange={(value) => {
-                        form.setFieldValue("type", value)
-                    }} />
-                },
-                render: (text, record) => {
-                    return record.orgPolicy?.appPolicyID ? t('System strategy') : t('Custom policy')
-                }
+                title: t('created at'), dataIndex: 'type', width: 120, valueType: "dateTime"
             },
             {
                 title: t('operation'), dataIndex: 'actions', fixed: 'right',
@@ -60,7 +44,8 @@ export default (props: {
                         </a>
                     </Space>
                 }
-            },
+            }
+
         ],
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -74,23 +59,12 @@ export default (props: {
         })
 
 
+
+
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as Permission[], success: true, total: 0 };
-            params.principalKind = "role"
-            params.roleID = props.orgRoleInfo.id
-            if (params.name || params.comments || params.type) {
-                params.hasOrgPolicyWith = {
-                    nameContains: params.name || null,
-                    commentsContains: params.comments || null,
-                    appPolicyIDNotNil: params.type === 'sys' ? true : undefined,
-                    appPolicyIDIsNil: params.type === 'cust' ? true : undefined
-                }
-            }
-            delete params.name
-            delete params.comments
-            delete params.type
-            const result = await getOrgPermissionList(props.orgRoleInfo.orgID, params, filter, sort);
+            const table = { data: [] as OrgRole[], success: true, total: 0 };
+            const result = await getUserJoinGroupList(props.userInfo.id, params, filter, sort);
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
@@ -98,12 +72,12 @@ export default (props: {
 
             return table
         },
-        onDel = (record: Permission) => {
+        onDel = (record: OrgRole) => {
             Modal.confirm({
                 title: t('disauthorization'),
-                content: `${t('confirm disauthorization')}：${record.orgPolicy?.name}?`,
+                content: `${t('confirm disauthorization')}：${record.name}?`,
                 onOk: async (close) => {
-                    const result = await delPermssion(record.id, props.orgRoleInfo.orgID)
+                    const result = await revokeOrgRoleUser(record.id, props.userInfo.id)
                     if (result) {
                         proTableRef.current?.reload();
                         message.success(t('submit success'))
@@ -128,7 +102,7 @@ export default (props: {
                         <Button type="primary" onClick={() => {
                             setModal({ open: true, title: '' })
                         }} >
-                            {t("add {{field}}", { field: t('authorization') })}
+                            {t("add {{field}}", { field: t('user group') })}
                         </Button>
                     ]
                 }}
@@ -141,17 +115,20 @@ export default (props: {
                     type: "checkbox"
                 }}
             />
-            <DrawerRolePolicy
-                orgId={props.orgRoleInfo.orgID}
-                orgRoleInfo={props.orgRoleInfo}
+            <DrawerRole
+                title={`${t("add {{field}}", { field: t('user group') })}`}
                 open={modal.open}
-                title={`${t("add {{field}}", { field: t('permission') })}`}
+                orgId={basisState.tenantId}
+                kind={"group"}
+                userInfo={props.userInfo}
                 onClose={(isSuccess) => {
                     if (isSuccess) {
                         proTableRef.current?.reload();
                     }
                     setModal({ open: false, title: '' })
-                }} />
+                }}
+            />
+
         </>
     );
 };

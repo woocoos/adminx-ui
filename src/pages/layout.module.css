@@ -7,9 +7,10 @@
     display: none;
   }
 
-  /* .ant-pro-global-header {
-    width: 100%;
-    justify-content: space-between;
-    padding: 0 24px;
-  } */
+  @media (max-width:767px) {
+    .ant-layout>div:nth-child(1) {
+      display: block;
+    }
+  }
+
 }
