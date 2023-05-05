@@ -24,7 +24,6 @@ export default () => {
         columns: ProColumns<AppPolicy>[] = [
             // 有需要排序配置  sorter: true 
             { title: t('name'), dataIndex: 'name', width: 120, },
-            { title: t('version'), dataIndex: 'version', width: 120, },
             {
                 title: t('automatic authorization'), dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
                 render: (text, record) => {

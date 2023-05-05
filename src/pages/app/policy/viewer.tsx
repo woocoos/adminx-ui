@@ -160,15 +160,6 @@ export default () => {
                             { required: true, message: `${t("Please enter {{field}}", { field: t('name') })}`, },
                         ]}
                     />
-                    <ProFormText
-                        colProps={{ md: 6 }}
-                        name="version"
-                        label={t('version')}
-                        placeholder={`${t("Please enter {{field}}", { field: t('version') })}`}
-                        rules={[
-                            { required: true, message: `${t("Please enter {{field}}", { field: t('version') })}`, },
-                        ]}
-                    />
                     <ProFormSelect
                         colProps={{ md: 6 }}
                         name="status"
