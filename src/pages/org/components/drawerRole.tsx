@@ -99,7 +99,7 @@ export default (props: {
                 <Alert showIcon message={t('after a user is added to a user group, the user has all the permissions of the group')} />
                 {
                     props.userInfo ? <>
-                        <div>{t('user')}：</div>
+                        <div>{t('user')}</div>
                         <div>
                             <Input value={props.userInfo.displayName} />
                         </div>
@@ -156,7 +156,10 @@ export default (props: {
                                     {t('selected')}（{selectedDatas.length}）
                                 </Col>
                                 <Col >
-                                    <a>{t('empty')}</a>
+                                    <a onClick={() => {
+                                        setSelectedDatas([])
+                                        setSaveDisabled(true)
+                                    }}>{t('empty')}</a>
                                 </Col>
                             </Row>
                         </div>

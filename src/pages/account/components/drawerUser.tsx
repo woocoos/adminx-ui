@@ -1,44 +1,48 @@
-import { Col, Drawer, Input, List, Row, Space, Table, Tag, message } from 'antd';
-import { ColumnsType } from 'antd/es/table';
-import { useEffect, useRef, useState } from 'react';
+import { Alert, Col, Input, List, Row, Space, message } from 'antd';
+import { useRef, useState } from 'react';
 import { CloseOutlined } from "@ant-design/icons";
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
-import { OrgPolicy, getOrgPolicyList } from '@/services/org/policy';
-import { OrgRole } from '@/services/org/role';
-import { Permission, createPermission } from '@/services/permission';
 import { useTranslation } from 'react-i18next';
-import { User } from '@/services/user';
+import { User, UserType } from '@/services/user';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { OrgRole, assignOrgRoleUser } from '@/services/org/role';
+import { allotOrgUser, getOrgUserList } from '@/services/org/user';
+import { Org } from '@/services/org';
+import { getDate } from '@/util';
 
 export default (props: {
     open: boolean
     title?: string
     orgId: string,
-    userInfo?: User
-    orgRoleInfo?: OrgRole
+    orgRole?: OrgRole
+    orgInfo?: Org
+    userType?: UserType
     onClose: (isSuccess?: boolean) => void
 }) => {
 
     const
         { t } = useTranslation(),
         proTableRef = useRef<ActionType>(),
-        columns: ProColumns<OrgPolicy>[] = [
-            { title: t('policy'), dataIndex: 'name' },
-            { title: t('description'), dataIndex: 'comments' },
+        columns: ProColumns<User>[] = [
+            { title: t('display name'), dataIndex: 'displayName' },
+            { title: t('principal name'), dataIndex: 'principalName' },
         ],
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
         [keyword, setKeyword] = useState<string>(),
-        [selectedDatas, setSelectedDatas] = useState<OrgPolicy[]>([]),
-        [dataSource, setdataSource] = useState<OrgPolicy[]>([])
+        [selectedDatas, setSelectedDatas] = useState<User[]>([]),
+        [dataSource, setdataSource] = useState<User[]>([])
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as OrgPolicy[], success: true, total: 0 };
+            const table = { data: [] as User[], success: true, total: 0 };
             if (keyword) {
                 params.nameContains = keyword
             }
-            const result = await getOrgPolicyList(props.orgId, params, filter, sort)
+            if (props.userType) {
+                params.userType = props.userType
+            }
+            const result = await getOrgUserList(props.orgId, params, filter, sort)
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
@@ -52,27 +56,24 @@ export default (props: {
             }
         },
         onFinish = async () => {
+            let isTree = false, result: boolean | null = null;
             setSaveLoading(true)
-            let isTree = false, result: Permission | null = null;
             for (let i in selectedDatas) {
                 const item = selectedDatas[i]
-                if (props.orgRoleInfo) {
-                    result = await createPermission({
-                        principalKind: "role",
-                        orgID: props.orgId,
-                        orgPolicyID: item.id,
-                        roleID: props.orgRoleInfo.id,
+                if (props.orgRole) {
+                    result = await assignOrgRoleUser({
+                        orgRoleID: props.orgRole.id,
+                        userID: item.id
                     })
-                } else if (props.userInfo) {
-                    result = await createPermission({
-                        principalKind: "user",
-                        orgID: props.orgId,
-                        orgPolicyID: item.id,
-                        userID: props.userInfo.id,
-                    })
+                } else if (props.orgInfo) {
+                    result = await allotOrgUser({
+                        joinedAt: getDate(Date.now(), 'YYYY-MM-DDTHH:mm:ssZ') as string,
+                        displayName: item.displayName,
+                        orgID: props.orgInfo.id,
+                        userID: item.id,
+                    });
                 }
-
-                if (result?.id) {
+                if (result) {
                     isTree = true
                 }
             }
@@ -108,23 +109,25 @@ export default (props: {
         >
             <Space direction="vertical">
                 {
-                    props.orgRoleInfo ? <>
-                        <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user group')}</div>
+                    props.orgRole ? <>
+                        <Alert showIcon message={t('after a user is added to a user group, the user has all the permissions of the group')} />
+                        <div>{props.orgRole.kind === 'role' ? t('role') : t('user group')}</div>
                         <div>
-                            <Input value={props.orgRoleInfo.name} />
+                            <Input value={props.orgRole.name} />
                         </div>
                     </> : ''
                 }
                 {
-                    props.userInfo ? <>
-                        <div>{t('user')}</div>
+                    props.orgInfo ? <>
+                        <div>{props.orgInfo.kind === 'root' ? t('organization') : t('department')}</div>
                         <div>
-                            <Input value={props.userInfo.displayName} />
+                            <Input value={props.orgInfo.name} />
                         </div>
                     </> : ''
                 }
                 <div>
-                    {t('policy')}
+
+                    {t('user')}
                 </div>
                 <Row gutter={20}>
                     <Col span="16">
@@ -199,7 +202,7 @@ export default (props: {
                                         <CloseOutlined />
                                     </a>
                                 }>
-                                    <List.Item.Meta title={item.name} description={item.comments} />
+                                    <List.Item.Meta title={item.displayName} description={item.principalName} />
                                 </List.Item>}
                             />
                         </div>

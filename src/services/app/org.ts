@@ -55,14 +55,17 @@ export async function getAppOrgList(appId: string, params: TableParams, filter: 
  * @param appRoleId
  * @returns 
  */
-export async function getAppRoleAssignedOrgList(appRoleId: string) {
-    const result = await graphqlApi(
-        `#graphql
-        query {
-            list:appRoleAssignedToOrgs(roleID:"${appRoleId}"){
+export async function getAppRoleAssignedOrgList(appRoleId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlApi(
+            `#graphql
+        query appRoleAssignedToOrgs($where: OrgWhereInput){
+            list:appRoleAssignedToOrgs(roleID:"${appRoleId}",where:$where){
                 ${OrgNodeField}
             }
-        }`)
+        }`, {
+            where
+        })
 
     if (result?.data?.list) {
         return result?.data?.list as Org[]
@@ -76,14 +79,17 @@ export async function getAppRoleAssignedOrgList(appRoleId: string) {
  * @param appPolicyId
  * @returns 
  */
-export async function getAppPolicyAssignedOrgList(appPolicyId: string) {
-    const result = await graphqlApi(
-        `#graphql
-        query {
-            list:appPolicyAssignedToOrgs(policyID:"${appPolicyId}"){
+export async function getAppPolicyAssignedOrgList(appPolicyId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlApi(
+            `#graphql
+        query appPolicyAssignedToOrgs($where: OrgWhereInput){
+            list:appPolicyAssignedToOrgs(policyID:"${appPolicyId}",where:$where){
                 ${OrgNodeField}
             }
-        }`)
+        }`, {
+            where
+        })
 
     if (result?.data?.list) {
         return result?.data?.list as Org[]

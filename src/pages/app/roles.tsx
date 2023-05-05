@@ -107,15 +107,18 @@ export default () => {
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as AppRole[], success: true, total: 0 },
-                info = await getApp();
+                info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
             if (info) {
                 const result = await getAppRoleList(info.id, params, filter, sort);
-
                 if (result) {
-                    table.data = result
-                    table.total = result.length
-                } else {
-                    table.total = 0
+                    table.data = result.filter(item => {
+                        let isTrue = true;
+                        if (params.name) {
+                            isTrue = item.name.indexOf(params.name) > -1
+                        }
+                        return isTrue
+                    })
+                    table.total = table.data.length
                 }
             }
 

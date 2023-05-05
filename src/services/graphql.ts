@@ -111,7 +111,7 @@ export function getGraphqlFilter(params: TableParams, filter: TableFilter, sort:
   }
 
   for (let key in where) {
-    if (Array.isArray(where[key])) {
+    if (!['or', 'and'].includes(key) && Array.isArray(where[key])) {
       where[`${key}In`] = where[key]
       delete where[key]
     }

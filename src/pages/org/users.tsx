@@ -30,16 +30,17 @@ export default () => {
         [loading, setLoading] = useState(false),
         [allOrgList, setAllOrgList] = useState<Org[]>([]),
         [treeData, setTreeData] = useState<TreeDataState[]>([]),
-        [selectedTreeKeys, setSelectedTreeKeys] = useState<string[]>([])
+        [selectedData, setSelectedData] = useState<Org>()
 
     const
         getMenusRequest = async () => {
             setLoading(true)
-            const orgList = await getOrgPathList(searchParams.get("id") || basisState.tenantId, "org")
-            if (orgList[0]?.id) {
-                setSelectedTreeKeys([orgList[0].id])
+            const orgList = await getOrgPathList(searchParams.get("id") || basisState.tenantId, "org"),
+                topData = orgList[0]
+            if (topData?.id) {
+                setSelectedData(topData)
             } else {
-                setSelectedTreeKeys([])
+                setSelectedData(undefined)
             }
 
             setAllOrgList(orgList)
@@ -50,7 +51,10 @@ export default () => {
                         title: item.name,
                         parentId: item.parentID,
                         node: item
-                    }))
+                    })),
+                    undefined,
+                    undefined,
+                    topData?.parentID || 0
                 )
             )
 
@@ -59,23 +63,23 @@ export default () => {
         onSearch = (keyword: string) => {
             const orgInfo = allOrgList.find(item => item.name.indexOf(keyword) > -1)
             if (orgInfo) {
-                setSelectedTreeKeys([orgInfo.id])
+                setSelectedData(orgInfo)
             }
         },
         onTreeSelect = (_selectedKeys, { node }) => {
-            setSelectedTreeKeys([node.key])
+            setSelectedData(node.node)
         },
         proCardtitle = () => {
-            const orgInfo = allOrgList.find(item => item.id == selectedTreeKeys[0])
-            if (orgInfo) {
-                return `${orgInfo.name}-${t("{{field}} list", { field: t('user') })}`
+            if (selectedData) {
+                return `${selectedData.name}-${t("{{field}} list", { field: t('user') })}`
             }
             return `${t("{{field}} list", { field: t('user') })}`
         }
 
     useEffect(() => {
         getMenusRequest()
-    }, [])
+    }, [, searchParams])
+
 
     return (
         <PageContainer
@@ -97,7 +101,7 @@ export default () => {
                     <Tree x-if={treeData.length != 0}
                         treeData={treeData}
                         onSelect={onTreeSelect}
-                        selectedKeys={selectedTreeKeys} defaultExpandAll
+                        selectedKeys={selectedData ? [selectedData.id] : []} defaultExpandAll
                     />
                     <div x-else>
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
@@ -105,11 +109,12 @@ export default () => {
                 </ProCard>
                 <ProCard >
                     <UserList
-                        x-if={selectedTreeKeys[0]}
+                        x-if={selectedData}
                         ref={userListActionRef}
                         title={proCardtitle()}
                         scene="orgUser"
-                        orgId={selectedTreeKeys[0]} />
+                        orgInfo={selectedData}
+                        orgId={selectedData?.id} />
                 </ProCard>
             </ProCard>
         </PageContainer>

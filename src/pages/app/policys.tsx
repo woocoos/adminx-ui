@@ -25,7 +25,7 @@ export default () => {
             // 有需要排序配置  sorter: true 
             { title: t('name'), dataIndex: 'name', width: 120, },
             {
-                title: t('automatic authorization'), dataIndex: 'autoGrant', width: 120, search: false, sorter: true,
+                title: t('automatic authorization'), dataIndex: 'autoGrant', width: 120, search: false,
                 render: (text, record) => {
                     return record.autoGrant ? t('yes') : t('no')
                 }
@@ -77,15 +77,22 @@ export default () => {
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as AppPolicy[], success: true, total: 0 },
-                info = await getApp();
+                info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
             if (info) {
                 const result = await getAppPolicyList(info.id, params, filter, sort);
-
                 if (result) {
-                    table.data = result
-                    table.total = result.length
-                } else {
-                    table.total = 0
+                    // 前端过滤
+                    table.data = result.filter(item => {
+                        let isTrue = true;
+                        if (params.name) {
+                            isTrue = item.name.indexOf(params.name) > -1
+                        }
+                        if (isTrue && params.status) {
+                            isTrue = item.status === params.status
+                        }
+                        return isTrue
+                    })
+                    table.total = table.data.length
                 }
             }
 

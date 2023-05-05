@@ -27,7 +27,7 @@ export default () => {
             {
                 title: t('name'), dataIndex: 'keyword', width: 120,
                 render: (text, record) => {
-                    return record.role?.name
+                    return record.principalKind === 'role' ? record.role?.name : record.user?.displayName
                 }
             },
             {
@@ -62,11 +62,14 @@ export default () => {
             const table = { data: [] as Permission[], success: true, total: 0 },
                 orgPolicyId = searchParams.get('id');
             if (orgPolicyId) {
-                const info = await getOrgPolicyInfo(orgPolicyId)
+                const info = orgPolicyInfo?.id == orgPolicyId ? orgPolicyInfo : await getOrgPolicyInfo(orgPolicyId)
                 if (info?.id) {
                     setOrgPolicy(info)
                     if (params.keyword) {
-                        params.hasRoleWith = { nameContains: params.keyword }
+                        params.or = [
+                            { hasRoleWith: { nameContains: params.keyword } },
+                            { hasUserWith: { displayNameContains: params.keyword } },
+                        ]
                     }
                     delete params.keyword
                     const result = await getOrgPolicyReferenceList(orgPolicyId, params, filter, sort);

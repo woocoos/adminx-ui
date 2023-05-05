@@ -67,6 +67,6 @@
 }
 
 
-.innerTable .ant-pro-card-body {
+.innerTable .ant-pro-card-body, .innerTable .ant-form {
     padding: 0;
 }

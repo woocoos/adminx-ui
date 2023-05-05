@@ -12,16 +12,19 @@ import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
 import { Link } from "ice";
 import { EnumUserStatus, User, UserType, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
 import AccountCreate from "./create";
-import { allotOrgUser, getOrgRoleUserList, getOrgUserList, removeOrgUser } from "@/services/org/user";
-import { assignOrgRoleUser, revokeOrgRoleUser } from "@/services/org/role";
-import ModalAccount from "@/pages/account/components/modalAccount";
-import { getDate } from "@/util";
+import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from "@/services/org/user";
+import { OrgRole, revokeOrgRoleUser } from "@/services/org/role";
+import DrawerUser from "@/pages/account/components/drawerUser";
 import { useTranslation } from "react-i18next";
+import { Org } from "@/services/org";
+import DrawerRole from "@/pages/org/components/drawerRole";
+import DrawerRolePolicy from "@/pages/org/components/drawerRolePolicy";
 
 type UserListProps = {
   title?: string
   orgId?: string
-  roleId?: string
+  orgRole?: OrgRole
+  orgInfo?: Org
   scene?: 'user' | 'orgUser' | 'modal' | "roleUser",
   userType?: UserType
   isMultiple?: boolean,
@@ -58,7 +61,8 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     [modal, setModal] = useState<{
       open: boolean
       title: string
-      scene: "add" | "create" | ""
+      data?: User
+      scene: "add" | "create" | "addGroup" | "addPermission" | ''
     }>({
       open: false,
       title: "",
@@ -69,7 +73,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     columns.push(
       {
         title: t('operation'), dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 120,
+        align: 'center', search: false, width: 180,
         render: (text, record) => {
           return props.scene === "roleUser" ? <Space>
             <a onClick={() => onRemoveRole(record)}>{t("remove")}</a>
@@ -79,6 +83,20 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             </Link>
             <Dropdown trigger={['click']} menu={{
               items: [
+                {
+                  key: "addGroup", label: <a onClick={() => {
+                    setModal({ open: true, data: record, title: t("add {{field}}", { field: t('user group') }), scene: "addGroup" })
+                  }}>
+                    {t("add {{field}}", { field: t('user group') })}
+                  </a>
+                },
+                {
+                  key: "addPermission", label: <a onClick={() => {
+                    setModal({ open: true, data: record, title: t("add {{field}}", { field: t('permission') }), scene: "addPermission" })
+                  }}>
+                    {t("add {{field}}", { field: t('permission') })}
+                  </a>
+                },
                 { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> },
                 { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> },
               ]
@@ -108,9 +126,13 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       const table = { data: [] as User[], success: true, total: 0 };
       let result: List<User> | null
       params['userType'] = props.userType
-      if (props?.roleId) {
-        result = await getOrgRoleUserList(props.roleId, params, filter, sort)
-      } else if (props?.orgId) {
+      if (params.displayName) {
+        params.displayNameContains = params.displayName
+      }
+      delete params.displayName
+      if (props.orgRole) {
+        result = await getOrgRoleUserList(props.orgRole.id, params, filter, sort)
+      } else if (props.orgId) {
         result = await getOrgUserList(props.orgId, params, filter, sort)
       } else {
         result = await getUserList(params, filter, sort);
@@ -174,8 +196,8 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         title: t('remove'),
         content: `${t('confirm remove')}：${record.displayName}`,
         onOk: async (close) => {
-          if (props?.roleId) {
-            const result = await revokeOrgRoleUser(props.roleId, record.id)
+          if (props.orgRole) {
+            const result = await revokeOrgRoleUser(props.orgRole.id, record.id)
             if (result) {
               proTableRef.current?.reload();
               message.success(t('submit success'))
@@ -206,6 +228,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       {
         ["modal", "orgUser", "roleUser"].includes(props?.scene || '') ? (
           <ProTable
+            className="innerTable"
             actionRef={proTableRef}
             search={{
               searchText: `${t('query')}`,
@@ -281,54 +304,70 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           </PageContainer>
         )
       }
-      {
+      {modal.scene === "create" ?
         // 创建用户
-        ['orgUser', 'user'].includes(props.scene || '') && modal.scene === "create" ? <>
-          <AccountCreate
+        <AccountCreate
+          open={modal.open}
+          title={modal.title}
+          orgId={props.orgId}
+          userType={props.userType || "member"}
+          scene="create"
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: '', scene: modal.scene })
+          }}
+        /> : ''}
+
+      {
+        // 添加用户
+        modal.scene === "add" && props.orgId ?
+          <DrawerUser
             open={modal.open}
             title={modal.title}
             orgId={props.orgId}
-            userType={props.userType || "member"}
-            scene="create"
+            orgRole={props.orgRole}
+            orgInfo={props.orgInfo}
+            userType={props.userType}
             onClose={(isSuccess) => {
               if (isSuccess) {
                 proTableRef.current?.reload();
               }
-              setModal({ open: false, title: '', scene: modal.scene })
-            }} />
-        </> : ''
+              setModal({ open: false, title: '', scene: modal.scene });
+            }}
+          />
+          : ''
       }
       {
-        // 添加用户
-        ['roleUser', 'orgUser'].includes(props.scene || '') && modal.scene === "add" ? <>
-          <ModalAccount
+        modal.scene === "addGroup" && props.orgId ?
+          <DrawerRole
+            title={modal.title}
+            open={modal.open}
+            orgId={props.orgId}
+            kind={"group"}
+            userInfo={modal.data}
+            onClose={(isSuccess) => {
+              if (isSuccess) {
+                proTableRef.current?.reload();
+              }
+              setModal({ open: false, title: '', scene: modal.scene });
+            }}
+          /> : ''
+      }
+      {
+        modal.scene === "addPermission" && props.orgId ?
+          <DrawerRolePolicy
+            orgId={props.orgId}
+            userInfo={modal.data}
             open={modal.open}
             title={modal.title}
-            userType={props.userType}
-            onClose={async (selectData) => {
-              const sdata = selectData?.[0]
-              if (sdata) {
-                let result: boolean | null = null;
-                if (props.scene === 'roleUser' && props.roleId) {
-                  result = await assignOrgRoleUser({
-                    orgRoleID: props.roleId,
-                    userID: sdata.id
-                  })
-                } else if (props.scene === 'orgUser' && props.orgId) {
-                  result = await allotOrgUser({
-                    joinedAt: getDate(Date.now(), 'YYYY-MM-DDTHH:mm:ssZ') as string,
-                    displayName: sdata.displayName,
-                    orgID: props.orgId,
-                    userID: sdata.id,
-                  })
-                }
-                if (result) {
-                  proTableRef.current?.reload();
-                }
+            onClose={(isSuccess) => {
+              if (isSuccess) {
+                proTableRef.current?.reload();
               }
-              setModal({ open: false, title: '', scene: modal.scene })
-            }} />
-        </> : ''
+              setModal({ open: false, title: '', scene: modal.scene });
+            }} /> : ''
       }
     </>
   );

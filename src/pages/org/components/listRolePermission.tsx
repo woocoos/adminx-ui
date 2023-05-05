@@ -17,6 +17,7 @@ import { useTranslation } from "react-i18next";
 
 export default (props: {
     orgRoleInfo: OrgRole
+    readonly?: boolean
 }) => {
     const { token } = useToken(),
         { t } = useTranslation(),
@@ -50,17 +51,7 @@ export default (props: {
                     return record.orgPolicy?.appPolicyID ? t('System strategy') : t('Custom policy')
                 }
             },
-            {
-                title: t('operation'), dataIndex: 'actions', fixed: 'right',
-                align: 'center', search: false, width: 110,
-                render: (text, record) => {
-                    return <Space>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('disauthorization')}
-                        </a>
-                    </Space>
-                }
-            },
+
         ],
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -72,7 +63,19 @@ export default (props: {
             open: false,
             title: "",
         })
-
+    if (!props.readonly) {
+        columns.push({
+            title: t('operation'), dataIndex: 'actions', fixed: 'right',
+            align: 'center', search: false, width: 110,
+            render: (text, record) => {
+                return <Space>
+                    <a key="del" onClick={() => onDel(record)}>
+                        {t('disauthorization')}
+                    </a>
+                </Space>
+            }
+        })
+    }
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
@@ -116,6 +119,7 @@ export default (props: {
     return (
         <>
             <ProTable
+                className="innerTable"
                 actionRef={proTableRef}
                 rowKey={"id"}
                 search={{
@@ -124,7 +128,7 @@ export default (props: {
                 }}
                 toolbar={{
                     title: t("{{field}} list", { field: t('policy') }),
-                    actions: [
+                    actions: props.readonly ? [] : [
                         <Button type="primary" onClick={() => {
                             setModal({ open: true, title: '' })
                         }} >

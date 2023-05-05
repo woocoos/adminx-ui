@@ -29,7 +29,7 @@ export default (props: {
                 title: t('name'), dataIndex: 'name', width: 120,
             },
             {
-                title: t('description'), dataIndex: 'comments', width: 120,
+                title: t('description'), dataIndex: 'comments', width: 120, search: false,
             },
             {
                 title: t('created at'), dataIndex: 'type', width: 120, valueType: "dateTime"
@@ -58,12 +58,13 @@ export default (props: {
             title: "",
         })
 
-
-
-
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as OrgRole[], success: true, total: 0 };
+            if (params.name) {
+                params.nameContains = params.name
+            }
+            delete params.name
             const result = await getUserJoinGroupList(props.userInfo.id, params, filter, sort);
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
@@ -90,6 +91,7 @@ export default (props: {
     return (
         <>
             <ProTable
+                className="innerTable"
                 actionRef={proTableRef}
                 rowKey={"id"}
                 search={{
@@ -97,7 +99,7 @@ export default (props: {
                     resetText: `${t('reset')}`,
                 }}
                 toolbar={{
-                    title: t("{{field}} list", { field: t('policy') }),
+                    title: t("{{field}} list", { field: t('user group') }),
                     actions: [
                         <Button type="primary" onClick={() => {
                             setModal({ open: true, title: '' })

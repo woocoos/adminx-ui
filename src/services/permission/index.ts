@@ -1,7 +1,7 @@
 import { gid } from "@/util"
 import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
 import { Org } from "../org"
-import { User } from "../user"
+import { User, UserNodeField } from "../user"
 import { OrgPolicy, OrgPolicyNodeField } from "../org/policy"
 import { OrgRole, OrgRoleNodeField } from "../org/role"
 
@@ -49,6 +49,9 @@ export const PermissionNodeField = `#graphql
     }
     orgPolicy{
         ${OrgPolicyNodeField}
+    }
+    user{
+        ${UserNodeField}
     }
 `
 

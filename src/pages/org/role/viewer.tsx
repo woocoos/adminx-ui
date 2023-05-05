@@ -61,7 +61,7 @@ export default () => {
             }}
         >
             <ProCard loading={loading} >
-                <ProDescriptions title={t("Basic information")} column={1} extra={
+                <ProDescriptions title={t("Basic information")} column={info?.kind === 'role' ? 2 : 1} extra={
                     <Button onClick={() => {
                         setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }), scene: "base" })
                     }}>
@@ -70,6 +70,9 @@ export default () => {
                 }>
                     <ProDescriptions.Item label={t('name')}  >
                         {info?.name}
+                    </ProDescriptions.Item>
+                    <ProDescriptions.Item x-if={info?.kind === 'role'} label={t('type')}  >
+                        {info?.isSystemRole ? t("system role") : t('custom role')}
                     </ProDescriptions.Item>
                     <ProDescriptions.Item label={t('introduction')}  >
                         {info?.comments}
@@ -92,13 +95,18 @@ export default () => {
                             label: t("{{field}} management", { field: t('member') }),
                             key: 'member',
                             children: info ? <>
-                                <UserList scene="roleUser" title={`${t("{{field}} list", { field: t('member') })}`} roleId={info.id} />
+                                <UserList
+                                    scene="roleUser"
+                                    title={`${t("{{field}} list", { field: t('member') })}`}
+                                    orgRole={info}
+                                    orgId={info.orgID}
+                                />
                             </> : '',
                         },
                         {
                             label: t("{{field}} management", { field: t('permission') }),
                             key: 'policy',
-                            children: info ? <ListRolePermission orgRoleInfo={info} /> : '',
+                            children: info ? <ListRolePermission orgRoleInfo={info} readonly={info?.isSystemRole} /> : '',
                         },
                     ],
                 }}

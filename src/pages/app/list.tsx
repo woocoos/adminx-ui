@@ -102,7 +102,10 @@ const AppList = (props: {
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as App[], success: true, total: 0 };
       let result: List<App> | null = null;
-
+      if (params.name) {
+        params.nameContains = params.name
+      }
+      delete params.name
       if (props.orgId) {
         result = await getOrgAppList(props.orgId, params, filter, sort)
       } else {

@@ -118,10 +118,14 @@ export default (props: {
                 columns={columns}
                 request={getRequest}
                 recordCreatorProps={{
-                    record: { id: "new", status: "active" } as any
+                    record: { id: "new", status: "active" } as any,
+                    creatorButtonText: t('add {{field}}', { field: '' })
                 }}
                 editable={{
                     type: 'single',
+                    saveText: t('save'),
+                    deleteText: t('delete'),
+                    cancelText: t('cancel'),
                     onSave: async (_key: string, record: UserIdentity) => {
                         if (props.id) {
                             const input: any = { ...record };

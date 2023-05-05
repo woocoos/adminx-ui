@@ -55,6 +55,7 @@ export const browserLanguage = () => {
  * @param allList 
  * @param parentList 
  * @param defineKey 
+ * @param parentId 
  * @returns 
  */
 export const formatTreeData = <T>(
@@ -66,8 +67,8 @@ export const formatTreeData = <T>(
         children?: string
     },
     parentId?: string | number) => {
-    const dataKey = { key: "key", parentId: "parentId", children: "children" }, pid = parentId == undefined ? "0" : parentId
-
+    const dataKey = { key: "key", parentId: "parentId", children: "children" }, pid = parentId === undefined ? "0" : parentId
+        
     if (defineKey) {
         for (let key in defineKey) {
             dataKey[key] = defineKey[key]

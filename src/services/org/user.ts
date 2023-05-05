@@ -5,8 +5,9 @@ import { User, UserNodeField } from "../user"
 /**
  * 组织下的用户信息
  * @param orgId 
- * @param userId 
- * @param headers 
+ * @param params 
+ * @param filter 
+ * @param sort 
  * @returns 
  */
 export async function getOrgUserList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
@@ -46,9 +47,10 @@ export async function getOrgUserList(orgId: string, params: TableParams, filter:
 
 /**
  * 组织下的角色用户
- * @param orgId 
- * @param userId 
- * @param headers 
+ * @param roleId 
+ * @param params 
+ * @param filter 
+ * @param sort 
  * @returns 
  */
 export async function getOrgRoleUserList(roleId: string, params: TableParams, filter: TableFilter, sort: TableSort) {

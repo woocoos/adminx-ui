@@ -28,7 +28,7 @@ export default () => {
         columns: ProColumns<Org>[] = [
             // 有需要排序配置  sorter: true 
             { title: t('name'), dataIndex: 'name', width: 120, },
-            { title: t('introduction'), dataIndex: 'profile', width: 120, },
+            { title: t('introduction'), dataIndex: 'profile', width: 120, search: false },
             {
                 title: t('manage user'), dataIndex: 'owner', width: 120, search: false,
                 render: (text, record) => {
@@ -74,7 +74,11 @@ export default () => {
             const table = { data: [] as Org[], success: true, total: 0 },
                 info = await getInfo();
             if (info) {
-                const result = await getAppRoleAssignedOrgList(info.id);
+                if (params.name) {
+                    params.nameContains = params.name
+                }
+                delete params.name
+                const result = await getAppRoleAssignedOrgList(info.id, params, filter, sort);
                 if (result) {
                     table.data = result
                     table.total = result.length

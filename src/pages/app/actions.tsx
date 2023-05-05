@@ -90,8 +90,12 @@ const AppActionList = (props: {
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as AppAction[], success: true, total: 0 },
-                info = await getApp();
+                info = appInfo?.id === appId ? appInfo : await getApp();
             if (info) {
+                if (params.name) {
+                    params.nameContains = params.name
+                }
+                delete params.name
                 const result = await getAppActionList(info.id, params, filter, sort);
                 if (result) {
                     table.data = result.edges.map(item => item.node)

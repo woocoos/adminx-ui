@@ -14,6 +14,7 @@ import DrawerRolePolicy from "@/pages/org/components/drawerRolePolicy";
 import { useTranslation } from "react-i18next";
 import store from "@/store";
 import { User } from "@/services/user";
+import { OrgRole, getUserJoinGroupList } from "@/services/org/role";
 
 
 export default (props: {
@@ -33,7 +34,7 @@ export default (props: {
                 }
             },
             {
-                title: t('description'), dataIndex: 'comments', width: 120,
+                title: t('description'), dataIndex: 'comments', width: 120, search: false,
                 render: (text, record) => {
                     return record.orgPolicy?.comments
                 }
@@ -41,12 +42,17 @@ export default (props: {
             {
                 title: t('policy type'), dataIndex: 'type', width: 120,
                 renderFormItem(schema, config, form) {
-                    return <Select allowClear options={[
-                        { label: t('System strategy'), value: 'sys' },
-                        { label: t('Custom policy'), value: 'cust' },
-                    ]} onChange={(value) => {
-                        form.setFieldValue("type", value)
-                    }} />
+                    return <Select
+                        placeholder={t('Please select {{field}}', { field: '' })}
+                        allowClear
+                        options={[
+                            { label: t('System strategy'), value: 'sys' },
+                            { label: t('Custom policy'), value: 'cust' },
+                        ]}
+                        onChange={(value) => {
+                            form.setFieldValue("type", value)
+                        }}
+                    />
                 },
                 render: (text, record) => {
                     return record.orgPolicy?.appPolicyID ? t('System strategy') : t('Custom policy')
@@ -56,6 +62,7 @@ export default (props: {
         ],
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+        [allUserGroup, setAllUserGroup] = useState<OrgRole[]>([]),
         // 弹出层处理
         [modal, setModal] = useState<{
             open: boolean
@@ -67,7 +74,17 @@ export default (props: {
 
     if (props.principalKind === 'role') {
         columns.unshift({
-            title: t('user group'), dataIndex: 'userGroupName', width: 120,
+            title: t('user group'), dataIndex: 'orgRoleId', width: 120,
+            renderFormItem(schema, config, form) {
+                return <Select
+                    placeholder={t('Please select {{field}}', { field: '' })}
+                    allowClear
+                    options={allUserGroup.map(item => ({ label: item.name, value: item.id }))}
+                    onChange={(value) => {
+                        form.setFieldValue("orgRoleId", value)
+                    }}
+                />
+            },
             render: (text, record) => {
                 return record.role?.name
             }
@@ -88,12 +105,20 @@ export default (props: {
 
 
     const
+        getUserGroup = async () => {
+            const result = await getUserJoinGroupList(props.userInfo.id, {}, {}, {});
+            if (result?.totalCount) {
+                setAllUserGroup(result.edges.map(item => item.node))
+            } else {
+                setAllUserGroup([])
+            }
+        },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as Permission[], success: true, total: 0 };
             params.principalKind = props.principalKind
-            if (params.userGroupName) {
+            if (params.orgRoleId) {
                 params.hasRoleWith = {
-                    nameContains: params.userGroupName || null,
+                    id: params.orgRoleId || undefined,
                 }
             }
             if (params.name || params.comments || params.type) {
@@ -104,7 +129,7 @@ export default (props: {
                     appPolicyIDIsNil: params.type === 'cust' ? true : undefined
                 }
             }
-            delete params.userGroupName
+            delete params.orgRoleId
             delete params.name
             delete params.comments
             delete params.type
@@ -131,9 +156,14 @@ export default (props: {
             })
         }
 
+    useEffect(() => {
+        getUserGroup()
+    }, [])
+
     return (
         <>
             <ProTable
+                className="innerTable"
                 actionRef={proTableRef}
                 rowKey={"id"}
                 search={{

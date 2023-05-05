@@ -50,10 +50,7 @@ const OrgList = (props: {
           return <div>{record?.owner?.displayName || '-'}</div>
         }
       },
-      {
-        title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
-        valueEnum: EnumOrgStatus,
-      },
+      { title: t('description'), dataIndex: 'profile', width: 120, search: false, },
     ],
     [allList, setAllList] = useState<Org[]>([]),
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
@@ -77,7 +74,7 @@ const OrgList = (props: {
     columns.push(
       {
         title: t('operation'), dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 170,
+        align: 'center', search: false, width: 150,
         render: (text, record) => {
           const createAction = [
             {

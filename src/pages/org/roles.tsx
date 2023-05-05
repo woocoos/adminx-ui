@@ -5,7 +5,7 @@ import {
     ProTable,
     useToken,
 } from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal, Alert, message } from "antd";
+import { Button, Space, Dropdown, Modal, Alert, message, Select } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
@@ -15,6 +15,9 @@ import { TreeEditorAction } from "@/util/type";
 import { OrgRole, OrgRoleKind, delOrgRole, getOrgGroupList, getOrgRoleList } from "@/services/org/role";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
+import DrawerUser from "../account/components/drawerUser";
+import DrawerRolePolicy from "./components/drawerRolePolicy";
+import DrawerAppRolePolicy from "@/pages/app/components/drawerRolePolicy";
 
 export type OrgRoleListRef = {
     getSelect: () => OrgRole[]
@@ -43,22 +46,7 @@ const OrgRoleList = (props: {
             // 有需要排序配置  sorter: true 
             { title: t('name'), dataIndex: 'name', width: 120, },
             { title: t('remarks'), dataIndex: 'comments', width: 120, search: false, },
-            {
-                title: t('operation'), dataIndex: 'actions', fixed: 'right',
-                align: 'center', search: false, width: 90,
-                render: (text, record) => {
-                    return <Space>
-                        <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
-                            {t('view')}
-                        </Link>
-                        <a onClick={() => {
-                            onDel(record)
-                        }}>
-                            {t('delete')}
-                        </a>
-                    </Space>
-                }
-            },
+
         ],
         [dataSource, setDataSource] = useState<OrgRole[]>([]),
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -67,7 +55,8 @@ const OrgRoleList = (props: {
             open: boolean
             title: string
             id: string
-            scene: TreeEditorAction
+            data?: OrgRole
+            scene: "editor" | "addUser" | "addPermission" | "addAppPermission"
         }>({
             open: false,
             title: "",
@@ -75,6 +64,56 @@ const OrgRoleList = (props: {
             scene: "editor",
         })
 
+    if (kind === 'role') {
+        columns.push({
+            title: t('type'), dataIndex: 'actions', fixed: 'right', search: false,
+            renderText(text, record) {
+                return record.isSystemRole ? t("system role") : t('custom role')
+            },
+        })
+    }
+
+    columns.push({
+        title: t('operation'), dataIndex: 'actions', fixed: 'right',
+        align: 'center', search: false, width: 210,
+        render: (text, record) => {
+            return <Space>
+                {
+                    record.isSystemRole ? <>
+                        <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
+                            {t('view')}
+                        </Link>
+                        <a onClick={() => {
+                            setModal({ open: true, title: t('add {{field}}', { field: t('member') }), id: '', data: record, scene: "addUser" })
+                        }}>
+                            {t('add {{field}}', { field: t('member') })}
+                        </a>
+                    </> :
+                        <>
+                            <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
+                                {t('view')}
+                            </Link>
+                            <a onClick={() => {
+                                setModal({ open: true, title: t('add {{field}}', { field: t('member') }), id: '', data: record, scene: "addUser" })
+                            }}>
+                                {t('add {{field}}', { field: t('member') })}
+                            </a>
+                            <a onClick={() => {
+                                setModal({ open: true, title: t('add {{field}}', { field: t('permission') }), id: '', data: record, scene: "addPermission" })
+                            }}>
+                                {t('add {{field}}', { field: t('permission') })}
+                            </a>
+                            <a onClick={() => {
+                                onDel(record)
+                            }}>
+                                {t('delete')}
+                            </a>
+                        </>
+                }
+
+            </Space>
+        }
+    })
 
 
     const
@@ -82,6 +121,10 @@ const OrgRoleList = (props: {
             const table = { data: [] as OrgRole[], success: true, total: 0 };
             params.kind = kind
             params.orgID = orgId
+            if (params.name) {
+                params.nameContains = params.name;
+            }
+            delete params.name
             const result = params.kind === 'role' ? await getOrgRoleList(params, filter, sort) : await getOrgGroupList(params, filter, sort)
             if (result) {
                 table.data = result.edges.map(item => item.node)
@@ -201,12 +244,51 @@ const OrgRoleList = (props: {
                         request={getRequest}
                     />
                     <CreateOrgRole
+                        x-if={modal.scene === 'editor'}
                         open={modal.open}
                         title={modal.title}
                         id={modal.id}
                         kind={kind}
                         orgId={orgId}
-                        onClose={onDrawerClose} />
+                        onClose={onDrawerClose}
+                    />
+                    <DrawerUser
+                        x-if={modal.scene === 'addUser'}
+                        open={modal.open}
+                        title={modal.title}
+                        orgId={orgId}
+                        orgRole={modal.data}
+                        onClose={(isSuccess) => {
+                            if (isSuccess) {
+                                proTableRef.current?.reload();
+                            }
+                            setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
+                        }}
+                    />
+                    <DrawerRolePolicy
+                        x-if={modal.scene === "addPermission"}
+                        orgId={orgId}
+                        orgRoleInfo={modal.data}
+                        open={modal.open}
+                        title={modal.title}
+                        onClose={(isSuccess) => {
+                            if (isSuccess) {
+                                proTableRef.current?.reload();
+                            }
+                            setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
+                        }}
+                    />
+                    <DrawerAppRolePolicy
+                        x-if={modal.scene === "addAppPermission"}
+                        open={modal.open}
+                        title={modal.title}
+                        onClose={(isSuccess) => {
+                            if (isSuccess) {
+                                proTableRef.current?.reload();
+                            }
+                            setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
+                        }}
+                    />
                 </PageContainer>
             }
         </>
