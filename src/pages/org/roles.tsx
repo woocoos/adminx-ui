@@ -68,7 +68,7 @@ const OrgRoleList = (props: {
         columns.push({
             title: t('type'), dataIndex: 'actions', fixed: 'right', search: false,
             renderText(text, record) {
-                return record.isSystemRole ? t("system role") : t('custom role')
+                return record.isAppRole ? t("system role") : t('custom role')
             },
         })
     }
@@ -79,7 +79,7 @@ const OrgRoleList = (props: {
         render: (text, record) => {
             return <Space>
                 {
-                    record.isSystemRole ? <>
+                    record.isAppRole ? <>
                         <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
                             {t('view')}
                         </Link>

@@ -140,8 +140,6 @@ export default (props: {
             <div x-if={['loginProfile'].includes(props.scene)}>
                 <ProFormSwitch name="canLogin" label={t('allow password login')} />
                 <ProFormSwitch name="passwordReset" label={t('reset password on next login')} />
-                <ProFormSwitch name="verifyDevice" label={t('equipment certification')} />
-                <ProFormSwitch name="mfaEnabled" label={t('MFA')} />
             </div>
         </DrawerForm>
     );

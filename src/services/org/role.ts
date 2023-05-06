@@ -11,7 +11,7 @@ export type OrgRole = {
     kind: OrgRoleKind
     name: string
     comments: string
-    isSystemRole: boolean
+    isAppRole: boolean
 }
 
 /**
@@ -21,7 +21,7 @@ export type OrgRole = {
 export type OrgRoleKind = "group" | "role"
 
 export const OrgRoleNodeField = `#graphql
-    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isSystemRole
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
 `
 
 /**

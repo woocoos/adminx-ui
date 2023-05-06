@@ -75,6 +75,11 @@ export interface UserLoginProfile {
   mfaStatus: UserStatus
 }
 
+export type Mfa = {
+  secret: string
+  account: string
+}
+
 interface UserPassword {
   id: string
   createdBy: string
@@ -130,6 +135,9 @@ export const
   `,
   UserIdentityField = `#graphql
       id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
+  `,
+  MFANodeField = `#graphql
+      secret,account
   `
 
 export type UpdateUserInfoScene = "create" | "base" | "loginProfile" | "identity"
@@ -405,3 +413,68 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
     return null
   }
 }
+
+
+/**
+ * 启用MFA
+ * @param userId
+ * @returns 
+ */
+export async function enableMFA(userId: string) {
+  const result = await graphqlApi(
+    `#graphql
+    mutation enableMFA{
+      action:enableMFA(userID:"${userId}"){
+        ${MFANodeField}
+      }
+    }`
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as Mfa
+  } else {
+    return null
+  }
+}
+
+/**
+ * 禁用MFA
+ * @param userId
+ * @returns 
+ */
+export async function disableMFA(userId: string) {
+  const result = await graphqlApi(
+    `#graphql
+    mutation disableMFA{
+      action:disableMFA(userID:"${userId}")
+    }`
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as boolean
+  } else {
+    return null
+  }
+}
+
+/**
+ * 发送MFA到用户邮箱
+ * @param userId
+ * @returns 
+ */
+export async function sendMFAEmail(userId: string) {
+  const result = await graphqlApi(
+    `#graphql
+    mutation sendMFAToUserByEmail{
+      action:sendMFAToUserByEmail(userID:"${userId}")
+    }`
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as boolean
+  } else {
+    return null
+  }
+}
+
+

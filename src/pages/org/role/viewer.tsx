@@ -72,7 +72,7 @@ export default () => {
                         {info?.name}
                     </ProDescriptions.Item>
                     <ProDescriptions.Item x-if={info?.kind === 'role'} label={t('type')}  >
-                        {info?.isSystemRole ? t("system role") : t('custom role')}
+                        {info?.isAppRole ? t("system role") : t('custom role')}
                     </ProDescriptions.Item>
                     <ProDescriptions.Item label={t('introduction')}  >
                         {info?.comments}
@@ -106,7 +106,7 @@ export default () => {
                         {
                             label: t("{{field}} management", { field: t('permission') }),
                             key: 'policy',
-                            children: info ? <ListRolePermission orgRoleInfo={info} readonly={info?.isSystemRole} /> : '',
+                            children: info ? <ListRolePermission orgRoleInfo={info} readonly={info?.isAppRole} /> : '',
                         },
                     ],
                 }}
