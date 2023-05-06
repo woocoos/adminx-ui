@@ -109,6 +109,9 @@ dist
 .DS_Store
 *.swp
 *.dia~
+.idea
+.run
+.vscode
 
 # tmp
 .ice
