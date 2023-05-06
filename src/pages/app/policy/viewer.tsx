@@ -7,7 +7,7 @@ import {
     useToken
 } from "@ant-design/pro-components";
 import { message } from "antd";
-import { useSearchParams } from "ice";
+import { useSearchParams } from "@ice/runtime";
 import { useEffect, useRef, useState } from "react";
 import PolicyRules from "../components/policyRules";
 import { AppAction, getAppActionList } from "@/services/app/action";

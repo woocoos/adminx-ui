@@ -9,7 +9,7 @@ import { Button, Space, Dropdown, Modal, Alert, message, Select } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Link, useSearchParams } from "ice";
+import { Link, useSearchParams } from "@ice/runtime";
 import CreateOrgRole from "./components/createRole";
 import { TreeEditorAction } from "@/util/type";
 import { OrgRole, OrgRoleKind, delOrgRole, getOrgGroupList, getOrgRoleList } from "@/services/org/role";

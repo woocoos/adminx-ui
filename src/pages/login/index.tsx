@@ -1,4 +1,3 @@
-import { definePageConfig } from "ice";
 import { message } from "antd";
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { ProFormText, LoginForm } from "@ant-design/pro-form";
@@ -119,10 +118,3 @@ export default () => {
     </div>
   );
 };
-
-export const pageConfig = definePageConfig(() => {
-  const { t } = useTranslation();
-  return {
-    title: `${t('login')}`,
-  };
-});

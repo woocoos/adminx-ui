@@ -1,7 +1,7 @@
 import { OrgRole, getOrgRoleInfo } from "@/services/org/role"
 import { PageContainer, ProCard, ProDescriptions, useToken } from "@ant-design/pro-components"
 import { Button } from "antd"
-import { useSearchParams } from "ice"
+import { useSearchParams } from "@ice/runtime"
 import { useEffect, useState } from "react"
 import UserList from "@/pages/account/components/listAccount";
 import CreateOrgRole from "../components/createRole";

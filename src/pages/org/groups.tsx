@@ -1,4 +1,4 @@
-import { useSearchParams } from 'ice'
+import { useSearchParams } from '@ice/runtime'
 import RoleList from './roles'
 import store from '@/store'
 

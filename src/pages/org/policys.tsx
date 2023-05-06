@@ -8,7 +8,7 @@ import {
 import { Button, Space, Dropdown, Modal, message, Alert, Select } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Link, useSearchParams } from "ice";
+import { Link, useSearchParams } from "@ice/runtime";
 import { Org, getOrgInfo } from "@/services/org";
 import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from "@/services/org/policy";
 import store from "@/store";

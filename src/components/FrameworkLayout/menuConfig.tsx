@@ -19,12 +19,12 @@ const asideMenuConfig: MenuDataItem[] = [
     children: [
       {
         name: "基本信息",
-        path: "/user/chginfo",
+        path: "/user/info",
         framework: true,
       },
       {
-        name: "修改密码",
-        path: "/user/chgpwd",
+        name: "安全设置",
+        path: "/user/safety",
         framework: true,
       },
     ],

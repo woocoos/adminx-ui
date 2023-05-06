@@ -1,7 +1,7 @@
 import AppList from '@/pages/app/list'
 import { Org, getOrgInfo } from '@/services/org'
 import { PageContainer, useToken } from '@ant-design/pro-components'
-import { useSearchParams } from 'ice'
+import { useSearchParams } from '@ice/runtime'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 

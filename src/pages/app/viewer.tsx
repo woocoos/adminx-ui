@@ -6,7 +6,7 @@ import {
 } from "@ant-design/pro-components";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import defaultApp from "@/assets/images/default-app.png";
-import { useSearchParams } from "ice";
+import { useSearchParams } from "@ice/runtime";
 import { useEffect, useState } from "react";
 import { App, EnumAppKind, EnumAppStatus, getAppInfo } from "@/services/app";
 import { Button, Divider } from "antd";

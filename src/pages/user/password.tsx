@@ -51,6 +51,7 @@ export default () => {
         breadcrumb: {
           items: [
             { title: t("Individual center"), },
+            { title: t('security setting'), },
             { title: t('Change password'), },
           ],
         },

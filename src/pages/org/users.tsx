@@ -9,8 +9,8 @@ import UserList, { UserListRef } from "@/pages/account/components/listAccount";
 import { formatTreeData } from "@/util";
 import { Org, getOrgPathList } from "@/services/org";
 import store from "@/store";
-import { useSearchParams } from "ice";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "@ice/runtime";
 
 type TreeDataState = {
     key: string

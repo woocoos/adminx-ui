@@ -6,7 +6,6 @@ import {
 } from "@ant-design/pro-components";
 import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import defaultAvatar from "@/assets/images/default-avatar.png";
-import { useSearchParams } from "ice";
 import { ReactNode, useEffect, useState } from "react";
 import { Button, Divider, Modal, Space, message } from "antd";
 import UserCreate from "./components/create";
@@ -15,6 +14,7 @@ import { EnumUserIdentityKind, UpdateUserInfoScene, User, UserType, disableMFA, 
 import { useTranslation } from "react-i18next";
 import ListUserPermission from "./components/listUserPermission";
 import ListUserJoinGroup from "./components/listUserJoinGroup";
+import { useSearchParams } from "@ice/runtime";
 
 export default () => {
     const { token } = useToken(),

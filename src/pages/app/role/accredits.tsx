@@ -9,7 +9,7 @@ import {
 import { Button, Space, Dropdown, Modal, message, Alert } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Link, useSearchParams } from "ice";
+import { Link, useSearchParams } from "@ice/runtime";
 import { Org } from "@/services/org";
 import ModalOrg from "@/pages/org/components/modalOrg";
 import { getAppPolicyAssignedOrgList, getAppRoleAssignedOrgList } from "@/services/app/org";

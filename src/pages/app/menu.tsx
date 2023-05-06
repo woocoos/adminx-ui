@@ -10,7 +10,6 @@ import {
 } from "@ant-design/pro-components";
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
-import { useSearchParams } from "ice";
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { formatTreeData, loopTreeData } from "@/util";
 import { TreeMoveAction } from "@/services/graphql";
@@ -19,6 +18,7 @@ import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateApp
 import { App } from "@/services/app";
 import ModalAction from "@/pages/app/components/modalAction";
 import { useTranslation } from "react-i18next";
+import { useSearchParams } from "@ice/runtime";
 
 type TreeDataState = {
     key: string

@@ -9,7 +9,7 @@ import { Button, Space, Dropdown, Modal, Alert, Input } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
-import { Link, useSearchParams } from "ice";
+import { Link, useSearchParams } from "@ice/runtime";
 import { EnumPermissionPrincipalKind, Permission, delPermssion } from "@/services/permission";
 import { getOrgPolicyReferenceList } from "@/services/permission";
 import { OrgPolicy, getOrgPolicyInfo } from "@/services/org/policy";

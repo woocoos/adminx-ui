@@ -1,6 +1,6 @@
 import store from '@/store'
 import OrgList from './list'
-import { useSearchParams } from 'ice'
+import { useSearchParams } from '@ice/runtime'
 
 export default () => {
     const [basisState] = store.useModel("basis"),

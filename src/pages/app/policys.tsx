@@ -8,10 +8,10 @@ import {
 import { Button, Space, Dropdown, Modal, message, Alert } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Link, useSearchParams } from "ice";
 import { App, getAppInfo } from "@/services/app";
 import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "@/services/app/policy";
 import { useTranslation } from "react-i18next";
+import { Link, useSearchParams } from "@ice/runtime";
 
 
 export default () => {
