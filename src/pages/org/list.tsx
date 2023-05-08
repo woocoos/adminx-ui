@@ -268,15 +268,6 @@ const OrgList = (props: {
                   { title: t("{{field}} management", { field: t('organization') }), },
                 ],
               },
-              extra: kind == 'org' ? <></> : <>
-                {/* <Button
-                  type="primary" onClick={() => {
-                    setModal({ open: true, title:t("create {{field}}", { field: t('organization') }) , id: "", scene: "editor" })
-
-                  }}>
-                  { t("create {{field}}", { field: t('organization') })}
-                </Button> */}
-              </>
             }}
           >
             <ProTable
@@ -284,7 +275,16 @@ const OrgList = (props: {
               rowKey={"id"}
               search={false}
               toolbar={{
-                title: kind === 'org' ? t('organizational branch tree') : t('organizational tree')
+                title: kind === 'org' ? t('organizational branch tree') : t('organizational tree'),
+                actions: kind == 'org' ? [] : [
+                  <Button
+                    type="primary" onClick={() => {
+                      setModal({ open: true, title: t("create {{field}}", { field: t('organization') }), id: "", scene: "editor" })
+
+                    }}>
+                    {t("create {{field}}", { field: t('organization') })}
+                  </Button>
+                ]
               }}
               expandable={{
                 expandedRowKeys: expandedRowKeys,

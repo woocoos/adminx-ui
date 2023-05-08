@@ -162,8 +162,8 @@ export async function updateOrgInfo(orgId: string, input: Org | Record<string, a
 export async function createOrgInfo(input: Org, kind: OrgKind) {
     const result = await graphqlApi(
         `#graphql
-        mutation createOrganization($input: CreateOrgInput!){
-          action:createOrganization(input:$input){
+        mutation createOrg($input: CreateOrgInput!){
+          action:${kind === 'root' ? 'createRoot' : 'createOrganization'}(input:$input){
             ${OrgNodeField}
           }
         }`, { input })

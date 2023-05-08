@@ -1,6 +1,7 @@
 import InputAccount from '@/pages/account/components/inputAccount';
-import { Org, OrgKind, createOrgInfo, getOrgInfo, getOrgList, updateOrgInfo } from '@/services/org';
+import { Org, OrgKind, createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';
 import { User } from '@/services/user';
+import store from '@/store';
 import { formatTreeData } from '@/util';
 import { TreeEditorAction } from '@/util/type';
 import {
@@ -29,25 +30,36 @@ export default (props: {
 }) => {
 
     const { t } = useTranslation(),
+        [basisState] = store.useModel("basis"),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
         [owner, setOwner] = useState<User>()
 
     const
         parentRequest = async () => {
-            const result = await getOrgList({}, {}, {}),
-                list: SelectTreeData[] = [
-                    {
-                        value: "0", title: t("top organization"), children: []
-                    }
-                ]
+            const result: Org[] = [], list: SelectTreeData[] = [
+                {
+                    value: "0", title: t("top organization"), children: []
+                }
+            ]
+            if (props.kind === 'root') {
+                const data = await getOrgList({ kind: props.kind }, {}, {})
+                if (data?.totalCount) {
+                    result.push(...data.edges.map(item => item.node))
+                }
+            } else {
+                const data = await getOrgPathList(basisState.tenantId, props.kind)
+                if (data.length) {
+                    result.push(...data)
+                }
+            }
             if (result) {
                 list[0].children = formatTreeData(
-                    result.edges.map(item => {
+                    result.map(item => {
                         return {
-                            value: item.node.id,
-                            parentId: item.node.parentID,
-                            title: item.node.name,
+                            value: item.id,
+                            parentId: item.parentID,
+                            title: item.name,
                         }
                     })
                     , undefined, { key: 'value', parentId: "parentId", children: 'children' })
