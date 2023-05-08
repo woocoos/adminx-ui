@@ -321,3 +321,84 @@ export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
     }
 }
 
+
+
+/**
+ * 获取组织用户组数量
+ * @param where 
+ * @returns 
+ */
+export async function getOrgGroupQty(where: Record<string, any>) {
+    const result = await graphqlApi(
+        `#graphql
+            query orgGroups($where:OrgRoleWhereInput){
+                list:orgGroups(where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                }
+            }`,
+        {
+            where,
+        },
+    )
+
+    if (result?.data?.list) {
+        const data = result.data.list as List<OrgRole>
+        return data.totalCount
+    } else {
+        return 0
+    }
+}
+
+
+/**
+ * 获取用户加入的用户组数量
+ * @param userId 
+ * @param where 
+ * @returns 
+ */
+export async function getUserJoinGroupQty(userId: string, where: Record<string, any>) {
+    const result = await graphqlApi(
+        `#graphql
+            query userGroups($where:OrgRoleWhereInput){
+                list:userGroups(userID:"${userId}",where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                }
+            }`,
+        {
+            where,
+        },
+    )
+
+    if (result?.data?.list) {
+        const data = result.data.list as List<OrgRole>
+        return data.totalCount
+    } else {
+        return 0
+    }
+}
+
+/**
+ * 获取角色数量
+ * @param where 
+ * @returns 
+ */
+export async function getOrgRoleQty(where: Record<string, any>) {
+    const result = await graphqlApi(
+        `#graphql
+            query orgRoles($where:OrgRoleWhereInput){
+                list:orgRoles(where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                }
+            }`,
+        {
+            where,
+        },
+    )
+
+    if (result?.data?.list) {
+        const data = result.data.list as List<OrgRole>
+        return data.totalCount
+    } else {
+        return 0
+    }
+}

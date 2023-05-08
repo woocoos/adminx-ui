@@ -220,6 +220,9 @@ export default {
         "Enter the security code displayed by the MFA application after scanning the code": "请输入 MFA 应用程序扫码后展示的安全码",
         "Complete the binding within {{total}}s, with {{surplus}}s remaining": "请在{{total}}秒内完成绑定，剩余{{surplus}}秒",
         "Binding completed": "绑定完成",
+        "Basic data": "基础数据",
+        "My application": "我的应用",
+        // "": "",
         // "": "",
     },
 };

@@ -200,3 +200,37 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
         return null
     }
 }
+
+
+
+/**
+ * 组织策略
+ * @param orgId 
+ * @param where 
+ * @returns 
+ */
+export async function getOrgPolicyQty(orgId: string, where: Record<string, any>) {
+    const result = await graphqlApi(
+        `#graphql
+            query orgPolicy($where:OrgPolicyWhereInput){
+                node(id:"${gid("org", orgId)}"){
+                    ... on Org{
+                        list:policies(where: $where){
+                            totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                        }
+                    }
+                }
+                
+            }`,
+        {
+            where,
+        },
+    )
+
+    if (result?.data?.node?.list) {
+        const data = result.data.node.list as List<OrgPolicy>
+        return data.totalCount
+    } else {
+        return 0
+    }
+}

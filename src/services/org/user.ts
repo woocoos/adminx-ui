@@ -128,3 +128,35 @@ export async function removeOrgUser(orgId: string, userId: string) {
         return null
     }
 }
+
+/**
+ * 组织下的用户数量
+ * @param orgId 
+ * @param where 
+ * @returns 
+ */
+export async function getOrgUserQty(orgId: string, where: Record<string, any>) {
+    const result = await graphqlApi(
+        `#graphql
+            query users($where:UserWhereInput){
+                node(id:"${gid('org', orgId)}"){
+                  ... on Org{
+                    id,
+                    list:users(where: $where){
+                        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    }
+                  }
+                }
+                
+            }`, {
+        where,
+    }
+    )
+
+    if (result?.data?.node?.list) {
+        const data = result.data.node.list as List<User>
+        return data.totalCount
+    } else {
+        return 0
+    }
+}
