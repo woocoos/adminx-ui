@@ -17,10 +17,9 @@ export default (
         [saveDisabled, setSaveDisabled] = useState(true);
 
 
-    const onFinish = async (values) => {
+    const onFinish = async (values: { username: string; password: string; captcha: string; }) => {
         setSaveLoading(true)
-        values.password = Sha256(values.password).toString();
-        const result = await login(values.username, values.password, values.captcha)
+        const result = await login(values.username, Sha256(values.password).toString(), values.captcha)
         if (result && !result.errors) {
             props.onSuccess(result)
         }

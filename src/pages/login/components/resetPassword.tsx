@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { LoginRes, loginResetPassword } from "@/services/basis";
 import { useRef, useState } from "react";
 import { ProFormInstance } from "@ant-design/pro-components";
+import Sha256 from "crypto-js/sha256";
 
 export default (
     props: {
@@ -17,7 +18,7 @@ export default (
 
     const onFinish = async (values: { password: string }) => {
         setSaveLoading(true)
-        const result = await loginResetPassword(props.stateToken, values.password)
+        const result = await loginResetPassword(props.stateToken, Sha256(values.password).toString())
         if (result && !result.errors) {
             props.onSuccess(result)
         }
