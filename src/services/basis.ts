@@ -1,5 +1,4 @@
 import { request } from 'ice';
-import { Mfa } from './user';
 
 export interface LoginParams {
   username: string
@@ -23,6 +22,13 @@ export interface LoginRes {
     domainId: number
   },
   errors?: LoginErrors[]
+}
+
+export type MfaPrepare = {
+  principalName: string
+  secret: string
+  stateToken: string
+  stateTokenTTL: number
 }
 
 /**
@@ -63,7 +69,7 @@ export async function loginResetPassword(stateToken: string, newPassword: string
  * 绑定mfa前需要的数据
  * @returns 
  */
-export async function bindPrepareMfa(): Promise<Mfa> {
+export async function bindPrepareMfa(): Promise<MfaPrepare> {
   return await request.post('/mfa/bind-prepare');
 }
 
@@ -73,7 +79,7 @@ export async function bindPrepareMfa(): Promise<Mfa> {
  * @param otpToken 
  * @returns 
  */
-export async function bindMfa(stateToken: string, otpToken: string): Promise<Mfa> {
+export async function bindMfa(stateToken: string, otpToken: string): Promise<boolean> {
   return await request.post('/mfa/bind', { stateToken, otpToken });
 }
 

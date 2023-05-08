@@ -1,4 +1,3 @@
-import { Outlet, Link } from "ice";
 import { Button, ConfigProvider, theme } from "antd";
 import { MappingAlgorithm } from "antd/es/config-provider/context";
 import store from "@/store";
@@ -11,6 +10,7 @@ import DarkMode from "@/components/Header/DarkMode";
 import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
 import defaultAvatar from "@/assets/images/default-avatar.png";
+import { Link, Outlet } from "@ice/runtime";
 
 
 export default function Layout() {

@@ -18,7 +18,9 @@ export default (props: {
     const onFinish = async (values) => {
         setSaveLoading(true)
         const result = await unbindMfa(values.code)
-        debugger;
+        if (result) {
+            props.onClose(true)
+        }
         setSaveLoading(false)
         return false
     }
