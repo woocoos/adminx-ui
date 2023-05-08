@@ -72,7 +72,7 @@ export default (props: {
             submitter={{
                 searchConfig: {
                     submitText: t('submit'),
-                    resetText: t('reset')
+                    resetText: t('cancel')
                 },
                 submitButtonProps: {
                     loading: saveLoading,
