@@ -27,6 +27,7 @@ export type MfaPrepare = {
   secret: string
   stateToken: string
   stateTokenTTL: number
+  qrCodeUri: string
 }
 
 /**

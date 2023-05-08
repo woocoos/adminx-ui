@@ -45,7 +45,7 @@ export default () => {
             if (result.stateToken) {
                 setMfaInfo(result)
                 countdown(result.stateTokenTTL);
-                setQrcodeValue(`/api/login/mfaqr.png?userId=${basisState.user.id}&secret=${result.secret}`)
+                setQrcodeValue(result.qrCodeUri)
             }
             setQrcodeLoading(false)
         },
