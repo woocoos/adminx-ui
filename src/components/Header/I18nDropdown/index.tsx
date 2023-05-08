@@ -4,6 +4,7 @@ import { Dropdown } from "antd";
 import type { MenuInfo } from "rc-menu/lib/interface";
 import styles from "./index.module.css";
 import store from "@/store";
+import { LocalLanguage } from "@/models/basis";
 
 const I18nDropdown: React.FC = () => {
   const [basisState, basisDispatcher] = store.useModel("basis");
@@ -16,7 +17,7 @@ const I18nDropdown: React.FC = () => {
     updateLocale = (key: String) => {
       const mItem = menu.items.find((item) => item.key === key);
       if (mItem) {
-        basisDispatcher.updateLocale(mItem.key);
+        basisDispatcher.updateLocale(mItem.key as LocalLanguage);
         i18n.changeLanguage(mItem.key);
         setLocale(mItem.label);
       }

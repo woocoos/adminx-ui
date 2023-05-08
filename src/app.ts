@@ -130,7 +130,7 @@ export const requestConfig = defineRequestConfig(() => {
                 }
             }
             // 请求出错：服务端返回错误状态码
-            return Promise.reject(error);
+            return error;
           },
         }
       },

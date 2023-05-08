@@ -1,4 +1,4 @@
-import { Button, ConfigProvider, theme } from "antd";
+import { ConfigProvider, theme } from "antd";
 import { MappingAlgorithm } from "antd/es/config-provider/context";
 import store from "@/store";
 import { useEffect, useState } from "react";
@@ -11,10 +11,14 @@ import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
 import defaultAvatar from "@/assets/images/default-avatar.png";
 import { Link, Outlet } from "@ice/runtime";
+import enUS from 'antd/locale/en_US';
+import zhCN from 'antd/locale/zh_CN';
+import { Locale } from "antd/es/locale";
 
 
 export default function Layout() {
   const [basisState] = store.useModel("basis"),
+    [locale, setLocal] = useState<Locale>(zhCN),
     [algorithm, setAlgorithm] = useState<MappingAlgorithm[]>([
       theme.defaultAlgorithm,
     ]);
@@ -24,6 +28,13 @@ export default function Layout() {
       return asideMenuConfig
     }
 
+  useEffect(() => {
+    if (basisState.locale === 'zh-CN') {
+      setLocal(zhCN)
+    } else if (basisState.locale === 'en-US') {
+      setLocal(enUS)
+    }
+  }, [basisState.locale])
 
 
   useEffect(() => {
@@ -40,43 +51,44 @@ export default function Layout() {
     setAlgorithm(algorithms);
   }, [basisState.darkMode, basisState.compactMode]);
 
-  if (["/login"].includes(location.pathname)) {
-    return <Outlet />;
-  }
-
   return (
     <ConfigProvider
+      locale={locale}
       theme={{
         algorithm: algorithm,
       }}
     >
-      <ProLayout
-        className={styles.layout}
-        menu={{
-          locale: true,
-          request: requestMenus
-        }}
-        logo={<img src={logo} alt="logo" />}
-        title="Adminx"
-        location={{
-          pathname: location.pathname,
-        }}
-        locale={basisState.locale}
-        layout="mix"
-        rightContentRender={() => (
-          <>
-            <I18nDropdown />
-            <AvatarDropdown
-              avatar={defaultAvatar}
-              name={basisState.user?.displayName || ""}
-            />
-            <DarkMode />
-          </>
-        )}
-        menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
-      >
-        <Outlet />
-      </ProLayout>
+      {
+        ["/login"].includes(location.pathname) ?
+          <Outlet /> :
+          <ProLayout
+            className={styles.layout}
+            menu={{
+              locale: true,
+              request: requestMenus
+            }}
+            logo={<img src={logo} alt="logo" />}
+            title="Adminx"
+            location={{
+              pathname: location.pathname,
+            }}
+            locale={basisState.locale}
+            layout="mix"
+            rightContentRender={() => (
+              <>
+                <I18nDropdown />
+                <AvatarDropdown
+                  avatar={defaultAvatar}
+                  name={basisState.user?.displayName || ""}
+                />
+                <DarkMode />
+              </>
+            )}
+            menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
+          >
+            <Outlet />
+          </ProLayout>
+      }
     </ConfigProvider>
   );
 }

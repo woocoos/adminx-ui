@@ -1,25 +1,23 @@
 import { request } from 'ice';
 
-export interface LoginParams {
-  username: string
-  password: string
-  captcha: string
-}
 
 interface LoginErrors {
   code: number
   messsage: string
+  details: string
 }
 
 export interface LoginRes {
   accessToken?: string
   expiresIn?: number
   refreshToken?: string
+  stateToken?: string
+  callbackUrl?: string
   user?: {
-    id: number
+    id: string
     displayName: string
     domainName: string
-    domainId: number
+    domainId: string
   },
   errors?: LoginErrors[]
 }
@@ -36,11 +34,11 @@ export type MfaPrepare = {
  * @param data 
  * @returns 
  */
-export async function login(data: LoginParams): Promise<LoginRes> {
-  return await request({
-    url: '/login/auth',
-    method: "post",
-    data,
+export async function login(username: string, password: string, captcha: string): Promise<LoginRes> {
+  return await request.post('/login/auth', {
+    username,
+    password,
+    captcha,
   });
 }
 
@@ -62,6 +60,21 @@ export async function loginResetPassword(stateToken: string, newPassword: string
   return await request.post('/login/reset-password', {
     stateToken,
     newPassword,
+  });
+}
+
+/**
+ * 登录后需要MFA验证
+ * @param deviceId 
+ * @param stateToken 
+ * @param otpToken 
+ * @returns 
+ */
+export async function loginVerifyFactor(deviceId: string, stateToken: string, otpToken: string): Promise<LoginRes> {
+  return await request.post('/login/verify-factor', {
+    deviceId,
+    stateToken,
+    otpToken,
   });
 }
 

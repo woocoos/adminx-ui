@@ -4,13 +4,15 @@ import { LoginRes } from '@/services/basis';
 import { User } from '@/services/user';
 
 interface BasisModelState {
-  locale: string
+  locale: LocalLanguage
   token: string
   tenantId: string
   darkMode: boolean
   compactMode: boolean
   user: User | undefined
 }
+
+export type LocalLanguage = "zh-CN" | "en-US"
 
 
 export default createModel({
@@ -23,7 +25,7 @@ export default createModel({
     compactMode: false,
   } as BasisModelState,
   reducers: {
-    updateLocale(prevState: BasisModelState, payload: string) {
+    updateLocale(prevState: BasisModelState, payload: LocalLanguage) {
       localStore.setItem("locale", payload)
       prevState.locale = payload;
     },
@@ -46,38 +48,18 @@ export default createModel({
     },
   },
   effects: () => ({
-    // /**
-    //  * 获取缓存数据 (废弃)
-    //  * @returns 
-    //  */
-    // async initBasis() {
-    //   const token = await localStore.getItem<string>("token");
-    //   const darkMode = await localStore.getItem<string>("darkMode");
-    //   const compactMode = await localStore.getItem<string>("compactMode");
-    //   const tenantId = await localStore.getItem<string>("tenantId");
-    //   const user = await localStore.getItem<User>("user");
-
-    //   // TODO：增加jwt判断token的处理
-
-    //   return {
-    //     locale: "zh-CN",
-    //     token,
-    //     darkMode,
-    //     compactMode,
-    //     tenantId,
-    //     user,
-    //   };
-    // },
     /**
      * 登录
      * @param payload 
      */
-    async login(payload: { result: LoginRes, user: User }) {
-      const { result, user } = payload
-      if (result.accessToken) {
-        this.updateToken(await localStore.setItem("token", result.accessToken))
-        this.updateTenantId(await localStore.setItem("tenantId", `${result.user?.domainId || ''}`))
-        this.updateUser(await localStore.setItem("user", user))
+    async login(payload: LoginRes) {
+      if (payload.accessToken) {
+        this.updateToken(await localStore.setItem("token", payload.accessToken))
+        this.updateTenantId(await localStore.setItem("tenantId", `${payload.user?.domainId || ''}`))
+        this.updateUser(await localStore.setItem("user", {
+          id: payload.user?.id,
+          displayName: payload.user?.displayName,
+        } as any))
       }
     },
     /**

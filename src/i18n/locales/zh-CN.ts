@@ -1,5 +1,6 @@
 export default {
     translation: {
+        "verify": "验证",
         "success": "成功",
         "error": "错误",
         "submit": "提交",

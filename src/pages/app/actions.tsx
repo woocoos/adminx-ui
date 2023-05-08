@@ -202,6 +202,7 @@ const AppActionList = (props: {
                         scroll={{ x: 'max-content' }}
                         columns={columns}
                         request={getRequest}
+                        pagination={{ showSizeChanger: true }}
                         rowSelection={{
                             selectedRowKeys: selectedRowKeys,
                             onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
