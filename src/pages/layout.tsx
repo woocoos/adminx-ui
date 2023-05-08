@@ -14,6 +14,7 @@ import { Link, Outlet } from "@ice/runtime";
 import enUS from 'antd/locale/en_US';
 import zhCN from 'antd/locale/zh_CN';
 import { Locale } from "antd/es/locale";
+import i18n from "@/i18n";
 
 
 export default function Layout() {
@@ -34,6 +35,7 @@ export default function Layout() {
     } else if (basisState.locale === 'en-US') {
       setLocal(enUS)
     }
+    i18n.changeLanguage(basisState.locale);
   }, [basisState.locale])
 
 

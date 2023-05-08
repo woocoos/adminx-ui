@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import i18n from "@/i18n";
 import { Dropdown } from "antd";
 import type { MenuInfo } from "rc-menu/lib/interface";
 import styles from "./index.module.css";
@@ -18,7 +17,6 @@ const I18nDropdown: React.FC = () => {
       const mItem = menu.items.find((item) => item.key === key);
       if (mItem) {
         basisDispatcher.updateLocale(mItem.key as LocalLanguage);
-        i18n.changeLanguage(mItem.key);
         setLocale(mItem.label);
       }
     };
