@@ -117,8 +117,7 @@ export default (props: {
                     type: "checkbox"
                 }}
             />
-            <DrawerRole
-                x-if={modal.open}
+            {modal.open ? <DrawerRole
                 title={`${t("add {{field}}", { field: t('user group') })}`}
                 open={modal.open}
                 orgId={basisState.tenantId}
@@ -130,8 +129,7 @@ export default (props: {
                     }
                     setModal({ open: false, title: '' })
                 }}
-            />
-
+            /> : ''}
         </>
     );
 };

@@ -145,8 +145,7 @@ export default (props: {
                     type: "checkbox"
                 }}
             />
-            <DrawerRolePolicy
-                x-if={modal.open}
+            {modal.open ? <DrawerRolePolicy
                 orgId={props.orgRoleInfo.orgID}
                 orgRoleInfo={props.orgRoleInfo}
                 open={modal.open}
@@ -156,7 +155,9 @@ export default (props: {
                         proTableRef.current?.reload();
                     }
                     setModal({ open: false, title: '' })
-                }} />
+                }}
+            /> : ''}
+
         </>
     );
 };
