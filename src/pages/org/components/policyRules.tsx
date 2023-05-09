@@ -127,7 +127,14 @@ const RuleItem = (props: {
                     <div style={{ width: "260px", }}>
                         <InputApp
                             value={appInfo}
-                            onChange={updateAppInfo}
+                            onChange={(data) => {
+                                const nRule = { ...props.rule }
+                                nRule.actions = []
+                                nRule.resources = []
+                                nRule.conditions = []
+                                props.onChange?.(nRule)
+                                updateAppInfo(data)
+                            }}
                         />
                     </div>
                 </Col>
