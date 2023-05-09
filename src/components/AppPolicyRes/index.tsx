@@ -3,7 +3,7 @@ import { getAppResList } from "@/services/app/resource"
 import { Checkbox, Col, Popconfirm, Row, Space } from "antd"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import style from "./layout.module.css"
+import style from "./index.module.css"
 import Create from "./create"
 
 export type AppResItem = {
