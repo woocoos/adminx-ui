@@ -118,6 +118,7 @@ export default (props: {
                 }}
             />
             <DrawerRole
+                x-if={modal.open}
                 title={`${t("add {{field}}", { field: t('user group') })}`}
                 open={modal.open}
                 orgId={basisState.tenantId}

@@ -10,7 +10,9 @@ import { User, UserNodeField } from "../user"
  * @param sort 
  * @returns 
  */
-export async function getOrgUserList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getOrgUserList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    orgRoleId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
@@ -23,6 +25,7 @@ export async function getOrgUserList(orgId: string, params: TableParams, filter:
                         edges{                                        
                             cursor,node{                    
                                 ${UserNodeField}
+                                ${isGrant?.orgRoleId ? `isAssignOrgRole(orgRoleID: "${isGrant.orgRoleId}")` : ''}
                             }
                         }
                     }

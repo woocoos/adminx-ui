@@ -201,7 +201,7 @@ export default () => {
                 onClose={onDrawerClose}
             />
             <DrawerRolePolicy
-                x-if={modal.scene === "addPolicy"}
+                x-if={modal.scene === "addPolicy" && modal.open}
                 open={modal.open}
                 title={modal.title}
                 appInfo={appInfo}

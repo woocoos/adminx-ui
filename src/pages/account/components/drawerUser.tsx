@@ -1,5 +1,5 @@
 import { Alert, Col, Input, List, Row, Space, message } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CloseOutlined } from "@ant-design/icons";
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
@@ -42,7 +42,7 @@ export default (props: {
             if (props.userType) {
                 params.userType = props.userType
             }
-            const result = await getOrgUserList(props.orgId, params, filter, sort)
+            const result = await getOrgUserList(props.orgId, params, filter, sort, { orgRoleId: props.orgRole?.id })
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
@@ -87,7 +87,7 @@ export default (props: {
 
 
     return (
-        <DrawerForm
+        <DrawerForm            
             title={props.title}
             open={props.open}
             submitter={{
@@ -166,6 +166,9 @@ export default (props: {
                                     setSelectedDatas([...oldDatas, ...newDatas])
                                     setSaveDisabled(false)
                                 },
+                                getCheckboxProps: (record) => ({
+                                    disabled: record.isAssignOrgRole
+                                }),
                                 type: "checkbox"
                             }}
                         />

@@ -116,6 +116,7 @@ export default (props: {
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as Permission[], success: true, total: 0 };
             params.principalKind = props.principalKind
+            params.orgID = basisState.tenantId
             if (params.orgRoleId) {
                 params.hasRoleWith = {
                     id: params.orgRoleId || undefined,
@@ -190,6 +191,7 @@ export default (props: {
                 }}
             />
             <DrawerRolePolicy
+                x-if={modal.open}
                 orgId={basisState.tenantId}
                 userInfo={props.userInfo}
                 open={modal.open}

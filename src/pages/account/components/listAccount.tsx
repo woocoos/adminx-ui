@@ -322,7 +322,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
 
       {
         // 添加用户
-        modal.scene === "add" && props.orgId ?
+        modal.scene === "add" && props.orgId && modal.open ?
           <DrawerUser
             open={modal.open}
             title={modal.title}
@@ -340,7 +340,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           : ''
       }
       {
-        modal.scene === "addGroup" && props.orgId ?
+        modal.scene === "addGroup" && props.orgId && modal.open ?
           <DrawerRole
             title={modal.title}
             open={modal.open}
@@ -356,7 +356,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           /> : ''
       }
       {
-        modal.scene === "addPermission" && props.orgId ?
+        modal.scene === "addPermission" && props.orgId && modal.open?
           <DrawerRolePolicy
             orgId={props.orgId}
             userInfo={modal.data}

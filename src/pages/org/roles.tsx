@@ -253,7 +253,7 @@ const OrgRoleList = (props: {
                         onClose={onDrawerClose}
                     />
                     <DrawerUser
-                        x-if={modal.scene === 'addUser'}
+                        x-if={modal.scene === 'addUser' && modal.open}
                         open={modal.open}
                         title={modal.title}
                         orgId={orgId}
@@ -266,7 +266,7 @@ const OrgRoleList = (props: {
                         }}
                     />
                     <DrawerRolePolicy
-                        x-if={modal.scene === "addPermission"}
+                        x-if={modal.scene === "addPermission" && modal.open}
                         orgId={orgId}
                         orgRoleInfo={modal.data}
                         open={modal.open}
@@ -279,7 +279,7 @@ const OrgRoleList = (props: {
                         }}
                     />
                     <DrawerAppRolePolicy
-                        x-if={modal.scene === "addAppPermission"}
+                        x-if={modal.scene === "addAppPermission" && modal.open}
                         open={modal.open}
                         title={modal.title}
                         onClose={(isSuccess) => {

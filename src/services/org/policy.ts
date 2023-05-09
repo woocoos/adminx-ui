@@ -17,6 +17,8 @@ export type OrgPolicy = {
     rules?: PolicyRule[]
     org?: Org
     permissions?: Permission[]
+    isGrantRole?: boolean
+    isGrantUser?: boolean
 }
 
 
@@ -34,7 +36,10 @@ export const OrgPolicyNodeField = `#graphql
  * @param sort
  * @returns 
  */
-export async function getOrgPolicyList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getOrgPolicyList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    roleId?: string
+    userId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
@@ -46,6 +51,8 @@ export async function getOrgPolicyList(orgId: string, params: TableParams, filte
                             edges{                                        
                                 cursor,node{                    
                                     ${OrgPolicyNodeField}
+                                    ${isGrant?.roleId ? `isGrantRole(roleID: "${isGrant.roleId}")` : ''}
+                                    ${isGrant?.userId ? `isGrantUser(userID: "${isGrant.userId}")` : ''}
                                 }
                             }
                         }
@@ -204,7 +211,7 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
 
 
 /**
- * 组织策略
+ * 组织策略数量
  * @param orgId 
  * @param where 
  * @returns 

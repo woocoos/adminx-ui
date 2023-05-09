@@ -38,7 +38,10 @@ export default (props: {
             if (keyword) {
                 params.nameContains = keyword
             }
-            const result = await getOrgPolicyList(props.orgId, params, filter, sort)
+            const result = await getOrgPolicyList(props.orgId, params, filter, sort, {
+                roleId: props.orgRoleInfo?.id,
+                userId: props.userInfo?.id
+            })
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
@@ -163,6 +166,9 @@ export default (props: {
                                     setSelectedDatas([...oldDatas, ...newDatas])
                                     setSaveDisabled(false)
                                 },
+                                getCheckboxProps: (record) => ({
+                                    disabled: record.isGrantRole || record.isGrantUser
+                                }),
                                 type: "checkbox"
                             }}
                         />

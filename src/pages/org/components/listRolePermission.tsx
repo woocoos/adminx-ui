@@ -146,6 +146,7 @@ export default (props: {
                 }}
             />
             <DrawerRolePolicy
+                x-if={modal.open}
                 orgId={props.orgRoleInfo.orgID}
                 orgRoleInfo={props.orgRoleInfo}
                 open={modal.open}
