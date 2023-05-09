@@ -86,7 +86,7 @@ export default function (props: {
                                 props.dataSource.filter(item => props.targetKeys.includes(`${props.appCode}:${item.name}`)).map(item => (
                                     <Row className="actionsTransfer-listRow" key={`select${item.id}`}>
                                         <Col flex="auto">
-                                            <div>{item.name}</div>
+                                            <div>{props.appCode}:{item.name}</div>
                                             <div>{item.comments}</div>
                                         </Col>
                                         <Col style={{ display: "flex", justifyContent: 'center' }}>

@@ -9,6 +9,7 @@ import { App, getAppList } from "@/services/app";
 import Editor from '@monaco-editor/react';
 import InputApp from "@/pages/app/components/inputApp";
 import { useTranslation } from "react-i18next";
+import AppPolicyRes from "@/components/AppPolicyRes";
 
 const RuleItem = (props: {
     orgId: string
@@ -18,20 +19,8 @@ const RuleItem = (props: {
     onDel?: () => void
 }) => {
     const { t } = useTranslation(),
-        [effect, setEffect] = useState<PolicyRuleEffect>(props.rule.effect || 'allow'),
         [appInfo, setAppInfo] = useState<App>(),
         [appActions, setAppActions] = useState<AppAction[]>([]),
-        [action, setAction] = useState<"all" | "customer">(props.rule.actions?.[0]?.indexOf(":*") > -1 ? "all" : 'customer'),
-        [actions, setActions] = useState<string[]>(props.rule.actions || []),
-        [resource, setResource] = useState<"all" | "customer">(props.rule.resources?.[0] === "*" ? "all" : 'customer'),
-        [resources, setResources] = useState<string[]>([]),
-        [conditions, setConditions] = useState<string[]>([]),
-        newRule: PolicyRule = {
-            effect: effect,
-            actions: [],
-            resources: [],
-            conditions: []
-        },
         [stretch1, setStretch1] = useState<boolean>(false),
         [stretch2, setStretch2] = useState<boolean>(false),
         [stretch3, setStretch3] = useState<boolean>(false)
@@ -63,10 +52,10 @@ const RuleItem = (props: {
             const titles: string[] = [];
             if (appInfo) {
                 titles.push(appInfo.name)
-                if (actions[0]?.indexOf(':*') > -1) {
+                if (props.rule.actions[0] === `${appInfo.code}:*`) {
                     titles.push(t('full operation'))
                 } else {
-                    titles.push(t('{{num}} operations', { num: actions.length }))
+                    titles.push(t('{{num}} operations', { num: props.rule.actions.length }))
                 }
             } else {
                 titles.push(t("Please select {{field}}", { field: t('app') }))
@@ -116,15 +105,15 @@ const RuleItem = (props: {
                 <Col style={rowColStyle()}>{t('effect')}</Col>
                 <Col flex="auto">
                     <Radio.Group
-                        value={effect}
+                        value={props.rule.effect}
                         options={[
                             { label: t('allow'), value: "allow" },
                             { label: t('deny'), value: "deny" },
                         ]}
                         onChange={(e) => {
-                            setEffect(e.target.value)
-                            newRule.effect = e.target.value
-                            props.onChange?.(newRule)
+                            const nRule = { ...props.rule }
+                            nRule.effect = e.target.value
+                            props.onChange?.(nRule)
                         }}
                     />
                 </Col>
@@ -153,38 +142,38 @@ const RuleItem = (props: {
                 <Col flex="auto">
                     <div x-if={appInfo}>
                         <div>
-                            <a>{action === 'all' ? t('full operation') : t('{{num}} operations', { num: actions.length })}</a>
+                            <a>{props.rule.actions[0] == `${appInfo?.code}:*` ? t('full operation') : t('{{num}} operations', { num: props.rule.actions.length })}</a>
                         </div>
                         <div x-if={stretch1}>
                             <div>
                                 <Radio.Group
-                                    value={action}
+                                    value={props.rule.actions[0] == `${appInfo?.code}:*`}
                                     options={[
-                                        { label: `${t('full operation')}(*)`, value: "all" },
-                                        { label: t('specify'), value: "customer" },
+                                        { label: `${t('full operation')}(*)`, value: true },
+                                        { label: t('specify'), value: false },
                                     ]}
                                     onChange={(e) => {
-                                        setAction(e.target.value)
-                                        if (e.target.value == 'all') {
-                                            newRule.actions = [`${appInfo?.code}:*`]
+                                        const nRule = { ...props.rule }
+                                        if (e.target.value) {
+                                            nRule.actions = [`${appInfo?.code}:*`]
                                         } else {
-                                            newRule.actions = []
+                                            nRule.actions = []
                                         }
-                                        props.onChange?.(newRule)
+                                        props.onChange?.(nRule)
                                     }}
                                 />
                             </div>
                             {
-                                action != "all" ? <>
+                                props.rule.actions[0] != `${appInfo?.code}:*` ? <>
                                     <br />
                                     <ActionsTransfer
                                         appCode={appInfo?.code || ''}
-                                        targetKeys={actions}
+                                        targetKeys={props.rule.actions}
                                         dataSource={appActions}
                                         onChange={(values) => {
-                                            setActions(values);
-                                            newRule.actions = values;
-                                            props.onChange?.(newRule);
+                                            const nRule = { ...props.rule }
+                                            nRule.actions = values;
+                                            props.onChange?.(nRule);
                                         }}
                                     />
                                 </> : ""
@@ -207,26 +196,43 @@ const RuleItem = (props: {
                     <div x-if={appInfo}>
                         <div>
                             <a>
-                                {resource === 'all' ? t('total resources') : t("{{num}} resources", { num: resources.length })}
+                                {props.rule.resources[0] == `${appInfo?.code}:*` ? t('total resources') : t("{{num}} resources", { num: props.rule.resources.length })}
                             </a>
                         </div>
                         <div x-if={stretch2}>
-                            <Radio.Group
-                                value={resource}
-                                options={[
-                                    { label: t('total resources'), value: "all" },
-                                    { label: t('specify'), value: "customer" },
-                                ]}
-                                onChange={(e) => {
-                                    setResource(e.target.value)
-                                    if (e.target.value == 'all') {
-                                        newRule.resources = ['*']
-                                    } else {
-                                        newRule.resources = []
-                                    }
-                                    props.onChange?.(newRule)
-                                }}
-                            />
+                            <div>
+                                <Radio.Group
+                                    value={props.rule.resources[0] == `${appInfo?.code}:*`}
+                                    options={[
+                                        { label: t('total resources'), value: true },
+                                        { label: t('specify'), value: false },
+                                    ]}
+                                    onChange={(e) => {
+                                        const nRule = { ...props.rule }
+                                        if (e.target.value) {
+                                            nRule.resources = [`${appInfo?.code}:*`]
+                                        } else {
+                                            nRule.resources = []
+                                        }
+                                        props.onChange?.(nRule)
+                                    }}
+                                />
+                            </div>
+                            {
+                                props.rule.resources[0] != `${appInfo?.code}:*` && appInfo ? <>
+                                    <br />
+                                    <AppPolicyRes
+                                        appInfo={appInfo}
+                                        orgId={props.orgId}
+                                        values={props.rule.resources}
+                                        onChange={(values) => {
+                                            const nRule = { ...props.rule }
+                                            nRule.resources = values;
+                                            props.onChange?.(nRule);
+                                        }}
+                                    />
+                                </> : ""
+                            }
                         </div>
                     </div>
                     <div x-else>
@@ -244,7 +250,7 @@ const RuleItem = (props: {
                 <Col flex="auto">
                     <div x-if={appInfo}>
                         <div>
-                            <a>{t("{{num}} conditions", { num: conditions.length })}</a>
+                            <a>{t("{{num}} conditions", { num: props.rule.conditions?.length || 0 })}</a>
                         </div>
                     </div>
                     <div x-else>

@@ -66,12 +66,24 @@ export default () => {
                     for (let i in rules) {
                         const item = rules[i];
                         if (item.actions.length) {
-                            const action = item.actions.find(key => key.split(':')[0] != appCode)
-                            if (action) {
-                                errMsg = t("{{field}} mismatch", { field: t("app code") })
+                            if (item.actions[0] != '*') {
+                                const action = item.actions.find(key => key.split(':')[0] != appCode)
+                                if (action) {
+                                    errMsg = t("{{field}} mismatch", { field: t("app code") })
+                                }
                             }
                         } else {
                             errMsg = t('this {{field}} is required', { field: t('operation') })
+                        }
+                        if (item.resources.length) {
+                            if (item.resources[0] != '*') {
+                                const resources = item.resources.find(key => key.split(':')[0] != appCode)
+                                if (resources) {
+                                    errMsg = t("{{field}} mismatch", { field: t("app code") })
+                                }
+                            }
+                        } else {
+                            errMsg = t('this {{field}} is required', { field: t('resources') })
                         }
                         if (errMsg.length) {
                             break;
@@ -171,6 +183,14 @@ export default () => {
                         name="autoGrant"
                         label={t('auto grant')} />
                     <ProFormText>
+                        <ProFormTextArea
+                            colProps={{ md: 12 }}
+                            name="comments"
+                            label={t('remarks')}
+                            placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
+                        />
+                    </ProFormText>
+                    <ProFormText>
                         {appInfo ? <PolicyRules
                             rules={rules}
                             onChange={(rules) => {
@@ -180,12 +200,7 @@ export default () => {
                             appInfo={appInfo}
                             appActions={appActions} /> : ''}
                     </ProFormText>
-                    <ProFormTextArea
-                        colProps={{ md: 12 }}
-                        name="comments"
-                        label={t('remarks')}
-                        placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
-                    />
+
 
                 </ProForm>
             </ProCard>

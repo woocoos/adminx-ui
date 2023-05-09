@@ -72,7 +72,7 @@ export default (props: {
                 }}>
                     <div className="mask"></div>
                     <Checkbox checked={props.checkedKeys.includes(`${props.appCode}:${item.name}`)} >
-                        <div>{item.name}</div>
+                        <div>{props.appCode}:{item.name}</div>
                         <div>{item.comments}</div>
                     </Checkbox>
                 </div>
