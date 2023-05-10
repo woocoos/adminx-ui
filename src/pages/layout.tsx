@@ -1,5 +1,3 @@
-import { ConfigProvider, theme } from "antd";
-import { MappingAlgorithm } from "antd/es/config-provider/context";
 import store from "@/store";
 import { useEffect, useState } from "react";
 import { asideMenuConfig } from "@/components/FrameworkLayout/menuConfig";
@@ -11,18 +9,13 @@ import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
 import defaultAvatar from "@/assets/images/default-avatar.png";
 import { Link, Outlet } from "@ice/runtime";
-import enUS from 'antd/locale/en_US';
-import zhCN from 'antd/locale/zh_CN';
-import { Locale } from "antd/es/locale";
 import i18n from "@/i18n";
+import { ProConfigProvider, useToken } from "@ant-design/pro-components";
 
 
 export default function Layout() {
   const [basisState] = store.useModel("basis"),
-    [locale, setLocal] = useState<Locale>(zhCN),
-    [algorithm, setAlgorithm] = useState<MappingAlgorithm[]>([
-      theme.defaultAlgorithm,
-    ]);
+    { token } = useToken();
 
   const
     requestMenus = async () => {
@@ -30,51 +23,34 @@ export default function Layout() {
     }
 
   useEffect(() => {
-    if (basisState.locale === 'zh-CN') {
-      setLocal(zhCN)
-    } else if (basisState.locale === 'en-US') {
-      setLocal(enUS)
-    }
     i18n.changeLanguage(basisState.locale);
   }, [basisState.locale])
 
 
-  useEffect(() => {
-    let algorithms: MappingAlgorithm[] = [];
-    setAlgorithm([]);
-    if (basisState.darkMode) {
-      algorithms.push(theme.darkAlgorithm);
-    } else {
-      algorithms.push(theme.defaultAlgorithm);
-    }
-    if (basisState.compactMode) {
-      algorithms.push(theme.compactAlgorithm);
-    }
-    setAlgorithm(algorithms);
-  }, [basisState.darkMode, basisState.compactMode]);
-
   return (
-    <ConfigProvider
-      locale={locale}
-      theme={{
-        algorithm: algorithm,
-      }}
+    <ProConfigProvider
+      dark={basisState.darkMode}
     >
       {
         ["/login"].includes(location.pathname) ?
           <Outlet /> :
           <ProLayout
+            token={{
+              sider: {
+                colorMenuBackground: basisState.darkMode ? "linear-gradient(#141414, #000000 28%)" : token.colorBgContainer
+              }
+            }}
             className={styles.layout}
             menu={{
               locale: true,
               request: requestMenus
             }}
+            fixSiderbar
             logo={<img src={logo} alt="logo" />}
             title="Adminx"
             location={{
               pathname: location.pathname,
             }}
-            locale={basisState.locale}
             layout="mix"
             rightContentRender={() => (
               <>
@@ -91,6 +67,6 @@ export default function Layout() {
             <Outlet />
           </ProLayout>
       }
-    </ConfigProvider>
+    </ProConfigProvider>
   );
 }

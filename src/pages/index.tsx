@@ -85,6 +85,7 @@ export default () => {
         {
           myApps.map(item =>
             <ProCard
+              key={item.id}
               colSpan={6}
               title={
                 <Space>

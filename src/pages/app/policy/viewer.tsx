@@ -14,9 +14,11 @@ import { AppAction, getAppActionList } from "@/services/app/action";
 import { App, getAppInfo } from "@/services/app";
 import { useTranslation } from "react-i18next";
 import { checkAuth } from "@/components/Auth";
+import { useAuth } from "ice";
 
 export default () => {
     const { token } = useToken(),
+        [auth] = useAuth(),
         { t } = useTranslation(),
         [searchParams, setSearchParams] = useSearchParams(),
         formRef = useRef<ProFormInstance>(),
@@ -31,10 +33,10 @@ export default () => {
         isReadonly = () => {
             if (policyId) {
                 // 编辑
-                return !checkAuth('updateAppPolicy')
+                return !checkAuth('updateAppPolicy', auth)
             } else {
                 // 新建
-                return !checkAuth('createAppPolicies')
+                return !checkAuth('createAppPolicies', auth)
             }
         },
         getBase = async (appId: string) => {
