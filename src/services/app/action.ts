@@ -16,7 +16,7 @@ export type AppAction = {
     app: App
 }
 
-export type AppActionKind = "restful" | "graphql" | "rpc"
+export type AppActionKind = "restful" | "graphql" | "rpc" | "function"
 
 export type AppActionMethod = "read" | "write" | "list"
 
@@ -24,12 +24,13 @@ export const EnumAppActionKind = {
     restful: { text: 'restful' },
     graphql: { text: 'graphql' },
     rpc: { text: 'rpc' },
+    function: { text: 'function' },
 }
 
 export const EnumAppActionMethod = {
-    read: { text: '读操作' },
-    write: { text: '写操作' },
-    list: { text: '列表操作' },
+    read: { text: 'read' },
+    write: { text: 'write' },
+    list: { text: 'list' },
 }
 
 const AppActionField = `#graphql
