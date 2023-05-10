@@ -1,3 +1,4 @@
+import { getOrgInfo } from '@/services/org';
 import { UpdateUserInfoScene, User, UserLoginProfile, UserLoginProfileSetKind, UserType, createUserInfo, getUserInfo, updateUserInfo, updateUserProfile } from '@/services/user';
 import store from '@/store';
 import {
@@ -7,7 +8,7 @@ import {
     ProFormSwitch,
 } from '@ant-design/pro-components';
 import { Radio } from 'antd';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 
 
@@ -24,10 +25,19 @@ export default (props: {
     const { t } = useTranslation(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
+        [domain, setDomain] = useState<string>(''),
         [setKind, setSetKind] = useState<UserLoginProfileSetKind>('auto'),
         [basisState] = store.useModel("basis")
 
     const
+        getBase = async () => {
+            if (basisState.tenantId) {
+                const result = await getOrgInfo(basisState.tenantId)
+                if (result?.id) {
+                    setDomain(result.domain || '')
+                }
+            }
+        },
         onOpenChange = (open: boolean) => {
             if (!open) {
                 props.onClose?.()
@@ -69,6 +79,9 @@ export default (props: {
                         break;
                 }
             } else {
+                if (props.userType === 'member' && domain) {
+                    values.principalName = `${values.principalName}@${domain}`
+                }
                 appInfo = await createUserInfo(props?.orgId || basisState.tenantId, values, props.userType, setKind)
             }
             if (appInfo?.id) {
@@ -78,6 +91,10 @@ export default (props: {
             setSaveLoading(false)
             return false;
         }
+
+    useEffect(() => {
+        getBase()
+    }, [])
 
     return (
         <DrawerForm
@@ -104,10 +121,16 @@ export default (props: {
             onOpenChange={onOpenChange}
         >
             <div x-if={['create'].includes(props.scene)}>
-                <ProFormText name="principalName" label={t("principal name")}
+                <ProFormText
+                    name="principalName"
+                    label={t("principal name")}
                     rules={[
                         { required: true, message: `${t("Please enter {{field}}", { field: t("principal name") })}`, },
-                    ]} />
+                    ]}
+                    fieldProps={{
+                        suffix: props.userType === 'member' ? `${domain ? `@${domain}` : ''}` : ''
+                    }}
+                />
                 <div>
                     <Radio.Group value={setKind} options={[
                         { label: t('manually set password'), value: "customer" },
