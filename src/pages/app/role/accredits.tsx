@@ -12,10 +12,11 @@ import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "@ice/runtime";
 import { Org } from "@/services/org";
 import ModalOrg from "@/pages/org/components/modalOrg";
-import { getAppPolicyAssignedOrgList, getAppRoleAssignedOrgList } from "@/services/app/org";
+import { getAppRoleAssignedOrgList } from "@/services/app/org";
 import { AppRole, getAppRoleInfo } from "@/services/app/role";
 import { assignOrgAppRole, revokeOrgAppRole } from "@/services/org/role";
 import { useTranslation } from "react-i18next";
+import Auth from "@/components/Auth";
 
 
 export default () => {
@@ -40,9 +41,11 @@ export default () => {
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('disauthorization')}
-                        </a>
+                        <Auth authKey="revokeOrganizationAppRole">
+                            <a key="del" onClick={() => onDel(record)}>
+                                {t('disauthorization')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             },
@@ -134,11 +137,13 @@ export default () => {
                         <span>{t('role')}：{appRoleInfo?.name || "-"}</span>
                     </Space>,
                     actions: [
-                        <Button type="primary" onClick={() => {
-                            setModal({ open: true, title: '' })
-                        }} >
-                            {t('add {{field}}', { field: t('organizational authorization') })}
-                        </Button>
+                        <Auth authKey="assignOrganizationAppRole">
+                            <Button type="primary" onClick={() => {
+                                setModal({ open: true, title: '' })
+                            }} >
+                                {t('add {{field}}', { field: t('organizational authorization') })}
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

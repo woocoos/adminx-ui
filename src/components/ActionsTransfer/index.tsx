@@ -13,6 +13,7 @@ export default function (props: {
     dataSource: AppAction[]
     appCode: string
     titles?: [string, string]
+    readonly?: boolean
     onChange?: (targetKeys: string[]) => void
 }) {
 
@@ -48,6 +49,7 @@ export default function (props: {
                                 checkedKeys={props.targetKeys}
                                 dataSource={dataSource}
                                 appCode={props.appCode}
+                                readonly={props.readonly}
                                 onChange={(keys: string[]) => {
                                     props.onChange?.(keys)
                                 }}
@@ -56,6 +58,7 @@ export default function (props: {
                                 checkedKeys={props.targetKeys}
                                 dataSource={dataSource}
                                 appCode={props.appCode}
+                                readonly={props.readonly}
                                 onChange={(keys: string[]) => {
                                     props.onChange?.(keys)
                                 }}
@@ -64,6 +67,7 @@ export default function (props: {
                                 checkedKeys={props.targetKeys}
                                 dataSource={dataSource}
                                 appCode={props.appCode}
+                                readonly={props.readonly}
                                 onChange={(keys: string[]) => {
                                     props.onChange?.(keys)
                                 }}
@@ -90,9 +94,10 @@ export default function (props: {
                                             <div>{item.comments}</div>
                                         </Col>
                                         <Col style={{ display: "flex", justifyContent: 'center' }}>
-                                            <CloseOutlined className="delIcon" onClick={() => {
+                                            {props.readonly ? '' : <CloseOutlined className="delIcon" onClick={() => {
                                                 props.onChange?.([...props.targetKeys.filter(key => key != `${props.appCode}:${item.name}`)])
                                             }} />
+                                            }
                                         </Col>
                                     </Row>
                                 ))

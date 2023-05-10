@@ -9,6 +9,7 @@ export default (props: {
     checkedKeys: string[]
     dataSource: AppAction[]
     appCode: string
+    readonly?: boolean
     onChange: (keys: string[]) => void
 }) => {
 
@@ -41,15 +42,18 @@ export default (props: {
         title={
             <div className="actionsTransfer-listAllCheckbox" onClick={(e) => {
                 e.stopPropagation();
-                const allKeys = list.map(item => `${props.appCode}:${item.name}`);
-                if (!checkAll()) {
-                    props.onChange([...props.checkedKeys, ...allKeys.filter(k => !props.checkedKeys.includes(k))])
-                } else {
-                    props.onChange(props.checkedKeys.filter(k => !allKeys.includes(k)))
+                if (!props.readonly) {
+                    const allKeys = list.map(item => `${props.appCode}:${item.name}`);
+                    if (!checkAll()) {
+                        props.onChange([...props.checkedKeys, ...allKeys.filter(k => !props.checkedKeys.includes(k))])
+                    } else {
+                        props.onChange(props.checkedKeys.filter(k => !allKeys.includes(k)))
+                    }
                 }
             }}>
                 <div className="mask"></div>
                 <Checkbox
+                    disabled={props.readonly}
                     checked={checkAll()}
                     indeterminate={indeterminateAll()}
                 >
@@ -63,15 +67,20 @@ export default (props: {
             list.map(item => (
                 <div key={item.id} className="actionsTransfer-listCheckbox" onClick={(e) => {
                     e.stopPropagation()
-                    const key = `${props.appCode}:${item.name}`
-                    if (props.checkedKeys.includes(key)) {
-                        props.onChange(props.checkedKeys.filter(k => k != key))
-                    } else {
-                        props.onChange([...props.checkedKeys, key])
+                    if (!props.readonly) {
+                        const key = `${props.appCode}:${item.name}`
+                        if (props.checkedKeys.includes(key)) {
+                            props.onChange(props.checkedKeys.filter(k => k != key))
+                        } else {
+                            props.onChange([...props.checkedKeys, key])
+                        }
                     }
                 }}>
                     <div className="mask"></div>
-                    <Checkbox checked={props.checkedKeys.includes(`${props.appCode}:${item.name}`)} >
+                    <Checkbox
+                        disabled={props.readonly}
+                        checked={props.checkedKeys.includes(`${props.appCode}:${item.name}`)}
+                    >
                         <div>{props.appCode}:{item.name}</div>
                         <div>{item.comments}</div>
                     </Checkbox>

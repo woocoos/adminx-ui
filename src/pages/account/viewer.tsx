@@ -15,6 +15,7 @@ import { useTranslation } from "react-i18next";
 import ListUserPermission from "./components/listUserPermission";
 import ListUserJoinGroup from "./components/listUserJoinGroup";
 import { useSearchParams } from "@ice/runtime";
+import Auth from "@/components/Auth";
 
 export default () => {
     const { token } = useToken(),
@@ -147,11 +148,13 @@ export default () => {
         >
             <ProCard loading={loading} >
                 <ProDescriptions title={t('Basic information')} column={2} extra={
-                    info ? <Button onClick={() =>
-                        setModal({ open: true, title: t('amend {{field}}', { field: t("basic information") }), scene: "base", userType: info?.userType || 'member' })
-                    }>
-                        {t('amend')}
-                    </Button> : ''
+                    info ? <Auth authKey="updateUser">
+                        <Button onClick={() =>
+                            setModal({ open: true, title: t('amend {{field}}', { field: t("basic information") }), scene: "base", userType: info?.userType || 'member' })
+                        }>
+                            {t('amend')}
+                        </Button>
+                    </Auth> : ''
                 }>
                     <ProDescriptions.Item label=""
                         valueType={{ type: 'image', width: 120 }}
@@ -189,21 +192,25 @@ export default () => {
                             key: 'certification',
                             children: <>
                                 <ProDescriptions title={t('Login credentials')} column={3} extra={
-                                    <Button onClick={() =>
-                                        setModal({ open: true, title: t('amend {{field}}', { field: t('login credentials') }), scene: "identity", userType: info?.userType || 'member' })
-                                    }>
-                                        {t('amend')}
-                                    </Button>
+                                    <Auth authKey={["deleteUserIdentity", "bindUserIdentity"]} keyAndOr="or">
+                                        <Button onClick={() =>
+                                            setModal({ open: true, title: t('amend {{field}}', { field: t('login credentials') }), scene: "identity", userType: info?.userType || 'member' })
+                                        }>
+                                            {t('amend')}
+                                        </Button>
+                                    </Auth>
                                 }>
                                     {identityRender()}
                                 </ProDescriptions>
                                 <Divider style={{ margin: "0 0 24px 0" }} />
                                 <ProDescriptions title={t('Login Settings')} column={3} extra={
-                                    <Button onClick={() =>
-                                        setModal({ open: true, title: t('amend {{field}}', { field: t('login Settings') }), scene: "loginProfile", userType: info?.userType || 'member' })
-                                    }>
-                                        {t('amend')}
-                                    </Button>
+                                    <Auth authKey="updateLoginProfile">
+                                        <Button onClick={() =>
+                                            setModal({ open: true, title: t('amend {{field}}', { field: t('login Settings') }), scene: "loginProfile", userType: info?.userType || 'member' })
+                                        }>
+                                            {t('amend')}
+                                        </Button>
+                                    </Auth>
                                 }>
                                     <ProDescriptions.Item label={t("last login IP")}  >
                                         {info?.loginProfile?.lastLoginIP || '-'}
@@ -229,22 +236,28 @@ export default () => {
                                                     }}>
                                                         {t('view QR code')}
                                                     </Button> */}
-                                                    <Button onClick={() => {
-                                                        sendEmail()
-                                                    }}>
-                                                        {t('send to email')}
-                                                    </Button>
-                                                    <Button type="primary" danger onClick={() => {
-                                                        chagneMfa(false)
-                                                    }}>
-                                                        {t('disable')}
-                                                    </Button>
+                                                    <Auth authKey="sendMFAToUserByEmail">
+                                                        <Button onClick={() => {
+                                                            sendEmail()
+                                                        }}>
+                                                            {t('send to email')}
+                                                        </Button>
+                                                    </Auth>
+                                                    <Auth authKey="enableMFA">
+                                                        <Button type="primary" danger onClick={() => {
+                                                            chagneMfa(false)
+                                                        }}>
+                                                            {t('disable')}
+                                                        </Button>
+                                                    </Auth>
                                                 </> : <>
-                                                    <Button onClick={() => {
-                                                        chagneMfa(true)
-                                                    }}>
-                                                        {t('enable')}
-                                                    </Button>
+                                                    <Auth authKey="enableMFA">
+                                                        <Button onClick={() => {
+                                                            chagneMfa(true)
+                                                        }}>
+                                                            {t('enable')}
+                                                        </Button>
+                                                    </Auth>
                                                 </>
                                             }
                                         </Space>

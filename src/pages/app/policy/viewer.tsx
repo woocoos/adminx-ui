@@ -13,6 +13,7 @@ import PolicyRules from "../components/policyRules";
 import { AppAction, getAppActionList } from "@/services/app/action";
 import { App, getAppInfo } from "@/services/app";
 import { useTranslation } from "react-i18next";
+import { checkAuth } from "@/components/Auth";
 
 export default () => {
     const { token } = useToken(),
@@ -27,6 +28,15 @@ export default () => {
         policyId = searchParams.get('id')
 
     const
+        isReadonly = () => {
+            if (policyId) {
+                // 编辑
+                return !checkAuth('updateAppPolicy')
+            } else {
+                // 新建
+                return !checkAuth('createAppPolicies')
+            }
+        },
         getBase = async (appId: string) => {
             const info = await getAppInfo(appId)
             if (info?.id) {
@@ -147,7 +157,7 @@ export default () => {
                     layout="vertical"
                     grid
                     formRef={formRef}
-                    submitter={{
+                    submitter={isReadonly() ? false : {
                         searchConfig: {
                             submitText: t('submit'),
                             resetText: t('reset')
@@ -193,6 +203,7 @@ export default () => {
                     <ProFormText>
                         {appInfo ? <PolicyRules
                             rules={rules}
+                            readonly={isReadonly()}
                             onChange={(rules) => {
                                 setRules([...rules])
                                 onValuesChange()

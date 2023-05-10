@@ -9,13 +9,15 @@ import { Button, Space, Dropdown, Modal } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Link } from "ice";
+import { Link, useAuth } from "ice";
 import { EnumOrgKind, EnumOrgStatus, Org, OrgKind, delOrgInfo, getOrgList, getOrgPathList } from "@/services/org";
 import OrgCreate from "./components/create";
 import { formatTreeData } from "@/util";
 import { TreeEditorAction } from "@/util/type";
 import { getAppOrgList } from "@/services/app/org";
 import { useTranslation } from "react-i18next";
+import Auth, { checkAuth } from "@/components/Auth";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 
 export type OrgListRef = {
   getSelect: () => Org[]
@@ -34,6 +36,7 @@ const OrgList = (props: {
 
   const { token } = useToken(),
     { t } = useTranslation(),
+    [auth] = useAuth(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     kind = props.kind || 'root',
@@ -94,45 +97,53 @@ const OrgList = (props: {
               </a>
             })
           }
+          const items: ItemType[] = []
+          if (kind == 'root') {
+            items.push(
+              { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>{t('policy')}</Link> },
+              { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>{t('authorized application')}</Link> },
+              { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >{t('organizational department management')}</Link> },
+              { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>{t('organizational user management')}</Link> },
+            )
+          } else {
+            if (checkAuth("createOrganization", auth)) {
+              items.push(
+                { key: 'create', label: t('created'), children: createAction }
+              )
+            }
+            if (record.kind === kind && checkAuth("deleteOrganization", auth)) {
+              items.push(
+                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
+              )
+            }
+          }
 
           return <Space>
             {record.kind === kind ? <>
-              <a key="editor" onClick={() => editorAction(record, 'editor')}>
-                {t('edit')}
-              </a>
+              <Auth authKey="updateOrganization">
+                <a key="editor" onClick={() => editorAction(record, 'editor')}>
+                  {t('edit')}
+                </a>
+              </Auth>
             </> : <></>}
             {
-              kind == 'root' ? (<>
+              kind == 'root' ? <>
                 <Link key="userGroup" to={`/org/groups?id=${record.id}`}>
                   {t('user group')}
                 </Link>
-                <Dropdown trigger={['click']} menu={{
-                  items: [
-                    { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>{t('policy')}</Link> },
-                    { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>{t('authorized application')}</Link> },
-                    { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >{t('organizational department management')}</Link> },
-                    { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>{t('organizational user management')}</Link> },
-                  ]
+                {items.length ? <Dropdown trigger={['click']} menu={{
+                  items
                 }} >
                   <a><EllipsisOutlined /></a>
-                </Dropdown>
+                </Dropdown> : ''}
               </>
-              ) : (
-                <Dropdown trigger={['click']} menu={{
-                  items: record.kind === kind ? [
-                    {
-                      key: 'create', label: t('created'), children: createAction
-                    },
-                    { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
-                  ] : [
-                    {
-                      key: 'create', label: t('created'), children: createAction
-                    },
-                  ]
-                }} >
-                  <a><EllipsisOutlined /></a>
-                </Dropdown>
-              )
+                : <>
+                  {items.length ? <Dropdown trigger={['click']} menu={{
+                    items
+                  }} >
+                    <a><EllipsisOutlined /></a>
+                  </Dropdown> : ''}
+                </>
             }
           </Space>
         }
@@ -277,13 +288,15 @@ const OrgList = (props: {
               toolbar={{
                 title: kind === 'org' ? t('organizational branch tree') : t('organizational tree'),
                 actions: kind == 'org' ? [] : [
-                  <Button
-                    type="primary" onClick={() => {
-                      setModal({ open: true, title: t("create {{field}}", { field: t('organization') }), id: "", scene: "editor" })
+                  <Auth authKey={kind === 'root' ? "createRoot" : "createOrganization"}>
+                    <Button
+                      type="primary" onClick={() => {
+                        setModal({ open: true, title: t("create {{field}}", { field: t('organization') }), id: "", scene: "editor" })
 
-                    }}>
-                    {t("create {{field}}", { field: t('organization') })}
-                  </Button>
+                      }}>
+                      {t("create {{field}}", { field: t('organization') })}
+                    </Button>
+                  </Auth>
                 ]
               }}
               expandable={{

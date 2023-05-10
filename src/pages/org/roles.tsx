@@ -18,6 +18,7 @@ import { useTranslation } from "react-i18next";
 import DrawerUser from "../account/components/drawerUser";
 import DrawerRolePolicy from "./components/drawerRolePolicy";
 import DrawerAppRolePolicy from "@/pages/app/components/drawerRolePolicy";
+import Auth from "@/components/Auth";
 
 export type OrgRoleListRef = {
     getSelect: () => OrgRole[]
@@ -83,31 +84,39 @@ const OrgRoleList = (props: {
                         <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
                             {t('view')}
                         </Link>
-                        <a onClick={() => {
-                            setModal({ open: true, title: t('add {{field}}', { field: t('member') }), id: '', data: record, scene: "addUser" })
-                        }}>
-                            {t('add {{field}}', { field: t('member') })}
-                        </a>
-                    </> :
-                        <>
-                            <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
-                                {t('view')}
-                            </Link>
+                        <Auth authKey="assignRoleUser">
                             <a onClick={() => {
                                 setModal({ open: true, title: t('add {{field}}', { field: t('member') }), id: '', data: record, scene: "addUser" })
                             }}>
                                 {t('add {{field}}', { field: t('member') })}
                             </a>
-                            <a onClick={() => {
-                                setModal({ open: true, title: t('add {{field}}', { field: t('permission') }), id: '', data: record, scene: "addPermission" })
-                            }}>
-                                {t('add {{field}}', { field: t('permission') })}
-                            </a>
-                            <a onClick={() => {
-                                onDel(record)
-                            }}>
-                                {t('delete')}
-                            </a>
+                        </Auth>
+                    </> :
+                        <>
+                            <Link to={`/org/${record.kind}/viewer?id=${record.id}`}>
+                                {t('view')}
+                            </Link>
+                            <Auth authKey="assignRoleUser">
+                                <a onClick={() => {
+                                    setModal({ open: true, title: t('add {{field}}', { field: t('member') }), id: '', data: record, scene: "addUser" })
+                                }}>
+                                    {t('add {{field}}', { field: t('member') })}
+                                </a>
+                            </Auth>
+                            <Auth authKey="grant">
+                                <a onClick={() => {
+                                    setModal({ open: true, title: t('add {{field}}', { field: t('permission') }), id: '', data: record, scene: "addPermission" })
+                                }}>
+                                    {t('add {{field}}', { field: t('permission') })}
+                                </a>
+                            </Auth>
+                            <Auth authKey="deleteRole">
+                                <a onClick={() => {
+                                    onDel(record)
+                                }}>
+                                    {t('delete')}
+                                </a>
+                            </Auth>
                         </>
                 }
 
@@ -231,12 +240,14 @@ const OrgRoleList = (props: {
                         toolbar={{
                             title: kind == "role" ? t("{{field}} list", { field: t('role') }) : t("{{field}} list", { field: t('user group') }),
                             actions: [
-                                <Button
-                                    type="primary" onClick={() => {
-                                        setModal({ open: true, title: `${kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}`, id: "", scene: "editor" })
-                                    }}>
-                                    {kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}
-                                </Button>
+                                <Auth authKey="createRole">
+                                    <Button
+                                        type="primary" onClick={() => {
+                                            setModal({ open: true, title: `${kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}`, id: "", scene: "editor" })
+                                        }}>
+                                        {kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}
+                                    </Button>
+                                </Auth>
                             ]
                         }}
                         scroll={{ x: 'max-content' }}

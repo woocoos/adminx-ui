@@ -19,6 +19,7 @@ export default (props: {
     appInfo: App
     orgId?: string
     values?: string[]
+    readonly?: boolean
     onChange: (values: string[]) => void
 }) => {
 
@@ -81,14 +82,18 @@ export default (props: {
                             </Col>
                             <Col>
                                 <Space>
-                                    {!!props.values?.find(vsItem => vsItem == item.allArn) ? '' : <a
-                                        onClick={() => {
-                                            setModal({ open: true, title: t('add {{field}}', { field: t('resources') }), data: item.allArn, scene: "create" })
-                                        }}
-                                    >
-                                        {t('add {{field}}', { field: t('resources') })}
-                                    </a>}
+                                    {
+                                        !!props.values?.find(vsItem => vsItem == item.allArn) ? '' :
+                                            props.readonly ? '' : <a
+                                                onClick={() => {
+                                                    setModal({ open: true, title: t('add {{field}}', { field: t('resources') }), data: item.allArn, scene: "create" })
+                                                }}
+                                            >
+                                                {t('add {{field}}', { field: t('resources') })}
+                                            </a>
+                                    }
                                     <Checkbox
+                                        disabled={props.readonly}
                                         checked={!!props.values?.find(vsItem => vsItem == item.allArn)}
                                         onChange={(e) => {
                                             let values: string[] = []
@@ -115,7 +120,7 @@ export default (props: {
                                     . {vItem}
                                 </Col>
                                 <Col flex="auto">
-                                    {!props.values?.find(vsItem => vsItem == item.allArn) ? <Space>
+                                    {!props.readonly && !props.values?.find(vsItem => vsItem == item.allArn) ? <Space>
                                         <a onClick={() => {
                                             setModal({ open: true, title: `${t('amend')} ${vItem}`, data: vItem, scene: "editor" })
                                         }}

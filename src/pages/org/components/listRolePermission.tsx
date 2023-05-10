@@ -13,6 +13,7 @@ import { Permission, delPermssion, getOrgPermissionList } from "@/services/permi
 import DrawerRolePolicy from "./drawerRolePolicy";
 import { OrgRole } from "@/services/org/role";
 import { useTranslation } from "react-i18next";
+import Auth from "@/components/Auth";
 
 
 export default (props: {
@@ -69,9 +70,11 @@ export default (props: {
             align: 'center', search: false, width: 110,
             render: (text, record) => {
                 return <Space>
-                    <a key="del" onClick={() => onDel(record)}>
-                        {t('disauthorization')}
-                    </a>
+                    <Auth authKey='revoke'>
+                        <a key="del" onClick={() => onDel(record)}>
+                            {t('disauthorization')}
+                        </a>
+                    </Auth>
                 </Space>
             }
         })
@@ -129,11 +132,13 @@ export default (props: {
                 toolbar={{
                     title: t("{{field}} list", { field: t('policy') }),
                     actions: props.readonly ? [] : [
-                        <Button type="primary" onClick={() => {
-                            setModal({ open: true, title: '' })
-                        }} >
-                            {t("add {{field}}", { field: t('authorization') })}
-                        </Button>
+                        <Auth authKey='grant'>
+                            <Button type="primary" onClick={() => {
+                                setModal({ open: true, title: '' })
+                            }} >
+                                {t("add {{field}}", { field: t('authorization') })}
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

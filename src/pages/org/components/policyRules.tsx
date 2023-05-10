@@ -14,6 +14,7 @@ import AppPolicyRes from "@/components/AppPolicyRes";
 const RuleItem = (props: {
     orgId: string
     rule: PolicyRule
+    readonly?: boolean
     onChange?: (rule: PolicyRule) => void
     onCopy?: () => void
     onDel?: () => void
@@ -78,33 +79,33 @@ const RuleItem = (props: {
             size="small"
             bordered
             title={getTitle()}
-            extra={
-                <>
-                    <Popconfirm
-                        title={t('copy')}
-                        description={`${t('confirm copy')}?`}
-                        onConfirm={() => {
-                            props.onCopy?.()
-                        }}
-                    >
-                        <a>{t('copy')}</a>
-                    </Popconfirm>
-                    <Divider type="vertical" />
-                    <Popconfirm
-                        title={t('delete')}
-                        description={`${t('confirm delete')}?`}
-                        onConfirm={() => {
-                            props.onDel?.()
-                        }}
-                    >
-                        <a>{t('delete')}</a>
-                    </Popconfirm>
-                </>
+            extra={props.readonly ? "" : <>
+                <Popconfirm
+                    title={t('copy')}
+                    description={`${t('confirm copy')}?`}
+                    onConfirm={() => {
+                        props.onCopy?.()
+                    }}
+                >
+                    <a>{t('copy')}</a>
+                </Popconfirm>
+                <Divider type="vertical" />
+                <Popconfirm
+                    title={t('delete')}
+                    description={`${t('confirm delete')}?`}
+                    onConfirm={() => {
+                        props.onDel?.()
+                    }}
+                >
+                    <a>{t('delete')}</a>
+                </Popconfirm>
+            </>
             }>
             <Row >
                 <Col style={rowColStyle()}>{t('effect')}</Col>
                 <Col flex="auto">
                     <Radio.Group
+                        disabled={props.readonly}
                         value={props.rule.effect}
                         options={[
                             { label: t('allow'), value: "allow" },
@@ -127,6 +128,7 @@ const RuleItem = (props: {
                     <div style={{ width: "260px", }}>
                         <InputApp
                             value={appInfo}
+                            disabled={props.readonly}
                             onChange={(data) => {
                                 const nRule = { ...props.rule }
                                 nRule.actions = []
@@ -154,6 +156,7 @@ const RuleItem = (props: {
                         <div x-if={stretch1}>
                             <div>
                                 <Radio.Group
+                                    disabled={props.readonly}
                                     value={props.rule.actions[0] == `${appInfo?.code}:*`}
                                     options={[
                                         { label: `${t('full operation')}(*)`, value: true },
@@ -174,6 +177,7 @@ const RuleItem = (props: {
                                 props.rule.actions[0] != `${appInfo?.code}:*` ? <>
                                     <br />
                                     <ActionsTransfer
+                                        readonly={props.readonly}
                                         appCode={appInfo?.code || ''}
                                         targetKeys={props.rule.actions}
                                         dataSource={appActions}
@@ -209,6 +213,7 @@ const RuleItem = (props: {
                         <div x-if={stretch2}>
                             <div>
                                 <Radio.Group
+                                    disabled={props.readonly}
                                     value={props.rule.resources[0] == `${appInfo?.code}:*`}
                                     options={[
                                         { label: t('total resources'), value: true },
@@ -229,6 +234,7 @@ const RuleItem = (props: {
                                 props.rule.resources[0] != `${appInfo?.code}:*` && appInfo ? <>
                                     <br />
                                     <AppPolicyRes
+                                        readonly={props.readonly}
                                         appInfo={appInfo}
                                         orgId={props.orgId}
                                         values={props.rule.resources}
@@ -271,6 +277,7 @@ const RuleItem = (props: {
 export default (props: {
     orgId: string
     rules: PolicyRule[],
+    readonly?: boolean
     onChange?: (rules: PolicyRule[]) => void
 }) => {
     const { t } = useTranslation();
@@ -287,6 +294,7 @@ export default (props: {
                                     <div key={`ruleItemdiv${index}`} >
                                         <RuleItem
                                             key={`ruleItem${index}`}
+                                            readonly={props.readonly}
                                             orgId={props.orgId}
                                             rule={item}
                                             onChange={(rule) => {
@@ -306,22 +314,24 @@ export default (props: {
                                     </div>
                                 )
                             }
+                            {
+                                props.readonly ? '' : <Button key="add"
+                                    block
+                                    icon={<PlusCircleOutlined />}
+                                    size="small"
+                                    onClick={() => {
+                                        props.rules.push({
+                                            effect: 'allow',
+                                            actions: [],
+                                            resources: [],
+                                            conditions: [],
+                                        })
+                                        props.onChange?.(props.rules)
+                                    }} >
+                                    {t('add statement')}
+                                </Button>
+                            }
 
-                            <Button key="add"
-                                block
-                                icon={<PlusCircleOutlined />}
-                                size="small"
-                                onClick={() => {
-                                    props.rules.push({
-                                        effect: 'allow',
-                                        actions: [],
-                                        resources: [],
-                                        conditions: [],
-                                    })
-                                    props.onChange?.(props.rules)
-                                }} >
-                                {t('add statement')}
-                            </Button>
                         </>
                 },
                 {
@@ -330,6 +340,9 @@ export default (props: {
                             className="adminx-editor"
                             height="400px"
                             defaultLanguage="json"
+                            options={{
+                                readOnly: props.readonly
+                            }}
                             value={JSON.stringify(props.rules, null, 4)}
                             onChange={(value) => {
                                 try {

@@ -19,6 +19,10 @@ import { App } from "@/services/app";
 import ModalAction from "@/pages/app/components/modalAction";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
+import Auth, { checkAuth } from "@/components/Auth";
+import { ItemType } from "antd/es/menu/hooks/useItems";
+import { useAuth } from "ice";
+
 
 type TreeDataState = {
     key: string
@@ -35,6 +39,7 @@ type TreeSelectedData = {
 
 export default () => {
     const { token } = useToken(),
+        [auth] = useAuth(),
         { t } = useTranslation(),
         formRef = useRef<ProFormInstance>(),
         [searchParams, setSearchParams] = useSearchParams(),
@@ -61,44 +66,51 @@ export default () => {
 
     const
         customerTitleRender = (nodeData: TreeDataState) => {
+            const items: ItemType[] = []
+            if (checkAuth('createAppMenus', auth)) {
+                items.push({
+                    key: 'create',
+                    label: t('created'),
+                    children: [
+                        {
+                            key: 'peer', label: <a onClick={(e) => {
+                                e.stopPropagation();
+                                editorMenuAction(nodeData.node, 'peer')
+                            }}>
+                                {t('same level')}
+                            </a>
+                        },
+                        {
+                            key: 'child', label: <a onClick={(e) => {
+                                e.stopPropagation();
+                                editorMenuAction(nodeData.node, 'child')
+                            }}>
+                                {t('sublayer')}
+                            </a>
+                        }
+                    ]
+                })
+            }
+            if (checkAuth('deleteAppMenu', auth)) {
+                items.push({
+                    key: 'deo', label: <a onClick={(e) => {
+                        if (nodeData.node) {
+                            onDelMenu(nodeData.node)
+                        }
+                    }}>
+                        {t('delete')}
+                    </a>
+                })
+            }
             return (
                 <Space>
                     <span>{nodeData.title}</span>
-                    <Dropdown menu={{
-                        items: [
-                            {
-                                key: 'create', label: t('created'), children: [
-                                    {
-                                        key: 'peer', label: <a onClick={(e) => {
-                                            e.stopPropagation();
-                                            editorMenuAction(nodeData.node, 'peer')
-                                        }}>
-                                            {t('same level')}
-                                        </a>
-                                    },
-                                    {
-                                        key: 'child', label: <a onClick={(e) => {
-                                            e.stopPropagation();
-                                            editorMenuAction(nodeData.node, 'child')
-                                        }}>
-                                            {t('sublayer')}
-                                        </a>
-                                    }
-                                ]
-                            },
-                            {
-                                key: 'deo', label: <a onClick={(e) => {
-                                    if (nodeData.node) {
-                                        onDelMenu(nodeData.node)
-                                    }
-                                }}>
-                                    {t('delete')}
-                                </a>
-                            },
-                        ]
-                    }} >
+                    {items.length ? <Dropdown menu={{
+                        items: items
+                    }}
+                    >
                         <SettingOutlined className="tree-setting" />
-                    </Dropdown>
+                    </Dropdown> : ''}
                 </Space>
             )
         },
@@ -281,9 +293,15 @@ export default () => {
                         { title: t("{{field}} management", { field: t('menu') }), },
                     ],
                 },
-                extra: <Button onClick={() => {
-                    setTreeDraggable(!treeDraggable)
-                }}>{treeDraggable ? t('close') : t('open')}{t('move')}</Button>
+                extra:
+                    <Auth authKey={"moveAppMenu"}>
+                        <Button onClick={() => {
+                            setTreeDraggable(!treeDraggable)
+                        }}
+                        >
+                            {treeDraggable ? t('close') : t('open')}{t('move')}
+                        </Button>
+                    </Auth>
             }}
         >
             <ProCard split="vertical">
@@ -306,7 +324,7 @@ export default () => {
                     <ProForm
                         formRef={formRef}
                         style={{ maxWidth: 400 }}
-                        submitter={{
+                        submitter={checkAuth('createAppMenus') || checkAuth('updateAppMenu') ? {
                             searchConfig: {
                                 submitText: t('submit'),
                                 resetText: t('reset')
@@ -315,7 +333,7 @@ export default () => {
                                 loading: saveLoading,
                                 disabled: saveDisabled,
                             }
-                        }}
+                        } : false}
                         onFinish={onFinish}
                         onReset={getRequest}
                         request={getRequest}

@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "@ice/runtime";
 import { AppRes, getAppResList } from "@/services/app/resource";
 import CreateRes from "./components/createRes";
+import Auth from "@/components/Auth";
 
 
 export default () => {
@@ -32,11 +33,13 @@ export default () => {
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
-                        <a key="edit" onClick={() => {
-                            setModal({ open: true, title: t('amend {{field}}', { field: record.name }), id: record.id })
-                        }}>
-                            {t('edit')}
-                        </a>
+                        <Auth authKey="updateAppRes">
+                            <a key="edit" onClick={() => {
+                                setModal({ open: true, title: t('amend {{field}}', { field: record.name }), id: record.id })
+                            }}>
+                                {t('edit')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             },

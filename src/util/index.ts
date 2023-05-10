@@ -44,7 +44,7 @@ export const browserLanguage = () => {
             locale = 'en-US'
             break;
         default:
-            locale = navigator.language
+            locale = 'zh-CN'
             break;
     }
     return locale
@@ -68,7 +68,7 @@ export const formatTreeData = <T>(
     },
     parentId?: string | number) => {
     const dataKey = { key: "key", parentId: "parentId", children: "children" }, pid = parentId === undefined ? "0" : parentId
-        
+
     if (defineKey) {
         for (let key in defineKey) {
             dataKey[key] = defineKey[key]

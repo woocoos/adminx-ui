@@ -13,6 +13,7 @@ import { Org, getOrgInfo } from "@/services/org";
 import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from "@/services/org/policy";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
+import Auth from "@/components/Auth";
 
 
 export default () => {
@@ -49,14 +50,16 @@ export default () => {
                         </Link>
                     </Space> : <Space>
                         <Link key="editor" to={`/org/policy/viewer?id=${record.id}`} >
-                            {t('edit')}
+                            {t('view')}
                         </Link>
                         <Link key="reference" to={`/org/policy/references?id=${record.id}`} >
                             {t('reference record')}
                         </Link>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('delete')}
-                        </a>
+                        <Auth authKey="deleteOrganizationPolicy">
+                            <a key="del" onClick={() => onDel(record)}>
+                                {t('delete')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             },
@@ -149,11 +152,13 @@ export default () => {
                 toolbar={{
                     title: `${t('organization')}:${orgInfo?.name || "-"}`,
                     actions: [
-                        <Button type="primary">
-                            <Link key="editor" to={`/org/policy/viewer?orgId=${orgInfo?.id}`} >
-                                {t('Custom policy')}
-                            </Link>
-                        </Button>
+                        <Auth authKey="createOrganizationPolicy">
+                            <Button type="primary">
+                                <Link key="editor" to={`/org/policy/viewer?orgId=${orgInfo?.id}`} >
+                                    {t('Custom policy')}
+                                </Link>
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

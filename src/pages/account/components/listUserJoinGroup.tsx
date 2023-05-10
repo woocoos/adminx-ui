@@ -14,6 +14,7 @@ import store from "@/store";
 import { User } from "@/services/user";
 import { OrgRole, getUserJoinGroupList, revokeOrgRoleUser } from "@/services/org/role";
 import DrawerRole from "@/pages/org/components/drawerRole";
+import Auth from "@/components/Auth";
 
 
 export default (props: {
@@ -39,9 +40,11 @@ export default (props: {
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('disauthorization')}
-                        </a>
+                        <Auth authKey="revokeRoleUser">
+                            <a key="del" onClick={() => onDel(record)}>
+                                {t('disauthorization')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             }
@@ -101,11 +104,13 @@ export default (props: {
                 toolbar={{
                     title: t("{{field}} list", { field: t('user group') }),
                     actions: [
-                        <Button type="primary" onClick={() => {
-                            setModal({ open: true, title: '' })
-                        }} >
-                            {t("add {{field}}", { field: t('user group') })}
-                        </Button>
+                        <Auth authKey="assignRoleUser">
+                            <Button type="primary" onClick={() => {
+                                setModal({ open: true, title: '' })
+                            }} >
+                                {t("add {{field}}", { field: t('user group') })}
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

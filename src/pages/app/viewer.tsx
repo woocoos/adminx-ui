@@ -12,6 +12,7 @@ import { App, EnumAppKind, EnumAppStatus, getAppInfo } from "@/services/app";
 import { Button, Divider } from "antd";
 import AppCreate from "./components/create";
 import { useTranslation } from "react-i18next";
+import Auth from "@/components/Auth";
 
 export default () => {
     const { token } = useToken(),
@@ -69,7 +70,11 @@ export default () => {
         >
             <ProCard loading={loading} >
                 <ProDescriptions title={t("Basic information")} column={2} extra={
-                    <Button onClick={() => setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }) })}>修改</Button>
+                    <Auth authKey="updateApp">
+                        <Button onClick={() => setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }) })}>
+                            {t('amend')}
+                        </Button>
+                    </Auth>
                 }>
                     <ProDescriptions.Item label=""
                         valueType={{ type: 'image', width: 120 }}
@@ -116,7 +121,11 @@ export default () => {
                 </ProDescriptions>
                 <Divider style={{ margin: "0 0 24px 0" }} />
                 <ProDescriptions title={t('Application configuration')} column={2} extra={
-                    <Button onClick={() => setModal({ open: true, title: t("amend {{field}}", { field: t("application configuration") }), scene: 'conf' })}>修改</Button>
+                    <Auth authKey="updateApp">
+                        <Button onClick={() => setModal({ open: true, title: t("amend {{field}}", { field: t("application configuration") }), scene: 'conf' })}>
+                            {t('amend')}
+                        </Button>
+                    </Auth>
                 }>
                     <ProDescriptions.Item label={t('callback address')}  >
                         {appInfo?.redirectURI || '-'}

@@ -14,6 +14,7 @@ import { EnumPermissionPrincipalKind, Permission, delPermssion } from "@/service
 import { getOrgPolicyReferenceList } from "@/services/permission";
 import { OrgPolicy, getOrgPolicyInfo } from "@/services/org/policy";
 import { useTranslation } from "react-i18next";
+import Auth from "@/components/Auth";
 
 export default () => {
     const { token } = useToken(),
@@ -46,11 +47,13 @@ export default () => {
                 align: 'center', search: false, width: 170,
                 render: (text, record) => {
                     return <Space>
-                        <a onClick={() => {
-                            revokeOrg(record)
-                        }}>
-                            {t('disauthorization')}
-                        </a>
+                        <Auth authKey="revoke">
+                            <a onClick={() => {
+                                revokeOrg(record)
+                            }}>
+                                {t('disauthorization')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             }

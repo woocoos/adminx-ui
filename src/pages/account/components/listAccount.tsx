@@ -9,7 +9,7 @@ import { Button, Space, Dropdown, Modal, message } from "antd";
 import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
-import { Link } from "ice";
+import { Link, useAuth } from "ice";
 import { EnumUserStatus, User, UserType, delUserInfo, getUserList, resetUserPasswordByEmail } from "@/services/user";
 import AccountCreate from "./create";
 import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from "@/services/org/user";
@@ -19,6 +19,8 @@ import { useTranslation } from "react-i18next";
 import { Org } from "@/services/org";
 import DrawerRole from "@/pages/org/components/drawerRole";
 import DrawerRolePolicy from "@/pages/org/components/drawerRolePolicy";
+import Auth, { checkAuth } from "@/components/Auth";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 
 type UserListProps = {
   title?: string
@@ -39,6 +41,7 @@ export type UserListRef = {
 const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    [auth] = useAuth(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [dataSource, setDataSource] = useState<User[]>([]),
@@ -75,46 +78,79 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         title: t('operation'), dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 180,
         render: (text, record) => {
-          return props.scene === "roleUser" ? <Space>
-            <a onClick={() => onRemoveRole(record)}>{t("remove")}</a>
-          </Space> : props?.scene === 'orgUser' ? <Space>
-            <Link key="editor" to={`/account/viewer?id=${record.id}`}>
-              {t('detail')}
-            </Link>
-            <Dropdown trigger={['click']} menu={{
-              items: [
+          const items: ItemType[] = []
+
+          if (props.scene === 'orgUser') {
+            if (checkAuth('assignRoleUser', auth)) {
+              items.push(
                 {
                   key: "addGroup", label: <a onClick={() => {
                     setModal({ open: true, data: record, title: t("add {{field}}", { field: t('user group') }), scene: "addGroup" })
                   }}>
                     {t("add {{field}}", { field: t('user group') })}
                   </a>
-                },
+                }
+              )
+            }
+            if (checkAuth('grant', auth)) {
+              items.push(
                 {
                   key: "addPermission", label: <a onClick={() => {
                     setModal({ open: true, data: record, title: t("add {{field}}", { field: t('permission') }), scene: "addPermission" })
                   }}>
                     {t("add {{field}}", { field: t('permission') })}
                   </a>
-                },
-                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> },
-                { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> },
-              ]
-            }} >
-              <a><EllipsisOutlined /></a>
-            </Dropdown>
+                }
+              )
+            }
+          }
+
+          if (checkAuth('resetUserPasswordByEmail', auth)) {
+            items.push(
+              { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> }
+            )
+          }
+          if (props.scene === 'orgUser') {
+            if (checkAuth('removeOrganizationUser', auth)) {
+              items.push(
+                { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> }
+              )
+            }
+          } else {
+            if (checkAuth('deleteUser', auth)) {
+              items.push(
+                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
+              )
+            }
+          }
+          return props.scene === "roleUser" ? <Space>
+            <Auth authKey="revokeRoleUser">
+              <a onClick={() => onRemoveRole(record)}>{t("remove")}</a>
+            </Auth>
+          </Space> : props.scene === 'orgUser' ? <Space>
+            <Link key="editor" to={`/account/viewer?id=${record.id}`}>
+              {t('detail')}
+            </Link>
+            {
+              items.length ? <Dropdown trigger={['click']} menu={{
+                items
+              }} >
+                <a><EllipsisOutlined /></a>
+              </Dropdown> : ''
+            }
+
           </Space> : <Space>
             <Link key="editor" to={`/account/viewer?id=${record.id}`}>
               {t('detail')}
             </Link>
-            <Dropdown trigger={['click']} menu={{
-              items: [
-                { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> },
-                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
-              ]
-            }} >
-              <a><EllipsisOutlined /></a>
-            </Dropdown>
+            {
+              items.length ? <Dropdown trigger={['click']} menu={{
+                items
+              }} >
+                <a><EllipsisOutlined /></a>
+              </Dropdown> : ''
+            }
+
           </Space>
         }
       }
@@ -238,22 +274,28 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             toolbar={{
               title: props.title || t("{{field}} list", { field: t(props.userType || '') }),
               actions: props.scene === "roleUser" ? [
-                <Button type="primary" onClick={() => {
-                  setModal({ open: true, title: t('add {{field}}', { field: t('member') }), scene: "add" })
-                }}>
-                  {t('add {{field}}', { field: t('member') })}
-                </Button>
+                <Auth authKey="assignRoleUser">
+                  <Button type="primary" onClick={() => {
+                    setModal({ open: true, title: t('add {{field}}', { field: t('member') }), scene: "add" })
+                  }}>
+                    {t('add {{field}}', { field: t('member') })}
+                  </Button>
+                </Auth>
               ] : props.scene === "orgUser" ? [
-                <Button type="primary" onClick={() => {
-                  setModal({ open: true, title: t('create {{field}}', { field: t('user') }), scene: "create" })
-                }}>
-                  {t('create {{field}}', { field: t('user') })}
-                </Button>,
-                <Button type="primary" onClick={() => {
-                  setModal({ open: true, title: t('add {{field}}', { field: t('user') }), scene: "add" })
-                }}>
-                  {t('add {{field}}', { field: t('user') })}
-                </Button>
+                <Auth authKey="createOrganizationUser">
+                  <Button type="primary" onClick={() => {
+                    setModal({ open: true, title: t('create {{field}}', { field: t('user') }), scene: "create" })
+                  }}>
+                    {t('create {{field}}', { field: t('user') })}
+                  </Button>
+                </Auth>,
+                <Auth authKey="allotOrganizationUser">
+                  <Button type="primary" onClick={() => {
+                    setModal({ open: true, title: t('add {{field}}', { field: t('user') }), scene: "add" })
+                  }}>
+                    {t('add {{field}}', { field: t('user') })}
+                  </Button>
+                </Auth>
               ] : []
             }}
             scroll={{ x: 'max-content', y: 300 }}
@@ -289,11 +331,13 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               toolbar={{
                 title: props?.title || t("{{field}} list", { field: t(props.userType || '') }),
                 actions: [
-                  <Button type="primary" onClick={() => {
-                    setModal({ open: true, title: t('create {{field}}', { field: t(props.userType || '') }), scene: "create" })
-                  }}>
-                    {t('create {{field}}', { field: t(props.userType || '') })}
-                  </Button>
+                  <Auth authKey="createOrganizationAccount">
+                    <Button type="primary" onClick={() => {
+                      setModal({ open: true, title: t('create {{field}}', { field: t(props.userType || '') }), scene: "create" })
+                    }}>
+                      {t('create {{field}}', { field: t(props.userType || '') })}
+                    </Button>
+                  </Auth>
                 ]
               }}
               scroll={{ x: 'max-content' }}
@@ -356,7 +400,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           /> : ''
       }
       {
-        modal.scene === "addPermission" && props.orgId && modal.open?
+        modal.scene === "addPermission" && props.orgId && modal.open ?
           <DrawerRolePolicy
             orgId={props.orgId}
             userInfo={modal.data}

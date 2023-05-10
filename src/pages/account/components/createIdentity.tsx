@@ -1,3 +1,4 @@
+import Auth, { checkAuth } from '@/components/Auth';
 import { EnumUserIdentityKind, EnumUserStatus, UserIdentity, bindUserIdentity, delUserIdentity, getUserInfo } from '@/services/user';
 import {
     ActionType,
@@ -63,20 +64,22 @@ export default (props: {
                 valueType: 'option',
                 width: 200,
                 render: (_text, record) => [
-                    <Popconfirm
-                        key="editable"
-                        title={t('delete')}
-                        description={`${t('confirm delete')}?`}
-                        onConfirm={async () => {
-                            setIsAction(true)
-                            if (await delUserIdentity(record.id)) {
-                                message.success(t('submit success'))
-                                proTableRef.current?.reload();
-                            }
-                        }}
-                    >
-                        <a> {t('delete')} </a>
-                    </Popconfirm>
+                    <Auth key={record.id} authKey="deleteUserIdentity">
+                        <Popconfirm
+                            key="editable"
+                            title={t('delete')}
+                            description={`${t('confirm delete')}?`}
+                            onConfirm={async () => {
+                                setIsAction(true)
+                                if (await delUserIdentity(record.id)) {
+                                    message.success(t('submit success'))
+                                    proTableRef.current?.reload();
+                                }
+                            }}
+                        >
+                            <a> {t('delete')} </a>
+                        </Popconfirm>
+                    </Auth>
 
                 ],
             },
@@ -117,10 +120,12 @@ export default (props: {
                 loading={loading}
                 columns={columns}
                 request={getRequest}
-                recordCreatorProps={{
+                recordCreatorProps={checkAuth('deleteUserIdentity') ? {
                     record: { id: "new", status: "active" } as any,
                     creatorButtonText: t('add {{field}}', { field: '' })
-                }}
+                } : false
+                }
+
                 editable={{
                     type: 'single',
                     saveText: t('save'),

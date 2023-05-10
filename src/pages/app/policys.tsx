@@ -12,6 +12,7 @@ import { App, getAppInfo } from "@/services/app";
 import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "@/services/app/policy";
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "@ice/runtime";
+import Auth from "@/components/Auth";
 
 
 export default () => {
@@ -37,15 +38,19 @@ export default () => {
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
-                        <Link key="editor" to={`/app/policy/viewer?id=${record.id}`} >
-                            {t('edit')}
-                        </Link>
+                        <Auth authKey="updateAppPolicy">
+                            <Link key="editor" to={`/app/policy/viewer?id=${record.id}`} >
+                                {t('edit')}
+                            </Link>
+                        </Auth>
                         <Link key="org" to={`/app/policy/accredits?id=${record.id}`} >
                             {t('authorization')}
                         </Link>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('delete')}
-                        </a>
+                        <Auth authKey="deleteAppPolicy">
+                            <a key="del" onClick={() => onDel(record)}>
+                                {t('delete')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             },
@@ -144,11 +149,13 @@ export default () => {
                 toolbar={{
                     title: `${t('app')}:${appInfo?.name || "-"}`,
                     actions: [
-                        <Button key="created" type="primary">
-                            <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
-                                {t("create {{field}}", { field: t('policy') })}
-                            </Link>
-                        </Button>
+                        <Auth authKey="createAppPolicies">
+                            <Button key="created" type="primary">
+                                <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
+                                    {t("create {{field}}", { field: t('policy') })}
+                                </Link>
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

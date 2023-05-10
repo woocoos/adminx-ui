@@ -13,6 +13,7 @@ import CreateAppAction from "./components/createAction";
 import { AppAction, EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from "@/services/app/action";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
+import Auth from "@/components/Auth";
 
 export type AppActionListRef = {
     getSelect: () => AppAction[]
@@ -61,16 +62,20 @@ const AppActionList = (props: {
                 align: 'center', search: false, width: 80,
                 render: (text, record) => {
                     return <Space>
-                        <a key="editor" onClick={() => {
-                            setModal({
-                                open: true, title: `${t('edit')}:${record.name}`, id: record.id
-                            })
-                        }} >
-                            {t('edit')}
-                        </a>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('delete')}
-                        </a>
+                        <Auth authKey={"updateAppAction"}>
+                            <a key="editor" onClick={() => {
+                                setModal({
+                                    open: true, title: `${t('edit')}:${record.name}`, id: record.id
+                                })
+                            }} >
+                                {t('edit')}
+                            </a>
+                        </Auth>
+                        <Auth authKey={"deleteAppAction"}>
+                            <a key="del" onClick={() => onDel(record)}>
+                                {t('delete')}
+                            </a>
+                        </Auth>
                     </Space>
                 }
             },
@@ -192,11 +197,13 @@ const AppActionList = (props: {
                                 }>
                                     {t('synchronization permission')}
                                 </Button >,
-                                <Button key="created" type="primary" onClick={() => {
-                                    setModal({ open: true, title: t("create {{field}}", { field: t('permission') }), id: '', })
-                                }}>
-                                    {t("create {{field}}", { field: t('permission') })}
-                                </Button>
+                                <Auth authKey="createAppActions">
+                                    <Button key="created" type="primary" onClick={() => {
+                                        setModal({ open: true, title: t("create {{field}}", { field: t('permission') }), id: '', })
+                                    }}>
+                                        {t("create {{field}}", { field: t('permission') })}
+                                    </Button>
+                                </Auth>
                             ]
                         }}
                         scroll={{ x: 'max-content' }}

@@ -17,6 +17,7 @@ import { assignOrgAppPolicy, revokeOrgAppPolicy } from "@/services/org/policy";
 import ModalOrg from "@/pages/org/components/modalOrg";
 import { getAppPolicyAssignedOrgList } from "@/services/app/org";
 import { useTranslation } from "react-i18next";
+import Auth from "@/components/Auth";
 
 
 export default () => {
@@ -41,10 +42,13 @@ export default () => {
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
-                        <a key="del" onClick={() => onDel(record)}>
-                            {t('disauthorization')}
-                        </a>
+                        <Auth authKey="revokeOrganizationAppPolicy">
+                            <a key="del" onClick={() => onDel(record)}>
+                                {t('disauthorization')}
+                            </a>
+                        </Auth>
                     </Space>
+
                 }
             },
         ],
@@ -134,11 +138,13 @@ export default () => {
                         <span>{t('policy')}：{appPolicyInfo?.name || "-"}</span>
                     </Space>,
                     actions: [
-                        <Button type="primary" onClick={() => {
-                            setModal({ open: true, title: '' })
-                        }} >
-                            {t('add {{field}}', { field: t('organizational authorization') })}
-                        </Button>
+                        <Auth authKey="assignOrganizationAppPolicy">
+                            <Button type="primary" onClick={() => {
+                                setModal({ open: true, title: '' })
+                            }} >
+                                {t('add {{field}}', { field: t('organizational authorization') })}
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

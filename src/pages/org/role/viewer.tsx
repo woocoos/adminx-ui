@@ -7,6 +7,7 @@ import UserList from "@/pages/account/components/listAccount";
 import CreateOrgRole from "../components/createRole";
 import ListRolePermission from "../components/listRolePermission"
 import { useTranslation } from "react-i18next"
+import Auth from "@/components/Auth"
 
 export default () => {
     const { token } = useToken(),
@@ -62,11 +63,13 @@ export default () => {
         >
             <ProCard loading={loading} >
                 <ProDescriptions title={t("Basic information")} column={info?.kind === 'role' ? 2 : 1} extra={
-                    <Button onClick={() => {
-                        setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }), scene: "base" })
-                    }}>
-                        {t('amend')}
-                    </Button>
+                    <Auth authKey="updateRole">
+                        <Button onClick={() => {
+                            setModal({ open: true, title: t("amend {{field}}", { field: t("basic information") }), scene: "base" })
+                        }}>
+                            {t('amend')}
+                        </Button>
+                    </Auth>
                 }>
                     <ProDescriptions.Item label={t('name')}  >
                         {info?.name}

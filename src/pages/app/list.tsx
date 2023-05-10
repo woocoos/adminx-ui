@@ -12,10 +12,12 @@ import defaultApp from "@/assets/images/default-app.png";
 import AppCreate from "./components/create";
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
-import { Link } from "ice";
+import { Link, useAuth } from "ice";
 import { assignOrgApp, getOrgAppList, revokeOrgApp } from "@/services/org/app";
 import ModalApp from "./components/modalApp"
 import { useTranslation } from "react-i18next";
+import Auth, { checkAuth } from "@/components/Auth";
+import { ItemType } from "antd/es/menu/hooks/useItems";
 
 export type AppListRef = {
   getSelect: () => App[]
@@ -31,6 +33,7 @@ const AppList = (props: {
 }, ref: MutableRefObject<AppListRef>) => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    [auth] = useAuth(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<App>[] = [
@@ -67,27 +70,39 @@ const AppList = (props: {
         title: t('operation'), dataIndex: 'actions', fixed: 'right',
         align: 'center', search: false, width: 170,
         render: (text, record) => {
+          const items: ItemType[] = [
+            { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
+            { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
+            { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
+            { key: "resource", label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
+
+          ]
+
+          if (checkAuth('deleteApp', auth)) {
+            items.push(
+              { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
+            )
+          }
+
           return props.scene === 'orgApp' ? <Space>
-            <a onClick={() => {
-              revokeOrg(record)
-            }}>
-              {t('disauthorization')}
-            </a>
+            <Auth authKey="revokeOrganizationApp">
+              <a onClick={() => {
+                revokeOrg(record)
+              }}>
+                {t('disauthorization')}
+              </a>
+            </Auth>
           </Space> : <Space>
-            <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
-              {t('edit')}
-            </Link>
+            <Auth authKey="updateApp">
+              <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
+                {t('edit')}
+              </Link>
+            </Auth>
             <Link key="actions" to={`/app/actions?id=${record.id}`} >
               {t('permission')}
             </Link>
             <Dropdown trigger={['click']} menu={{
-              items: [
-                { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
-                { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
-                { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
-                { key: "resource", label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
-                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
-              ]
+              items
             }} >
               <a><EllipsisOutlined /></a>
             </Dropdown>
@@ -186,11 +201,13 @@ const AppList = (props: {
               toolbar={{
                 title: props?.title || t("{{field}} list", { field: t('app') }),
                 actions: props.scene === 'orgApp' ? [
-                  <Button type="primary" onClick={() => {
-                    setModal({ open: true, title: t("search {{field}}", { field: t("app") }), id: '' })
-                  }}>
-                    {t('Authorized application')}
-                  </Button>
+                  <Auth authKey="assignOrganizationApp">
+                    <Button type="primary" onClick={() => {
+                      setModal({ open: true, title: t("search {{field}}", { field: t("app") }), id: '' })
+                    }}>
+                      {t('Authorized application')}
+                    </Button>
+                  </Auth>
                 ] : []
               }}
               scroll={{ x: 'max-content', y: 300 }}
@@ -243,13 +260,15 @@ const AppList = (props: {
               toolbar={{
                 title: t("{{field}} list", { field: t('app') }),
                 actions: [
-                  <Button key="create" type="primary" onClick={
-                    () => {
-                      setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
-                    }
-                  }>
-                    {t("create {{field}}", { field: t('app') })}
-                  </Button >
+                  <Auth authKey="createApp">
+                    <Button key="create" type="primary" onClick={
+                      () => {
+                        setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
+                      }
+                    }>
+                      {t("create {{field}}", { field: t('app') })}
+                    </Button >
+                  </Auth>
                 ]
               }}
               scroll={{ x: 'max-content' }}

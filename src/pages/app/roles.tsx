@@ -17,11 +17,15 @@ import { AppRole } from "@/services/app/role";
 import { delAppRole, getAppRoleList } from "@/services/app/role";
 import { useTranslation } from "react-i18next";
 import DrawerRolePolicy from "./components/drawerRolePolicy";
+import Auth, { checkAuth } from "@/components/Auth";
+import { ItemType } from "antd/es/menu/hooks/useItems";
+import { useAuth } from "ice";
 
 
 export default () => {
     const { token } = useToken(),
         { t } = useTranslation(),
+        [auth] = useAuth(),
         [searchParams, setSearchParams] = useSearchParams(),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
@@ -46,33 +50,43 @@ export default () => {
                 title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 120,
                 render: (text, record) => {
+                    const items: ItemType[] = []
+                    if (checkAuth('assignAppRolePolicy', auth)) {
+                        items.push(
+                            {
+                                key: "addPolicy", label: <a onClick={() => {
+                                    setModal({
+                                        open: true, title: t("add {{field}}", { field: t('permission') }), id: record.id, roleInfo: record, scene: "addPolicy"
+                                    })
+                                }}>
+                                    {t("add {{field}}", { field: t('permission') })}
+                                </a>
+                            }
+                        )
+                    }
+                    if (checkAuth('deleteAppRole', auth)) {
+                        items.push(
+                            { key: "delete", label: <a onClick={() => onDel(record)}>{t('delete')}</a> }
+                        )
+                    }
                     return <Space>
-                        <a key="editor" onClick={() => {
-                            setModal({
-                                open: true, title: `${t('edit')}:${record.name}`, id: record.id, scene: 'create'
-                            })
-                        }} >
-                            {t('edit')}
-                        </a>
+                        <Auth authKey="updateAppRole">
+                            <a key="editor" onClick={() => {
+                                setModal({
+                                    open: true, title: `${t('edit')}:${record.name}`, id: record.id, scene: 'create'
+                                })
+                            }} >
+                                {t('edit')}
+                            </a>
+                        </Auth>
                         <Link key="sq" to={`/app/role/accredits?id=${record.id}`}>
                             {t('authorization')}
                         </Link>
-                        <Dropdown trigger={['click']} menu={{
-                            items: [
-                                {
-                                    key: "addPolicy", label: <a onClick={() => {
-                                        setModal({
-                                            open: true, title: t("add {{field}}", { field: t('permission') }), id: record.id, roleInfo: record, scene: "addPolicy"
-                                        })
-                                    }}>
-                                        {t("add {{field}}", { field: t('permission') })}
-                                    </a>
-                                },
-                                { key: "delete", label: <a onClick={() => onDel(record)}>{t('delete')}</a> },
-                            ]
+                        {items.length ? <Dropdown trigger={['click']} menu={{
+                            items
                         }} >
                             <a><EllipsisOutlined /></a>
-                        </Dropdown>
+                        </Dropdown> : ''}
                     </Space>
                 }
             },
@@ -176,11 +190,13 @@ export default () => {
                 toolbar={{
                     title: `${t('app')}:${appInfo?.name || "-"}`,
                     actions: [
-                        <Button key="created" type="primary" onClick={() => {
-                            setModal({ open: true, title: t("create {{field}}", { field: t('role') }), id: '', scene: 'create' })
-                        }}>
-                            {t("create {{field}}", { field: t('role') })}
-                        </Button>
+                        <Auth authKey="createAppRole">
+                            <Button key="created" type="primary" onClick={() => {
+                                setModal({ open: true, title: t("create {{field}}", { field: t('role') }), id: '', scene: 'create' })
+                            }}>
+                                {t("create {{field}}", { field: t('role') })}
+                            </Button>
+                        </Auth>
                     ]
                 }}
                 scroll={{ x: 'max-content' }}

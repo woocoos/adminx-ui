@@ -14,6 +14,7 @@ const RuleItem = (props: {
     rule: PolicyRule
     appActions: AppAction[],
     appInfo: App,
+    readonly?: boolean,
     onChange?: (rule: PolicyRule) => void
     onCopy?: () => void
     onDel?: () => void
@@ -44,33 +45,33 @@ const RuleItem = (props: {
             size="small"
             bordered
             title={getTitle()}
-            extra={
-                <>
-                    <Popconfirm
-                        title={t('copy')}
-                        description={`${t('confirm copy')}?`}
-                        onConfirm={() => {
-                            props.onCopy?.()
-                        }}
-                    >
-                        <a>{t('copy')}</a>
-                    </Popconfirm>
-                    <Divider type="vertical" />
-                    <Popconfirm
-                        title={t('delete')}
-                        description={`${t('confirm delete')}?`}
-                        onConfirm={() => {
-                            props.onDel?.()
-                        }}
-                    >
-                        <a>{t('delete')}</a>
-                    </Popconfirm>
-                </>
+            extra={props.readonly ? '' : <>
+                <Popconfirm
+                    title={t('copy')}
+                    description={`${t('confirm copy')}?`}
+                    onConfirm={() => {
+                        props.onCopy?.()
+                    }}
+                >
+                    <a>{t('copy')}</a>
+                </Popconfirm>
+                <Divider type="vertical" />
+                <Popconfirm
+                    title={t('delete')}
+                    description={`${t('confirm delete')}?`}
+                    onConfirm={() => {
+                        props.onDel?.()
+                    }}
+                >
+                    <a>{t('delete')}</a>
+                </Popconfirm>
+            </>
             }>
             <Row >
                 <Col style={rowColStyle}>{t('effect')}</Col>
                 <Col flex="auto">
                     <Radio.Group
+                        disabled={props.readonly}
                         value={props.rule.effect}
                         options={[
                             { label: t('allow'), value: "allow" },
@@ -108,6 +109,7 @@ const RuleItem = (props: {
                     <div x-if={stretch1}>
                         <div>
                             <Radio.Group
+                                disabled={props.readonly}
                                 value={props.rule.actions[0] === `*`}
                                 options={[
                                     { label: `${t('full operation')}(*)`, value: true },
@@ -127,6 +129,7 @@ const RuleItem = (props: {
                             props.rule.actions[0] != `*` ? <>
                                 <br />
                                 <ActionsTransfer
+                                    readonly={props.readonly}
                                     appCode={props.appInfo.code}
                                     targetKeys={props.rule.actions}
                                     dataSource={props.appActions}
@@ -158,6 +161,7 @@ const RuleItem = (props: {
                     <div x-if={stretch2}>
                         <div>
                             <Radio.Group
+                                disabled={props.readonly}
                                 value={props.rule.resources[0] === `*`}
                                 options={[
                                     { label: t('total resources'), value: true },
@@ -178,6 +182,7 @@ const RuleItem = (props: {
                             props.rule.resources[0] != `*` ? <>
                                 <br />
                                 <AppPolicyRes
+                                    readonly={props.readonly}
                                     appInfo={props.appInfo}
                                     values={props.rule.resources}
                                     onChange={(values) => {
@@ -215,6 +220,7 @@ export default (props: {
     appInfo: App,
     rules: PolicyRule[],
     appActions: AppAction[],
+    readonly?: boolean
     onChange?: (rules: PolicyRule[]) => void
 }) => {
     const { t } = useTranslation();
@@ -231,6 +237,7 @@ export default (props: {
                                     <div key={`ruleItemdiv${index}`} >
                                         <RuleItem
                                             key={`ruleItem${index}`}
+                                            readonly={props.readonly}
                                             rule={item}
                                             appInfo={props.appInfo}
                                             appActions={props.appActions}
@@ -251,8 +258,8 @@ export default (props: {
                                     </div>
                                 )
                             }
-
-                            <Button key="add"
+                            {props.readonly ? '' : <Button
+                                key="add"
                                 block
                                 icon={<PlusCircleOutlined />}
                                 size="small"
@@ -266,12 +273,16 @@ export default (props: {
                                     props.onChange?.(props.rules)
                                 }} >
                                 {t('add statement')}
-                            </Button>
+                            </Button>}
+
                         </>
                 },
                 {
                     label: t('script editing'), key: "json", children: <>
                         <Editor
+                            options={{
+                                readOnly: props.readonly
+                            }}
                             className="adminx-editor"
                             height="400px"
                             defaultLanguage="json"

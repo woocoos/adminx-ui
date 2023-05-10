@@ -11,6 +11,7 @@ import { Org, getOrgInfo } from "@/services/org";
 import { PolicyRule } from "@/services/app/policy";
 import { OrgPolicy, createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from "@/services/org/policy";
 import { useTranslation } from "react-i18next";
+import { checkAuth } from "@/components/Auth";
 
 export default () => {
     const { token } = useToken(),
@@ -24,6 +25,15 @@ export default () => {
         policyId = searchParams.get('id')
 
     const
+        isReadonly = () => {
+            if (policyId) {
+                // 编辑
+                return !checkAuth('updateOrganizationPolicy')
+            } else {
+                // 新建
+                return !checkAuth('createOrganizationPolicy')
+            }
+        },
         getBase = async (orgId: string) => {
             const info = await getOrgInfo(orgId)
             if (info?.id) {
@@ -131,7 +141,7 @@ export default () => {
                     layout="vertical"
                     grid
                     formRef={formRef}
-                    submitter={{
+                    submitter={isReadonly() ? false : {
                         searchConfig: {
                             submitText: t('submit'),
                             resetText: t('reset')
@@ -168,6 +178,7 @@ export default () => {
                         {orgInfo?.id ? <PolicyRules
                             orgId={orgInfo?.id}
                             rules={rules}
+                            readonly={isReadonly()}
                             onChange={(rules) => {
                                 setRules([...rules])
                                 onValuesChange()
