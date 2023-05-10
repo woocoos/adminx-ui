@@ -10,7 +10,7 @@ export type AppPolicy = {
     updatedAt: string
     appID: string
     name: string
-    comments: string    
+    comments: string
     autoGrant: boolean
     status: AppPolicyStatus
     rules?: PolicyRule[]
@@ -20,8 +20,8 @@ export type AppPolicy = {
 export type PolicyRule = {
     effect: PolicyRuleEffect
     actions: string[]
-    resources: string[]
-    conditions: string[]
+    resources: string[] | null
+    conditions: string[] | null
 }
 
 export type PolicyRuleEffect = "allow" | "deny"

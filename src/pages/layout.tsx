@@ -27,46 +27,41 @@ export default function Layout() {
   }, [basisState.locale])
 
 
-  return (
+  return ["/login"].includes(location.pathname) ? <Outlet /> :
     <ProConfigProvider
       dark={basisState.darkMode}
     >
-      {
-        ["/login"].includes(location.pathname) ?
-          <Outlet /> :
-          <ProLayout
-            token={{
-              sider: {
-                colorMenuBackground: basisState.darkMode ? "linear-gradient(#141414, #000000 28%)" : token.colorBgContainer
-              }
-            }}
-            className={styles.layout}
-            menu={{
-              locale: true,
-              request: requestMenus
-            }}
-            fixSiderbar
-            logo={<img src={logo} alt="logo" />}
-            title="Adminx"
-            location={{
-              pathname: location.pathname,
-            }}
-            layout="mix"
-            rightContentRender={() => (
-              <>
-                <I18nDropdown />
-                <AvatarDropdown
-                  avatar={defaultAvatar}
-                  name={basisState.user?.displayName || ""}
-                />
-                <DarkMode />
-              </>
-            )}
-            menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
-          >
-            <Outlet />
-          </ProLayout>
-      }
+      <ProLayout
+        token={{
+          sider: {
+            colorMenuBackground: basisState.darkMode ? "linear-gradient(#141414, #000000 28%)" : token.colorBgContainer
+          }
+        }}
+        className={styles.layout}
+        menu={{
+          locale: true,
+          request: requestMenus
+        }}
+        fixSiderbar
+        logo={<img src={logo} alt="logo" />}
+        title="Adminx"
+        location={{
+          pathname: location.pathname,
+        }}
+        layout="mix"
+        rightContentRender={() => (
+          <>
+            <I18nDropdown />
+            <AvatarDropdown
+              avatar={defaultAvatar}
+              name={basisState.user?.displayName || ""}
+            />
+            <DarkMode />
+          </>
+        )}
+        menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
+      >
+        <Outlet />
+      </ProLayout>
     </ProConfigProvider>
-  );
 }

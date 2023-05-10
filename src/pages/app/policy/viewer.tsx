@@ -87,15 +87,13 @@ export default () => {
                         } else {
                             errMsg = t('this {{field}} is required', { field: t('operation') })
                         }
-                        if (item.resources.length) {
-                            if (item.resources[0] != '*') {
+                        if (item.resources) {
+                            if (item.resources.length) {
                                 const resources = item.resources.find(key => key.split(':')[0] != appCode)
                                 if (resources) {
                                     errMsg = t("{{field}} mismatch", { field: t("app code") })
                                 }
                             }
-                        } else {
-                            errMsg = t('this {{field}} is required', { field: t('resources') })
                         }
                         if (errMsg.length) {
                             break;

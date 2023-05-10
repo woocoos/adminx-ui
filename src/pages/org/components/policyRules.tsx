@@ -207,14 +207,14 @@ const RuleItem = (props: {
                     <div x-if={appInfo}>
                         <div>
                             <a>
-                                {props.rule.resources[0] == `${appInfo?.code}:*` ? t('total resources') : t("{{num}} resources", { num: props.rule.resources.length })}
+                                {props.rule.resources ? t("{{num}} resources", { num: props.rule.resources.length }) : t('total resources')}
                             </a>
                         </div>
                         <div x-if={stretch2}>
                             <div>
                                 <Radio.Group
                                     disabled={props.readonly}
-                                    value={props.rule.resources[0] == `${appInfo?.code}:*`}
+                                    value={!props.rule.resources}
                                     options={[
                                         { label: t('total resources'), value: true },
                                         { label: t('specify'), value: false },
@@ -222,7 +222,7 @@ const RuleItem = (props: {
                                     onChange={(e) => {
                                         const nRule = { ...props.rule }
                                         if (e.target.value) {
-                                            nRule.resources = [`${appInfo?.code}:*`]
+                                            nRule.resources = null
                                         } else {
                                             nRule.resources = []
                                         }
@@ -231,7 +231,7 @@ const RuleItem = (props: {
                                 />
                             </div>
                             {
-                                props.rule.resources[0] != `${appInfo?.code}:*` && appInfo ? <>
+                                props.rule.resources && appInfo ? <>
                                     <br />
                                     <AppPolicyRes
                                         readonly={props.readonly}
@@ -323,8 +323,8 @@ export default (props: {
                                         props.rules.push({
                                             effect: 'allow',
                                             actions: [],
-                                            resources: [],
-                                            conditions: [],
+                                            resources: null,
+                                            conditions: null,
                                         })
                                         props.onChange?.(props.rules)
                                     }} >
