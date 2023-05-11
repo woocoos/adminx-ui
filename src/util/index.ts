@@ -1,3 +1,5 @@
+import { TreeDataState, TreeMoveAction } from "@/services/graphql"
+import { EventDataNode } from "antd/es/tree"
 import CryptoJS from "crypto-js"
 import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
@@ -144,4 +146,51 @@ export const randomId = (len: number) => {
     var rdmString = '';
     for (; rdmString.length < len; rdmString += Math.random().toString(36).substr(2));
     return rdmString.substr(0, len)
+}
+
+
+
+
+export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) => {
+    const dragTreeData = JSON.parse(JSON.stringify(treeData));
+
+    let dragObj: TreeDataState<T>,
+        action: TreeMoveAction = "child",
+        sourceId: string = "",
+        targetId: string = "";
+    loopTreeData<TreeDataState<T>>(dragTreeData, dragInfo.dragNode.key, (item, i, pArr) => {
+        pArr.splice(i, 1);
+        sourceId = item.key
+        dragObj = item
+    })
+    if (!dragInfo.dropToGap) {
+        // 直接插入第一个子节点
+        loopTreeData<TreeDataState<T>>(dragTreeData, dragInfo.node.key, (item) => {
+            item.children = item.children || []
+            if (item.children.length) {
+                targetId = item.children[0].key
+                action = "up"
+            } else {
+                targetId = item.key
+                action = 'child'
+            }
+            item.children.unshift(dragObj)
+        })
+    } else {
+        loopTreeData(dragTreeData, dragInfo.node.key, (_item, i, arr) => {
+            if (dragInfo.dropPosition === -1) {
+                targetId = arr[0].key
+                action = "up"
+                arr.splice(0, 0, dragObj)
+            } else {
+                targetId = arr[i].key
+                action = "down"
+                arr.splice(dragInfo.dropPosition, 0, dragObj)
+            }
+        });
+    }
+
+    return {
+        sourceId, targetId, action, newTreeData: dragTreeData
+    }
 }

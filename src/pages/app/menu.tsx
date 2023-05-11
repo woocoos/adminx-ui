@@ -11,8 +11,8 @@ import {
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import { useEffect, useState, useRef, ReactNode } from "react";
-import { formatTreeData, loopTreeData } from "@/util";
-import { TreeMoveAction } from "@/services/graphql";
+import { formatTreeData, getTreeDropData, loopTreeData } from "@/util";
+import { TreeDataState, TreeMoveAction } from "@/services/graphql";
 import { TreeEditorAction } from "@/util/type";
 import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from "@/services/app/menu";
 import { App } from "@/services/app";
@@ -24,13 +24,7 @@ import { ItemType } from "antd/es/menu/hooks/useItems";
 import { useAuth } from "ice";
 
 
-type TreeDataState = {
-    key: string
-    title: string | ReactNode
-    children?: TreeDataState[]
-    parentId: string
-    node?: AppMenu
-}
+
 type TreeSelectedData = {
     keys: Array<string>
     action: TreeEditorAction
@@ -48,7 +42,7 @@ export default () => {
         [treeDraggable, setTreeDraggable] = useState(false),
         [appInfo, setAppInfo] = useState<App>(),
         [menus, setMenus] = useState<AppMenu[]>([]),
-        [treeData, setTreeData] = useState<TreeDataState[]>([]),
+        [treeData, setTreeData] = useState<TreeDataState<AppMenu>[]>([]),
         [selectedTree, setSelectedTree] = useState<TreeSelectedData>({
             keys: [],
             info: undefined,
@@ -65,7 +59,7 @@ export default () => {
         })
 
     const
-        customerTitleRender = (nodeData: TreeDataState) => {
+        customerTitleRender = (nodeData: TreeDataState<AppMenu>) => {
             const items: ItemType[] = []
             if (checkAuth('createAppMenus', auth)) {
                 items.push({
@@ -178,50 +172,10 @@ export default () => {
             }
         },
         onTreeDrop = async (dragInfo) => {
-            // 深拷贝
-            const dragTreeData = JSON.parse(JSON.stringify(treeData));
-            let dragObj: TreeDataState,
-                action: TreeMoveAction = "child",
-                sourceId: string = "",
-                targetId: string = "";
-            loopTreeData<TreeDataState>(dragTreeData, dragInfo.dragNode.key, (item, i, pArr) => {
-                pArr.splice(i, 1);
-                sourceId = item.key
-                dragObj = item
-            })
-            if (!dragInfo.dropToGap) {
-                // 直接插入第一个子节点
-                loopTreeData<TreeDataState>(dragTreeData, dragInfo.node.key, (item) => {
-                    item.children = item.children || []
-                    if (item.children.length) {
-                        targetId = item.children[0].key
-                        action = "up"
-                    } else {
-                        targetId = item.key
-                        action = 'child'
-                    }
-                    item.children.unshift(dragObj)
-                })
-            } else {
-                loopTreeData(dragTreeData, dragInfo.node.key, (_item, i, arr) => {
-                    if (dragInfo.dropPosition === -1) {
-                        targetId = arr[0].key
-                        action = "up"
-                        arr.splice(0, 0, dragObj)
-                    } else {
-                        targetId = arr[i].key
-                        action = "down"
-                        arr.splice(dragInfo.dropPosition, 0, dragObj)
-                    }
-                });
-            }
+            const { sourceId, targetId, action, newTreeData } = getTreeDropData(treeData, dragInfo)
 
-            // 传给后端数据效果
-            // console.log(sourceId, targetId, action)
             await moveAppMenu(sourceId, targetId, action);
             await getMenusRequest();
-            // 前端拖拽效果
-            // setTreeData(dragTreeData)
         },
         onDelMenu = (menuInfo: AppMenu) => {
             Modal.confirm({

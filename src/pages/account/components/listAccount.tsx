@@ -76,7 +76,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     columns.push(
       {
         title: t('operation'), dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 180,
+        align: 'center', search: false, width: 100,
         render: (text, record) => {
           const items: ItemType[] = []
 
@@ -264,7 +264,6 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       {
         ["modal", "orgUser", "roleUser"].includes(props?.scene || '') ? (
           <ProTable
-            className="innerTable"
             actionRef={proTableRef}
             search={{
               searchText: `${t('query')}`,

@@ -1,6 +1,7 @@
 import { firstUpper } from '@/util';
 import { SortOrder } from 'antd/lib/table/interface';
 import { request } from 'ice';
+import { ReactNode } from 'react';
 
 export interface OrderBy {
   direction: "ASC" | "DESC"
@@ -57,6 +58,14 @@ export interface PagingParams {
 }
 
 export type TreeMoveAction = "child" | "up" | "down"
+
+export type TreeDataState<T> = {
+  key: string
+  title: string | ReactNode
+  children?: TreeDataState<T>[]
+  parentId: string
+  node?: T
+}
 
 export interface TablePage {
   pageSize?: number
