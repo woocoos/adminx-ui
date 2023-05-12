@@ -1,3 +1,4 @@
+import { setLeavePromptWhen } from "@/components/LeavePrompt"
 import { unbindMfa } from "@/services/basis"
 import { User } from "@/services/user"
 import { ModalForm, ProFormText } from "@ant-design/pro-components"
@@ -14,6 +15,8 @@ export default (props: {
     const { t } = useTranslation(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
+        
+    setLeavePromptWhen(saveDisabled)
 
     const onFinish = async (values) => {
         setSaveLoading(true)

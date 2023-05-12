@@ -10,6 +10,7 @@ import { Card, message } from "antd";
 import store from "@/store";
 import { updatePassword } from "@/services/user";
 import { useTranslation } from "react-i18next";
+import { setLeavePromptWhen } from "@/components/LeavePrompt";
 
 type FormValues = { oldPwd: string, newPwd: string, reNewPwd: string }
 
@@ -21,6 +22,7 @@ export default () => {
     [saveDisabled, setSaveDisabled] = useState(true),
     [, basisDispatcher] = store.useModel("basis");
 
+  setLeavePromptWhen(saveDisabled)
 
   const
     getRequest = async () => {

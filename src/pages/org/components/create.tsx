@@ -1,3 +1,4 @@
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import InputAccount from '@/pages/account/components/inputAccount';
 import { Org, OrgKind, createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';
 import { User } from '@/services/user';
@@ -34,6 +35,8 @@ export default (props: {
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
         [owner, setOwner] = useState<User>()
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         parentRequest = async () => {

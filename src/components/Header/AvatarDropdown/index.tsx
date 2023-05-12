@@ -6,6 +6,7 @@ import styles from "./index.module.css";
 import { logout } from "@/services/basis";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
+import { checkLave } from "@/components/LeavePrompt";
 
 interface AvatarDropdownProps {
   name: string;
@@ -19,9 +20,11 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
   const onMenuClick = useCallback((event: MenuInfo) => {
     const { key } = event;
     if (key === "logout") {
-      // 即使退出接口异常前端也需要直接退出掉所以不需要同步处理
-      logout();
-      basisDispatcher.logout()
+      checkLave(() => {
+        // 即使退出接口异常前端也需要直接退出掉所以不需要同步处理
+        logout();
+        basisDispatcher.logout()
+      })
     }
   }, []);
 

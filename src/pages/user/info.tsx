@@ -10,6 +10,7 @@ import { Card, message } from "antd";
 import { User, getUserInfo, updateUserInfo } from "@/services/user";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 
 export default () => {
   const
@@ -18,6 +19,8 @@ export default () => {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [basisState, basisDispatcher] = store.useModel("basis");
+
+  setLeavePromptWhen(saveDisabled)
 
   const
     getRequest = async () => {

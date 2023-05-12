@@ -22,6 +22,7 @@ import { useSearchParams } from "@ice/runtime";
 import Auth, { checkAuth } from "@/components/Auth";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { useAuth } from "ice";
+import { setLeavePromptWhen } from "@/components/LeavePrompt";
 
 
 
@@ -57,6 +58,8 @@ export default () => {
         }>({
             open: false
         })
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         customerTitleRender = (nodeData: TreeDataState<AppMenu>) => {

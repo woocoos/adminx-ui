@@ -1,3 +1,4 @@
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { getOrgInfo } from '@/services/org';
 import { UpdateUserInfoScene, User, UserLoginProfile, UserLoginProfileSetKind, UserType, createUserInfo, getUserInfo, updateUserInfo, updateUserProfile } from '@/services/user';
 import store from '@/store';
@@ -28,6 +29,8 @@ export default (props: {
         [domain, setDomain] = useState<string>(''),
         [setKind, setSetKind] = useState<UserLoginProfileSetKind>('auto'),
         [basisState] = store.useModel("basis")
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         getBase = async () => {

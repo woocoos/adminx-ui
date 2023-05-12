@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next"
 import { MfaPrepare, bindMfa, bindPrepareMfa } from "@/services/basis"
 import { clearInterval } from "timers"
 import { User, getUserInfo } from "@/services/user"
+import { setLeavePromptWhen } from "@/components/LeavePrompt"
 
 export default () => {
 
@@ -23,7 +24,7 @@ export default () => {
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
 
-
+    setLeavePromptWhen(saveDisabled)
 
     const
         getRequest = async () => {

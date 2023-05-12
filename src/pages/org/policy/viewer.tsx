@@ -13,6 +13,7 @@ import { OrgPolicy, createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from "@
 import { useTranslation } from "react-i18next";
 import { checkAuth } from "@/components/Auth";
 import { useAuth } from "ice";
+import { setLeavePromptWhen } from "@/components/LeavePrompt";
 
 export default () => {
     const { token } = useToken(),
@@ -25,6 +26,8 @@ export default () => {
         [orgInfo, setOrgInfo] = useState<Org>(),
         [rules, setRules] = useState<PolicyRule[]>([]),
         policyId = searchParams.get('id')
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         isReadonly = () => {

@@ -6,6 +6,7 @@ import { OrgRole, OrgRoleKind, assignOrgRoleUser, getOrgGroupList, getOrgRoleLis
 import { useTranslation } from 'react-i18next';
 import { User } from '@/services/user';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 
 export default (props: {
     open: boolean
@@ -28,6 +29,8 @@ export default (props: {
         [keyword, setKeyword] = useState<string>(),
         [selectedDatas, setSelectedDatas] = useState<OrgRole[]>([]),
         [dataSource, setdataSource] = useState<OrgRole[]>([])
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {

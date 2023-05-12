@@ -15,6 +15,7 @@ import { App, getAppInfo } from "@/services/app";
 import { useTranslation } from "react-i18next";
 import { checkAuth } from "@/components/Auth";
 import { useAuth } from "ice";
+import { setLeavePromptWhen } from "@/components/LeavePrompt";
 
 export default () => {
     const { token } = useToken(),
@@ -28,6 +29,8 @@ export default () => {
         [rules, setRules] = useState<PolicyRule[]>([]),
         [appActions, setAppActions] = useState<AppAction[]>([]),
         policyId = searchParams.get('id')
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         isReadonly = () => {

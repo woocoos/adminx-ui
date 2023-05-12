@@ -1,3 +1,4 @@
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import InputAccount from '@/pages/account/components/inputAccount';
 import { OrgRole, OrgRoleKind, createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/org/role';
 import { User } from '@/services/user';
@@ -22,6 +23,8 @@ export default (props: {
         { t } = useTranslation(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         onOpenChange = (open: boolean) => {

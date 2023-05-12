@@ -9,6 +9,7 @@ import { OrgRole, assignOrgRoleUser } from '@/services/org/role';
 import { allotOrgUser, getOrgUserList } from '@/services/org/user';
 import { Org } from '@/services/org';
 import { getDate } from '@/util';
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 
 export default (props: {
     open: boolean
@@ -32,6 +33,8 @@ export default (props: {
         [keyword, setKeyword] = useState<string>(),
         [selectedDatas, setSelectedDatas] = useState<User[]>([]),
         [dataSource, setdataSource] = useState<User[]>([])
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
@@ -87,7 +90,7 @@ export default (props: {
 
 
     return (
-        <DrawerForm            
+        <DrawerForm
             title={props.title}
             open={props.open}
             submitter={{

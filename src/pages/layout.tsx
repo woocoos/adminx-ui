@@ -8,9 +8,10 @@ import DarkMode from "@/components/Header/DarkMode";
 import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
 import defaultAvatar from "@/assets/images/default-avatar.png";
-import { Link, Outlet } from "@ice/runtime";
+import { Outlet } from "@ice/runtime";
 import i18n from "@/i18n";
 import { ProConfigProvider, useToken } from "@ant-design/pro-components";
+import LeavePrompt, { Link } from "@/components/LeavePrompt";
 
 
 export default function Layout() {
@@ -31,6 +32,7 @@ export default function Layout() {
     <ProConfigProvider
       dark={basisState.darkMode}
     >
+      <LeavePrompt />
       <ProLayout
         token={{
           sider: {

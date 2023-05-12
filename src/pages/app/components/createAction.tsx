@@ -1,3 +1,4 @@
+import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { AppAction, EnumAppActionKind, EnumAppActionMethod, createAppAction, getAppActionInfo, updateAppAction } from '@/services/app/action';
 import {
     DrawerForm,
@@ -19,6 +20,8 @@ export default (props: {
     const { t } = useTranslation(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         onOpenChange = (open: boolean) => {

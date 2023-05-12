@@ -2,6 +2,7 @@ import { ModalForm, ProForm, ProFormInstance, ProFormText, } from '@ant-design/p
 import { Checkbox, Col, Modal, Row } from 'antd';
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from 'react-i18next';
+import { setLeavePromptWhen } from '../LeavePrompt';
 
 export default (props: {
     open: boolean
@@ -20,6 +21,8 @@ export default (props: {
             [key: string]: string
         }>({}),
         [newArn, setNewArn] = useState<string>('');
+
+    setLeavePromptWhen(saveDisabled)
 
     const
         getRequest = async () => {
