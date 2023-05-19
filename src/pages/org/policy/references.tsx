@@ -123,6 +123,7 @@ export default () => {
                     search={{
                         searchText: `${t('query')}`,
                         resetText: `${t('reset')}`,
+                        labelWidth: 'auto',
                     }}
                     rowKey={"id"}
                     toolbar={{

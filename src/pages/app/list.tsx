@@ -197,6 +197,7 @@ const AppList = (props: {
               search={{
                 searchText: `${t('query')}`,
                 resetText: `${t('reset')}`,
+                labelWidth: 'auto',
               }}
               toolbar={{
                 title: props?.title || t("{{field}} list", { field: t('app') }),
@@ -256,6 +257,7 @@ const AppList = (props: {
               search={{
                 searchText: `${t('query')}`,
                 resetText: `${t('reset')}`,
+                labelWidth: 'auto',
               }}
               toolbar={{
                 title: t("{{field}} list", { field: t('app') }),

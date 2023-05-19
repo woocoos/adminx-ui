@@ -116,35 +116,14 @@ export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<"app">
 export async function createAppPolicy(appId: string, input: AppPolicy | Record<string, any>) {
     const result = await graphqlApi(
         `#graphql
-        mutation createAppPolicies($input: [CreateAppPolicyInput!]){
-          action:createAppPolicies(appID:"${appId}",input:$input){
+        mutation createAppPolicy($input: CreateAppPolicyInput!){
+          action:createAppPolicy(appID:"${appId}",input:$input){
             ${AppPolicyField}
           }
-        }`, { input: [input] })
+        }`, { input: input })
 
-    if (result?.data?.action?.[0]?.id) {
-        return result.data.action[0] as AppPolicy
-    } else {
-        return null
-    }
-}
-
-/**
- * 创建
- * @param input 
- * @returns 
- */
-export async function createAppPolicies(appId: string, input: Array<AppPolicy | Record<string, any>>) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation createAppPolicies($input: [CreateAppPolicyInput!]){
-          action:createAppPolicies(appID:"${appId}",input:$input){
-            ${AppPolicyField}
-          }
-        }`, { input: setClearInputField(input) })
-
-    if (result?.data?.action?.length) {
-        return result.data.action as AppPolicy[]
+    if (result?.data?.action?.id) {
+        return result.data.action as AppPolicy
     } else {
         return null
     }

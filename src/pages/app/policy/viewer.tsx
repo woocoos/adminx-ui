@@ -39,7 +39,7 @@ export default () => {
                 return !checkAuth('updateAppPolicy', auth)
             } else {
                 // 新建
-                return !checkAuth('createAppPolicies', auth)
+                return !checkAuth('createAppPolicy', auth)
             }
         },
         getBase = async (appId: string) => {

@@ -106,7 +106,7 @@ export default () => {
                     </Auth>
             }}
         >
-            <Row gutter={26} wrap={false}>
+            <Row gutter={16} wrap={false}>
                 <Col flex="280px" >
                     <div style={{ background: token.colorBgContainer, height: "100%" }}>
                         <ProCard title={

@@ -268,6 +268,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             search={{
               searchText: `${t('query')}`,
               resetText: `${t('reset')}`,
+              labelWidth: 'auto',
             }}
             rowKey={"id"}
             toolbar={{
@@ -325,6 +326,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               search={{
                 searchText: `${t('query')}`,
                 resetText: `${t('reset')}`,
+                labelWidth: 'auto',
               }}
               rowKey={"id"}
               toolbar={{

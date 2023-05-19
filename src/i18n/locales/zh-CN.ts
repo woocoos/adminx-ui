@@ -98,8 +98,9 @@ export default {
         "manage account": "管理账户",
         "Management system": "管理系统",
         "worktable": "工作台",
-        "organizational department management": "组织部门管理",
-        "organizational user management": "组织用户管理",
+        "organizational management": "组织管理",
+        "organizational department management": "部门管理",
+        "organizational user management": "用户管理",
         "organizational branch tree": "组织部门树",
         "organizational tree": "组织树",
 

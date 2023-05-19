@@ -125,6 +125,7 @@ export default () => {
                 search={{
                     searchText: `${t('query')}`,
                     resetText: `${t('reset')}`,
+                    labelWidth: 'auto',
                 }}
                 toolbar={{
                     title: `${t('app')}:${appInfo?.name || "-"}`,

@@ -186,6 +186,7 @@ const OrgRoleList = (props: {
                     search={{
                         searchText: `${t('query')}`,
                         resetText: `${t('reset')}`,
+                        labelWidth: 'auto',
                     }}
                     rowKey={"id"}
                     toolbar={{
@@ -235,6 +236,7 @@ const OrgRoleList = (props: {
                         search={{
                             searchText: `${t('query')}`,
                             resetText: `${t('reset')}`,
+                            labelWidth: 'auto',
                         }}
                         rowKey={"id"}
                         toolbar={{

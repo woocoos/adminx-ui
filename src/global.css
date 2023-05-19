@@ -12,10 +12,10 @@ body{
 .ant-pro-layout-content 
 .ant-pro-page-container 
 .ant-pro-page-container-children-content {
-  padding-block: 24px;
-  padding-inline: 24px;
+  padding-block: 16px;
+  padding-inline: 16px;
 }
 .ant-pro-page-container .ant-pro-page-container-warp-page-header {
-  padding-inline-start: 24px;
-  padding-inline-end: 24px;
+  padding-inline-start: 16px;
+  padding-inline-end: 16px;
 }

@@ -173,6 +173,7 @@ export default (props: {
                 search={{
                     searchText: `${t('query')}`,
                     resetText: `${t('reset')}`,
+                    labelWidth: 'auto',
                 }}
                 toolbar={{
                     title: t("{{field}} list", { field: t('policy') }),

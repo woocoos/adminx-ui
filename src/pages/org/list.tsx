@@ -245,9 +245,10 @@ const OrgList = (props: {
             search={props.appId ? {
               searchText: `${t('query')}`,
               resetText: `${t('reset')}`,
+              labelWidth: 'auto',
             } : false}
             toolbar={{
-              title: props?.title || (kind === 'org' ? t('organizational branch tree') : t('organizational tree'))
+              title: props?.title || (kind === 'org' ? t('organizational department management') : t('organizational management'))
             }}
             expandable={{
               expandedRowKeys: expandedRowKeys,
@@ -286,7 +287,7 @@ const OrgList = (props: {
               rowKey={"id"}
               search={false}
               toolbar={{
-                title: kind === 'org' ? t('organizational branch tree') : t('organizational tree'),
+                title: kind === 'org' ? t('organizational department management') : t('organizational management'),
                 actions: kind == 'org' ? [] : [
                   <Auth authKey={kind === 'root' ? "createRoot" : "createOrganization"}>
                     <Button

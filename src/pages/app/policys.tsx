@@ -145,11 +145,12 @@ export default () => {
                 search={{
                     searchText: `${t('query')}`,
                     resetText: `${t('reset')}`,
+                    labelWidth: 'auto',
                 }}
                 toolbar={{
                     title: `${t('app')}:${appInfo?.name || "-"}`,
                     actions: [
-                        <Auth authKey="createAppPolicies">
+                        <Auth authKey="createAppPolicy">
                             <Button key="created" type="primary">
                                 <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
                                     {t("create {{field}}", { field: t('policy') })}

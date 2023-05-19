@@ -152,6 +152,7 @@ const AppActionList = (props: {
                     search={{
                         searchText: `${t('query')}`,
                         resetText: `${t('reset')}`,
+                        labelWidth: 'auto',
                     }}
                     toolbar={{
                         title: props?.title || `${t('app')}:${appInfo?.name || "-"}`
@@ -185,6 +186,7 @@ const AppActionList = (props: {
                         search={{
                             searchText: `${t('query')}`,
                             resetText: `${t('reset')}`,
+                            labelWidth: 'auto',
                         }}
                         rowKey={"id"}
                         toolbar={{

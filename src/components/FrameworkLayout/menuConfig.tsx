@@ -34,12 +34,12 @@ const asideMenuConfig: MenuDataItem[] = [
     icon: <TeamOutlined />,
     children: [
       {
-        name: "组织部门管理",
+        name: "部门管理",
         path: "/org/departments",
         framework: true,
       },
       {
-        name: "组织用户管理",
+        name: "用户管理",
         path: "/org/users",
         framework: true,
       },
