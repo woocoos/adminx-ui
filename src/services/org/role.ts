@@ -11,7 +11,8 @@ export type OrgRole = {
     kind: OrgRoleKind
     name: string
     comments: string
-    isAppRole: boolean
+    isAppRole: boolean,
+    isGrantUser?: boolean
 }
 
 /**
@@ -31,7 +32,9 @@ export const OrgRoleNodeField = `#graphql
  * @param sort 
  * @returns 
  */
-export async function getOrgGroupList(params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getOrgGroupList(params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    userId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
@@ -41,6 +44,7 @@ export async function getOrgGroupList(params: TableParams, filter: TableFilter, 
                     edges{                                        
                         cursor,node{                    
                             ${OrgRoleNodeField}
+                            ${isGrant?.userId ? `isGrantUser(userID: "${isGrant.userId}")` : ''}
                         }
                     }
                 }
@@ -104,7 +108,9 @@ export async function getUserJoinGroupList(userId: string, params: TableParams, 
  * @param sort 
  * @returns 
  */
-export async function getOrgRoleList(params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getOrgRoleList(params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    userId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
@@ -114,6 +120,7 @@ export async function getOrgRoleList(params: TableParams, filter: TableFilter, s
                     edges{                                        
                         cursor,node{                    
                             ${OrgRoleNodeField}
+                            ${isGrant?.userId ? `isGrantUser(userID: "${isGrant.userId}")` : ''}
                         }
                     }
                 }

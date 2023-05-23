@@ -130,7 +130,6 @@ const RuleItem = (props: {
                                 <br />
                                 <ActionsTransfer
                                     readonly={props.readonly}
-                                    appCode={props.appInfo.code}
                                     targetKeys={props.rule.actions}
                                     dataSource={props.appActions}
                                     onChange={(values) => {

@@ -11,6 +11,7 @@ import { getOrgUserQty } from '@/services/org/user';
 import { getOrgGroupQty, getOrgRoleQty } from '@/services/org/role';
 import { getOrgPolicyQty } from '@/services/org/policy';
 import { getOrgAppList } from '@/services/org/app';
+import { Link } from '@ice/runtime';
 
 export default () => {
   const { token } = useToken(),
@@ -68,16 +69,24 @@ export default () => {
     >
       <ProCard title={t('Basic data')} direction="row">
         <ProCard>
-          <Statistic title={t('user')} value={userQty} />
+          <Statistic title={t('user')} value={userQty} formatter={(value) => <Link to="/org/users">
+            {value}
+          </Link>} />
         </ProCard>
         <ProCard>
-          <Statistic title={t('user group')} value={userGroupQty} />
+          <Statistic title={t('user group')} value={userGroupQty} formatter={(value) => <Link to="/org/groups">
+            {value}
+          </Link>} />
         </ProCard>
         <ProCard>
-          <Statistic title={t('role')} value={roleQty} />
+          <Statistic title={t('role')} value={roleQty} formatter={(value) => <Link to="/org/roles">
+            {value}
+          </Link>} />
         </ProCard>
         <ProCard>
-          <Statistic title={t('Custom policy')} value={policyQty} />
+          <Statistic title={t('Custom policy')} value={policyQty} formatter={(value) => <Link to="/org/policys">
+            {value}
+          </Link>} />
         </ProCard>
       </ProCard>
       <br />

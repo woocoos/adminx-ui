@@ -54,13 +54,9 @@ export default () => {
                     if (checkAuth('assignAppRolePolicy', auth)) {
                         items.push(
                             {
-                                key: "addPolicy", label: <a onClick={() => {
-                                    setModal({
-                                        open: true, title: t("add {{field}}", { field: t('permission') }), id: record.id, roleInfo: record, scene: "addPolicy"
-                                    })
-                                }}>
-                                    {t("add {{field}}", { field: t('permission') })}
-                                </a>
+                                key: "policy", label: <Link to={`/app/role/policys?id=${record.id}`}>
+                                    {t('permission')}
+                                </Link>
                             }
                         )
                     }

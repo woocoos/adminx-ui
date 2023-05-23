@@ -39,7 +39,7 @@ export default (props: {
             }
             params.status = 'active'
             if (props.appInfo) {
-                const result = await getAppPolicyList(props.appInfo.id, params, filter, sort)
+                const result = await getAppPolicyList(props.appInfo.id, params, filter, sort, { appRoleId: props.roleInfo?.id })
                 if (result?.length) {
                     table.data = result
                     table.total = result.length
@@ -138,6 +138,9 @@ export default (props: {
                                     setSelectedDatas([...oldDatas, ...newDatas])
                                     setSaveDisabled(false)
                                 },
+                                getCheckboxProps: (record) => ({
+                                    disabled: record.isGrantAppRole
+                                }),
                                 type: "checkbox"
                             }}
                         />

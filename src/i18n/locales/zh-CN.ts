@@ -151,6 +151,7 @@ export default {
         "organizational authorization": "组织授权",
         "authorized organization": "授权组织",
         "Application role authorization": "应用角色授权",
+        "Application role permissions": "应用角色权限",
         "If a role is authorized to an organization, the organization has the application rights of the role": "角色授权给组织，组织就拥有了对应角色的应用权限",
         "Application permission": "应用权限",
         "synchronization permission": "同步权限",

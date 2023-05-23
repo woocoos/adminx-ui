@@ -1,6 +1,7 @@
 import { gid } from "@/util"
 import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from "../graphql"
 import { App, AppNodeField } from "../app"
+import { AppAction, AppActionField } from "../app/action"
 
 
 /**
@@ -82,6 +83,29 @@ export async function revokeOrgApp(orgId: string, appId: string) {
 
     if (result?.data?.action) {
         return result?.data?.action as boolean
+    } else {
+        return null
+    }
+}
+
+
+/**
+ * 组织下的应用授权权限
+ * @param appCode
+ * @returns 
+ */
+export async function getOrgAppActionList(appCode: string) {
+    const result = await graphqlApi(
+        `#graphql
+        query orgAppActions{
+            list:orgAppActions(appCode: "${appCode}"){
+                ${AppActionField}
+            }                    
+        }`
+    )
+
+    if (result?.data?.list) {
+        return result.data.list as AppAction[]
     } else {
         return null
     }

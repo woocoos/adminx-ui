@@ -171,7 +171,7 @@ export default () => {
                             { required: true, message: `${t("Please enter {{field}}", { field: t('name') })}`, },
                         ]}
                     />
-                    <ProFormTextArea
+                    <ProFormText
                         colProps={{ md: 12 }}
                         name="comments"
                         label={t('remarks')}

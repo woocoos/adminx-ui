@@ -17,6 +17,7 @@ export type AppResItem = {
 
 export default (props: {
     appInfo: App
+    isShowAppCode?: boolean
     orgId?: string
     values?: string[]
     readonly?: boolean
@@ -43,7 +44,7 @@ export default (props: {
             if (result) {
                 setDataSource(
                     result.edges.map(item => {
-                        const arn = `${props.appInfo.code}${item.node.arnPattern}`,
+                        const arn = props.isShowAppCode ? `${props.appInfo.code}${item.node.arnPattern}` : item.node.arnPattern,
                             arnParams = arn.split(':').filter(sItem => sItem.indexOf('/') > -1).map(sItem => sItem.split('/')[0])
 
                         return {

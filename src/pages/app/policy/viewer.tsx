@@ -80,23 +80,8 @@ export default () => {
                 if (rules.length) {
                     for (let i in rules) {
                         const item = rules[i];
-                        if (item.actions.length) {
-                            if (item.actions[0] != '*') {
-                                const action = item.actions.find(key => key.split(':')[0] != appCode)
-                                if (action) {
-                                    errMsg = t("{{field}} mismatch", { field: t("app code") })
-                                }
-                            }
-                        } else {
+                        if (!item.actions.length) {
                             errMsg = t('this {{field}} is required', { field: t('operation') })
-                        }
-                        if (item.resources) {
-                            if (item.resources.length) {
-                                const resources = item.resources.find(key => key.split(':')[0] != appCode)
-                                if (resources) {
-                                    errMsg = t("{{field}} mismatch", { field: t("app code") })
-                                }
-                            }
                         }
                         if (errMsg.length) {
                             break;
@@ -117,6 +102,7 @@ export default () => {
             }
             let result: AppPolicy | null = null;
             setSaveLoading(true)
+            values.status = 'active';
             if (policyId) {
                 values.rules = rules
                 result = await updateAppPolicy(policyId, values)
@@ -185,24 +171,16 @@ export default () => {
                             { required: true, message: `${t("Please enter {{field}}", { field: t('name') })}`, },
                         ]}
                     />
-                    <ProFormSelect
-                        colProps={{ md: 6 }}
-                        name="status"
-                        label={t('status')}
-                        valueEnum={EnumAppPolicyStatus}
+                    <ProFormText
+                        colProps={{ md: 12 }}
+                        name="comments"
+                        label={t('remarks')}
+                        placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
                     />
                     <ProFormSwitch
                         colProps={{ md: 6 }}
                         name="autoGrant"
                         label={t('auto grant')} />
-                    <ProFormText>
-                        <ProFormTextArea
-                            colProps={{ md: 12 }}
-                            name="comments"
-                            label={t('remarks')}
-                            placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
-                        />
-                    </ProFormText>
                     <ProFormText>
                         {appInfo ? <PolicyRules
                             rules={rules}

@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 export default function (props: {
     targetKeys: string[]
     dataSource: AppAction[]
-    appCode: string
+    appCode?: string
     titles?: [string, string]
     readonly?: boolean
     onChange?: (targetKeys: string[]) => void
@@ -87,15 +87,15 @@ export default function (props: {
                     >
                         <div style={{ overflow: 'auto', height: '342px' }}>
                             {
-                                props.dataSource.filter(item => props.targetKeys.includes(`${props.appCode}:${item.name}`)).map(item => (
+                                props.dataSource.filter(item => props.targetKeys.includes(props.appCode ? `${props.appCode}:${item.name}` : item.name)).map(item => (
                                     <Row className="actionsTransfer-listRow" key={`select${item.id}`}>
                                         <Col flex="auto">
-                                            <div>{props.appCode}:{item.name}</div>
+                                            <div>{props.appCode ? `${props.appCode}:${item.name}` : item.name}</div>
                                             <div>{item.comments}</div>
                                         </Col>
                                         <Col style={{ display: "flex", justifyContent: 'center' }}>
                                             {props.readonly ? '' : <CloseOutlined className="delIcon" onClick={() => {
-                                                props.onChange?.([...props.targetKeys.filter(key => key != `${props.appCode}:${item.name}`)])
+                                                props.onChange?.([...props.targetKeys.filter(key => key != props.appCode ? `${props.appCode}:${item.name}` : item.name)])
                                             }} />
                                             }
                                         </Col>

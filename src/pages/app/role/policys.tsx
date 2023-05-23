@@ -12,11 +12,12 @@ import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "@ice/runtime";
 import { Org } from "@/services/org";
 import ModalOrg from "@/pages/org/components/modalOrg";
-import { getAppRoleAssignedOrgList } from "@/services/app/org";
-import { AppRole, getAppRoleInfo } from "@/services/app/role";
+import { AppRole, getAppRoleInfo, revokeAppRolePolicy } from "@/services/app/role";
 import { assignOrgAppRole, revokeOrgAppRole } from "@/services/org/role";
 import { useTranslation } from "react-i18next";
 import Auth from "@/components/Auth";
+import { AppPolicy } from "@/services/app/policy";
+import DrawerRolePolicy from "../components/drawerRolePolicy";
 
 
 export default () => {
@@ -26,24 +27,18 @@ export default () => {
         [appRoleInfo, setAppRoleInfo] = useState<AppRole>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
-        columns: ProColumns<Org>[] = [
+        columns: ProColumns<AppPolicy>[] = [
             // 有需要排序配置  sorter: true 
             { title: t('name'), dataIndex: 'name', width: 120, },
-            { title: t('introduction'), dataIndex: 'profile', width: 120, search: false },
-            {
-                title: t('manage user'), dataIndex: 'owner', width: 120, search: false,
-                render: (text, record) => {
-                    return record.owner?.displayName
-                }
-            },
+            { title: t('description'), dataIndex: 'comments', width: 120, search: false, },
             {
                 title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 110,
                 render: (text, record) => {
                     return <Space>
-                        <Auth authKey="revokeOrganizationAppRole">
+                        <Auth authKey="revokeAppRolePolicy">
                             <a key="del" onClick={() => onDel(record)}>
-                                {t('disauthorization')}
+                                {t('remove')}
                             </a>
                         </Auth>
                     </Space>
@@ -77,29 +72,30 @@ export default () => {
             return info
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as Org[], success: true, total: 0 },
+            const table = { data: [] as AppPolicy[], success: true, total: 0 },
                 info = await getInfo();
             if (info) {
-                if (params.name) {
-                    params.nameContains = params.name
-                }
-                delete params.name
-                const result = await getAppRoleAssignedOrgList(info.id, params, filter, sort);
+                const result = await getAppRoleInfo(info.id, ['policies']);
                 if (result) {
-                    table.data = result
-                    table.total = result.length
+                    table.data = result.policies?.filter(item => {
+                        if (params.name) {
+                            return item.name.indexOf(params.name) > -1
+                        }
+                        return true;
+                    }) || []
+                    table.total = table.data?.length
                 }
             }
 
             return table
         },
-        onDel = (record: Org) => {
+        onDel = (record: AppPolicy) => {
             if (appRoleInfo) {
                 Modal.confirm({
-                    title: t('disauthorization'),
-                    content: `${t('confirm disauthorization')}：${record.name}?`,
+                    title: t('remove'),
+                    content: `${t('confirm remove')}：${record.name}?`,
                     onOk: async (close) => {
-                        const result = await revokeOrgAppRole(record.id, appRoleInfo.id)
+                        const result = await revokeAppRolePolicy(appRoleInfo.appID, appRoleInfo.id, [record.id])
                         if (result) {
                             proTableRef.current?.reload();
                             message.success(t('submit success'))
@@ -113,17 +109,16 @@ export default () => {
     return (
         <PageContainer
             header={{
-                title: t("Application role authorization"),
+                title: t("Application role permissions"),
                 style: { background: token.colorBgContainer },
                 breadcrumb: {
                     items: [
                         { title: t('System configuration'), },
                         { title: t("{{field}} management", { field: t('app') }), },
                         { title: t('Application role'), },
-                        { title: t("Application role authorization"), },
+                        { title: t("Application role permissions"), },
                     ],
                 },
-                children: <Alert showIcon message={t("If a role is authorized to an organization, the organization has the application rights of the role")} />
 
             }}
         >
@@ -141,16 +136,16 @@ export default () => {
                         <span>{t('role')}：{appRoleInfo?.name || "-"}</span>
                     </Space>,
                     actions: [
-                        <Auth authKey="assignOrganizationAppRole">
+                        <Auth authKey="assignAppRolePolicy">
                             <Button type="primary" onClick={() => {
-                                setModal({ open: true, title: '' })
+                                setModal({ open: true, title: t("add {{field}}", { field: t('permission') }) })
                             }} >
-                                {t('add {{field}}', { field: t('organizational authorization') })}
+                                {t("add {{field}}", { field: t('permission') })}
                             </Button>
                         </Auth>
                     ]
                 }}
-                scroll={{ x: 'max-content' }}
+                scroll={{ x: 'max-content', y: 500 }}
                 columns={columns}
                 request={getRequest}
                 rowSelection={{
@@ -158,21 +153,17 @@ export default () => {
                     onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
                     type: "checkbox"
                 }}
+                pagination={false}
             />
-            <ModalOrg
-                x-if={appRoleInfo}
+            <DrawerRolePolicy
+                x-if={modal.open}
                 open={modal.open}
-                title={t('search {{field}}', { field: t('organization') })}
-                tableTitle={`${t('app')}：${appRoleInfo?.app?.name} ${t("{{field}} list", { field: t('authorized organization') })}`}
-                appId={appRoleInfo?.appID}
-                onClose={async (selectData) => {
-                    const sdata = selectData?.[0];
-                    if (sdata && appRoleInfo) {
-                        const result = await assignOrgAppRole(sdata.id, appRoleInfo.id)
-                        if (result) {
-                            proTableRef.current?.reload();
-                            message.success(t('submit success'))
-                        }
+                title={modal.title}
+                appInfo={appRoleInfo?.app}
+                roleInfo={appRoleInfo}
+                onClose={(isSuccess) => {
+                    if (isSuccess) {
+                        proTableRef.current?.reload();
                     }
                     setModal({ open: false, title: '' })
                 }}

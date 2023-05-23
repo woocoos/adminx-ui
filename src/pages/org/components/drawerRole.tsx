@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { User } from '@/services/user';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { userInfo } from 'os';
 
 export default (props: {
     open: boolean
@@ -38,7 +39,7 @@ export default (props: {
             if (keyword) {
                 params.nameContains = keyword
             }
-            const result = props.kind === 'role' ? await getOrgRoleList(params, filter, sort) : await getOrgGroupList(params, filter, sort)
+            const result = props.kind === 'role' ? await getOrgRoleList(params, filter, sort, { userId: props.userInfo?.id }) : await getOrgGroupList(params, filter, sort, { userId: props.userInfo?.id })
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
@@ -150,6 +151,9 @@ export default (props: {
                                     setSelectedDatas([...oldDatas, ...newDatas])
                                     setSaveDisabled(false)
                                 },
+                                getCheckboxProps: (record) => ({
+                                    disabled: record.isGrantUser
+                                }),
                                 type: "checkbox"
                             }}
                         />

@@ -1,15 +1,16 @@
-import { EnumPolicyRuleEffect, PolicyRule, PolicyRuleEffect } from "@/services/app/policy"
+import { PolicyRule, } from "@/services/app/policy"
 import { ProCard } from "@ant-design/pro-components"
 import { Divider, Radio, Tabs, Row, Col, Button, Transfer, Tree, List, Popconfirm } from "antd"
 import { CSSProperties, ReactNode, useEffect, useState } from "react"
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { AppAction, getAppActionList } from "@/services/app/action";
+import { AppAction, } from "@/services/app/action";
 import ActionsTransfer from "@/components/ActionsTransfer";
 import { App, getAppList } from "@/services/app";
 import Editor from '@monaco-editor/react';
 import InputApp from "@/pages/app/components/inputApp";
 import { useTranslation } from "react-i18next";
 import AppPolicyRes from "@/components/AppPolicyRes";
+import { getOrgAppActionList } from "@/services/org/app";
 
 const RuleItem = (props: {
     orgId: string
@@ -29,13 +30,9 @@ const RuleItem = (props: {
     const
         updateAppInfo = async (info?: App) => {
             setAppInfo(info)
-            if (info?.id) {
-                const actionsList = await getAppActionList(info.id, {}, {}, {})
-                if (actionsList?.totalCount) {
-                    setAppActions(actionsList.edges.map(item => item.node))
-                } else {
-                    setAppActions([])
-                }
+            if (info?.code) {
+                const actionsList = await getOrgAppActionList(info.code)
+                setAppActions(actionsList || [])
             } else {
                 setAppActions([])
             }
@@ -128,6 +125,7 @@ const RuleItem = (props: {
                     <div style={{ width: "260px", }}>
                         <InputApp
                             value={appInfo}
+                            orgId={props.orgId}
                             disabled={props.readonly}
                             onChange={(data) => {
                                 const nRule = { ...props.rule }
@@ -236,6 +234,7 @@ const RuleItem = (props: {
                                     <AppPolicyRes
                                         readonly={props.readonly}
                                         appInfo={appInfo}
+                                        isShowAppCode
                                         orgId={props.orgId}
                                         values={props.rule.resources}
                                         onChange={(values) => {

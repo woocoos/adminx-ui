@@ -207,8 +207,8 @@ export async function getUserExtendGroupPolicyList(userId: string, params: Table
             params.current
         )
 
-    if (result?.data?.node?.list) {
-        return result.data.node.list as List<Permission>
+    if (result?.data?.list) {
+        return result.data.list as List<Permission>
     } else {
         return null
     }

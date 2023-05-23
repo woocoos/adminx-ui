@@ -15,6 +15,7 @@ export type AppPolicy = {
     status: AppPolicyStatus
     rules?: PolicyRule[]
     app?: App
+    isGrantAppRole?: boolean
 }
 
 export type PolicyRule = {
@@ -51,9 +52,12 @@ export const AppPolicyField = `#graphql
  * @param params 
  * @param filter 
  * @param sort 
+ * @param isGrant
  * @returns 
  */
-export async function getAppPolicyList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getAppPolicyList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    appRoleId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlApi(
             `#graphql
@@ -63,6 +67,7 @@ export async function getAppPolicyList(appId: string, params: TableParams, filte
                         id,
                         list:policies{
                             ${AppPolicyField}
+                            ${isGrant?.appRoleId ? `isGrantAppRole(appRoleID: "${isGrant.appRoleId}")` : ''}
                         }
                     }
                 }
