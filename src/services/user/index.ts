@@ -507,14 +507,14 @@ export async function checkPermission(permission: string) {
  * @param where 
  * @returns 
  */
-export async function userPermissions(where: Record<string, any>) {
+export async function userPermissions(where: Record<string, any>, headers?: Record<string, any>) {
   const result = await graphqlApi(
     `#graphql
     query userPermissions($where: AppActionWhereInput){
       list:userPermissions(where: $where){
         ${AppActionField}
       }
-    }`, { where }
+    }`, { where }, headers
   )
 
   if (result?.data?.list) {

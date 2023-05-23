@@ -61,12 +61,16 @@ export const authConfig = defineAuthConfig(async (appData) => {
   // 判断路由权限
   if (!basis.token) {
     store.dispatch.basis.logout()
-  }
-  const ups = await userPermissions({});
-  if (ups) {
-    ups.forEach(item => {
-      initialAuth[item.name] = true;
-    })
+  } else {
+    const ups = await userPermissions({}, {
+      "Authorization": `Bearer ${basis.token}`,
+      "X-Tenant-ID": basis.tenantId,
+    });
+    if (ups) {
+      ups.forEach(item => {
+        initialAuth[item.name] = true;
+      })
+    }
   }
   return {
     initialAuth
