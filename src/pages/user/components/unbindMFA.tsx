@@ -15,7 +15,7 @@ export default (props: {
     const { t } = useTranslation(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true)
-        
+
     setLeavePromptWhen(saveDisabled)
 
     const onFinish = async (values) => {
@@ -23,6 +23,7 @@ export default (props: {
         const result = await unbindMfa(values.code)
         if (result) {
             props.onClose(true)
+            setSaveDisabled(true)
         }
         setSaveLoading(false)
         return false
@@ -50,6 +51,7 @@ export default (props: {
             if (!open) {
                 props.onClose()
             }
+            setSaveDisabled(true)
         }}
     >
         <br />

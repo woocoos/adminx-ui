@@ -1,6 +1,6 @@
 import store from "@/store";
 import { useEffect, useState } from "react";
-import { asideMenuConfig } from "@/components/FrameworkLayout/menuConfig";
+import { userMenuList } from "@/components/FrameworkLayout/menuConfig";
 import ProLayout from "@ant-design/pro-layout";
 import AvatarDropdown from "@/components/Header/AvatarDropdown";
 import I18nDropdown from "@/components/Header/I18nDropdown";
@@ -17,11 +17,6 @@ import LeavePrompt, { Link } from "@/components/LeavePrompt";
 export default function Layout() {
   const [basisState] = store.useModel("basis"),
     { token } = useToken();
-
-  const
-    requestMenus = async () => {
-      return asideMenuConfig
-    }
 
   useEffect(() => {
     i18n.changeLanguage(basisState.locale);
@@ -42,7 +37,7 @@ export default function Layout() {
         className={styles.layout}
         menu={{
           locale: true,
-          request: requestMenus
+          request: userMenuList
         }}
         fixSiderbar
         logo={<img src={logo} alt="logo" />}

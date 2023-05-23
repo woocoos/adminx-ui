@@ -177,6 +177,43 @@ export async function getUserPermissionList(userId: string, params: TableParams,
     }
 }
 
+/**
+ * 用户继承用户组的权限策略
+ * @param userId 
+ * @param params 
+ * @param filter 
+ * @param sort 
+ * @returns 
+ */
+export async function getUserExtendGroupPolicyList(userId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+        result = await graphqlPageApi(
+            `#graphql
+            query userExtendGroupPolicies($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+                list:userExtendGroupPolicies(userID:"${userId}",after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                    edges{                                        
+                        cursor,node{                    
+                            ${PermissionNodeField}
+                        }
+                    }
+                }
+            }`,
+            {
+                first: params.pageSize,
+                where,
+                orderBy,
+            },
+            params.current
+        )
+
+    if (result?.data?.node?.list) {
+        return result.data.node.list as List<Permission>
+    } else {
+        return null
+    }
+}
+
 
 /**
  * 获取权限情况
@@ -278,4 +315,3 @@ export async function delPermssion(permissionId: string, orgId: string) {
         return null
     }
 }
-

@@ -51,6 +51,8 @@ export default {
         "System configuration": "系统配置",
         "{{field}} management": "{{field}}管理",
 
+        "icon": "图标",
+        "route": "路由",
         "type": "类型",
         "menu": "菜单",
         "permission": "权限",

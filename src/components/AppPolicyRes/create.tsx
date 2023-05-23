@@ -83,6 +83,7 @@ export default (props: {
             destroyOnClose
             cancelText={t('cancel')}
             onCancel={() => {
+                setSaveDisabled(true)
                 props.onClose()
             }}
             onOk={() => {

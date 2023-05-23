@@ -45,6 +45,7 @@ export default (props: {
             if (!open) {
                 props.onClose?.()
             }
+            setSaveDisabled(true)
         },
         getRequest = async () => {
             let info: User | UserLoginProfile | null = null

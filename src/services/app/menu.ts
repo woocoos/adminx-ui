@@ -14,15 +14,17 @@ export interface AppMenu {
     parentID: string
     kind: AppMenuKind
     name: string
-    actionID: string
+    icon: string
+    route: string
+    actionID: string | null
     comments: string
     displaySort: number
     app?: App
     action?: AppAction
 }
 
-const AppMenuField = `#graphql
-    id,appID,parentID,kind,name,actionID,comments,displaySort,
+export const AppMenuField = `#graphql
+    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
     action{ id,name }
 `
 

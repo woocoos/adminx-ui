@@ -299,7 +299,7 @@ export default () => {
                                     }, {
                                         label: t('inherit user group permissions'),
                                         key: 'group-permission',
-                                        children: <ListUserPermission userInfo={info} principalKind="role" />
+                                        children: <ListUserPermission userInfo={info} isExtendGroup principalKind="role" />
                                     }
                                 ]
                             }}

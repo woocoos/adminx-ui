@@ -50,6 +50,7 @@ export default (props: {
             if (!open) {
                 props.onClose?.()
             }
+            setSaveDisabled(true)
         },
         onFinish = async () => {
             let isTree = false, result: boolean | null = null, userId = props.userInfo?.id;
@@ -69,6 +70,7 @@ export default (props: {
                 }
                 if (isTree) {
                     message.success(t('submit success'))
+                    setSaveDisabled(true)
                     props.onClose?.(true)
                 }
                 setSaveLoading(false)

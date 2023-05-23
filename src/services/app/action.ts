@@ -33,7 +33,7 @@ export const EnumAppActionMethod = {
     list: { text: 'list' },
 }
 
-const AppActionField = `#graphql
+export const AppActionField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
 `
 

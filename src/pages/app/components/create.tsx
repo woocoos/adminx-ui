@@ -29,6 +29,7 @@ export default (props: {
             if (!open) {
                 props.onClose?.()
             }
+            setSaveDisabled(true);
         },
         getRequest = async () => {
             setSaveLoading(false)

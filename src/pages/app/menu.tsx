@@ -16,7 +16,6 @@ import { TreeDataState, TreeMoveAction } from "@/services/graphql";
 import { TreeEditorAction } from "@/util/type";
 import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from "@/services/app/menu";
 import { App } from "@/services/app";
-import ModalAction from "@/pages/app/components/modalAction";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
 import Auth, { checkAuth } from "@/components/Auth";
@@ -49,7 +48,7 @@ export default () => {
             info: undefined,
             action: 'editor'
         }),
-        [actionTitle, setActionTitle] = useState<string>(`${t('created')}-${t('top menu')}`),
+        [actionTitle, setActionTitle] = useState<string>(""),
         [formFieldsValue, setFormFieldsValue] = useState<AppMenu>(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
@@ -158,10 +157,12 @@ export default () => {
                         break;
                     case 'peer':
                         title = `${t('created')}-${menuInfo.name}-${t('same level')}`
+                        setFormFieldsValue(undefined)
                         formRef.current?.resetFields()
                         break;
                     case 'child':
                         title = `${t('created')}-${menuInfo.name}-${t('sublayer')}`
+                        setFormFieldsValue(undefined)
                         formRef.current?.resetFields()
                         break;
                     default:
@@ -195,7 +196,7 @@ export default () => {
                 }
             })
         },
-        onValuesChange = () => {
+        onValuesChange = (value) => {
             setSaveDisabled(false)
         },
         getRequest = async () => {
@@ -210,6 +211,9 @@ export default () => {
                     values.actionID = formFieldsValue.action.id
                 }
                 if (selectedTree.info?.id && selectedTree.action === 'editor') {
+                    if(values.kind === 'dir'){
+                        values.actionID = null
+                    }
                     const ur = await updateAppMenu(selectedTree.info.id, values)
                     if (ur?.id) {
                         message.success(t('submit success'));
@@ -237,6 +241,8 @@ export default () => {
     useEffect(() => {
         getMenusRequest(true)
     }, [])
+
+
 
     return (
         <PageContainer
@@ -277,7 +283,7 @@ export default () => {
                         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
                     </div>
                 </ProCard>
-                <ProCard title={actionTitle} headerBordered>
+                <ProCard title={actionTitle || `${t('created')}-${t('top menu')}`} headerBordered>
                     <ProForm
                         formRef={formRef}
                         style={{ maxWidth: 400 }}
@@ -313,40 +319,27 @@ export default () => {
                                 { required: true, message: `${t("Please enter {{field}}", { field: t('type') })}`, },
                             ]} />
                         <ProFormText
-                            label={t('permission')}
-                            placeholder={`${t("Please enter {{field}}", { field: t('permission') })}`}
-                        >
-                            <Input.Search
-                                value={formFieldsValue?.action?.name || ""}
-                                placeholder={`${t("click search {{field}}", { field: t('permission') })}`}
-                                onSearch={() => {
-                                    setModal({ open: true })
-                                }}
-                            />
-                        </ProFormText>
+                            name="icon"
+                            label={t('icon')}
+                            placeholder={`${t("Please enter {{field}}", { field: t('icon') })}`}
+                        />
+                        <ProForm.Item noStyle shouldUpdate>
+                            {(form) => (
+                                form.getFieldValue('kind') == 'menu' ? <>
+                                    <ProFormText
+                                        name="route"
+                                        label={t('route')}
+                                        placeholder={`${t("Please enter {{field}}", { field: t('route') })}`}
+                                    />                                    
+                                </> : ''
+                            )}
+                        </ProForm.Item>
                         <ProFormTextArea
                             name="comments"
                             label={t('remarks')}
                             placeholder={`${t("Please enter {{field}}", { field: t('remarks') })}`}
                         />
                     </ProForm>
-                    <ModalAction
-                        open={modal.open}
-                        title={t("search {{field}}", { field: t('permission') })}
-                        appId={appInfo?.id || ''}
-                        onClose={(selectData) => {
-                            const data = selectData?.[0]
-
-                            if (data?.id) {
-                                setFormFieldsValue({
-                                    ...formFieldsValue,
-                                    action: data,
-                                    actionID: data.id
-                                } as any)
-                            }
-                            onValuesChange()
-                            setModal({ open: false })
-                        }} />
                 </ProCard>
             </ProCard>
         </PageContainer>

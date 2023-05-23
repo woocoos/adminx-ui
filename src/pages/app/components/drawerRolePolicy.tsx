@@ -52,8 +52,8 @@ export default (props: {
             if (!open) {
                 props.onClose?.()
             }
+            setSaveDisabled(true)
         },
-
         onFinish = async () => {
             if (props.roleInfo?.id) {
                 setSaveLoading(true)
@@ -61,6 +61,7 @@ export default (props: {
                 if (result) {
                     message.success(t('submit success'))
                     props.onClose?.(true)
+                    setSaveDisabled(true)
                 }
             }
             setSaveLoading(false)

@@ -1,3 +1,5 @@
+import { userMenus } from "@/services/user";
+import { formatTreeData } from "@/util";
 import {
   SettingOutlined,
   TeamOutlined,
@@ -83,4 +85,36 @@ const asideMenuConfig: MenuDataItem[] = [
   },
 ];
 
-export { asideMenuConfig };
+/**
+ * 菜单的处理
+ * @returns 
+ */
+export const userMenuList = async () => {
+  const list: MenuDataItem[] = []
+  if (process.env.ICE_CORE_MODE === 'development') {
+    list.push(...asideMenuConfig)
+  } else {
+    if (process.env.ICE_APP_CODE) {
+      const menus = await userMenus(process.env.ICE_APP_CODE)
+      if (menus) {
+        const menuList = menus.map(item => {
+          const data: MenuDataItem = {
+            id: item.id,
+            name: item.name,
+            icon: <i className={item.icon} />,
+            parentId: item.parentID,
+          }
+          if (item.route) {
+            data.path = item.route
+          }
+          return data
+        })
+        list.push(...formatTreeData(menuList, undefined, { key: 'id' }))
+      }
+    }
+  }
+  return list
+}
+
+
+

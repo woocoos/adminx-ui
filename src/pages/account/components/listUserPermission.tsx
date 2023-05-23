@@ -9,7 +9,7 @@ import {
 import { Button, Space, Dropdown, Modal, message, Alert, Select } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
-import { Permission, PermissionPrincipalKind, delPermssion, getOrgPermissionList, getUserPermissionList } from "@/services/permission";
+import { Permission, PermissionPrincipalKind, delPermssion, getOrgPermissionList, getUserExtendGroupPolicyList, getUserPermissionList } from "@/services/permission";
 import DrawerRolePolicy from "@/pages/org/components/drawerRolePolicy";
 import { useTranslation } from "react-i18next";
 import store from "@/store";
@@ -20,6 +20,7 @@ import Auth from "@/components/Auth";
 
 export default (props: {
     userInfo: User
+    isExtendGroup?: boolean
     principalKind: PermissionPrincipalKind
 }) => {
     const { t } = useTranslation(),
@@ -137,7 +138,7 @@ export default (props: {
             delete params.name
             delete params.comments
             delete params.type
-            const result = await getUserPermissionList(props.userInfo.id, params, filter, sort);
+            const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, params, filter, sort) : await getUserPermissionList(props.userInfo.id, params, filter, sort);
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount

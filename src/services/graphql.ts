@@ -150,7 +150,11 @@ export function setClearInputField(input: Record<string, any>) {
     if (!input[key]) {
       const clearKey = `clear${firstUpper(key)}`
       if (!Object.keys(input).includes(clearKey)) {
-        input[clearKey] = true
+        if (key === 'actionID') {
+          input['clearAction'] = true
+        } else {
+          input[clearKey] = true
+        }
       }
     }
   }

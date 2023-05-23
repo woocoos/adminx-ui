@@ -40,6 +40,6 @@ export const checkAuth = (authKey: string, auth?: AuthType) => {
     if (!auth) {
         [auth] = useAuth();
     }
-
+    
     return process.env.ICE_CORE_MODE === 'development' || auth[authKey]
 }

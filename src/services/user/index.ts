@@ -7,6 +7,8 @@ import {
   graphqlPageApi,
   List
 } from "../graphql";
+import { AppAction, AppActionField } from "../app/action";
+import { AppMenu, AppMenuField } from "../app/menu";
 
 export type UserType = "account" | "member"
 export type UserCreationType = "invitation" | "register" | "manual"
@@ -479,3 +481,67 @@ export async function sendMFAEmail(userId: string) {
 }
 
 
+/**
+ * 检测权限
+ * @param permission  'appCode:action'
+ * @returns 
+ */
+export async function checkPermission(permission: string) {
+  const result = await graphqlApi(
+    `#graphql
+    query{
+      action:checkPermission(permission: "${permission}")
+    }`
+  )
+
+  if (result?.data?.action) {
+    return result?.data?.action as boolean
+  } else {
+    return null
+  }
+}
+
+
+/**
+ * 获取用户的权限
+ * @param where 
+ * @returns 
+ */
+export async function userPermissions(where: Record<string, any>) {
+  const result = await graphqlApi(
+    `#graphql
+    query userPermissions($where: AppActionWhereInput){
+      list:userPermissions(where: $where){
+        ${AppActionField}
+      }
+    }`, { where }
+  )
+
+  if (result?.data?.list) {
+    return result?.data?.list as AppAction[]
+  } else {
+    return null
+  }
+}
+
+/**
+ * 获取用户授权的菜单
+ * @param appCode 
+ * @returns 
+ */
+export async function userMenus(appCode: string) {
+  const result = await graphqlApi(
+    `#graphql
+    query userMenus{
+      list:userMenus(appCode: "${appCode}"){
+        ${AppMenuField}
+      }
+    }`
+  )
+
+  if (result?.data?.list) {
+    return result?.data?.list as AppMenu[]
+  } else {
+    return null
+  }
+}

@@ -6,7 +6,7 @@ import { message } from 'antd';
 import store from "@/store";
 import "@/assets/styles/index.css"
 import localStore from "@/pkg/localStore";
-import { User } from "./services/user";
+import { User, userPermissions } from "./services/user";
 import { browserLanguage } from "./util";
 import jwt_decode, { JwtPayload } from "jwt-decode";
 
@@ -57,18 +57,23 @@ export const dataLoader = defineDataLoader(async () => {
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const { basis } = appData;
+  const { basis } = appData, initialAuth = {};
   // 判断路由权限
   if (!basis.token) {
     store.dispatch.basis.logout()
   }
+  const ups = await userPermissions({});
+  if (ups) {
+    ups.forEach(item => {
+      initialAuth[item.name] = true;
+    })
+  }
   return {
-    initialAuth: {
-    }
+    initialAuth
   }
 });
 
-// 数据项
+// store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
   const { basis } = appData;
   return {
