@@ -13,6 +13,7 @@ import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "@ice/runtime";
 import Auth from "@/components/Auth";
+import KeepAlive from 'react-activation'
 
 
 export default () => {
@@ -118,56 +119,58 @@ export default () => {
         }
 
     return (
-        <PageContainer
-            header={{
-                title: t('policy'),
-                style: { background: token.colorBgContainer },
-                breadcrumb: {
-                    items: [
-                        { title: t('System configuration'), },
-                        { title: t("{{field}} management", { field: t('app') }), },
-                        { title: t('policy'), },
-                    ],
-                },
-                children: <Alert showIcon message={
-                    <>
-                        <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
-                        <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
-                        <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
-                    </>
-                } />
+        <KeepAlive id={appInfo?.id}>
+            <PageContainer
+                header={{
+                    title: t('policy'),
+                    style: { background: token.colorBgContainer },
+                    breadcrumb: {
+                        items: [
+                            { title: t('System configuration'), },
+                            { title: t("{{field}} management", { field: t('app') }), },
+                            { title: t('policy'), },
+                        ],
+                    },
+                    children: <Alert showIcon message={
+                        <>
+                            <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
+                            <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
+                            <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
+                        </>
+                    } />
 
-            }}
-        >
-            <ProTable
-                actionRef={proTableRef}
-                rowKey={"id"}
-                search={{
-                    searchText: `${t('query')}`,
-                    resetText: `${t('reset')}`,
-                    labelWidth: 'auto',
                 }}
-                toolbar={{
-                    title: `${t('app')}:${appInfo?.name || "-"}`,
-                    actions: [
-                        <Auth authKey="createAppPolicy">
-                            <Button key="created" type="primary">
-                                <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
-                                    {t("create {{field}}", { field: t('policy') })}
-                                </Link>
-                            </Button>
-                        </Auth>
-                    ]
-                }}
-                scroll={{ x: 'max-content' }}
-                columns={columns}
-                request={getRequest}
-                rowSelection={{
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                    type: "checkbox"
-                }}
-            />
-        </PageContainer>
+            >
+                <ProTable
+                    actionRef={proTableRef}
+                    rowKey={"id"}
+                    search={{
+                        searchText: `${t('query')}`,
+                        resetText: `${t('reset')}`,
+                        labelWidth: 'auto',
+                    }}
+                    toolbar={{
+                        title: `${t('app')}:${appInfo?.name || "-"}`,
+                        actions: [
+                            <Auth authKey="createAppPolicy">
+                                <Button key="created" type="primary">
+                                    <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
+                                        {t("create {{field}}", { field: t('policy') })}
+                                    </Link>
+                                </Button>
+                            </Auth>
+                        ]
+                    }}
+                    scroll={{ x: 'max-content' }}
+                    columns={columns}
+                    request={getRequest}
+                    rowSelection={{
+                        selectedRowKeys: selectedRowKeys,
+                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                        type: "checkbox"
+                    }}
+                />
+            </PageContainer>
+        </KeepAlive>
     );
 };

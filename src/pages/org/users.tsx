@@ -12,13 +12,14 @@ import store from "@/store";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
 import Auth from "@/components/Auth";
-import { TreeDataState, TreeMoveAction } from "@/services/graphql";
+import { TreeDataState } from "@/services/graphql";
+import KeepAlive from "react-activation";
 
-export default () => {
+const PageOrgUsers = (props: {
+    orgId: string
+}) => {
     const { token } = useToken(),
         { t } = useTranslation(),
-        [basisState] = store.useModel("basis"),
-        [searchParams, setSearchParams] = useSearchParams(),
         [treeDraggable, setTreeDraggable] = useState(false),
         userListActionRef = useRef<UserListRef>(null),
         [loading, setLoading] = useState(false),
@@ -29,7 +30,7 @@ export default () => {
     const
         getRequest = async () => {
             setLoading(true)
-            const orgList = await getOrgPathList(searchParams.get("id") || basisState.tenantId, "org"),
+            const orgList = await getOrgPathList(props.orgId, "org"),
                 topData = orgList[0]
             if (topData?.id) {
                 setSelectedData(topData)
@@ -81,7 +82,7 @@ export default () => {
 
     useEffect(() => {
         getRequest()
-    }, [, searchParams])
+    }, [props.orgId])
 
 
     return (
@@ -136,5 +137,18 @@ export default () => {
                 </Col>
             </Row>
         </PageContainer>
+
+    )
+}
+
+
+export default () => {
+    const [basisState] = store.useModel("basis"),
+        [searchParams] = useSearchParams(),
+        orgId = searchParams.get("id") || basisState.tenantId
+
+    return (<KeepAlive id={orgId}>
+        <PageOrgUsers orgId={orgId} />
+    </KeepAlive>
     )
 }

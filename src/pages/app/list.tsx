@@ -18,6 +18,7 @@ import ModalApp from "./components/modalApp"
 import { useTranslation } from "react-i18next";
 import Auth, { checkAuth } from "@/components/Auth";
 import { ItemType } from "antd/es/menu/hooks/useItems";
+import KeepAlive from 'react-activation'
 
 export type AppListRef = {
   getSelect: () => App[]
@@ -39,7 +40,11 @@ const AppList = (props: {
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true 
       { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
-      { title: t('name'), dataIndex: 'name', width: 120, },
+      {
+        title: t('name'), dataIndex: 'name', width: 120, search: {
+          transform: (value) => ({ nameContains: value || undefined })
+        }
+      },
       { title: t('code'), dataIndex: 'code', width: 120, },
       {
         title: t('type'), dataIndex: 'kind',
@@ -117,10 +122,6 @@ const AppList = (props: {
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as App[], success: true, total: 0 };
       let result: List<App> | null = null;
-      if (params.name) {
-        params.nameContains = params.name
-      }
-      delete params.name
       if (props.orgId) {
         result = await getOrgAppList(props.orgId, params, filter, sort)
       } else {
@@ -239,52 +240,54 @@ const AppList = (props: {
 
           </>
         ) : (
-          <PageContainer
-            header={{
-              title: t("{{field}} management", { field: t('app') }),
-              style: { background: token.colorBgContainer },
-              breadcrumb: {
-                items: [
-                  { title: t('System configuration'), },
-                  { title: t("{{field}} management", { field: t('app') }), },
-                ],
-              },
-            }}
-          >
-            <ProTable
-              actionRef={proTableRef}
-              rowKey={"id"}
-              search={{
-                searchText: `${t('query')}`,
-                resetText: `${t('reset')}`,
-                labelWidth: 'auto',
+          <KeepAlive>
+            <PageContainer
+              header={{
+                title: t("{{field}} management", { field: t('app') }),
+                style: { background: token.colorBgContainer },
+                breadcrumb: {
+                  items: [
+                    { title: t('System configuration'), },
+                    { title: t("{{field}} management", { field: t('app') }), },
+                  ],
+                },
               }}
-              toolbar={{
-                title: t("{{field}} list", { field: t('app') }),
-                actions: [
-                  <Auth authKey="createApp">
-                    <Button key="create" type="primary" onClick={
-                      () => {
-                        setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
-                      }
-                    }>
-                      {t("create {{field}}", { field: t('app') })}
-                    </Button >
-                  </Auth>
-                ]
-              }}
-              scroll={{ x: 'max-content' }}
-              columns={columns}
-              request={getRequest}
-              pagination={{ showSizeChanger: true }}
-            />
+            >
+              <ProTable
+                actionRef={proTableRef}
+                rowKey={"id"}
+                search={{
+                  searchText: `${t('query')}`,
+                  resetText: `${t('reset')}`,
+                  labelWidth: 'auto',
+                }}
+                toolbar={{
+                  title: t("{{field}} list", { field: t('app') }),
+                  actions: [
+                    <Auth authKey="createApp">
+                      <Button key="create" type="primary" onClick={
+                        () => {
+                          setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
+                        }
+                      }>
+                        {t("create {{field}}", { field: t('app') })}
+                      </Button >
+                    </Auth>
+                  ]
+                }}
+                scroll={{ x: 'max-content' }}
+                columns={columns}
+                request={getRequest}
+                pagination={{ showSizeChanger: true }}
+              />
 
-            <AppCreate
-              open={modal.open}
-              title={modal.title}
-              id={modal.id}
-              onClose={onDrawerClose} />
-          </PageContainer >
+              <AppCreate
+                open={modal.open}
+                title={modal.title}
+                id={modal.id}
+                onClose={onDrawerClose} />
+            </PageContainer >
+          </KeepAlive>
         )}
     </>
   );

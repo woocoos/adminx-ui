@@ -25,8 +25,16 @@ export default () => {
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<AppRes>[] = [
             // 有需要排序配置  sorter: true 
-            { title: t('name'), dataIndex: 'name', width: 120, },
-            { title: t('type name'), dataIndex: 'typeName', width: 120, },
+            {
+                title: t('name'), dataIndex: 'name', width: 120, search: {
+                    transform: (value) => ({ nameContains: value || undefined })
+                }
+            },
+            {
+                title: t('type name'), dataIndex: 'typeName', width: 120, search: {
+                    transform: (value) => ({ typeNameContains: value || undefined })
+                }
+            },
             { title: t('expression'), dataIndex: 'arnPattern', width: 120, search: false },
             {
                 title: t('operation'), dataIndex: 'actions', fixed: 'right',
@@ -73,14 +81,6 @@ export default () => {
             const table = { data: [] as AppRes[], success: true, total: 0 },
                 info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
             if (info) {
-                if (params.name) {
-                    params.nameContains = params.name
-                }
-                if (params.typeName) {
-                    params.typeNameContains = params.typeName
-                }
-                delete params.name
-                delete params.typeName
                 const result = await getAppResList(info.id, params, filter, sort);
                 if (result) {
                     // 前端过滤

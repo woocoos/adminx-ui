@@ -12,7 +12,7 @@ import { Outlet } from "@ice/runtime";
 import i18n from "@/i18n";
 import { ProConfigProvider, useToken } from "@ant-design/pro-components";
 import LeavePrompt, { Link } from "@/components/LeavePrompt";
-
+import { AliveScope } from 'react-activation'
 
 export default function Layout() {
   const [basisState] = store.useModel("basis"),
@@ -58,7 +58,9 @@ export default function Layout() {
         )}
         menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
       >
-        <Outlet />
+        <AliveScope>
+          <Outlet />
+        </AliveScope>
       </ProLayout>
     </ProConfigProvider>
 }

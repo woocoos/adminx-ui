@@ -27,7 +27,9 @@ export default (props: {
         columns: ProColumns<OrgRole>[] = [
             // 有需要排序配置  sorter: true 
             {
-                title: t('name'), dataIndex: 'name', width: 120,
+                title: t('name'), dataIndex: 'name', width: 120, search: {
+                    transform: (value) => ({ nameContains: value || undefined })
+                }
             },
             {
                 title: t('description'), dataIndex: 'comments', width: 120, search: false,
@@ -63,11 +65,7 @@ export default (props: {
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as OrgRole[], success: true, total: 0 };
-            if (params.name) {
-                params.nameContains = params.name
-            }
-            delete params.name
+            const table = { data: [] as OrgRole[], success: true, total: 0 };    
             const result = await getUserJoinGroupList(props.userInfo.id, params, filter, sort);
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)

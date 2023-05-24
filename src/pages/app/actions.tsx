@@ -36,7 +36,11 @@ const AppActionList = (props: {
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<AppAction>[] = [
             // 有需要排序配置  sorter: true 
-            { title: t('name'), dataIndex: 'name', width: 120, },
+            {
+                title: t('name'), dataIndex: 'name', width: 120, search: {
+                    transform: (value) => ({ nameContains: value || undefined })
+                }
+            },
             { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumAppActionKind },
             { title: t('method'), dataIndex: 'method', width: 120, valueEnum: EnumAppActionMethod },
             { title: t('remarks'), dataIndex: 'comments', width: 120, search: false, },
@@ -97,10 +101,6 @@ const AppActionList = (props: {
             const table = { data: [] as AppAction[], success: true, total: 0 },
                 info = appInfo?.id === appId ? appInfo : await getApp();
             if (info) {
-                if (params.name) {
-                    params.nameContains = params.name
-                }
-                delete params.name
                 const result = await getAppActionList(info.id, params, filter, sort);
                 if (result) {
                     table.data = result.edges.map(item => item.node)

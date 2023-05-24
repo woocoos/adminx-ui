@@ -20,6 +20,7 @@ import DrawerRolePolicy from "./components/drawerRolePolicy";
 import Auth, { checkAuth } from "@/components/Auth";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { useAuth } from "ice";
+import KeepAlive from "react-activation";
 
 
 export default () => {
@@ -156,71 +157,73 @@ export default () => {
 
 
     return (
-        <PageContainer
-            header={{
-                title: t('Application role'),
-                style: { background: token.colorBgContainer },
-                breadcrumb: {
-                    items: [
-                        { title: t('System configuration'), },
-                        { title: t("{{field}} management", { field: t('app') }), },
-                        { title: t('Application role'), },
-                    ],
-                },
-                children: <Alert showIcon message={
-                    <>
-                        <div key="1">{t('An application role is a set of application permission policies. When an application is authorized to a tenant, the role determines the application permission granted to the tenant')}</div>
-                        <div key="2">{t('automatic authorization')}：{t('When an application is authorized to a tenant, all roles of the automatic authorization type are authorized to the tenant and the administrator of the tenant')}</div>
-                        <div key="3">{t('manual authorization')}：{t("After an application is authorized to a tenant, the system administrator can use the xxx function to authorize the non-automatic role to the tenant")}</div>
-                    </>
-                } />
-            }}
-        >
-            <ProTable
-                actionRef={proTableRef}
-                search={{
-                    searchText: `${t('query')}`,
-                    resetText: `${t('reset')}`,
-                    labelWidth: 'auto',
+        <KeepAlive id={appInfo?.id}>
+            <PageContainer
+                header={{
+                    title: t('Application role'),
+                    style: { background: token.colorBgContainer },
+                    breadcrumb: {
+                        items: [
+                            { title: t('System configuration'), },
+                            { title: t("{{field}} management", { field: t('app') }), },
+                            { title: t('Application role'), },
+                        ],
+                    },
+                    children: <Alert showIcon message={
+                        <>
+                            <div key="1">{t('An application role is a set of application permission policies. When an application is authorized to a tenant, the role determines the application permission granted to the tenant')}</div>
+                            <div key="2">{t('automatic authorization')}：{t('When an application is authorized to a tenant, all roles of the automatic authorization type are authorized to the tenant and the administrator of the tenant')}</div>
+                            <div key="3">{t('manual authorization')}：{t("After an application is authorized to a tenant, the system administrator can use the xxx function to authorize the non-automatic role to the tenant")}</div>
+                        </>
+                    } />
                 }}
-                rowKey={"id"}
-                toolbar={{
-                    title: `${t('app')}:${appInfo?.name || "-"}`,
-                    actions: [
-                        <Auth authKey="createAppRole">
-                            <Button key="created" type="primary" onClick={() => {
-                                setModal({ open: true, title: t("create {{field}}", { field: t('role') }), id: '', scene: 'create' })
-                            }}>
-                                {t("create {{field}}", { field: t('role') })}
-                            </Button>
-                        </Auth>
-                    ]
-                }}
-                scroll={{ x: 'max-content' }}
-                columns={columns}
-                request={getRequest}
-                rowSelection={{
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                    type: "checkbox"
-                }}
-            />
-            <CreateAppRole
-                x-if={modal.scene === 'create'}
-                open={modal.open}
-                title={modal.title}
-                id={modal.id}
-                appId={appInfo?.id}
-                onClose={onDrawerClose}
-            />
-            <DrawerRolePolicy
-                x-if={modal.scene === "addPolicy" && modal.open}
-                open={modal.open}
-                title={modal.title}
-                appInfo={appInfo}
-                roleInfo={modal.roleInfo}
-                onClose={onDrawerClose}
-            />
-        </PageContainer>
+            >
+                <ProTable
+                    actionRef={proTableRef}
+                    search={{
+                        searchText: `${t('query')}`,
+                        resetText: `${t('reset')}`,
+                        labelWidth: 'auto',
+                    }}
+                    rowKey={"id"}
+                    toolbar={{
+                        title: `${t('app')}:${appInfo?.name || "-"}`,
+                        actions: [
+                            <Auth authKey="createAppRole">
+                                <Button key="created" type="primary" onClick={() => {
+                                    setModal({ open: true, title: t("create {{field}}", { field: t('role') }), id: '', scene: 'create' })
+                                }}>
+                                    {t("create {{field}}", { field: t('role') })}
+                                </Button>
+                            </Auth>
+                        ]
+                    }}
+                    scroll={{ x: 'max-content' }}
+                    columns={columns}
+                    request={getRequest}
+                    rowSelection={{
+                        selectedRowKeys: selectedRowKeys,
+                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                        type: "checkbox"
+                    }}
+                />
+                <CreateAppRole
+                    x-if={modal.scene === 'create'}
+                    open={modal.open}
+                    title={modal.title}
+                    id={modal.id}
+                    appId={appInfo?.id}
+                    onClose={onDrawerClose}
+                />
+                <DrawerRolePolicy
+                    x-if={modal.scene === "addPolicy" && modal.open}
+                    open={modal.open}
+                    title={modal.title}
+                    appInfo={appInfo}
+                    roleInfo={modal.roleInfo}
+                    onClose={onDrawerClose}
+                />
+            </PageContainer>
+        </KeepAlive>
     );
 };

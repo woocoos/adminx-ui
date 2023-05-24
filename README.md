@@ -7,4 +7,5 @@ adminx前端项目
 - 模板组件 [ProComponents](https://procomponents.ant.design/)
 - 多语言 [i18n](https://www.i18next.com/)
 - 本地存储 [localforage](https://localforage.docschina.org/)
+- keep-alive [react-activation](https://github.com/CJY0208/react-activation/blob/HEAD/README_CN.md)
 

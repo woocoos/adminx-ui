@@ -14,6 +14,7 @@ import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from "@/services/org/policy
 import store from "@/store";
 import { useTranslation } from "react-i18next";
 import Auth from "@/components/Auth";
+import KeepAlive from "react-activation";
 
 
 export default () => {
@@ -118,59 +119,61 @@ export default () => {
     }, [searchParams])
 
     return (
-        <PageContainer
-            header={{
-                title: t('policy'),
-                style: { background: token.colorBgContainer },
-                breadcrumb: {
-                    items: searchParams.get('id') ? [
-                        { title: t('System configuration'), },
-                        { title: t("{{field}} management", { field: t('organization') }), },
-                        { title: t('policy'), },
-                    ] : [
-                        { title: t('organization and cooperation'), },
-                        { title: t('policy'), },
-                    ],
-                },
-                children: <Alert showIcon message={
-                    <>
-                        <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
-                        <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
-                        <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
-                    </>
-                } />
+        <KeepAlive id={orgInfo?.id}>
+            <PageContainer
+                header={{
+                    title: t('policy'),
+                    style: { background: token.colorBgContainer },
+                    breadcrumb: {
+                        items: searchParams.get('id') ? [
+                            { title: t('System configuration'), },
+                            { title: t("{{field}} management", { field: t('organization') }), },
+                            { title: t('policy'), },
+                        ] : [
+                            { title: t('organization and cooperation'), },
+                            { title: t('policy'), },
+                        ],
+                    },
+                    children: <Alert showIcon message={
+                        <>
+                            <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
+                            <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
+                            <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
+                        </>
+                    } />
 
-            }}
-        >
-            <ProTable
-                actionRef={proTableRef}
-                search={{
-                    searchText: `${t('query')}`,
-                    resetText: `${t('reset')}`,
-                    labelWidth: 'auto',
                 }}
-                rowKey={"id"}
-                toolbar={{
-                    title: `${t('organization')}:${orgInfo?.name || "-"}`,
-                    actions: [
-                        <Auth authKey="createOrganizationPolicy">
-                            <Button type="primary">
-                                <Link key="editor" to={`/org/policy/viewer?orgId=${orgInfo?.id}`} >
-                                    {t('Custom policy')}
-                                </Link>
-                            </Button>
-                        </Auth>
-                    ]
-                }}
-                scroll={{ x: 'max-content' }}
-                columns={columns}
-                request={getRequest}
-                rowSelection={{
-                    selectedRowKeys: selectedRowKeys,
-                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                    type: "checkbox"
-                }}
-            />
-        </PageContainer>
+            >
+                <ProTable
+                    actionRef={proTableRef}
+                    search={{
+                        searchText: `${t('query')}`,
+                        resetText: `${t('reset')}`,
+                        labelWidth: 'auto',
+                    }}
+                    rowKey={"id"}
+                    toolbar={{
+                        title: `${t('organization')}:${orgInfo?.name || "-"}`,
+                        actions: [
+                            <Auth authKey="createOrganizationPolicy">
+                                <Button type="primary">
+                                    <Link key="editor" to={`/org/policy/viewer?orgId=${orgInfo?.id}`} >
+                                        {t('Custom policy')}
+                                    </Link>
+                                </Button>
+                            </Auth>
+                        ]
+                    }}
+                    scroll={{ x: 'max-content' }}
+                    columns={columns}
+                    request={getRequest}
+                    rowSelection={{
+                        selectedRowKeys: selectedRowKeys,
+                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                        type: "checkbox"
+                    }}
+                />
+            </PageContainer>
+        </KeepAlive>
     );
 };

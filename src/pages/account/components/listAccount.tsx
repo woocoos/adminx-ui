@@ -48,7 +48,11 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     columns: ProColumns<User>[] = [
       // 有需要排序配置  sorter: true 
       { title: t("principal name"), dataIndex: 'principalName', width: 90, },
-      { title: t('display name'), dataIndex: 'displayName', width: 120, },
+      {
+        title: t('display name'), dataIndex: 'displayName', width: 120, search: {
+          transform: (value) => ({ displayNameContains: value || undefined })
+        }
+      },
       { title: t('email'), dataIndex: 'email', width: 120, },
       { title: t('mobile'), dataIndex: 'mobile', width: 160 },
       {
@@ -162,10 +166,6 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       const table = { data: [] as User[], success: true, total: 0 };
       let result: List<User> | null
       params['userType'] = props.userType
-      if (params.displayName) {
-        params.displayNameContains = params.displayName
-      }
-      delete params.displayName
       if (props.orgRole) {
         result = await getOrgRoleUserList(props.orgRole.id, params, filter, sort)
       } else if (props.orgId) {
