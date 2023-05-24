@@ -2,7 +2,7 @@ import { App } from '@/services/app';
 import { Button, Modal } from 'antd';
 import { useRef } from 'react';
 import { AppListRef } from '../list';
-import AppList from '../list';
+import { AppList } from '../list';
 
 export default (props: {
     open: boolean

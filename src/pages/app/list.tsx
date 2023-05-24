@@ -25,7 +25,7 @@ export type AppListRef = {
   reload: (resetPageIndex?: boolean) => void
 }
 
-const AppList = (props: {
+const PageAppList = (props: {
   ref?: MutableRefObject<AppListRef>
   title?: string
   orgId?: string
@@ -240,57 +240,62 @@ const AppList = (props: {
 
           </>
         ) : (
-          <KeepAlive>
-            <PageContainer
-              header={{
-                title: t("{{field}} management", { field: t('app') }),
-                style: { background: token.colorBgContainer },
-                breadcrumb: {
-                  items: [
-                    { title: t('System configuration'), },
-                    { title: t("{{field}} management", { field: t('app') }), },
-                  ],
-                },
+          <PageContainer
+            header={{
+              title: t("{{field}} management", { field: t('app') }),
+              style: { background: token.colorBgContainer },
+              breadcrumb: {
+                items: [
+                  { title: t('System configuration'), },
+                  { title: t("{{field}} management", { field: t('app') }), },
+                ],
+              },
+            }}
+          >
+            <ProTable
+              actionRef={proTableRef}
+              rowKey={"id"}
+              search={{
+                searchText: `${t('query')}`,
+                resetText: `${t('reset')}`,
+                labelWidth: 'auto',
               }}
-            >
-              <ProTable
-                actionRef={proTableRef}
-                rowKey={"id"}
-                search={{
-                  searchText: `${t('query')}`,
-                  resetText: `${t('reset')}`,
-                  labelWidth: 'auto',
-                }}
-                toolbar={{
-                  title: t("{{field}} list", { field: t('app') }),
-                  actions: [
-                    <Auth authKey="createApp">
-                      <Button key="create" type="primary" onClick={
-                        () => {
-                          setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
-                        }
-                      }>
-                        {t("create {{field}}", { field: t('app') })}
-                      </Button >
-                    </Auth>
-                  ]
-                }}
-                scroll={{ x: 'max-content' }}
-                columns={columns}
-                request={getRequest}
-                pagination={{ showSizeChanger: true }}
-              />
+              toolbar={{
+                title: t("{{field}} list", { field: t('app') }),
+                actions: [
+                  <Auth authKey="createApp">
+                    <Button key="create" type="primary" onClick={
+                      () => {
+                        setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
+                      }
+                    }>
+                      {t("create {{field}}", { field: t('app') })}
+                    </Button >
+                  </Auth>
+                ]
+              }}
+              scroll={{ x: 'max-content' }}
+              columns={columns}
+              request={getRequest}
+              pagination={{ showSizeChanger: true }}
+            />
 
-              <AppCreate
-                open={modal.open}
-                title={modal.title}
-                id={modal.id}
-                onClose={onDrawerClose} />
-            </PageContainer >
-          </KeepAlive>
+            <AppCreate
+              open={modal.open}
+              title={modal.title}
+              id={modal.id}
+              onClose={onDrawerClose} />
+          </PageContainer >
         )}
     </>
   );
 };
 
-export default forwardRef(AppList) 
+export const AppList = forwardRef(PageAppList)
+
+export default () => {
+
+  return <KeepAlive cacheKey="appList">
+    <AppList />
+  </KeepAlive>
+}

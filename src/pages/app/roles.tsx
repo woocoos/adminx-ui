@@ -157,7 +157,7 @@ export default () => {
 
 
     return (
-        <KeepAlive id={appInfo?.id}>
+        <KeepAlive cacheKey="appRoles" id={`appRoleId${appInfo?.id || 0}`}>
             <PageContainer
                 header={{
                     title: t('Application role'),

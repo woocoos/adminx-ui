@@ -8,7 +8,7 @@ export default () => {
         [basisState] = store.useModel("basis"),
         orgId = searchParams.get('id') || basisState.tenantId
 
-    return (<KeepAlive id={orgId}>
+    return (<KeepAlive cacheKey='orgGroups' id={`orgId${orgId}`}>
         <OrgRoleList kind='group' orgId={orgId} />
     </KeepAlive>
     )

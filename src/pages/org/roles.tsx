@@ -313,8 +313,7 @@ export default () => {
         [searchParams, setSearchParams] = useSearchParams(),
         orgId = searchParams.get('id') || basisState.tenantId
 
-    return <KeepAlive id={orgId}>
+    return <KeepAlive cacheKey="orgRoles" id={`orgId${orgId}`}>
         <OrgRoleList orgId={orgId} />
     </KeepAlive>
-
 }

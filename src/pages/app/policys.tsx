@@ -16,10 +16,11 @@ import Auth from "@/components/Auth";
 import KeepAlive from 'react-activation'
 
 
-export default () => {
+const PageAppPolicys = (props: {
+    appId?: string
+}) => {
     const { token } = useToken(),
         { t } = useTranslation(),
-        [searchParams, setSearchParams] = useSearchParams(),
         [appInfo, setAppInfo] = useState<App>(),
         // 表格相关
         proTableRef = useRef<ActionType>(),
@@ -72,9 +73,9 @@ export default () => {
 
     const
         getApp = async () => {
-            let info: App | null = null, appId = searchParams.get('id');
-            if (appId) {
-                info = await getAppInfo(appId)
+            let info: App | null = null;
+            if (props.appId) {
+                info = await getAppInfo(props.appId)
                 if (info?.id) {
                     setAppInfo(info)
                 }
@@ -83,7 +84,7 @@ export default () => {
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as AppPolicy[], success: true, total: 0 },
-                info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
+                info = props.appId == appInfo?.id ? appInfo : await getApp();
             if (info) {
                 const result = await getAppPolicyList(info.id, params, filter, sort);
                 if (result) {
@@ -119,58 +120,66 @@ export default () => {
         }
 
     return (
-        <KeepAlive id={appInfo?.id}>
-            <PageContainer
-                header={{
-                    title: t('policy'),
-                    style: { background: token.colorBgContainer },
-                    breadcrumb: {
-                        items: [
-                            { title: t('System configuration'), },
-                            { title: t("{{field}} management", { field: t('app') }), },
-                            { title: t('policy'), },
-                        ],
-                    },
-                    children: <Alert showIcon message={
-                        <>
-                            <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
-                            <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
-                            <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
-                        </>
-                    } />
+        <PageContainer
+            header={{
+                title: t('policy'),
+                style: { background: token.colorBgContainer },
+                breadcrumb: {
+                    items: [
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
+                        { title: t('policy'), },
+                    ],
+                },
+                children: <Alert showIcon message={
+                    <>
+                        <div key="1">{t('A permission policy is a set of permission. Currently, two types of permission policies are supported')}</div>
+                        <div key="2">{t("System strategy")}：{t('The unified system is created by the system. You can only use it but cannot delete it. The system maintains the update of system policies')}</div>
+                        <div key="3">{t('Custom policy')}：{t('You can create, update, and delete customized policies. You can maintain the update of customized policies')}</div>
+                    </>
+                } />
 
+            }}
+        >
+            <ProTable
+                actionRef={proTableRef}
+                rowKey={"id"}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                    labelWidth: 'auto',
                 }}
-            >
-                <ProTable
-                    actionRef={proTableRef}
-                    rowKey={"id"}
-                    search={{
-                        searchText: `${t('query')}`,
-                        resetText: `${t('reset')}`,
-                        labelWidth: 'auto',
-                    }}
-                    toolbar={{
-                        title: `${t('app')}:${appInfo?.name || "-"}`,
-                        actions: [
-                            <Auth authKey="createAppPolicy">
-                                <Button key="created" type="primary">
-                                    <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
-                                        {t("create {{field}}", { field: t('policy') })}
-                                    </Link>
-                                </Button>
-                            </Auth>
-                        ]
-                    }}
-                    scroll={{ x: 'max-content' }}
-                    columns={columns}
-                    request={getRequest}
-                    rowSelection={{
-                        selectedRowKeys: selectedRowKeys,
-                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                        type: "checkbox"
-                    }}
-                />
-            </PageContainer>
-        </KeepAlive>
+                toolbar={{
+                    title: `${t('app')}:${appInfo?.name || "-"}`,
+                    actions: [
+                        <Auth authKey="createAppPolicy">
+                            <Button key="created" type="primary">
+                                <Link to={`/app/policy/viewer?appId=${appInfo?.id || ''}`}>
+                                    {t("create {{field}}", { field: t('policy') })}
+                                </Link>
+                            </Button>
+                        </Auth>
+                    ]
+                }}
+                scroll={{ x: 'max-content' }}
+                columns={columns}
+                request={getRequest}
+                rowSelection={{
+                    selectedRowKeys: selectedRowKeys,
+                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                    type: "checkbox"
+                }}
+            />
+        </PageContainer>
     );
 };
+
+
+export default () => {
+    const [searchParams] = useSearchParams(),
+        appId = searchParams.get('id') || ''
+
+    return <KeepAlive cacheKey="appPolicys" id={`appId${appId || 0}`}>
+        <PageAppPolicys appId={appId} />
+    </KeepAlive>
+}

@@ -119,7 +119,7 @@ export default () => {
     }, [searchParams])
 
     return (
-        <KeepAlive id={orgInfo?.id}>
+        <KeepAlive cacheKey="orgPolicys" id={`orgId${orgInfo?.id || 0}`}>
             <PageContainer
                 header={{
                     title: t('policy'),

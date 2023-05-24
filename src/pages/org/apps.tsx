@@ -1,4 +1,4 @@
-import AppList from '@/pages/app/list'
+import { AppList } from '@/pages/app/list'
 import { Org, getOrgInfo } from '@/services/org'
 import { PageContainer, useToken } from '@ant-design/pro-components'
 import { useSearchParams } from '@ice/runtime'
