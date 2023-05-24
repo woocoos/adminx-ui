@@ -2,7 +2,7 @@ import { Button, Modal } from 'antd';
 import { useRef } from 'react';
 import { OrgRoleListRef } from '../roles';
 import { OrgRole, OrgRoleKind } from '@/services/org/role';
-import OrgRoleList from '../roles';
+import { OrgRoleList } from '../roles';
 
 
 export default (props: {
