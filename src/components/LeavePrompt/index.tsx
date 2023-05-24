@@ -1,5 +1,5 @@
 import { history } from 'ice';
-import { useEffect } from 'react';
+import { ReactNode, useEffect } from 'react';
 
 const tipStr = '您还有内容未保存，是否离开！';
 const pathName = {
@@ -61,7 +61,7 @@ export default () => {
  */
 export const Link = (props: {
     to: string
-    children: JSX.Element
+    children: ReactNode
 }) => {
     return <a onClick={() => {
         checkLave(() => {
