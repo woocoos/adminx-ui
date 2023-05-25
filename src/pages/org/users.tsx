@@ -97,7 +97,7 @@ const PageOrgUsers = (props: {
         setTreeDraggable(checkAuth('moveOrganization', auth))
     }, [props.orgId])
 
-
+    token
     return (
         <PageContainer
             className={styles.users}
@@ -130,7 +130,7 @@ const PageOrgUsers = (props: {
                     </div>
                 </Col>
                 <Col flex="auto">
-                    <div x-if={allOrgList.length > 1} className="stretch" onClick={() => { setStretch(!stretch) }}>
+                    <div x-if={allOrgList.length > 1} className="stretch" style={{ background: token.colorBgContainer, color: token.colorText }} onClick={() => { setStretch(!stretch) }}>
                         {stretch ? <RightOutlined /> : <LeftOutlined />}
                     </div>
                     <UserList
