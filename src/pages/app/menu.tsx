@@ -8,7 +8,7 @@ import {
     ProFormTextArea,
     ProFormInstance,
 } from "@ant-design/pro-components";
-import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button } from "antd";
+import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from "antd";
 import { SettingOutlined } from "@ant-design/icons";
 import { useEffect, useState, useRef, ReactNode } from "react";
 import { formatTreeData, getTreeDropData, loopTreeData } from "@/util";
@@ -242,7 +242,6 @@ export default () => {
 
     useEffect(() => {
         getMenusRequest(true)
-        setTreeDraggable(checkAuth('moveAppMenu', auth))
     }, [])
 
 
@@ -262,9 +261,20 @@ export default () => {
             }}
         >
             <ProCard split="vertical">
-                <ProCard title={
-                    <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
-                } colSpan="30%" loading={loading}>
+                <ProCard colSpan="30%" loading={loading}>
+                    <Row wrap={false}>
+                        <Col flex="auto">
+                            <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
+                        </Col>
+                        <Col >
+                            <Auth authKey="moveAppMenu">
+                                <Button type="text" onClick={() => {
+                                    setTreeDraggable(!treeDraggable)
+                                }}>{treeDraggable ? '取消' : '拖拽'}</Button>
+                            </Auth>
+                        </Col>
+                    </Row>
+                    <br />
                     <Tree x-if={treeData.length != 0}
                         draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
                         treeData={treeData}

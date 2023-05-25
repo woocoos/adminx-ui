@@ -12,18 +12,16 @@ import { Org, getOrgPathList, moveOrg } from "@/services/org";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
-import { checkAuth } from "@/components/Auth";
 import { TreeDataState } from "@/services/graphql";
 import KeepAlive from "@/components/KeepAlive";
-import { useAuth } from "ice";
 import styles from "./users.module.css";
+import Auth from "@/components/Auth";
 
 const PageOrgUsers = (props: {
     orgId: string
 }) => {
     const { token } = useToken(),
         { t } = useTranslation(),
-        [auth] = useAuth(),
         [treeDraggable, setTreeDraggable] = useState(false),
         [stretch, setStretch] = useState(false),
         userListActionRef = useRef<UserListRef>(null),
@@ -94,7 +92,6 @@ const PageOrgUsers = (props: {
 
     useEffect(() => {
         getRequest()
-        setTreeDraggable(checkAuth('moveOrganization', auth))
     }, [props.orgId])
 
     token
@@ -116,9 +113,20 @@ const PageOrgUsers = (props: {
             <Row gutter={16} wrap={false}>
                 <Col flex="280px" x-if={!stretch}>
                     <div style={{ background: token.colorBgContainer, height: "100%" }}>
-                        <ProCard title={
-                            <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
-                        } colSpan="280px">
+                        <ProCard colSpan="280px">
+                            <Row wrap={false}>
+                                <Col flex="auto">
+                                    <Input.Search style={{ width: '100%' }} placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
+                                </Col>
+                                <Col >
+                                    <Auth authKey="moveOrganization">
+                                        <Button type="text" onClick={() => {
+                                            setTreeDraggable(!treeDraggable)
+                                        }}>{treeDraggable ? '取消' : '拖拽'}</Button>
+                                    </Auth>
+                                </Col>
+                            </Row>
+                            <br />
                             <Tree
                                 draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
                                 treeData={treeData}
