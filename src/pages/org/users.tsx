@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
 import Auth from "@/components/Auth";
 import { TreeDataState } from "@/services/graphql";
-import KeepAlive from "react-activation";
+import KeepAlive from "@/components/KeepAlive";
 
 const PageOrgUsers = (props: {
     orgId: string
@@ -147,7 +147,7 @@ export default () => {
         [searchParams] = useSearchParams(),
         orgId = searchParams.get("id") || basisState.tenantId
 
-    return (<KeepAlive cacheKey="orgUsers" id={`orgId${orgId}`}>
+    return (<KeepAlive>
         <PageOrgUsers orgId={orgId} />
     </KeepAlive>
     )

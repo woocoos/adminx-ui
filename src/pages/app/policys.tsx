@@ -13,7 +13,7 @@ import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from "
 import { useTranslation } from "react-i18next";
 import { Link, useSearchParams } from "@ice/runtime";
 import Auth from "@/components/Auth";
-import KeepAlive from 'react-activation'
+import KeepAlive from "@/components/KeepAlive";
 
 
 const PageAppPolicys = (props: {
@@ -179,7 +179,7 @@ export default () => {
     const [searchParams] = useSearchParams(),
         appId = searchParams.get('id') || ''
 
-    return <KeepAlive cacheKey="appPolicys" id={`appId${appId || 0}`}>
+    return <KeepAlive>
         <PageAppPolicys appId={appId} />
     </KeepAlive>
 }

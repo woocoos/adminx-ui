@@ -14,7 +14,7 @@ import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from "@/services/org/policy
 import store from "@/store";
 import { useTranslation } from "react-i18next";
 import Auth from "@/components/Auth";
-import KeepAlive from "react-activation";
+import KeepAlive from "@/components/KeepAlive";
 
 
 export default () => {
@@ -119,7 +119,7 @@ export default () => {
     }, [searchParams])
 
     return (
-        <KeepAlive cacheKey="orgPolicys" id={`orgId${orgInfo?.id || 0}`}>
+        <KeepAlive>
             <PageContainer
                 header={{
                     title: t('policy'),

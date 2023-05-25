@@ -20,7 +20,7 @@ import DrawerRolePolicy from "./components/drawerRolePolicy";
 import Auth, { checkAuth } from "@/components/Auth";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { useAuth } from "ice";
-import KeepAlive from "react-activation";
+import KeepAlive from "@/components/KeepAlive";
 
 
 export default () => {
@@ -157,7 +157,7 @@ export default () => {
 
 
     return (
-        <KeepAlive cacheKey="appRoles" id={`appRoleId${appInfo?.id || 0}`}>
+        <KeepAlive>
             <PageContainer
                 header={{
                     title: t('Application role'),

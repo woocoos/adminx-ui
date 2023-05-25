@@ -18,7 +18,7 @@ import ModalApp from "./components/modalApp"
 import { useTranslation } from "react-i18next";
 import Auth, { checkAuth } from "@/components/Auth";
 import { ItemType } from "antd/es/menu/hooks/useItems";
-import KeepAlive from 'react-activation'
+import KeepAlive from "@/components/KeepAlive";
 
 export type AppListRef = {
   getSelect: () => App[]
@@ -295,7 +295,7 @@ export const AppList = forwardRef(PageAppList)
 
 export default () => {
 
-  return <KeepAlive cacheKey="appList">
+  return <KeepAlive>
     <AppList />
   </KeepAlive>
 }

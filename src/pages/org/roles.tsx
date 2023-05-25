@@ -19,7 +19,7 @@ import DrawerUser from "../account/components/drawerUser";
 import DrawerRolePolicy from "./components/drawerRolePolicy";
 import DrawerAppRolePolicy from "@/pages/app/components/drawerRolePolicy";
 import Auth from "@/components/Auth";
-import KeepAlive from "react-activation";
+import KeepAlive from "@/components/KeepAlive";
 
 export type OrgRoleListRef = {
     getSelect: () => OrgRole[]
@@ -313,7 +313,7 @@ export default () => {
         [searchParams, setSearchParams] = useSearchParams(),
         orgId = searchParams.get('id') || basisState.tenantId
 
-    return <KeepAlive cacheKey="orgRoles" id={`orgId${orgId}`}>
+    return <KeepAlive>
         <OrgRoleList orgId={orgId} />
     </KeepAlive>
 }
