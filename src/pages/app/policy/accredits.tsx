@@ -47,9 +47,9 @@ export default () => {
                 render: (text, record) => {
                     return <Space>
                         <Auth authKey="revokeOrganizationAppPolicy">
-                            <a key="del" onClick={() => onDel(record)}>
+                            {record.isAllowRevokeAppPolicy ? <a key="del" onClick={() => onDel(record)}>
                                 {t('disauthorization')}
-                            </a>
+                            </a> : ''}
                         </Auth>
                     </Space>
 
@@ -81,9 +81,11 @@ export default () => {
         },
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
             const table = { data: [] as Org[], success: true, total: 0 },
-                info = await getInfo();
+                info = searchParams.get('id') == appPolicyInfo?.id ? appPolicyInfo : await getInfo();
             if (info) {
-                const result = await getAppPolicyAssignedOrgList(info.id, params, filter, sort);
+                const result = await getAppPolicyAssignedOrgList(info.id, params, filter, sort, {
+                    appPolicyId: info.id
+                });
                 if (result) {
                     table.data = result
                     table.total = result.length

@@ -96,13 +96,13 @@ export default (props: {
             title: t('operation'), dataIndex: 'actions', fixed: 'right',
             align: 'center', search: false, width: 110,
             render: (text, record) => {
-                return <Space>
+                return record.isAllowRevoke ? <Space>
                     <Auth authKey="revoke">
                         <a key="del" onClick={() => onDel(record)}>
                             {t('disauthorization')}
                         </a>
                     </Auth>
-                </Space>
+                </Space> : ''
             }
         })
     }

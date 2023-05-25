@@ -31,6 +31,7 @@ export interface Org {
     parent?: Org
     owner?: User
     children?: Org[]
+    isAllowRevokeAppPolicy?: boolean
 }
 
 export const EnumOrgStatus = {

@@ -36,6 +36,7 @@ export interface User {
   password?: UserPassword
   identities?: UserIdentity[]
   isAssignOrgRole?: boolean
+  isAllowRevokeRole?: boolean
 }
 
 export type UserLoginProfileSetKind = "keep" | "customer" | "auto"

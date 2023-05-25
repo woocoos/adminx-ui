@@ -26,6 +26,7 @@ export async function getOrgUserList(orgId: string, params: TableParams, filter:
                             cursor,node{                    
                                 ${UserNodeField}
                                 ${isGrant?.orgRoleId ? `isAssignOrgRole(orgRoleID: "${isGrant.orgRoleId}")` : ''}
+                                ${isGrant?.orgRoleId ? `isAllowRevokeRole(orgRoleID: "${isGrant.orgRoleId}")` : ''}
                             }
                         }
                     }
@@ -56,7 +57,9 @@ export async function getOrgUserList(orgId: string, params: TableParams, filter:
  * @param sort 
  * @returns 
  */
-export async function getOrgRoleUserList(roleId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getOrgRoleUserList(roleId: string, params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    orgRoleId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlPageApi(
             `#graphql
@@ -66,6 +69,8 @@ export async function getOrgRoleUserList(roleId: string, params: TableParams, fi
                     edges{                                        
                         cursor,node{                    
                             ${UserNodeField}
+                            ${isGrant?.orgRoleId ? `isAssignOrgRole(orgRoleID: "${isGrant.orgRoleId}")` : ''}
+                            ${isGrant?.orgRoleId ? `isAllowRevokeRole(orgRoleID: "${isGrant.orgRoleId}")` : ''}
                         }
                     }
                 }

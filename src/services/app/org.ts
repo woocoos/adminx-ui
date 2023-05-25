@@ -79,13 +79,16 @@ export async function getAppRoleAssignedOrgList(appRoleId: string, params: Table
  * @param appPolicyId
  * @returns 
  */
-export async function getAppPolicyAssignedOrgList(appPolicyId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
+export async function getAppPolicyAssignedOrgList(appPolicyId: string, params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
+    appPolicyId?: string
+}) {
     const { where, orderBy } = getGraphqlFilter(params, filter, sort),
         result = await graphqlApi(
             `#graphql
         query appPolicyAssignedToOrgs($where: OrgWhereInput){
             list:appPolicyAssignedToOrgs(policyID:"${appPolicyId}",where:$where){
                 ${OrgNodeField}
+                ${isGrant?.appPolicyId ? `isAllowRevokeAppPolicy(appPolicyID: "${isGrant.appPolicyId}")` : ''}
             }
         }`, {
             where

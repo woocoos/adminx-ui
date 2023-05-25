@@ -46,7 +46,7 @@ export default () => {
                 title: t('operation'), dataIndex: 'actions', fixed: 'right',
                 align: 'center', search: false, width: 170,
                 render: (text, record) => {
-                    return <Space>
+                    return record.isAllowRevoke ? <Space>
                         <Auth authKey="revoke">
                             <a onClick={() => {
                                 revokeOrg(record)
@@ -54,7 +54,7 @@ export default () => {
                                 {t('disauthorization')}
                             </a>
                         </Auth>
-                    </Space>
+                    </Space> : ''
                 }
             }
         ]

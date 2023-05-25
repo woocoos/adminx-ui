@@ -19,6 +19,7 @@ export type Permission = {
     startAt: string
     endAt: string
     status: PermissionStatus
+    isAllowRevoke: boolean
     org?: Org
     user?: User
     role?: OrgRole
@@ -44,6 +45,7 @@ export const EnumPermissionStatus = {
 
 export const PermissionNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,userID,roleID,orgPolicyID,startAt,endAt,status,
+    isAllowRevoke,
     role{
         ${OrgRoleNodeField}
     }

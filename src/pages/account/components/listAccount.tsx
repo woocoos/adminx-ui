@@ -129,7 +129,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           }
           return props.scene === "roleUser" ? <Space>
             <Auth authKey="revokeRoleUser">
-              <a onClick={() => onRemoveRole(record)}>{t("remove")}</a>
+              {record.isAllowRevokeRole ? <a onClick={() => onRemoveRole(record)}>{t("remove")}</a> : ''}
             </Auth>
           </Space> : props.scene === 'orgUser' ? <Space>
             <Link key="editor" to={`/account/viewer?id=${record.id}`}>
@@ -167,7 +167,9 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       let result: List<User> | null
       params['userType'] = props.userType
       if (props.orgRole) {
-        result = await getOrgRoleUserList(props.orgRole.id, params, filter, sort)
+        result = await getOrgRoleUserList(props.orgRole.id, params, filter, sort, {
+          orgRoleId: props.orgRole.id
+        })
       } else if (props.orgId) {
         result = await getOrgUserList(props.orgId, params, filter, sort)
       } else {
