@@ -1,0 +1,9 @@
+.viewer :global {
+    .ant-descriptions-header {
+        margin-bottom: 10px
+    }
+
+    .ant-divider {
+        margin: 0 0 10px 0;
+    }
+}

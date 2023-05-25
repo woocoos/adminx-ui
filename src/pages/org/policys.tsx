@@ -27,7 +27,11 @@ export default () => {
         proTableRef = useRef<ActionType>(),
         columns: ProColumns<OrgPolicy>[] = [
             // 有需要排序配置  sorter: true 
-            { title: t('name'), dataIndex: 'name', width: 120, },
+            {
+                title: t('name'), dataIndex: 'name', width: 120, search: {
+                    transform: (value) => ({ nameContains: value || undefined })
+                }
+            },
             { title: t('description'), dataIndex: 'comments', width: 120, search: false, },
             {
                 title: t('policy type'), dataIndex: 'type', width: 120,

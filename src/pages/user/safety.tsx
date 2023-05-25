@@ -6,6 +6,7 @@ import { Divider } from "antd"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import UnbindMFA from "./components/unbindMFA"
+import styles from "./safety.module.css"
 
 export default () => {
 
@@ -48,8 +49,8 @@ export default () => {
             },
         }}
     >
-        <ProCard loading={loading}>
-            <ProDescriptions title={t('Account password')} column={2} extra={
+        <ProCard className={styles.safrety} loading={loading} >
+            <ProDescriptions size="small" title={t('Account password')} column={2} extra={
                 info ? <Link to="/user/password">
                     {t('amend')}
                 </Link> : ''
@@ -58,8 +59,8 @@ export default () => {
                     {info?.email}
                 </ProDescriptions.Item>
             </ProDescriptions>
-            <Divider style={{ margin: "0 0 24px 0" }} />
-            <ProDescriptions title={t('virtual MFA')} column={1} extra={
+            <Divider />
+            <ProDescriptions size="small" title={t('virtual MFA')} column={1} extra={
                 info?.loginProfile?.mfaEnabled ? <a onClick={() => {
                     setModal({ open: true })
                 }}>

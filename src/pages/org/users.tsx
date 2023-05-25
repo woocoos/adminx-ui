@@ -3,24 +3,29 @@ import {
     ProCard,
     useToken,
 } from "@ant-design/pro-components";
-import { Tree, Empty, Input, Button, Row, Col } from "antd";
+import { Tree, Empty, Input, Button, Row, Col, message } from "antd";
 import { useEffect, useState, useRef, ReactNode } from "react";
+import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 import UserList, { UserListRef } from "@/pages/account/components/listAccount";
 import { formatTreeData, getTreeDropData, loopTreeData } from "@/util";
 import { Org, getOrgPathList, moveOrg } from "@/services/org";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "@ice/runtime";
-import Auth from "@/components/Auth";
+import { checkAuth } from "@/components/Auth";
 import { TreeDataState } from "@/services/graphql";
 import KeepAlive from "@/components/KeepAlive";
+import { useAuth } from "ice";
+import styles from "./users.module.css";
 
 const PageOrgUsers = (props: {
     orgId: string
 }) => {
     const { token } = useToken(),
         { t } = useTranslation(),
+        [auth] = useAuth(),
         [treeDraggable, setTreeDraggable] = useState(false),
+        [stretch, setStretch] = useState(false),
         userListActionRef = useRef<UserListRef>(null),
         [loading, setLoading] = useState(false),
         [allOrgList, setAllOrgList] = useState<Org[]>([]),
@@ -53,6 +58,7 @@ const PageOrgUsers = (props: {
                 )
             )
 
+            setStretch(orgList.length <= 1)
             setLoading(false)
         },
         onSearch = (keyword: string) => {
@@ -66,12 +72,18 @@ const PageOrgUsers = (props: {
         },
         onTreeDrop = async (dragInfo) => {
             const { sourceId, targetId, action, newTreeData } = getTreeDropData(treeData, dragInfo)
-
-            // 传给后端数据效果
-            await moveOrg(sourceId, targetId, action);
-            await getRequest();
-            // 前端拖拽效果
-            // setTreeData(newTreeData)
+            const targetData = allOrgList.find(item => item.id == targetId)
+            if (targetData?.parentID == '0' && ['up', 'down'].includes(action)) {
+                message.warning(t('Unable to move to the root node'))
+            } else {
+                // 传给后端数据效果
+                const result = await moveOrg(sourceId, targetId, action);
+                if (result) {
+                    await getRequest();
+                    // 前端拖拽效果
+                    // setTreeData(newTreeData)
+                }
+            }
         },
         proCardtitle = () => {
             if (selectedData) {
@@ -82,11 +94,13 @@ const PageOrgUsers = (props: {
 
     useEffect(() => {
         getRequest()
+        setTreeDraggable(checkAuth('moveOrganization', auth))
     }, [props.orgId])
 
 
     return (
         <PageContainer
+            className={styles.users}
             header={{
                 title: t('organizational user management'),
                 style: { background: token.colorBgContainer },
@@ -96,37 +110,29 @@ const PageOrgUsers = (props: {
                         { title: t('organizational user management'), },
                     ],
                 },
-                extra:
-                    <Auth authKey={"moveOrganization"}>
-                        <Button onClick={() => {
-                            setTreeDraggable(!treeDraggable)
-                        }}
-                        >
-                            {treeDraggable ? t('close') : t('open')}{t('move')}
-                        </Button>
-                    </Auth>
             }}
+            loading={loading}
         >
             <Row gutter={16} wrap={false}>
-                <Col flex="280px" >
+                <Col flex="280px" x-if={!stretch}>
                     <div style={{ background: token.colorBgContainer, height: "100%" }}>
                         <ProCard title={
                             <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
-                        } colSpan="280px" loading={loading}>
-                            <Tree x-if={treeData.length != 0}
-                                draggable={treeDraggable}
+                        } colSpan="280px">
+                            <Tree
+                                draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
                                 treeData={treeData}
                                 onSelect={onTreeSelect}
                                 onDrop={onTreeDrop}
                                 selectedKeys={selectedData ? [selectedData.id] : []} defaultExpandAll
                             />
-                            <div x-else>
-                                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-                            </div>
                         </ProCard>
                     </div>
                 </Col>
                 <Col flex="auto">
+                    <div x-if={allOrgList.length > 1} className="stretch" onClick={() => { setStretch(!stretch) }}>
+                        {stretch ? <RightOutlined /> : <LeftOutlined />}
+                    </div>
                     <UserList
                         x-if={selectedData}
                         ref={userListActionRef}

@@ -16,6 +16,7 @@ import ListUserPermission from "./components/listUserPermission";
 import ListUserJoinGroup from "./components/listUserJoinGroup";
 import { useSearchParams } from "@ice/runtime";
 import Auth from "@/components/Auth";
+import style from "./viewer.module.css";
 
 export default () => {
     const { token } = useToken(),
@@ -134,6 +135,7 @@ export default () => {
 
     return (
         <PageContainer
+            className={style.viewer}
             header={{
                 title: t("{{field}} detail", { field: t(info?.userType || '') }),
                 style: { background: token.colorBgContainer },
@@ -147,7 +149,7 @@ export default () => {
             }}
         >
             <ProCard loading={loading} >
-                <ProDescriptions title={t('Basic information')} column={2} extra={
+                <ProDescriptions size="small" title={t('Basic information')} column={2} extra={
                     info ? <Auth authKey="updateUser">
                         <Button onClick={() =>
                             setModal({ open: true, title: t('amend {{field}}', { field: t("basic information") }), scene: "base", userType: info?.userType || 'member' })
@@ -185,13 +187,15 @@ export default () => {
 
             </ProCard>
             {info ? <ProCard
+                style={{ marginTop: '-14px' }}
                 tabs={{
+                    size: "small",
                     items: [
                         {
                             label: t("{{field}} management", { field: t('certification') }),
                             key: 'certification',
                             children: <>
-                                <ProDescriptions title={t('Login credentials')} column={3} extra={
+                                <ProDescriptions size="small" title={t('Login credentials')} column={3} extra={
                                     <Auth authKey={["deleteUserIdentity", "bindUserIdentity"]} keyAndOr="or">
                                         <Button onClick={() =>
                                             setModal({ open: true, title: t('amend {{field}}', { field: t('login credentials') }), scene: "identity", userType: info?.userType || 'member' })
@@ -202,8 +206,8 @@ export default () => {
                                 }>
                                     {identityRender()}
                                 </ProDescriptions>
-                                <Divider style={{ margin: "0 0 24px 0" }} />
-                                <ProDescriptions title={t('Login Settings')} column={3} extra={
+                                <Divider />
+                                <ProDescriptions size="small" title={t('Login Settings')} column={3} extra={
                                     <Auth authKey="updateLoginProfile">
                                         <Button onClick={() =>
                                             setModal({ open: true, title: t('amend {{field}}', { field: t('login Settings') }), scene: "loginProfile", userType: info?.userType || 'member' })
@@ -225,8 +229,8 @@ export default () => {
                                         {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
                                     </ProDescriptions.Item>
                                 </ProDescriptions>
-                                <Divider style={{ margin: "0 0 24px 0" }} />
-                                <ProDescriptions title={t('MFA')} column={3}
+                                <Divider />
+                                <ProDescriptions size="small" title={t('MFA')} column={3}
                                     extra={
                                         <Space>
                                             {
@@ -290,19 +294,22 @@ export default () => {
                         }, {
                             label: t("{{field}} management", { field: t('permission') }),
                             key: 'permission',
-                            children: <ProCard tabs={{
-                                items: [
-                                    {
-                                        label: t('personal authority'),
-                                        key: 'user-permission',
-                                        children: <ListUserPermission userInfo={info} principalKind="user" />
-                                    }, {
-                                        label: t('inherit user group permissions'),
-                                        key: 'group-permission',
-                                        children: <ListUserPermission userInfo={info} isExtendGroup principalKind="role" />
-                                    }
-                                ]
-                            }}
+                            children: <ProCard
+                                style={{ marginTop: '-14px' }}
+                                tabs={{
+                                    size: "small",
+                                    items: [
+                                        {
+                                            label: t('personal authority'),
+                                            key: 'user-permission',
+                                            children: <ListUserPermission userInfo={info} principalKind="user" />
+                                        }, {
+                                            label: t('inherit user group permissions'),
+                                            key: 'group-permission',
+                                            children: <ListUserPermission userInfo={info} isExtendGroup principalKind="role" />
+                                        }
+                                    ]
+                                }}
                             />
                         }
                     ],

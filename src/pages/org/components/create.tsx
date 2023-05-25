@@ -114,7 +114,11 @@ export default (props: {
             }
             switch (props.scene) {
                 case "editor":
-                    result = props.id ? await updateOrgInfo(props.id, values) : await createOrgInfo(values, props.kind)
+                    if (props.id) {
+                        result = await updateOrgInfo(props.id, values)
+                    } else {
+                        result = await createOrgInfo(values, props.kind)
+                    }
                     break;
                 case "peer":
                     result = await createOrgInfo(values, props.kind)
@@ -168,9 +172,21 @@ export default (props: {
                 request={parentRequest} rules={[
                     { required: true, message: `${t("Please enter {{field}}", { field: t("parent organization") })}`, },
                 ]} />
-            <ProFormText name="domain" label={t('domain')} tooltip={t('The domain cannot be modified at will. Otherwise, the user login account will be changed')} />
-            <ProFormText name="countryCode" label={t('country/region')} />
-            <ProFormText label={t('manage account')} tooltip={t('The Settings cannot be modified')} >
+            <ProFormText
+                x-if={props.kind === 'root'}
+                disabled={!!props.id}
+                name="domain"
+                label={t('domain')}
+                tooltip={t('The domain cannot be modified at will. Otherwise, the user login account will be changed')}
+            />
+            <ProFormText
+                x-if={props.kind === 'root'}
+                name="countryCode"
+                label={t('country/region')} />
+            <ProFormText
+                x-if={props.kind === 'root'}
+                label={t('manage account')}
+                tooltip={t('The Settings cannot be modified')} >
                 <InputAccount value={owner}
                     userType="account"
                     onChange={(value) => {

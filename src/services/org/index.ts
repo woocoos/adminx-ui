@@ -140,6 +140,7 @@ export async function getOrgInfo(orgId: string) {
  */
 export async function updateOrgInfo(orgId: string, input: Org | Record<string, any>) {
     delete input['code'];
+    delete input['domain'];
     const result = await graphqlApi(
         `#graphql
         mutation updateOrganization($input: UpdateOrgInput!){

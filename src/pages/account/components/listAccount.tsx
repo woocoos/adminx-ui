@@ -47,14 +47,26 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     [dataSource, setDataSource] = useState<User[]>([]),
     columns: ProColumns<User>[] = [
       // 有需要排序配置  sorter: true 
-      { title: t("principal name"), dataIndex: 'principalName', width: 90, },
+      {
+        title: t("principal name"), dataIndex: 'principalName', width: 90, search: {
+          transform: (value) => ({ principalNameContains: value || undefined })
+        }
+      },
       {
         title: t('display name'), dataIndex: 'displayName', width: 120, search: {
           transform: (value) => ({ displayNameContains: value || undefined })
         }
       },
-      { title: t('email'), dataIndex: 'email', width: 120, },
-      { title: t('mobile'), dataIndex: 'mobile', width: 160 },
+      {
+        title: t('email'), dataIndex: 'email', width: 120, search: {
+          transform: (value) => ({ emailContains: value || undefined })
+        }
+      },
+      {
+        title: t('mobile'), dataIndex: 'mobile', width: 160, search: {
+          transform: (value) => ({ mobileContains: value || undefined })
+        }
+      },
       {
         title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
         valueEnum: EnumUserStatus,
@@ -84,7 +96,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         render: (text, record) => {
           const items: ItemType[] = []
 
-          if (props.scene === 'orgUser') {
+          if (props.scene === 'orgUser' && props.orgInfo?.kind === 'root') {
             if (checkAuth('assignRoleUser', auth)) {
               items.push(
                 {
@@ -115,10 +127,12 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             )
           }
           if (props.scene === 'orgUser') {
-            if (checkAuth('removeOrganizationUser', auth)) {
-              items.push(
-                { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> }
-              )
+            if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
+              if (checkAuth('removeOrganizationUser', auth)) {
+                items.push(
+                  { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> }
+                )
+              }
             }
           } else {
             if (checkAuth('deleteUser', auth)) {
@@ -219,7 +233,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         content: `${t('confirm remove')}：${record.displayName} ?`,
         onOk: async (close) => {
           if (props?.orgId) {
-            const result = await removeOrgUser(props.orgId, record.id)
+            const result = props.orgInfo?.kind === 'root' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id)
             if (result) {
               proTableRef.current?.reload();
               message.success(t('submit success'))
@@ -284,20 +298,21 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                   </Button>
                 </Auth>
               ] : props.scene === "orgUser" ? [
-                <Auth authKey="createOrganizationUser">
-                  <Button type="primary" onClick={() => {
-                    setModal({ open: true, title: t('create {{field}}', { field: t('user') }), scene: "create" })
-                  }}>
-                    {t('create {{field}}', { field: t('user') })}
-                  </Button>
-                </Auth>,
-                <Auth authKey="allotOrganizationUser">
+                props.orgInfo?.kind === 'root' ?
+                  <Auth authKey="createOrganizationUser">
+                    <Button type="primary" onClick={() => {
+                      setModal({ open: true, title: t('create {{field}}', { field: t('user') }), scene: "create" })
+                    }}>
+                      {t('create {{field}}', { field: t('user') })}
+                    </Button>
+                  </Auth> : '',
+                props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
                   <Button type="primary" onClick={() => {
                     setModal({ open: true, title: t('add {{field}}', { field: t('user') }), scene: "add" })
                   }}>
                     {t('add {{field}}', { field: t('user') })}
                   </Button>
-                </Auth>
+                </Auth> : ''
               ] : []
             }}
             scroll={{ x: 'max-content', y: 300 }}

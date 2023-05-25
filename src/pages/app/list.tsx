@@ -45,7 +45,11 @@ const PageAppList = (props: {
           transform: (value) => ({ nameContains: value || undefined })
         }
       },
-      { title: t('code'), dataIndex: 'code', width: 120, },
+      {
+        title: t('code'), dataIndex: 'code', width: 120, search: {
+          transform: (value) => ({ codeContains: value || undefined })
+        }
+      },
       {
         title: t('type'), dataIndex: 'kind',
         filters: true,

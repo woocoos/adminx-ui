@@ -252,7 +252,7 @@ const RuleItem = (props: {
                     </div>
                 </Col>
             </Row>
-            <Divider style={{ margin: "10px 0" }} />
+            {/* <Divider style={{ margin: "10px 0" }} />
             <Row >
                 <Col style={rowColStyle()}>
                     <CaretUpOutlined x-if={stretch3} onClick={() => { setStretch3(false) }} />
@@ -269,7 +269,7 @@ const RuleItem = (props: {
                         {t("Please select {{field}}", { field: t('app') })}
                     </div>
                 </Col>
-            </Row>
+            </Row> */}
         </ProCard >)
 }
 

@@ -178,8 +178,10 @@ export default () => {
         onTreeDrop = async (dragInfo) => {
             const { sourceId, targetId, action, newTreeData } = getTreeDropData(treeData, dragInfo)
 
-            await moveAppMenu(sourceId, targetId, action);
-            await getMenusRequest();
+            const result = await moveAppMenu(sourceId, targetId, action);
+            if (result) {
+                await getMenusRequest();
+            }
         },
         onDelMenu = (menuInfo: AppMenu) => {
             Modal.confirm({
@@ -211,7 +213,7 @@ export default () => {
                     values.actionID = formFieldsValue.action.id
                 }
                 if (selectedTree.info?.id && selectedTree.action === 'editor') {
-                    if(values.kind === 'dir'){
+                    if (values.kind === 'dir') {
                         values.actionID = null
                     }
                     const ur = await updateAppMenu(selectedTree.info.id, values)
@@ -240,6 +242,7 @@ export default () => {
 
     useEffect(() => {
         getMenusRequest(true)
+        setTreeDraggable(checkAuth('moveAppMenu', auth))
     }, [])
 
 
@@ -256,15 +259,6 @@ export default () => {
                         { title: t("{{field}} management", { field: t('menu') }), },
                     ],
                 },
-                extra:
-                    <Auth authKey={"moveAppMenu"}>
-                        <Button onClick={() => {
-                            setTreeDraggable(!treeDraggable)
-                        }}
-                        >
-                            {treeDraggable ? t('close') : t('open')}{t('move')}
-                        </Button>
-                    </Auth>
             }}
         >
             <ProCard split="vertical">
@@ -272,7 +266,7 @@ export default () => {
                     <Input.Search placeholder={`${t("search {{field}}", { field: t('keyword') })}`} onSearch={onSearch} />
                 } colSpan="30%" loading={loading}>
                     <Tree x-if={treeData.length != 0}
-                        draggable={treeDraggable}
+                        draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
                         treeData={treeData}
                         onSelect={onTreeSelect}
                         selectedKeys={selectedTree.keys} defaultExpandAll
@@ -330,7 +324,7 @@ export default () => {
                                         name="route"
                                         label={t('route')}
                                         placeholder={`${t("Please enter {{field}}", { field: t('route') })}`}
-                                    />                                    
+                                    />
                                 </> : ''
                             )}
                         </ProForm.Item>
