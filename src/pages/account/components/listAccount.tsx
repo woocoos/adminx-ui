@@ -21,6 +21,7 @@ import DrawerRole from "@/pages/org/components/drawerRole";
 import DrawerRolePolicy from "@/pages/org/components/drawerRolePolicy";
 import Auth, { checkAuth } from "@/components/Auth";
 import { ItemType } from "antd/es/menu/hooks/useItems";
+import store from "@/store";
 
 type UserListProps = {
   title?: string
@@ -42,6 +43,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [auth] = useAuth(),
+    [basisState] = store.useModel("basis"),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [dataSource, setDataSource] = useState<User[]>([]),
@@ -388,7 +390,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           <DrawerUser
             open={modal.open}
             title={modal.title}
-            orgId={props.orgId}
+            orgId={basisState.tenantId}
             orgRole={props.orgRole}
             orgInfo={props.orgInfo}
             userType={props.userType}

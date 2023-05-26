@@ -9,6 +9,7 @@ import {
 } from "../graphql";
 import { AppAction, AppActionField } from "../app/action";
 import { AppMenu, AppMenuField } from "../app/menu";
+import { Org, OrgNodeField } from "../org";
 
 export type UserType = "account" | "member"
 export type UserCreationType = "invitation" | "register" | "manual"
@@ -129,11 +130,11 @@ export const EnumUserLoginProfileMfaStatus = {
   processing: { text: "处理中", status: 'warning' }
 }
 
-export const
-  UserNodeField = `#graphql
+export const UserNodeField = `#graphql
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments`,
-  UserLoginProfileField = `#graphql
+      email,mobile,userType,creationType,registerIP,status,comments`;
+
+const UserLoginProfileField = `#graphql
       id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
       canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
   `,
@@ -142,7 +143,7 @@ export const
   `,
   MFANodeField = `#graphql
       secret,account
-  `
+  `;
 
 export type UpdateUserInfoScene = "create" | "base" | "loginProfile" | "identity"
 
@@ -223,12 +224,12 @@ export async function getUserInfo(userId: string, scene?: UpdateUserInfoScene[],
  */
 export async function createUserInfo(rootOrgID: string, input: User | Record<string, any>, userType: UserType, setKind: UserLoginProfileSetKind) {
   if (input['password']) {
+    const pwd = input['password']
     input.password = {
       scene: "login",
-      password: input['password'],
-      status: "active"
+      status: "active",
+      password: pwd,
     }
-    delete input['password']
   }
 
   if (setKind) {
@@ -542,6 +543,27 @@ export async function userMenus(appCode: string) {
 
   if (result?.data?.list) {
     return result?.data?.list as AppMenu[]
+  } else {
+    return null
+  }
+}
+
+/**
+ * 获取用户root组织
+ * @returns 
+ */
+export async function userRootOrgs() {
+  const result = await graphqlApi(
+    `#graphql
+    query userRootOrgs{
+      list:userRootOrgs{
+        ${OrgNodeField}
+      }
+    }`
+  )
+
+  if (result?.data?.list) {
+    return result?.data?.list as Org[]
   } else {
     return null
   }

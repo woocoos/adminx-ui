@@ -46,10 +46,12 @@ export const EnumOrgStatus = {
 export const OrgNodeField = `#graphql
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,
-    owner{
-        ${UserNodeField}
+    owner {
+        id,displayName
+        # 不知道为什么 undefined
+        # ${UserNodeField}
     }
-    `
+`
 
 /**
  * 获取组织信息

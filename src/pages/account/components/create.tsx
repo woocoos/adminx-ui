@@ -143,6 +143,7 @@ export default (props: {
                 </div>
                 <br />
                 <ProFormText.Password x-if={setKind === 'customer'} name="password" label={t('password')}
+                    fieldProps={{ "autocomplete": "new-password" } as any}
                     rules={[
                         { required: true, message: `${t("Please enter {{field}}", { field: t("password") })}`, },
                     ]} />

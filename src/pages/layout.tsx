@@ -13,6 +13,7 @@ import i18n from "@/i18n";
 import { ProConfigProvider, useToken } from "@ant-design/pro-components";
 import LeavePrompt, { Link } from "@/components/LeavePrompt";
 import { AliveScope } from 'react-activation'
+import TenantDropdown from "@/components/Header/TenantDropdown";
 
 export default function Layout() {
   const [basisState] = store.useModel("basis"),
@@ -49,6 +50,7 @@ export default function Layout() {
         rightContentRender={() => (
           <>
             <I18nDropdown />
+            <TenantDropdown />
             <AvatarDropdown
               avatar={defaultAvatar}
               name={basisState.user?.displayName || ""}

@@ -14,6 +14,7 @@ export default function Document() {
       </head>
       <body>
         <Main />
+        <div id='perch' />
         <Scripts />
       </body>
     </html>
