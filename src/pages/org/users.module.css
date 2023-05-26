@@ -21,4 +21,12 @@
         color: rgba(0, 0, 0, 0.65);
     }
 
+    .stretch.dark {
+        background-color: #1f1f1f;
+        color: rgba(255, 255, 255, 0.25);
+    }
+
+    .stretch.dark:hover {
+        color: rgba(255, 255, 255, 0.65);
+    }
 }

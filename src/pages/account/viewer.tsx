@@ -268,7 +268,7 @@ export default () => {
                                     }
                                 >
                                     <ProDescriptions.Item span={3} >
-                                        <span style={{ color: "rgba(0, 0, 0, 0.45)" }}>
+                                        <span style={{ color: token.colorTextDescription }}>
                                             {t('MFA is a simple and effective best security practice that adds a layer of security beyond the user name and password. The combination of these factors will provide higher security protection for your account')}
                                         </span>
                                     </ProDescriptions.Item>

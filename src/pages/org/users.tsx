@@ -22,6 +22,7 @@ const PageOrgUsers = (props: {
 }) => {
     const { token } = useToken(),
         { t } = useTranslation(),
+        [basisState] = store.useModel("basis"),
         [treeDraggable, setTreeDraggable] = useState(false),
         [stretch, setStretch] = useState(false),
         userListActionRef = useRef<UserListRef>(null),
@@ -138,7 +139,7 @@ const PageOrgUsers = (props: {
                     </div>
                 </Col>
                 <Col flex="auto">
-                    <div x-if={allOrgList.length > 1} className="stretch" style={{ background: token.colorBgContainer, color: token.colorText }} onClick={() => { setStretch(!stretch) }}>
+                    <div x-if={allOrgList.length > 1} className={`stretch ${basisState.darkMode ? 'dark' : ''}`} onClick={() => { setStretch(!stretch) }}>
                         {stretch ? <RightOutlined /> : <LeftOutlined />}
                     </div>
                     <UserList
