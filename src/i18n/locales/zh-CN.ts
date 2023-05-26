@@ -232,7 +232,7 @@ export default {
         "Resource ARN format": "资源ARN格式",
         "match all": "匹配全部",
         "Unable to move to the root node": "无法移动到根节点",
-        // "": "",
+        "drag": "拖拽",
         // "": "",
         // "": "",
     },

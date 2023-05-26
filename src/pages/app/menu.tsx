@@ -270,7 +270,7 @@ export default () => {
                             <Auth authKey="moveAppMenu">
                                 <Button type="text" onClick={() => {
                                     setTreeDraggable(!treeDraggable)
-                                }}>{treeDraggable ? '取消' : '拖拽'}</Button>
+                                }}>{treeDraggable ? t('cancel') : t('drag')}</Button>
                             </Auth>
                         </Col>
                     </Row>
