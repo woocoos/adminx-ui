@@ -14,15 +14,47 @@ import { ProConfigProvider, useToken } from "@ant-design/pro-components";
 import LeavePrompt, { Link } from "@/components/LeavePrompt";
 import { AliveScope } from 'react-activation'
 import TenantDropdown from "@/components/Header/TenantDropdown";
+import { monitorKeyChange } from "@/pkg/localStore";
+
+
 
 export default function Layout() {
-  const [basisState] = store.useModel("basis"),
+  const [basisState, basisDispatcher] = store.useModel("basis"),
     { token } = useToken();
 
   useEffect(() => {
     i18n.changeLanguage(basisState.locale);
   }, [basisState.locale])
 
+
+  useEffect(() => {
+    monitorKeyChange([
+      {
+        key: "tenantId",
+        onChange(value) {
+          basisDispatcher.updateTenantId(value)
+        },
+      },
+      {
+        key: "token",
+        onChange(value) {
+          basisDispatcher.updateToken(value)
+        },
+      },
+      {
+        key: "user",
+        onChange(value) {
+          basisDispatcher.updateUser(value)
+        },
+      },
+      {
+        key: "locale",
+        onChange(value) {
+          basisDispatcher.updateLocale(value)
+        },
+      },     
+    ])
+  }, [])
 
   return ["/login"].includes(location.pathname) ? <Outlet /> :
     <ProConfigProvider

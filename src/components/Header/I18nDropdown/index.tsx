@@ -10,11 +10,8 @@ const I18nDropdown: React.FC = () => {
   const [locale, setLocale] = useState("");
 
   const
-    onMenuClick = (event: MenuInfo) => {
-      updateLocale(event.key);
-    },
-    updateLocale = (key: String) => {
-      const mItem = menu.items.find((item) => item.key === key);
+    onMenuClick = (ev: MenuInfo) => {
+      const mItem = menu.items.find((item) => item.key === ev.key);
       if (mItem) {
         basisDispatcher.updateLocale(mItem.key as LocalLanguage);
         setLocale(mItem.label);
@@ -37,8 +34,11 @@ const I18nDropdown: React.FC = () => {
   };
 
   useEffect(() => {
-    updateLocale(basisState.locale);
-  }, []);
+    const mItem = menu.items.find((item) => item.key === basisState.locale);
+    if (mItem) {
+      setLocale(mItem.label);
+    }
+  }, [basisState.locale]);
 
   return (
     <Dropdown menu={menu}>

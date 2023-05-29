@@ -1,51 +1,67 @@
 import { createModel, history } from 'ice';
-import localStore from '@/pkg/localStore'
+
 import { LoginRes } from '@/services/basis';
 import { User } from '@/services/user';
+import { setItem, removeItem } from '@/pkg/localStore';
 
-interface BasisModelState {
+type BasisUserState = {
+  id: string
+  displayName: string
+}
+
+type BasisModelState = {
   locale: LocalLanguage
   token: string
   tenantId: string
   darkMode: boolean
   compactMode: boolean
-  user: User | undefined
+  user: BasisUserState | null
 }
 
 export type LocalLanguage = "zh-CN" | "en-US"
-
 
 export default createModel({
   state: {
     locale: "zh-CN",
     token: "",
     tenantId: "",
-    user: {},
+    user: null,
     darkMode: false,
     compactMode: false,
   } as BasisModelState,
   reducers: {
     updateLocale(prevState: BasisModelState, payload: LocalLanguage) {
-      localStore.setItem("locale", payload)
+      setItem("locale", payload)
       prevState.locale = payload;
     },
     updateToken(prevState: BasisModelState, payload: string) {
+      if (payload) {
+        setItem('token', payload)
+      } else {
+        removeItem("token")
+      }
       prevState.token = payload;
     },
     updateTenantId(prevState: BasisModelState, payload: string) {
+      if (payload) {
+        setItem('tenantId', payload)
+      } else {
+        removeItem("tenantId")
+      }
       prevState.tenantId = payload;
     },
-    updateUser(prevState: BasisModelState, payload?: User) {
+    updateUser(prevState: BasisModelState, payload: BasisUserState | null) {
+      if (payload) {
+        setItem('user', payload)
+      } else {
+        removeItem("user")
+      }
       prevState.user = payload
     },
     updateDarkMode(prevState: BasisModelState, payload: boolean) {
-      localStore.setItem("darkMode", payload)
+      setItem("darkMode", payload)
       prevState.darkMode = payload;
-    },
-    updateCompactMode(prevState: BasisModelState, payload: boolean) {
-      localStore.setItem("compactMode", payload)
-      prevState.compactMode = payload;
-    },
+    },   
   },
   effects: () => ({
     /**
@@ -54,12 +70,14 @@ export default createModel({
      */
     async login(payload: LoginRes) {
       if (payload.accessToken) {
-        this.updateToken(await localStore.setItem("token", payload.accessToken))
-        this.updateTenantId(await localStore.setItem("tenantId", `${payload.user?.domainId || ''}`))
-        this.updateUser(await localStore.setItem("user", {
-          id: payload.user?.id,
-          displayName: payload.user?.displayName,
-        } as any))
+        this.updateToken(payload.accessToken)
+        if (payload.user) {
+          this.updateTenantId(payload.user.domainId)
+          this.updateUser({
+            id: payload.user.id,
+            displayName: payload.user.displayName,
+          })
+        }
       }
     },
     /**
@@ -67,12 +85,8 @@ export default createModel({
      * @param isHistory 
      */
     async logout() {
-      await localStore.removeItem("token")
-      await localStore.removeItem("tenantId")
-      await localStore.removeItem("user")
       this.updateToken("")
-      this.updateTenantId("")
-      this.updateUser(undefined)
+      this.updateUser(null)
 
       if (!location.pathname.split('/').includes('login')) {
         history?.push(`/login?redirect=${encodeURIComponent(location.href)}`)
@@ -83,7 +97,17 @@ export default createModel({
      * @param user 
      */
     async saveUser(user: User) {
-      this.updateUser(await localStore.setItem("user", user))
+      this.updateUser({
+        id: user.id,
+        displayName: user.displayName,
+      })
+    },
+    /**
+     * 更新租户id
+     * @param key 
+     */
+    async saveTenantId(tenantId: string) {
+      this.updateTenantId(tenantId)
     },
   })
 });

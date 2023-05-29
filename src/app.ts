@@ -5,7 +5,7 @@ import { defineRequestConfig } from "@ice/plugin-request/esm/types";
 import { message } from 'antd';
 import store from "@/store";
 import "@/assets/styles/index.css"
-import localStore from "@/pkg/localStore";
+import { getItem } from "@/pkg/localStore";
 import { User, userPermissions } from "./services/user";
 import { browserLanguage } from "./util";
 import jwt_decode, { JwtPayload } from "jwt-decode";
@@ -20,13 +20,12 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  let locale = await localStore.getItem<string>("locale"),
-    token = await localStore.getItem<string>("token");
-
-  const darkMode = await localStore.getItem<string>("darkMode"),
-    compactMode = await localStore.getItem<string>("compactMode"),
-    tenantId = await localStore.getItem<string>("tenantId"),
-    user = await localStore.getItem<User>("user");
+  let locale = getItem<string>("locale"),
+    token = getItem<string>("token"),
+    darkMode = getItem<string>("darkMode"),
+    compactMode = getItem<string>("compactMode"),
+    tenantId = getItem<string>("tenantId"),
+    user = getItem<User>("user");
 
   if (token) {
     // 增加jwt判断token过期的处理
@@ -41,7 +40,7 @@ export const dataLoader = defineDataLoader(async () => {
   }
   if (!locale) {
     locale = browserLanguage()
-  }
+  }  
 
   return {
     basis: {

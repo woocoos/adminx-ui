@@ -30,7 +30,7 @@ export default (props: {
                         onClick={() => {
                             props.onChange?.(undefined)
                         }}
-                    /> : ""}
+                    /> : <span />}
                 onSearch={() => {
                     modal.open = true;
                     setModal({ ...modal })

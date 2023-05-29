@@ -5,34 +5,29 @@ import { checkLave } from "@/components/LeavePrompt";
 import store from "@/store";
 import { useEffect, useState } from "react";
 import { Org, getOrgInfo } from "@/services/org";
-import { render } from "react-dom";
 import { userRootOrgs } from "@/services/user";
-
-
 
 export default () => {
     const { t } = useTranslation(),
         [basis, basisDispatcher] = store.useModel("basis"),
-        [orgInfo, setOrgInfo] = useState<Org>();
+        [orgInfo, setOrgInfo] = useState<Org>(),
+        [menu, setMenu] = useState<MenuProps>();
 
     const
         getRequest = async () => {
-            if (basis.tenantId) {
-                const result = await getOrgInfo(basis.tenantId)
-                if (result?.id) {
-                    setOrgInfo(result)
+            const result = await userRootOrgs()
+            if (result) {
+                setOrgInfo(result.find(item => item.id == basis.tenantId))
+                setMenu({
+                    items: result.filter(item => item.id != basis.tenantId).map(item => {
+                        return {
+                            key: item.id,
+                            label: item.name,
+                            onClick: onMenuClick
+                        }
+                    })
+                })
 
-                    const uros = await userRootOrgs()
-                    if (uros) {
-                        menu.items = uros.filter(item => item.id != result.id).map(item => {
-                            return {
-                                key: item.id,
-                                label: item.name,
-                                onClick: onMenuClick
-                            }
-                        })
-                    }
-                }
             }
         },
         onMenuClick = (info: MenuInfo) => {
@@ -42,35 +37,29 @@ export default () => {
                     title: t('Tenant switch reminder'),
                     content: t('tenant_switch_context'),
                     onOk: () => {
-                        basisDispatcher.updateTenantId(key)
+                        basisDispatcher.saveTenantId(key)
                         location.reload()
                     }
                 })
             })
         }
 
-    const menu: MenuProps = {
-        items: [],
-    };
 
     useEffect(() => {
+        console.log(basis.tenantId)
         if (document.hidden) {
             const tipStr = t('tenant_switch_title')
-            window.close();
-            document.body.innerHTML = ""
             document.title = tipStr
-            render(<>
-                <br />
-                <div style={{ maxWidth: "600px", margin: '0 auto' }}>
-                    <Alert message={tipStr} />
-                </div>
-            </>, document.querySelector('#perch'))
-        } else {
-            getRequest()
+            document.body.innerHTML = `<div style="width:370px;margin:40px auto 0 auto;">${tipStr}</div>`
+            window.close();
         }
     }, [basis.tenantId])
 
-    return orgInfo ? <Dropdown menu={menu} disabled={menu.items?.length === 0}>
+    useEffect(() => {
+        getRequest()
+    }, [])
+
+    return orgInfo ? <Dropdown menu={menu} disabled={menu?.items?.length === 0}>
         <span style={{ margin: '0 12px' }}>
             {orgInfo.name}
         </span>
