@@ -34,6 +34,7 @@ export default (props: {
         [basisState] = store.useModel("basis"),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
+        [oldInfo, setOldInfo] = useState<Org>(),
         [owner, setOwner] = useState<User>()
 
     setLeavePromptWhen(saveDisabled)
@@ -97,10 +98,16 @@ export default (props: {
                             setOwner(undefined)
                             break;
                         default:
+                            setOwner(undefined)
                             break;
                     }
+                } else {
+                    setOwner(undefined)
                 }
+            } else {
+                setOwner(undefined)
             }
+            setOldInfo(result as Org)
             return result
         },
         onValuesChange = () => {
@@ -174,7 +181,7 @@ export default (props: {
                 ]} />
             <ProFormText
                 x-if={props.kind === 'root'}
-                disabled={!!props.id}
+                disabled={!!oldInfo?.domain}
                 name="domain"
                 label={t('domain')}
                 tooltip={t('The domain cannot be modified at will. Otherwise, the user login account will be changed')}
@@ -188,6 +195,7 @@ export default (props: {
                 label={t('manage account')}
                 tooltip={t('The Settings cannot be modified')} >
                 <InputAccount value={owner}
+                    disabled={!!oldInfo?.ownerID}
                     userType="account"
                     onChange={(value) => {
                         setOwner(value)

@@ -24,6 +24,7 @@ export default (props: {
             <Input.Search
                 value={props.value?.displayName}
                 disabled={props.disabled}
+                placeholder={`${t("click search {{field}}", { field: t(props.userType) })}`}
                 suffix={props.value && props.disabled != true ?
                     <CloseCircleFilled
                         style={{ fontSize: "12px", cursor: "pointer", color: "rgba(0, 0, 0, 0.25)" }}

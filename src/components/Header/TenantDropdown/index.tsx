@@ -46,7 +46,6 @@ export default () => {
 
 
     useEffect(() => {
-        console.log(basis.tenantId)
         if (document.hidden) {
             const tipStr = t('tenant_switch_title')
             document.title = tipStr
