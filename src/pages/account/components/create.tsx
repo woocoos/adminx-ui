@@ -1,6 +1,6 @@
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { getOrgInfo } from '@/services/org';
-import { UpdateUserInfoScene, User, UserLoginProfile, UserLoginProfileSetKind, UserType, createUserInfo, getUserInfo, updateUserInfo, updateUserProfile } from '@/services/user';
+import { UpdateUserInfoScene, User, UserLoginProfile, UserLoginProfileSetKind, UserType, createUserInfo, getUserInfo, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/user';
 import store from '@/store';
 import {
     DrawerForm,
@@ -8,7 +8,7 @@ import {
     ProFormTextArea,
     ProFormSwitch,
 } from '@ant-design/pro-components';
-import { Radio } from 'antd';
+import { Alert, Radio } from 'antd';
 import { useEffect, useState } from "react";
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,7 @@ export default (props: {
     id?: string | null
     orgId?: string
     userType: UserType
+    recycleInfo?: User
     scene: UpdateUserInfoScene
     onClose?: (isSuccess?: boolean) => void
 }) => {
@@ -60,6 +61,12 @@ export default (props: {
                     default:
                         break;
                 }
+            } else if (props.scene === 'recycle' && props.recycleInfo) {
+                info = props.recycleInfo
+                if (domain) {
+                    info.principalName = info.principalName.replace(`@${domain}`, '')
+                }
+
             }
             setSaveLoading(false)
             setSaveDisabled(true)
@@ -70,14 +77,14 @@ export default (props: {
         },
         onFinish = async (values: User) => {
             setSaveLoading(true)
-            let appInfo: User | UserLoginProfile | null = null
+            let result: User | UserLoginProfile | null = null
             if (props.id) {
                 switch (props.scene) {
                     case "base":
-                        appInfo = await updateUserInfo(props.id, values)
+                        result = await updateUserInfo(props.id, values)
                         break;
                     case "loginProfile":
-                        appInfo = await updateUserProfile(props.id, values)
+                        result = await updateUserProfile(props.id, values)
                         break;
                     default:
                         break;
@@ -86,9 +93,14 @@ export default (props: {
                 if (props.userType === 'member' && domain) {
                     values.principalName = `${values.principalName}@${domain}`
                 }
-                appInfo = await createUserInfo(props?.orgId || basisState.tenantId, values, props.userType, setKind)
+                if (props.scene == 'recycle' && props.recycleInfo) {
+                    result = await restoreRecycleUser(props.recycleInfo.id, values, setKind)
+                } else {
+                    result = await createUserInfo(props?.orgId || basisState.tenantId, values, props.userType, setKind)
+                }
+
             }
-            if (appInfo?.id) {
+            if (result?.id) {
                 setSaveDisabled(true)
                 props.onClose?.(true)
             }
@@ -124,7 +136,11 @@ export default (props: {
             onFinish={onFinish}
             onOpenChange={onOpenChange}
         >
-            <div x-if={['create'].includes(props.scene)}>
+            <div x-if={["recycle"].includes(props.scene)}>
+                <Alert showIcon type="warning" message={t('recycle_alert')} />
+                <br />
+            </div>
+            <div x-if={['create', "recycle"].includes(props.scene)}>
                 <ProFormText
                     name="principalName"
                     label={t("principal name")}
@@ -148,7 +164,7 @@ export default (props: {
                         { required: true, message: `${t("Please enter {{field}}", { field: t("password") })}`, },
                     ]} />
             </div>
-            <div x-if={['create', "base"].includes(props.scene)}>
+            <div x-if={['create', "base", "recycle"].includes(props.scene)}>
                 <ProFormText name="displayName" label={t('display name')}
                     rules={[
                         { required: true, message: `${t("Please enter {{field}}", { field: t("display name") })}`, },

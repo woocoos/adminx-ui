@@ -145,7 +145,7 @@ const UserLoginProfileField = `#graphql
       secret,account
   `;
 
-export type UpdateUserInfoScene = "create" | "base" | "loginProfile" | "identity"
+export type UpdateUserInfoScene = "create" | "base" | "loginProfile" | "identity" | "recycle"
 
 /**
  * 获取用户信息
@@ -564,6 +564,84 @@ export async function userRootOrgs() {
 
   if (result?.data?.list) {
     return result?.data?.list as Org[]
+  } else {
+    return null
+  }
+}
+
+
+/**
+ * 获取回收站用户
+ * @param userId 
+ * @param headers 
+ * @returns 
+ */
+export async function getRecycleUserList(params: TableParams, filter: TableFilter, sort: TableSort) {
+  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
+    result = await graphqlPageApi(
+      `#graphql
+          query orgRecycleUsers($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:UserOrder,$where:UserWhereInput){
+              list:orgRecycleUsers(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
+                  totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+                  edges{                                        
+                      cursor,node{                    
+                          ${UserNodeField}
+                      }
+                  }
+              }
+          }`,
+      {
+        first: params.pageSize,
+        where,
+        orderBy,
+      },
+      params.current
+    )
+
+  if (result?.data?.list) {
+    return result.data.list as List<User>
+  } else {
+    return null
+  }
+}
+
+
+/**
+ * 恢复回收站用户
+ * @param userId
+ * @returns 
+ */
+export async function restoreRecycleUser(userId: string, input: User | Record<string, any>, setKind: UserLoginProfileSetKind) {
+  let pwdInput: Record<string, any> | undefined = undefined
+  if (setKind === 'customer') {
+    pwdInput = {
+      scene: "login",
+      password: input.password,
+      status: "active",
+      userID: userId,
+    }
+    delete input.password
+  }
+  const result = await graphqlApi(
+    `#graphql
+    mutation recoverOrgUser($userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
+      action:recoverOrgUser(
+        userID:"${userId}",
+        pwdKind:${setKind},
+        userInput: $userInput,
+        pwdInput: $pwdInput
+        ){
+          ${UserNodeField}
+        }
+    }`,
+    {
+      userInput: setClearInputField(input),
+      pwdInput,
+    }
+  )
+
+  if (result?.data?.action?.id) {
+    return result?.data?.action as User
   } else {
     return null
   }

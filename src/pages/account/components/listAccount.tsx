@@ -308,6 +308,10 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                       {t('create {{field}}', { field: t('user') })}
                     </Button>
                   </Auth> : '',
+                props.orgInfo?.kind === 'root' ?
+                  <Button>
+                    <Link to="/account/recycle">{t("Recycling station")}</Link>
+                  </Button> : '',
                 props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
                   <Button type="primary" onClick={() => {
                     setModal({ open: true, title: t('add {{field}}', { field: t('user') }), scene: "add" })
@@ -357,7 +361,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                     }}>
                       {t('create {{field}}', { field: t(props.userType || '') })}
                     </Button>
-                  </Auth>
+                  </Auth>,
                 ]
               }}
               scroll={{ x: 'max-content' }}
@@ -373,12 +377,13 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         <AccountCreate
           open={modal.open}
           title={modal.title}
-          orgId={props.orgId}
+          orgId={basisState.tenantId}
           userType={props.userType || "member"}
           scene="create"
           onClose={(isSuccess) => {
             if (isSuccess) {
               proTableRef.current?.reload();
+              message.success(t('submit success'))
             }
             setModal({ open: false, title: '', scene: modal.scene })
           }}
@@ -397,6 +402,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             onClose={(isSuccess) => {
               if (isSuccess) {
                 proTableRef.current?.reload();
+                message.success(t('submit success'))
               }
               setModal({ open: false, title: '', scene: modal.scene });
             }}
@@ -414,6 +420,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             onClose={(isSuccess) => {
               if (isSuccess) {
                 proTableRef.current?.reload();
+                message.success(t('submit success'))
               }
               setModal({ open: false, title: '', scene: modal.scene });
             }}
@@ -429,6 +436,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             onClose={(isSuccess) => {
               if (isSuccess) {
                 proTableRef.current?.reload();
+                message.success(t('submit success'))
               }
               setModal({ open: false, title: '', scene: modal.scene });
             }} /> : ''
