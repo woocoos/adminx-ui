@@ -13,6 +13,8 @@ export default () => {
     [res, setRes] = useState<LoginRes>(),
     [, basisDispatcher] = store.useModel("basis");
 
+  document.title = t('login')
+
   async function loginSuccess(result: LoginRes) {
     setRes(result)
     if (result?.accessToken) {
