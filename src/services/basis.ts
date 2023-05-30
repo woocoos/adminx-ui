@@ -16,8 +16,10 @@ export interface LoginRes {
   user?: {
     id: string
     displayName: string
-    domainName: string
-    domainId: string
+    domains: {
+      id: string
+      name: string
+    }[]
   },
   errors?: LoginErrors[]
 }
@@ -30,16 +32,29 @@ export type MfaPrepare = {
   qrCodeUri: string
 }
 
+export type CaptchaRes = {
+  captchaId: string
+  captchaImage: string
+}
+
+/**
+ * 获取验证码
+ * @returns 
+ */
+export async function captcha(): Promise<CaptchaRes> {
+  return await request.get('/captcha');
+}
 /**
  * 登录
  * @param data 
  * @returns 
  */
-export async function login(username: string, password: string, captcha: string): Promise<LoginRes> {
+export async function login(username: string, password: string, captcha: string, captchaId: string): Promise<LoginRes> {
   return await request.post('/login/auth', {
     username,
     password,
     captcha,
+    captchaId,
   });
 }
 

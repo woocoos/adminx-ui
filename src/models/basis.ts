@@ -61,22 +61,28 @@ export default createModel({
     updateDarkMode(prevState: BasisModelState, payload: boolean) {
       setItem("darkMode", payload)
       prevState.darkMode = payload;
-    },   
+    },
   },
   effects: () => ({
     /**
      * 登录
      * @param payload 
      */
-    async login(payload: LoginRes) {
+    async login(payload: LoginRes, rootState: any) {
       if (payload.accessToken) {
         this.updateToken(payload.accessToken)
         if (payload.user) {
-          this.updateTenantId(payload.user.domainId)
           this.updateUser({
             id: payload.user.id,
             displayName: payload.user.displayName,
           })
+          if (payload.user.domains?.length) {
+            if (!payload.user.domains.find(item => item.id == rootState.basis.tenantId)) {
+              this.updateTenantId(payload.user.domains[0].id)
+            }
+          } else {
+            this.updateTenantId('')
+          }
         }
       }
     },

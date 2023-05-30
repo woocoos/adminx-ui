@@ -3,8 +3,8 @@ import { ProFormText, LoginForm } from "@ant-design/pro-form";
 import logo from "@/assets/logo.png";
 import Sha256 from "crypto-js/sha256";
 import { useTranslation } from "react-i18next";
-import { LoginRes, login } from "@/services/basis";
-import { useState } from "react";
+import { CaptchaRes, LoginRes, captcha, login } from "@/services/basis";
+import { useEffect, useState } from "react";
 import { Link } from "@ice/runtime";
 
 export default (
@@ -13,20 +13,29 @@ export default (
     }
 ) => {
     const { t } = useTranslation(),
-        [captchaSrc, setCaptchaSrc] = useState<string>(`/api/captcha?t=${Date.now()}`),
+        [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true);
 
 
-    const onFinish = async (values: { username: string; password: string; captcha: string; }) => {
-        setSaveLoading(true)
-        const result = await login(values.username, Sha256(values.password).toString(), values.captcha)
-        if (result && !result.errors) {
-            props.onSuccess(result)
+    const
+        getCaptcha = async () => {
+            setCaptchaInfo(await captcha())
+        },
+        onFinish = async (values: { username: string; password: string; captcha: string; }) => {
+            if (captchaInfo) {
+                setSaveLoading(true)
+                const result = await login(values.username, Sha256(values.password).toString(), values.captcha, captchaInfo.captchaId)
+                if (result && !result.errors) {
+                    props.onSuccess(result)
+                }
+                setSaveLoading(false)
+            }
+            return false
         }
-        setSaveLoading(false)
-        return false
-    }
+    useEffect(() => {
+        getCaptcha()
+    }, [])
 
     return (
         <LoginForm
@@ -84,8 +93,8 @@ export default (
                 name="captcha"
                 fieldProps={{
                     size: "large",
-                    addonAfter: <img src={captchaSrc} height="32px" onClick={() => {
-                        setCaptchaSrc(`/api/captcha?t=${Date.now()}`)
+                    addonAfter: <img src={captchaInfo?.captchaImage} height="32px" onClick={() => {
+                        getCaptcha()
                     }} />,
                 }}
                 placeholder={`${t('verification code')}`}
