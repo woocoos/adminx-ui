@@ -1,7 +1,6 @@
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import InputAccount from '@/pages/account/components/inputAccount';
 import { Org, OrgKind, createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';
-import { User } from '@/services/user';
 import store from '@/store';
 import { formatTreeData } from '@/util';
 import { TreeEditorAction } from '@/util/type';
@@ -34,8 +33,7 @@ export default (props: {
         [basisState] = store.useModel("basis"),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true),
-        [oldInfo, setOldInfo] = useState<Org>(),
-        [owner, setOwner] = useState<User>()
+        [oldInfo, setOldInfo] = useState<Org>()
 
     setLeavePromptWhen(saveDisabled)
 
@@ -87,25 +85,17 @@ export default (props: {
                     switch (props.scene) {
                         case "editor":
                             result = orgInfo
-                            setOwner(orgInfo.owner)
                             break;
                         case "peer":
                             result = { parentID: orgInfo.parentID }
-                            setOwner(undefined)
                             break;
                         case "child":
                             result = { parentID: orgInfo.id }
-                            setOwner(undefined)
                             break;
                         default:
-                            setOwner(undefined)
                             break;
                     }
-                } else {
-                    setOwner(undefined)
                 }
-            } else {
-                setOwner(undefined)
             }
             setOldInfo(result as Org)
             return result
@@ -116,8 +106,10 @@ export default (props: {
         onFinish = async (values: Org) => {
             setSaveLoading(true)
             let result: Org | null = null;
-            if (owner) {
-                values.ownerID = owner.id
+
+            if (values.owner) {
+                values.ownerID = values.owner.id
+                delete values.owner
             }
             switch (props.scene) {
                 case "editor":
@@ -192,15 +184,12 @@ export default (props: {
                 label={t('country/region')} />
             <ProFormText
                 x-if={props.kind === 'root'}
+                name="owner"
                 label={t('manage account')}
                 tooltip={t('The Settings cannot be modified')} >
-                <InputAccount value={owner}
+                <InputAccount
                     disabled={!!oldInfo?.ownerID}
                     userType="account"
-                    onChange={(value) => {
-                        setOwner(value)
-                        onValuesChange()
-                    }}
                 />
             </ProFormText>
             <ProFormTextArea
