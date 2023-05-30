@@ -102,7 +102,7 @@ const PageAppPolicys = (props: {
                     table.total = table.data.length
                 }
             }
-
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: AppPolicy) => {

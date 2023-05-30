@@ -138,6 +138,7 @@ const PageOrgRoleList = (props: {
                 table.total = result.totalCount
             }
             setDataSource(table.data)
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: OrgRole) => {

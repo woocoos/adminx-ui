@@ -65,13 +65,13 @@ export default (props: {
 
     const
         getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-            const table = { data: [] as OrgRole[], success: true, total: 0 };    
+            const table = { data: [] as OrgRole[], success: true, total: 0 };
             const result = await getUserJoinGroupList(props.userInfo.id, params, filter, sort);
             if (result?.totalCount) {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
             }
-
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: OrgRole) => {

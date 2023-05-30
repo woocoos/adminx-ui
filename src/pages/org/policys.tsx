@@ -101,6 +101,7 @@ export default () => {
                     table.total = 0
                 }
             }
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: OrgPolicy) => {

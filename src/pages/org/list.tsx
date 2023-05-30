@@ -184,6 +184,7 @@ const OrgList = (props: {
         }
         setAllList(list)
       }
+      setSelectedRowKeys([]) 
       setDataSource(table.data)
       return table
     },

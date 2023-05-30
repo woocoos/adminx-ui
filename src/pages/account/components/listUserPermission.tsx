@@ -143,7 +143,7 @@ export default (props: {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
             }
-
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: Permission) => {

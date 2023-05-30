@@ -91,7 +91,7 @@ export default () => {
                     table.total = result.length
                 }
             }
-
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: Org) => {

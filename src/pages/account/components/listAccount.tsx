@@ -196,6 +196,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         table.data = result.edges.map(item => item.node)
         table.total = result.totalCount
       }
+      setSelectedRowKeys([])
       setDataSource(table.data)
       return table
     },

@@ -88,7 +88,7 @@ export default () => {
                     table.total = result.totalCount
                 }
             }
-
+            setSelectedRowKeys([])
             return table
         },
         onDel = (record: AppRes) => {

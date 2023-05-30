@@ -142,6 +142,7 @@ const PageAppList = (props: {
       } else {
         table.total = 0
       }
+      setSelectedRowKeys([])
       setDataSource(table.data)
       return table
     },
