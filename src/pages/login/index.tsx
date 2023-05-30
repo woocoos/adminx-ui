@@ -25,39 +25,40 @@ export default () => {
 
   return (
     <div className={styles.container}>
-      {
-        !res ?
-          <Login
-            onSuccess={loginSuccess}
-          /> : ''
-      }
-      {
-        res?.stateToken && res?.callbackUrl === '/login/verify-factor' ?
-          <MfaVerify
-            stateToken={res.stateToken}
-            onSuccess={loginSuccess}
-          /> : ''
-      }
-      {
-        res?.stateToken && res?.callbackUrl === '/login/reset-password' ?
-          <ResetPassword
-            stateToken={res.stateToken}
-            onSuccess={loginSuccess}
-          /> : ''
-      }
-      {
-        res?.accessToken ?
-          <Result
-            status="success"
-            style={{
-              height: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          /> : ''
-      }
-
+      <div className="container-item">
+        {
+          !res ?
+            <Login
+              onSuccess={loginSuccess}
+            /> : ''
+        }
+        {
+          res?.stateToken && res?.callbackUrl === '/login/verify-factor' ?
+            <MfaVerify
+              stateToken={res.stateToken}
+              onSuccess={loginSuccess}
+            /> : ''
+        }
+        {
+          res?.stateToken && res?.callbackUrl === '/login/reset-password' ?
+            <ResetPassword
+              stateToken={res.stateToken}
+              onSuccess={loginSuccess}
+            /> : ''
+        }
+        {
+          res?.accessToken ?
+            <Result
+              status="success"
+              style={{
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
+              }}
+            /> : ''
+        }
+      </div>
     </div>
   );
 };

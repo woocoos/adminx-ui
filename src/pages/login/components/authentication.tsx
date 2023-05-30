@@ -1,15 +1,11 @@
-import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { ProFormText, LoginForm } from "@ant-design/pro-form";
-import logo from "@/assets/logo.png";
-import Sha256 from "crypto-js/sha256";
 import { useTranslation } from "react-i18next";
-import { LoginRes, login } from "@/services/basis";
 import { useState } from "react";
 import { Link } from "@ice/runtime";
 
 export default (
     props: {
-        onSuccess(result: LoginRes): void
+        onSuccess(result: string): void
     }
 ) => {
     const { t } = useTranslation(),
@@ -17,30 +13,20 @@ export default (
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true);
 
-
-    const onFinish = async (values: { username: string; password: string; captcha: string; }) => {
+    const onFinish = async (values: { code: string }) => {
         setSaveLoading(true)
-        const result = await login(values.username, Sha256(values.password).toString(), values.captcha)
-        if (result && !result.errors) {
-            props.onSuccess(result)
-        }
+        props.onSuccess("token")
         setSaveLoading(false)
         return false
     }
 
     return (
         <LoginForm
-            title="Adminx Pro"
-            logo={<img alt="logo" src={logo} />}
-            subTitle={t('Management system')}
-            initialValues={{
-                username: "admin",
-                password: "123456",
-            }}
+            title={t("Retrieve password")}
+            subTitle={t("please_retrieve_sub_titie")}
             submitter={{
                 searchConfig: {
-                    submitText: t('login'),
-                    resetText: t('cancel')
+                    submitText: t("please_retrieve_submit")
                 },
                 submitButtonProps: {
                     loading: saveLoading,
@@ -53,11 +39,8 @@ export default (
             onFinish={onFinish}
         >
             <ProFormText
-                name="username"
-                fieldProps={{
-                    size: "large",
-                    prefix: <UserOutlined className={"prefixIcon"} />,
-                }}
+                name="code"
+                label={t('principal name')}
                 placeholder={`${t("Please enter {{field}}", { field: t('principal name') })}`}
                 rules={[
                     {
@@ -65,30 +48,20 @@ export default (
                         message: `${t("Please enter {{field}}", { field: t('principal name') })}`,
                     },
                 ]}
-            />
-            <ProFormText.Password
-                name="password"
                 fieldProps={{
-                    size: "large",
-                    prefix: <LockOutlined className={"prefixIcon"} />,
+                    size: "large"
                 }}
-                placeholder={`${t("Please enter {{field}}", { field: t('password') })}`}
-                rules={[
-                    {
-                        required: true,
-                        message: `${t("Please enter {{field}}", { field: t('password') })}`,
-                    },
-                ]}
             />
             <ProFormText
                 name="captcha"
+                label={t('verification code')}
                 fieldProps={{
                     size: "large",
                     addonAfter: <img src={captchaSrc} height="32px" onClick={() => {
                         setCaptchaSrc(`/api/captcha?t=${Date.now()}`)
                     }} />,
                 }}
-                placeholder={`${t('verification code')}`}
+                placeholder={`${t("Please enter {{field}}", { field: t('verification code') })}`}
                 rules={[
                     {
                         required: true,
@@ -96,12 +69,15 @@ export default (
                     },
                 ]}
             />
-            <div style={{ marginBottom: 24, }} >
-                <Link
-                    style={{ float: "right", }}
-                    to="/login/retrievePassword"
+            <div
+                style={{
+                    marginBottom: 24,
+                }}
+            >
+                <Link style={{ float: "right", }}
+                    to="/login"
                 >
-                    {t('forget your password')}
+                    {t('go to login')}
                 </Link>
             </div>
         </LoginForm>

@@ -56,7 +56,7 @@ export default function Layout() {
     ])
   }, [])
 
-  return ["/login"].includes(location.pathname) ? <Outlet /> :
+  return ["/login","/login/retrievePassword"].includes(location.pathname) ? <Outlet /> :
     <ProConfigProvider
       dark={basisState.darkMode}
     >
