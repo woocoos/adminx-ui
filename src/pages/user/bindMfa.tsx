@@ -43,7 +43,7 @@ export default () => {
         onRefresh = async () => {
             setQrcodeLoading(true)
             const result = await bindPrepareMfa();
-            if (result.stateToken) {
+            if (result?.stateToken) {
                 setMfaInfo(result)
                 countdown(result.stateTokenTTL);
                 setQrcodeValue(result.qrCodeUri)

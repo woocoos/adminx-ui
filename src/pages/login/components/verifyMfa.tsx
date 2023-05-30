@@ -1,21 +1,24 @@
+import { forgetPwdVerifyMfa } from "@/services/basis";
 import { LoginForm, ProFormText } from "@ant-design/pro-components";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default (props: {
-    onSuccess: () => void
+    token: string
+    onSuccess: (token: string) => void
     onChangeMode: () => void
 }) => {
 
     const { t } = useTranslation(),
-
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true);
 
-    const onFinish = async (values: { code: string }) => {
+    const onFinish = async (values: { otpToken: string }) => {
         setSaveLoading(true)
-        // todo
-        props.onSuccess();
+        const result = await forgetPwdVerifyMfa(props.token, values.otpToken)
+        if (result?.stateToken) {
+            props.onSuccess(result.stateToken);
+        }
         setSaveLoading(false)
         return false
     }
@@ -38,7 +41,7 @@ export default (props: {
             onFinish={onFinish}
         >
             <ProFormText
-                name="code"
+                name="otpToken"
                 label={t("security code")}
                 placeholder={`${t("Please enter {{field}}", { field: t('security code') })}`}
                 rules={[

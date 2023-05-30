@@ -1,15 +1,39 @@
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, List, Result, Steps } from "antd";
 import VerifyEmail from "./verifyEmail";
 import VerifyMfa from "./verifyMfa";
 import SetPassword from "./setPassword";
 import { Link } from "@ice/runtime";
+import { ForgetPwdBeginRes } from "@/services/basis";
 
-export default () => {
+export default (props: {
+    token: ForgetPwdBeginRes
+}) => {
     const { t } = useTranslation(),
+        [usableMode, setUsableMode] = useState<{
+            email: string
+            mfa: boolean
+        }>({
+            email: '',
+            mfa: false
+        }),
         [mode, setMode] = useState<"email" | "mfa">(),
-        [step, setStep] = useState<number>(0)
+        [step, setStep] = useState<number>(0),
+        [pwdToken, setPwdToken] = useState<string>()
+
+
+    useEffect(() => {
+
+        props.token.verifies.forEach(item => {
+            if (item.kind === 'email') {
+                usableMode[item.kind] = item.value
+            } else if (item.kind === 'mfa') {
+                usableMode[item.kind] = true
+            }
+        })
+        setUsableMode({ ...usableMode })
+    }, [props.token])
 
 
     return (
@@ -29,7 +53,7 @@ export default () => {
                         {t('pwd_step_0_title')}
                     </div>
                     <List x-if={mode === undefined}>
-                        <List.Item actions={[
+                        <List.Item x-if={usableMode.email} actions={[
                             <a onClick={() => setMode('email')}>
                                 {t("pwd_step_0_btn")}
                             </a>
@@ -39,7 +63,7 @@ export default () => {
                                 description={t('pwd_step_0_email_des')}
                             />
                         </List.Item>
-                        <List.Item actions={[
+                        <List.Item x-if={usableMode.mfa} actions={[
                             <a onClick={() => setMode("mfa")}>
                                 {t("pwd_step_0_btn")}
                             </a>
@@ -52,29 +76,38 @@ export default () => {
                     </List>
                     <VerifyEmail
                         x-if={mode === 'email'}
+                        token={props.token.stateToken}
                         onChangeMode={() => {
                             setMode(undefined);
                         }}
-                        onSuccess={() => {
+                        onSuccess={(token) => {
                             setStep(1)
+                            setPwdToken(token)
                         }}
                     />
                     <VerifyMfa
                         x-if={mode === 'mfa'}
+                        token={props.token.stateToken}
                         onChangeMode={() => {
                             setMode(undefined);
                         }}
-                        onSuccess={() => {
+                        onSuccess={(token) => {
                             setStep(1)
+                            setPwdToken(token)
                         }}
                     />
                 </div>
-                <SetPassword
-                    x-if={step === 1}
-                    onSuccess={() => {
-                        setStep(2)
-                    }}
-                />
+                {
+                    step === 1 && pwdToken ?
+                        <SetPassword
+                            token={pwdToken}
+                            onSuccess={() => {
+                                setStep(2)
+                            }}
+                        />
+                        : <></>
+                }
+
                 <Result
                     x-if={step === 2}
                     status="success"

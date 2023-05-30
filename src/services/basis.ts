@@ -1,7 +1,6 @@
 import { request } from 'ice';
 
-
-interface LoginErrors {
+interface OasErrors {
   code: number
   messsage: string
   details: string
@@ -21,7 +20,7 @@ export interface LoginRes {
       name: string
     }[]
   },
-  errors?: LoginErrors[]
+  errors?: OasErrors[]
 }
 
 export type MfaPrepare = {
@@ -35,6 +34,16 @@ export type MfaPrepare = {
 export type CaptchaRes = {
   captchaId: string
   captchaImage: string
+}
+
+export type ForgetPwdBeginRes = {
+  stateToken: string
+  stateTokenTTL: number
+  verifies: {
+    kind: 'email' | 'mfa'
+    value: string
+  }[]
+  errors?: OasErrors[]
 }
 
 /**
@@ -119,4 +128,72 @@ export async function bindMfa(stateToken: string, otpToken: string): Promise<boo
  */
 export async function unbindMfa(otpToken: string): Promise<boolean> {
   return await request.post('/mfa/unbind', { otpToken });
+}
+
+/**
+ * 确认用户信息
+ * @param username
+ * @param captcha
+ * @param captchaId
+ * @returns 
+ */
+export async function forgetPwdBegin(username: string, captcha: string, captchaId: string): Promise<ForgetPwdBeginRes> {
+  return await request.post('/forget-pwd/begin', {
+    username,
+    captcha,
+    captchaId,
+  });
+}
+
+
+/**
+ * 验证email
+ * @param stateToken
+ * @param captcha
+ * @param captchaId
+ * @returns 
+ */
+export async function forgetPwdVerifyEmail(stateToken: string, captcha: string, captchaId: string): Promise<ForgetPwdBeginRes> {
+  return await request.post('/forget-pwd/verify-email', {
+    stateToken,
+    captcha,
+    captchaId,
+  });
+}
+
+/**
+ * 邮箱发送验证码
+ * @param stateToken
+ * @returns 
+ */
+export async function forgetPwdSendEmail(stateToken: string): Promise<string> {
+  return await request.post('/forget-pwd/send-email', {
+    stateToken,
+  });
+}
+
+/**
+ * 验证mfa
+ * @param stateToken
+ * @param otpToken 
+ * @returns 
+ */
+export async function forgetPwdVerifyMfa(stateToken: string, otpToken: string): Promise<ForgetPwdBeginRes> {
+  return await request.post('/forget-pwd/verify-mfa', {
+    stateToken,
+    otpToken,
+  });
+}
+
+/**
+ * 重置密码
+ * @param stateToken
+ * @param newPassword 
+ * @returns 
+ */
+export async function forgetPwdReset(stateToken: string, newPassword: string): Promise<boolean> {
+  return await request.post('/forget-pwd/reset', {
+    stateToken,
+    newPassword,
+  });
 }

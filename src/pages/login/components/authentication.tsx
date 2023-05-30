@@ -1,24 +1,38 @@
 import { ProFormText, LoginForm } from "@ant-design/pro-form";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@ice/runtime";
+import { CaptchaRes, ForgetPwdBeginRes, captcha, forgetPwdBegin } from "@/services/basis";
 
 export default (
     props: {
-        onSuccess(result: string): void
+        onSuccess(token: ForgetPwdBeginRes): void
     }
 ) => {
     const { t } = useTranslation(),
-        [captchaSrc, setCaptchaSrc] = useState<string>(`/api/captcha?t=${Date.now()}`),
+        [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true);
 
-    const onFinish = async (values: { code: string }) => {
-        setSaveLoading(true)
-        props.onSuccess("token")
-        setSaveLoading(false)
-        return false
-    }
+    const
+        getCaptcha = async () => {
+            setCaptchaInfo(await captcha())
+        },
+        onFinish = async (values: { username: string, captcha: string }) => {
+            if (captchaInfo) {
+                setSaveLoading(true)
+                const result = await forgetPwdBegin(values.username, values.captcha, captchaInfo?.captchaId)
+                if (result?.stateToken) {
+                    props.onSuccess(result)
+                }
+                setSaveLoading(false)
+            }
+            return false
+        }
+
+    useEffect(() => {
+        getCaptcha()
+    }, [])
 
     return (
         <LoginForm
@@ -39,7 +53,7 @@ export default (
             onFinish={onFinish}
         >
             <ProFormText
-                name="code"
+                name="username"
                 label={t('principal name')}
                 placeholder={`${t("Please enter {{field}}", { field: t('principal name') })}`}
                 rules={[
@@ -57,8 +71,8 @@ export default (
                 label={t('verification code')}
                 fieldProps={{
                     size: "large",
-                    addonAfter: <img src={captchaSrc} height="32px" onClick={() => {
-                        setCaptchaSrc(`/api/captcha?t=${Date.now()}`)
+                    addonAfter: <img src={captchaInfo?.captchaImage} height="32px" onClick={() => {
+                        getCaptcha()
                     }} />,
                 }}
                 placeholder={`${t("Please enter {{field}}", { field: t('verification code') })}`}

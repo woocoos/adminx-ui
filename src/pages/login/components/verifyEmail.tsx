@@ -1,23 +1,28 @@
-import { CaptFieldRef, LoginForm, ProFormCaptcha } from "@ant-design/pro-components";
-import { useRef, useState } from "react";
+import { forgetPwdSendEmail, forgetPwdVerifyEmail } from "@/services/basis";
+import { LoginForm, ProFormCaptcha } from "@ant-design/pro-components";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default (props: {
-    onSuccess: () => void
+    token: string
+    onSuccess: (token: string) => void
     onChangeMode: () => void
 }) => {
 
     const { t } = useTranslation(),
-        captchaRef = useRef<CaptFieldRef | null | undefined>(),
-
+        [captchaId, setCaptchaId] = useState<string>(),
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true);
 
-    const onFinish = async (values: { code: string }) => {
-        setSaveLoading(true)
-        // todo
-        props.onSuccess();
-        setSaveLoading(false)
+    const onFinish = async (values: { captcha: string }) => {
+        if (captchaId) {
+            setSaveLoading(true)
+            const result = await forgetPwdVerifyEmail(props.token, values.captcha, captchaId)
+            if (result?.stateToken) {
+                props.onSuccess(result.stateToken);
+            }
+            setSaveLoading(false)
+        }
         return false
     }
     return <>
@@ -39,8 +44,7 @@ export default (props: {
             onFinish={onFinish}
         >
             <ProFormCaptcha
-                fieldRef={captchaRef}
-                name="code"
+                name="captcha"
                 label={t("verification code")}
                 placeholder={`${t("Please enter {{field}}", { field: t('verification code') })}`}
                 rules={[
@@ -50,7 +54,11 @@ export default (props: {
                     },
                 ]}
                 onGetCaptcha={() => {
-                    return new Promise((resolve, reject) => {
+                    return new Promise(async (resolve, reject) => {
+                        const result = await forgetPwdSendEmail(props.token)
+                        if (typeof result === "string") {
+                            setCaptchaId(result)
+                        }
                         resolve();
                     });
                 }}

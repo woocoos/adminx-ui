@@ -1,8 +1,10 @@
+import { forgetPwdReset } from "@/services/basis";
 import { LoginForm, ProFormInstance, ProFormText } from "@ant-design/pro-components";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 export default (props: {
+    token: string
     onSuccess: () => void
 }) => {
 
@@ -11,10 +13,12 @@ export default (props: {
         [saveLoading, setSaveLoading] = useState(false),
         [saveDisabled, setSaveDisabled] = useState(true);
 
-    const onFinish = async (values: { code: string }) => {
+    const onFinish = async (values: { password: string }) => {
         setSaveLoading(true)
-        // todo
-        props.onSuccess();
+        const result = await forgetPwdReset(props.token, values.password)
+        if (result === true) {
+            props.onSuccess();
+        }
         setSaveLoading(false)
         return false
     }

@@ -40,7 +40,7 @@ export const dataLoader = defineDataLoader(async () => {
   }
   if (!locale) {
     locale = browserLanguage()
-  }  
+  }
 
   return {
     basis: {
@@ -117,25 +117,39 @@ export const requestConfig = defineRequestConfig(() => {
           },
           onError: (error) => {
             const errRes = error.response as any
+            let msg: string = '';
+            if (errRes?.data?.errors?.[0]?.message) {
+              msg = errRes?.data?.errors?.[0]?.message
+            }
             switch (errRes.status) {
               case 401:
                 store.dispatch.basis.logout()
+                if (!msg) {
+                  msg = "登录过期"
+                }
                 break;
               case 403:
-                message.error("无访问权限")
+                if (!msg) {
+                  msg = "无访问权限"
+                }
                 break;
               case 404:
-                message.error("找不到方法")
+                if (!msg) {
+                  msg = "找不到方法"
+                }
                 break;
               case 500:
-                message.error("服务端系统异常")
+                if (!msg) {
+                  msg = "服务端系统异常"
+                }
                 break;
               default:
-                if (errRes?.data?.errors?.[0]?.message) {
-                  message.error(errRes?.data?.errors?.[0]?.message)
-                } else {
-                  message.error(errRes.statusText)
+                if (!msg) {
+                  msg = errRes.statusText
                 }
+            }
+            if (msg) {
+              message.error(msg)
             }
             // 请求出错：服务端返回错误状态码
             return error;
