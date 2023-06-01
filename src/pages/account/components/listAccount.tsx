@@ -139,7 +139,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           } else {
             if (checkAuth('deleteUser', auth)) {
               items.push(
-                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
+                { key: "delete", label: <a onClick={() => onDelUser(record)}>{t('delete')}</a> }
               )
             }
           }
@@ -216,13 +216,18 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         }
       })
     },
-    onDelApp = (record: User) => {
+    onDelUser = (record: User) => {
       Modal.confirm({
         title: t('delete'),
         content: `${t("confirm delete")}：${record.displayName} ?`,
         onOk: async (close) => {
           const result = await delUserInfo(record.id)
-          if (result) {
+          if (result === true) {
+            if (dataSource.length === 1) {
+              const pageInfo = { ...proTableRef.current?.pageInfo }
+              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+              proTableRef.current?.setPageInfo?.(pageInfo)
+            }
             proTableRef.current?.reload();
             message.success(t('submit success'))
             close();
@@ -237,7 +242,12 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         onOk: async (close) => {
           if (props?.orgId) {
             const result = props.orgInfo?.kind === 'root' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id)
-            if (result) {
+            if (result === true) {
+              if (dataSource.length === 1) {
+                const pageInfo = { ...proTableRef.current?.pageInfo }
+                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                proTableRef.current?.setPageInfo?.(pageInfo)
+              }
               proTableRef.current?.reload();
               message.success(t('submit success'))
               close();
@@ -253,7 +263,12 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         onOk: async (close) => {
           if (props.orgRole) {
             const result = await revokeOrgRoleUser(props.orgRole.id, record.id)
-            if (result) {
+            if (result === true) {
+              if (dataSource.length === 1) {
+                const pageInfo = { ...proTableRef.current?.pageInfo }
+                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                proTableRef.current?.setPageInfo?.(pageInfo)
+              }
               proTableRef.current?.reload();
               message.success(t('submit success'))
               close();

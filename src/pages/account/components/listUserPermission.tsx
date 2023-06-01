@@ -62,6 +62,7 @@ export default (props: {
             },
 
         ],
+        [dataSource, setDataSource] = useState<Permission[]>([]),
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
         [allUserGroup, setAllUserGroup] = useState<OrgRole[]>([]),
@@ -144,6 +145,7 @@ export default (props: {
                 table.total = result.totalCount
             }
             setSelectedRowKeys([])
+            setDataSource(table.data)
             return table
         },
         onDel = (record: Permission) => {
@@ -152,7 +154,12 @@ export default (props: {
                 content: `${t('confirm disauthorization')}：${record.orgPolicy?.name}?`,
                 onOk: async (close) => {
                     const result = await delPermssion(record.id, record.orgID)
-                    if (result) {
+                    if (result === true) {
+                        if (dataSource.length === 1) {
+                            const pageInfo = { ...proTableRef.current?.pageInfo }
+                            pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                            proTableRef.current?.setPageInfo?.(pageInfo)
+                        }
                         proTableRef.current?.reload();
                         message.success(t('submit success'))
                         close();

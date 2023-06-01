@@ -113,7 +113,7 @@ const OrgList = (props: {
             }
             if (record.kind === kind && checkAuth("deleteOrganization", auth)) {
               items.push(
-                { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
+                { key: "delete", label: <a onClick={() => onDelOrg(record)}>{t('delete')}</a> }
               )
             }
           }
@@ -184,17 +184,22 @@ const OrgList = (props: {
         }
         setAllList(list)
       }
-      setSelectedRowKeys([]) 
+      setSelectedRowKeys([])
       setDataSource(table.data)
       return table
     },
-    onDelApp = (record: Org) => {
+    onDelOrg = (record: Org) => {
       Modal.confirm({
         title: t('delete'),
         content: `${t('confirm delete')}：${record.name}?`,
         onOk: async (close) => {
           const result = await delOrgInfo(record.id)
-          if (result) {
+          if (result === true) {
+            if (dataSource.length === 1) {
+              const pageInfo = { ...proTableRef.current?.pageInfo }
+              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+              proTableRef.current?.setPageInfo?.(pageInfo)
+            }
             proTableRef.current?.reload();
             close();
           }

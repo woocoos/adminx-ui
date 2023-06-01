@@ -57,6 +57,7 @@ const PageAppPolicys = (props: {
                 }
             },
         ],
+        [dataSource, setDataSource] = useState<AppPolicy[]>([]),
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
         // 弹出层处理
@@ -103,6 +104,7 @@ const PageAppPolicys = (props: {
                 }
             }
             setSelectedRowKeys([])
+            setDataSource(table.data)
             return table
         },
         onDel = (record: AppPolicy) => {
@@ -111,7 +113,12 @@ const PageAppPolicys = (props: {
                 content: `${t('confirm delete')}：${record.name}`,
                 onOk: async (close) => {
                     const result = await delAppPolicy(record.id)
-                    if (result) {
+                    if (result === true) {
+                        if (dataSource.length === 1) {
+                            const pageInfo = { ...proTableRef.current?.pageInfo }
+                            pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                            proTableRef.current?.setPageInfo?.(pageInfo)
+                        }
                         proTableRef.current?.reload();
                         close();
                     }

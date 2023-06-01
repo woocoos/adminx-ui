@@ -152,7 +152,12 @@ const PageAppList = (props: {
         content: `${t('confirm delete')}：${record.name}?`,
         onOk: async (close) => {
           const result = await delAppInfo(record.id)
-          if (result) {
+          if (result === true) {
+            if (dataSource.length === 1) {
+              const pageInfo = { ...proTableRef.current?.pageInfo }
+              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+              proTableRef.current?.setPageInfo?.(pageInfo)
+            }
             proTableRef.current?.reload();
             close();
           }
@@ -166,7 +171,12 @@ const PageAppList = (props: {
         onOk: async (close) => {
           if (props.orgId) {
             const result = await revokeOrgApp(props.orgId, record.id)
-            if (result) {
+            if (result === true) {
+              if (dataSource.length === 1) {
+                const pageInfo = { ...proTableRef.current?.pageInfo }
+                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                proTableRef.current?.setPageInfo?.(pageInfo)
+              }
               proTableRef.current?.reload();
               close();
             }

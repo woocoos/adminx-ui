@@ -52,6 +52,7 @@ export default () => {
                 }
             },
         ],
+        [dataSource, setDataSource] = useState<AppRes[]>([]),
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
         // 弹出层处理
@@ -89,6 +90,7 @@ export default () => {
                 }
             }
             setSelectedRowKeys([])
+            setDataSource(table.data)
             return table
         },
         onDel = (record: AppRes) => {
@@ -96,8 +98,14 @@ export default () => {
                 title: t('delete'),
                 content: `${t('confirm delete')}：${record.name}`,
                 onOk: async (close) => {
-                    // const result = await delAppPolicy(record.id)
-                    // if (result) {
+                    // 没有接口
+                    // const result =
+                    // if (result === true) {
+                    //     if (dataSource.length === 1) {
+                    //         const pageInfo = { ...proTableRef.current?.pageInfo }
+                    //         pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                    //         proTableRef.current?.setPageInfo?.(pageInfo)
+                    //     }
                     //     proTableRef.current?.reload();
                     //     close();
                     // }

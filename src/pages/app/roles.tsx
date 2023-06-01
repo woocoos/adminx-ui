@@ -88,6 +88,7 @@ export default () => {
                 }
             },
         ],
+        [dataSource, setDataSource] = useState<AppRole[]>([]),
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
         // 弹出层处理
@@ -133,6 +134,7 @@ export default () => {
                 }
             }
             setSelectedRowKeys([])
+            setDataSource(table.data)
             return table
         },
         onDel = (record: AppRole) => {
@@ -141,7 +143,12 @@ export default () => {
                 content: `${t("confirm delete")}：${record.name}`,
                 onOk: async (close) => {
                     const result = await delAppRole(record.id)
-                    if (result) {
+                    if (result === true) {
+                        if (dataSource.length === 1) {
+                            const pageInfo = { ...proTableRef.current?.pageInfo }
+                            pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                            proTableRef.current?.setPageInfo?.(pageInfo)
+                        }
                         proTableRef.current?.reload();
                         close();
                     }

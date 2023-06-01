@@ -57,7 +57,9 @@ export default () => {
                     </Space> : ''
                 }
             }
-        ]
+        ],
+        [dataSource, setDataSource] = useState<Permission[]>([])
+
 
 
     const
@@ -85,6 +87,7 @@ export default () => {
                     }
                 }
             }
+            setDataSource(table.data)
             return table
         },
         revokeOrg = (record: Permission) => {
@@ -93,7 +96,12 @@ export default () => {
                 content: `${t('confirm disauthorization')}${EnumPermissionPrincipalKind[record.principalKind].text}：${record.role?.name}?`,
                 onOk: async (close) => {
                     const result = await delPermssion(record.id, record.orgID)
-                    if (result) {
+                    if (result === true) {
+                        if (dataSource.length === 1) {
+                            const pageInfo = { ...proTableRef.current?.pageInfo }
+                            pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                            proTableRef.current?.setPageInfo?.(pageInfo)
+                        }
                         proTableRef.current?.reload();
                         close();
                     }

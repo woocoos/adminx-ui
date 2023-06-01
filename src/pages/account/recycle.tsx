@@ -46,6 +46,7 @@ export default () => {
                 }
             }
         ],
+        [dataSource, setDataSource] = useState<User[]>([]),
         [modal, setModal] = useState<{
             open: boolean
             title: string
@@ -63,6 +64,7 @@ export default () => {
                 table.data = result.edges.map(item => item.node)
                 table.total = result.totalCount
             }
+            setDataSource(table.data)
             return table
         }
 

@@ -52,6 +52,7 @@ export default (props: {
             }
 
         ],
+        [dataSource, setDataSource] = useState<OrgRole[]>([]),
         // 选中处理
         [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
         // 弹出层处理
@@ -72,6 +73,7 @@ export default (props: {
                 table.total = result.totalCount
             }
             setSelectedRowKeys([])
+            setDataSource(table.data)
             return table
         },
         onDel = (record: OrgRole) => {
@@ -80,7 +82,12 @@ export default (props: {
                 content: `${t('confirm disauthorization')}：${record.name}?`,
                 onOk: async (close) => {
                     const result = await revokeOrgRoleUser(record.id, props.userInfo.id)
-                    if (result) {
+                    if (result === true) {
+                        if (dataSource.length === 1) {
+                            const pageInfo = { ...proTableRef.current?.pageInfo }
+                            pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+                            proTableRef.current?.setPageInfo?.(pageInfo)
+                        }
                         proTableRef.current?.reload();
                         message.success(t('submit success'))
                         close();
