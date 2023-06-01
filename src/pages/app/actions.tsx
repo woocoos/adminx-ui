@@ -25,7 +25,6 @@ const AppActionList = (props: {
     appId?: string
     title?: string
     isMultiple?: boolean
-    scene?: "modal"
     ref?: MutableRefObject<AppActionListRef>
 }, ref: MutableRefObject<AppActionListRef>) => {
     const { token } = useToken(),
@@ -60,32 +59,30 @@ const AppActionList = (props: {
             id: "",
         })
 
-    if (props?.scene !== 'modal') {
-        columns.push(
-            {
-                title: t('operation'), dataIndex: 'actions', fixed: 'right',
-                align: 'center', search: false, width: 80,
-                render: (text, record) => {
-                    return <Space>
-                        <Auth authKey={"updateAppAction"}>
-                            <a key="editor" onClick={() => {
-                                setModal({
-                                    open: true, title: `${t('edit')}:${record.name}`, id: record.id
-                                })
-                            }} >
-                                {t('edit')}
-                            </a>
-                        </Auth>
-                        <Auth authKey={"deleteAppAction"}>
-                            <a key="del" onClick={() => onDel(record)}>
-                                {t('delete')}
-                            </a>
-                        </Auth>
-                    </Space>
-                }
-            },
-        )
-    }
+    columns.push(
+        {
+            title: t('operation'), dataIndex: 'actions', fixed: 'right',
+            align: 'center', search: false, width: 80,
+            render: (text, record) => {
+                return <Space>
+                    <Auth authKey={"updateAppAction"}>
+                        <a key="editor" onClick={() => {
+                            setModal({
+                                open: true, title: `${t('edit')}:${record.name}`, id: record.id
+                            })
+                        }} >
+                            {t('edit')}
+                        </a>
+                    </Auth>
+                    <Auth authKey={"deleteAppAction"}>
+                        <a key="del" onClick={() => onDel(record)}>
+                            {t('delete')}
+                        </a>
+                    </Auth>
+                </Space>
+            }
+        },
+    )
 
     const
         getApp = async () => {
@@ -150,90 +147,65 @@ const AppActionList = (props: {
 
 
     return <>
-        {
-            props?.scene == 'modal' ? (
-                <ProTable
-                    actionRef={proTableRef}
-                    rowKey={"id"}
-                    search={{
-                        searchText: `${t('query')}`,
-                        resetText: `${t('reset')}`,
-                        labelWidth: 'auto',
-                    }}
-                    toolbar={{
-                        title: props?.title || `${t('app')}:${appInfo?.name || "-"}`
-                    }}
-                    scroll={{ x: 'max-content', y: 300 }}
-                    columns={columns}
-                    request={getRequest}
-                    rowSelection={{
-                        selectedRowKeys: selectedRowKeys,
-                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                        type: props.isMultiple ? "checkbox" : "radio"
-                    }}
-                />
-            ) : (
-                <PageContainer
-                    header={{
-                        title: t('Application permission'),
-                        style: { background: token.colorBgContainer },
-                        breadcrumb: {
-                            items: [
-                                { title: t('System configuration'), },
-                                { title: t("{{field}} management", { field: t('app') }), },
-                                { title: t('Application permission'), },
-                            ],
-                        },
+        <PageContainer
+            header={{
+                title: t('Application permission'),
+                style: { background: token.colorBgContainer },
+                breadcrumb: {
+                    items: [
+                        { title: t('System configuration'), },
+                        { title: t("{{field}} management", { field: t('app') }), },
+                        { title: t('Application permission'), },
+                    ],
+                },
 
-                    }}
-                >
-                    <ProTable
-                        actionRef={proTableRef}
-                        search={{
-                            searchText: `${t('query')}`,
-                            resetText: `${t('reset')}`,
-                            labelWidth: 'auto',
-                        }}
-                        rowKey={"id"}
-                        toolbar={{
-                            title: `${t('app')}:${appInfo?.name || "-"}`,
-                            actions: [
-                                <Button key="import" onClick={
-                                    () => {
-                                        alert('还未实现')
-                                    }
-                                }>
-                                    {t('synchronization permission')}
-                                </Button >,
-                                <Auth authKey="createAppActions">
-                                    <Button key="created" type="primary" onClick={() => {
-                                        setModal({ open: true, title: t("create {{field}}", { field: t('permission') }), id: '', })
-                                    }}>
-                                        {t("create {{field}}", { field: t('permission') })}
-                                    </Button>
-                                </Auth>
-                            ]
-                        }}
-                        scroll={{ x: 'max-content' }}
-                        columns={columns}
-                        request={getRequest}
-                        pagination={{ showSizeChanger: true }}
-                        rowSelection={{
-                            selectedRowKeys: selectedRowKeys,
-                            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                            type: "checkbox"
-                        }}
-                    />
-                    <CreateAppAction
-                        open={modal.open}
-                        title={modal.title}
-                        id={modal.id}
-                        appId={appInfo?.id}
-                        onClose={onDrawerClose}
-                    />
-                </PageContainer >
-            )
-        }
+            }}
+        >
+            <ProTable
+                actionRef={proTableRef}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                    labelWidth: 'auto',
+                }}
+                rowKey={"id"}
+                toolbar={{
+                    title: `${t('app')}:${appInfo?.name || "-"}`,
+                    actions: [
+                        <Button key="import" onClick={
+                            () => {
+                                alert('还未实现')
+                            }
+                        }>
+                            {t('synchronization permission')}
+                        </Button >,
+                        <Auth authKey="createAppActions">
+                            <Button key="created" type="primary" onClick={() => {
+                                setModal({ open: true, title: t("create {{field}}", { field: t('permission') }), id: '', })
+                            }}>
+                                {t("create {{field}}", { field: t('permission') })}
+                            </Button>
+                        </Auth>
+                    ]
+                }}
+                scroll={{ x: 'max-content' }}
+                columns={columns}
+                request={getRequest}
+                pagination={{ showSizeChanger: true }}
+                rowSelection={{
+                    selectedRowKeys: selectedRowKeys,
+                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                    type: "checkbox"
+                }}
+            />
+            <CreateAppAction
+                open={modal.open}
+                title={modal.title}
+                id={modal.id}
+                appId={appInfo?.id}
+                onClose={onDrawerClose}
+            />
+        </PageContainer >
     </>;
 };
 

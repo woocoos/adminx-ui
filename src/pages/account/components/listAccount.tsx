@@ -28,7 +28,7 @@ type UserListProps = {
   orgId?: string
   orgRole?: OrgRole
   orgInfo?: Org
-  scene?: 'user' | 'orgUser' | 'modal' | "roleUser",
+  scene?: 'user' | 'orgUser' | "roleUser",
   userType?: UserType
   isMultiple?: boolean,
   ref?: MutableRefObject<UserListRef>
@@ -90,92 +90,90 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       scene: "",
     })
 
-  if (props?.scene !== 'modal') {
-    columns.push(
-      {
-        title: t('operation'), dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 100,
-        render: (text, record) => {
-          const items: ItemType[] = []
+  columns.push(
+    {
+      title: t('operation'), dataIndex: 'actions', fixed: 'right',
+      align: 'center', search: false, width: 100,
+      render: (text, record) => {
+        const items: ItemType[] = []
 
-          if (props.scene === 'orgUser' && props.orgInfo?.kind === 'root') {
-            if (checkAuth('assignRoleUser', auth)) {
-              items.push(
-                {
-                  key: "addGroup", label: <a onClick={() => {
-                    setModal({ open: true, data: record, title: t("add {{field}}", { field: t('user group') }), scene: "addGroup" })
-                  }}>
-                    {t("add {{field}}", { field: t('user group') })}
-                  </a>
-                }
-              )
-            }
-            if (checkAuth('grant', auth)) {
-              items.push(
-                {
-                  key: "addPermission", label: <a onClick={() => {
-                    setModal({ open: true, data: record, title: t("add {{field}}", { field: t('permission') }), scene: "addPermission" })
-                  }}>
-                    {t("add {{field}}", { field: t('permission') })}
-                  </a>
-                }
-              )
-            }
-          }
-
-          if (checkAuth('resetUserPasswordByEmail', auth)) {
+        if (props.scene === 'orgUser' && props.orgInfo?.kind === 'root') {
+          if (checkAuth('assignRoleUser', auth)) {
             items.push(
-              { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> }
+              {
+                key: "addGroup", label: <a onClick={() => {
+                  setModal({ open: true, data: record, title: t("add {{field}}", { field: t('user group') }), scene: "addGroup" })
+                }}>
+                  {t("add {{field}}", { field: t('user group') })}
+                </a>
+              }
             )
           }
-          if (props.scene === 'orgUser') {
-            if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
-              if (checkAuth('removeOrganizationUser', auth)) {
-                items.push(
-                  { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> }
-                )
+          if (checkAuth('grant', auth)) {
+            items.push(
+              {
+                key: "addPermission", label: <a onClick={() => {
+                  setModal({ open: true, data: record, title: t("add {{field}}", { field: t('permission') }), scene: "addPermission" })
+                }}>
+                  {t("add {{field}}", { field: t('permission') })}
+                </a>
               }
-            }
-          } else {
-            if (checkAuth('deleteUser', auth)) {
+            )
+          }
+        }
+
+        if (checkAuth('resetUserPasswordByEmail', auth)) {
+          items.push(
+            { key: "resetPwd", label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> }
+          )
+        }
+        if (props.scene === 'orgUser') {
+          if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
+            if (checkAuth('removeOrganizationUser', auth)) {
               items.push(
-                { key: "delete", label: <a onClick={() => onDelUser(record)}>{t('delete')}</a> }
+                { key: "delete", label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> }
               )
             }
           }
-          return props.scene === "roleUser" ? <Space>
-            <Auth authKey="revokeRoleUser">
-              {record.isAllowRevokeRole ? <a onClick={() => onRemoveRole(record)}>{t("remove")}</a> : ''}
-            </Auth>
-          </Space> : props.scene === 'orgUser' ? <Space>
-            <Link key="editor" to={`/account/viewer?id=${record.id}`}>
-              {t('detail')}
-            </Link>
-            {
-              items.length ? <Dropdown trigger={['click']} menu={{
-                items
-              }} >
-                <a><EllipsisOutlined /></a>
-              </Dropdown> : ''
-            }
-
-          </Space> : <Space>
-            <Link key="editor" to={`/account/viewer?id=${record.id}`}>
-              {t('detail')}
-            </Link>
-            {
-              items.length ? <Dropdown trigger={['click']} menu={{
-                items
-              }} >
-                <a><EllipsisOutlined /></a>
-              </Dropdown> : ''
-            }
-
-          </Space>
+        } else {
+          if (checkAuth('deleteUser', auth)) {
+            items.push(
+              { key: "delete", label: <a onClick={() => onDelUser(record)}>{t('delete')}</a> }
+            )
+          }
         }
+        return props.scene === "roleUser" ? <Space>
+          <Auth authKey="revokeRoleUser">
+            {record.isAllowRevokeRole ? <a onClick={() => onRemoveRole(record)}>{t("remove")}</a> : ''}
+          </Auth>
+        </Space> : props.scene === 'orgUser' ? <Space>
+          <Link key="editor" to={`/account/viewer?id=${record.id}`}>
+            {t('detail')}
+          </Link>
+          {
+            items.length ? <Dropdown trigger={['click']} menu={{
+              items
+            }} >
+              <a><EllipsisOutlined /></a>
+            </Dropdown> : ''
+          }
+
+        </Space> : <Space>
+          <Link key="editor" to={`/account/viewer?id=${record.id}`}>
+            {t('detail')}
+          </Link>
+          {
+            items.length ? <Dropdown trigger={['click']} menu={{
+              items
+            }} >
+              <a><EllipsisOutlined /></a>
+            </Dropdown> : ''
+          }
+
+        </Space>
       }
-    )
-  }
+    }
+  )
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
@@ -337,15 +335,11 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                 </Auth> : ''
               ] : []
             }}
-            scroll={{ x: 'max-content', y: 300 }}
+            scroll={{ x: 'max-content' }}
             columns={columns}
             request={getRequest}
             pagination={{ showSizeChanger: true }}
-            rowSelection={props?.scene === 'modal' ? {
-              selectedRowKeys: selectedRowKeys,
-              onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-              type: props.isMultiple ? "checkbox" : "radio"
-            } : false}
+            rowSelection={false}
           />
         ) : (
           <PageContainer

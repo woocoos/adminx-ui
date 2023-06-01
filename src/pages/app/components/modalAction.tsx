@@ -1,8 +1,9 @@
 import { Button, Modal } from 'antd';
-import { useRef } from 'react';
-import { AppAction } from '@/services/app/action';
-import { AppActionListRef } from '../actions';
-import AppActionList from '../actions';
+import { AppAction, EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/app/action';
+import { useTranslation } from 'react-i18next';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
+import { useState } from 'react';
+import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 
 export default (props: {
     open: boolean
@@ -12,19 +13,78 @@ export default (props: {
     appId: string
     onClose: (selectData?: AppAction[]) => void
 }) => {
-    const listRef = useRef<AppActionListRef>(null)
+    const { t } = useTranslation(),
+        columns: ProColumns<AppAction>[] = [
+            // 有需要排序配置  sorter: true 
+            {
+                title: t('name'), dataIndex: 'name', width: 120, search: {
+                    transform: (value) => ({ nameContains: value || undefined })
+                }
+            },
+            { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumAppActionKind },
+            { title: t('method'), dataIndex: 'method', width: 120, valueEnum: EnumAppActionMethod },
+            { title: t('remarks'), dataIndex: 'comments', width: 120, search: false, },
+        ],
+        [dataSource, setDataSource] = useState<AppAction[]>([]),
+        // 选中处理
+        [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([])
+
 
     const
+        getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+            const table = { data: [] as AppAction[], success: true, total: 0 };
+            const result = await getAppActionList(props.appId, params, filter, sort);
+            if (result) {
+                table.data = result.edges.map(item => item.node)
+                table.total = result.totalCount
+            }
+            setSelectedRowKeys([])
+            setDataSource(table.data)
+            return table
+        },
         handleOk = () => {
-            props?.onClose(listRef.current?.getSelect())
+            props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)))
         },
         handleCancel = () => {
-            props?.onClose(undefined)
+            props?.onClose()
         }
 
     return (
         <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
-            <AppActionList ref={listRef} title={props.tableTitle} appId={props.appId} isMultiple={props.isMultiple} scene="modal" />
+            <ProTable
+                size="small"
+                rowKey={"id"}
+                search={{
+                    searchText: `${t('query')}`,
+                    resetText: `${t('reset')}`,
+                    labelWidth: 'auto',
+                }}
+                scroll={{ x: 'max-content', y: 300 }}
+                options={false}
+                columns={columns}
+                request={getRequest}
+                rowSelection={{
+                    selectedRowKeys: selectedRowKeys,
+                    onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
+                    type: props.isMultiple ? "checkbox" : "radio"
+                }}
+                onRow={(record) => {
+                    return {
+                        onClick: () => {
+                            if (props.isMultiple) {
+                                if (selectedRowKeys.includes(record.id)) {
+                                    setSelectedRowKeys(selectedRowKeys.filter(id => id != record.id))
+                                } else {
+                                    selectedRowKeys.push(record.id)
+                                    setSelectedRowKeys([...selectedRowKeys])
+                                }
+                            } else {
+                                setSelectedRowKeys([record.id])
+                            }
+                        }
+                    };
+                }}
+            />
         </Modal>
     )
 }

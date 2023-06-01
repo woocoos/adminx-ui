@@ -6,12 +6,10 @@ import {
     useToken,
 } from "@ant-design/pro-components";
 import { Button, Space, Dropdown, Modal, Alert, message, Select } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { TableSort, TableParams, TableFilter } from "@/services/graphql";
 import { Link, useSearchParams } from "@ice/runtime";
 import CreateOrgRole from "./components/createRole";
-import { TreeEditorAction } from "@/util/type";
 import { OrgRole, OrgRoleKind, delOrgRole, getOrgGroupList, getOrgRoleList } from "@/services/org/role";
 import store from "@/store";
 import { useTranslation } from "react-i18next";
@@ -30,7 +28,6 @@ const PageOrgRoleList = (props: {
     kind?: OrgRoleKind
     orgId: string
     title?: string
-    scene?: "modal"
     isMultiple?: boolean,
     ref?: MutableRefObject<OrgRoleListRef>
 
@@ -184,7 +181,29 @@ const PageOrgRoleList = (props: {
 
     return (
         <>
-            {["modal"].includes(props.scene || '') ?
+
+            <PageContainer
+                header={{
+                    title: kind == 'role' ? t('role') : t('user group'),
+                    style: { background: token.colorBgContainer },
+                    breadcrumb: {
+                        items: kind == 'role' ? [
+                            { title: t('organization and cooperation'), },
+                            { title: t('role'), },
+                        ] : [
+                            { title: t('organization and cooperation'), },
+                            { title: t('user group'), },
+                        ],
+                    },
+                    children: <Alert showIcon message={kind == 'role' ? <>
+                        <div>{t('Roles are not the division of responsibilities of user groups, but a secure way to authorize entities that you trust, such as users')}</div>
+                    </> : <>
+                        <div>{t('Users and their rights can be managed more efficiently by classifying and authorizing users with the same responsibilities through user groups')}</div>
+                        <div>{t('After a user group is authorized, all users in the user group automatically inherit the rights of the user group')}</div>
+                        <div>{t('If a user is added to multiple user groups, the user inherits the rights of multiple user groups')}</div>
+                    </>} />
+                }}
+            >
                 <ProTable
                     actionRef={proTableRef}
                     search={{
@@ -194,120 +213,69 @@ const PageOrgRoleList = (props: {
                     }}
                     rowKey={"id"}
                     toolbar={{
-                        title: props.title || kind == "role" ? t("{{field}} list", { field: t('role') }) : t("{{field}} list", { field: t('user group') }),
+                        title: kind == "role" ? t("{{field}} list", { field: t('role') }) : t("{{field}} list", { field: t('user group') }),
                         actions: [
-                            <Button
-                                type="primary" onClick={() => {
-                                    setModal({ open: true, title: `${kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}`, id: "", scene: "editor" })
-                                }}>
-                                {kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}
-                            </Button>
+                            <Auth authKey="createRole">
+                                <Button
+                                    type="primary" onClick={() => {
+                                        setModal({ open: true, title: `${kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}`, id: "", scene: "editor" })
+                                    }}>
+                                    {kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}
+                                </Button>
+                            </Auth>
                         ]
                     }}
-                    rowSelection={props?.scene === 'modal' ? {
-                        selectedRowKeys: selectedRowKeys,
-                        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                        type: props.isMultiple ? "checkbox" : "radio"
-                    } : false}
                     scroll={{ x: 'max-content' }}
                     columns={columns}
                     request={getRequest}
-                /> :
-                <PageContainer
-                    header={{
-                        title: kind == 'role' ? t('role') : t('user group'),
-                        style: { background: token.colorBgContainer },
-                        breadcrumb: {
-                            items: kind == 'role' ? [
-                                { title: t('organization and cooperation'), },
-                                { title: t('role'), },
-                            ] : [
-                                { title: t('organization and cooperation'), },
-                                { title: t('user group'), },
-                            ],
-                        },
-                        children: <Alert showIcon message={kind == 'role' ? <>
-                            <div>{t('Roles are not the division of responsibilities of user groups, but a secure way to authorize entities that you trust, such as users')}</div>
-                        </> : <>
-                            <div>{t('Users and their rights can be managed more efficiently by classifying and authorizing users with the same responsibilities through user groups')}</div>
-                            <div>{t('After a user group is authorized, all users in the user group automatically inherit the rights of the user group')}</div>
-                            <div>{t('If a user is added to multiple user groups, the user inherits the rights of multiple user groups')}</div>
-                        </>} />
+                />
+                <CreateOrgRole
+                    x-if={modal.scene === 'editor'}
+                    open={modal.open}
+                    title={modal.title}
+                    id={modal.id}
+                    kind={kind}
+                    orgId={props.orgId}
+                    onClose={onDrawerClose}
+                />
+                <DrawerUser
+                    x-if={modal.scene === 'addUser' && modal.open}
+                    open={modal.open}
+                    title={modal.title}
+                    orgId={props.orgId}
+                    orgRole={modal.data}
+                    onClose={(isSuccess) => {
+                        if (isSuccess) {
+                            proTableRef.current?.reload();
+                        }
+                        setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
                     }}
-                >
-                    <ProTable
-                        actionRef={proTableRef}
-                        search={{
-                            searchText: `${t('query')}`,
-                            resetText: `${t('reset')}`,
-                            labelWidth: 'auto',
-                        }}
-                        rowKey={"id"}
-                        toolbar={{
-                            title: kind == "role" ? t("{{field}} list", { field: t('role') }) : t("{{field}} list", { field: t('user group') }),
-                            actions: [
-                                <Auth authKey="createRole">
-                                    <Button
-                                        type="primary" onClick={() => {
-                                            setModal({ open: true, title: `${kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}`, id: "", scene: "editor" })
-                                        }}>
-                                        {kind == "role" ? t("create {{field}}", { field: t('role') }) : t("create {{field}}", { field: t('user group') })}
-                                    </Button>
-                                </Auth>
-                            ]
-                        }}
-                        scroll={{ x: 'max-content' }}
-                        columns={columns}
-                        request={getRequest}
-                    />
-                    <CreateOrgRole
-                        x-if={modal.scene === 'editor'}
-                        open={modal.open}
-                        title={modal.title}
-                        id={modal.id}
-                        kind={kind}
-                        orgId={props.orgId}
-                        onClose={onDrawerClose}
-                    />
-                    <DrawerUser
-                        x-if={modal.scene === 'addUser' && modal.open}
-                        open={modal.open}
-                        title={modal.title}
-                        orgId={props.orgId}
-                        orgRole={modal.data}
-                        onClose={(isSuccess) => {
-                            if (isSuccess) {
-                                proTableRef.current?.reload();
-                            }
-                            setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
-                        }}
-                    />
-                    <DrawerRolePolicy
-                        x-if={modal.scene === "addPermission" && modal.open}
-                        orgId={props.orgId}
-                        orgRoleInfo={modal.data}
-                        open={modal.open}
-                        title={modal.title}
-                        onClose={(isSuccess) => {
-                            if (isSuccess) {
-                                proTableRef.current?.reload();
-                            }
-                            setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
-                        }}
-                    />
-                    <DrawerAppRolePolicy
-                        x-if={modal.scene === "addAppPermission" && modal.open}
-                        open={modal.open}
-                        title={modal.title}
-                        onClose={(isSuccess) => {
-                            if (isSuccess) {
-                                proTableRef.current?.reload();
-                            }
-                            setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
-                        }}
-                    />
-                </PageContainer>
-            }
+                />
+                <DrawerRolePolicy
+                    x-if={modal.scene === "addPermission" && modal.open}
+                    orgId={props.orgId}
+                    orgRoleInfo={modal.data}
+                    open={modal.open}
+                    title={modal.title}
+                    onClose={(isSuccess) => {
+                        if (isSuccess) {
+                            proTableRef.current?.reload();
+                        }
+                        setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
+                    }}
+                />
+                <DrawerAppRolePolicy
+                    x-if={modal.scene === "addAppPermission" && modal.open}
+                    open={modal.open}
+                    title={modal.title}
+                    onClose={(isSuccess) => {
+                        if (isSuccess) {
+                            proTableRef.current?.reload();
+                        }
+                        setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
+                    }}
+                />
+            </PageContainer>
         </>
     );
 };

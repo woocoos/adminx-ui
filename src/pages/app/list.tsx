@@ -29,7 +29,7 @@ const PageAppList = (props: {
   ref?: MutableRefObject<AppListRef>
   title?: string
   orgId?: string
-  scene?: 'modal' | "orgApp",
+  scene?: "orgApp",
   isMultiple?: boolean,
 }, ref: MutableRefObject<AppListRef>) => {
   const { token } = useToken(),
@@ -73,53 +73,51 @@ const PageAppList = (props: {
       id: ""
     })
 
-  if (!['modal'].includes(props.scene || '')) {
-    columns.push(
-      {
-        title: t('operation'), dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 170,
-        render: (text, record) => {
-          const items: ItemType[] = [
-            { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
-            { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
-            { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
-            { key: "resource", label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
+  columns.push(
+    {
+      title: t('operation'), dataIndex: 'actions', fixed: 'right',
+      align: 'center', search: false, width: 170,
+      render: (text, record) => {
+        const items: ItemType[] = [
+          { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
+          { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
+          { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
+          { key: "resource", label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
 
-          ]
+        ]
 
-          if (checkAuth('deleteApp', auth)) {
-            items.push(
-              { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
-            )
-          }
-
-          return props.scene === 'orgApp' ? <Space>
-            <Auth authKey="revokeOrganizationApp">
-              <a onClick={() => {
-                revokeOrg(record)
-              }}>
-                {t('disauthorization')}
-              </a>
-            </Auth>
-          </Space> : <Space>
-            <Auth authKey="updateApp">
-              <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
-                {t('edit')}
-              </Link>
-            </Auth>
-            <Link key="actions" to={`/app/actions?id=${record.id}`} >
-              {t('permission')}
-            </Link>
-            <Dropdown trigger={['click']} menu={{
-              items
-            }} >
-              <a><EllipsisOutlined /></a>
-            </Dropdown>
-          </Space>
+        if (checkAuth('deleteApp', auth)) {
+          items.push(
+            { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
+          )
         }
-      },
-    )
-  }
+
+        return props.scene === 'orgApp' ? <Space>
+          <Auth authKey="revokeOrganizationApp">
+            <a onClick={() => {
+              revokeOrg(record)
+            }}>
+              {t('disauthorization')}
+            </a>
+          </Auth>
+        </Space> : <Space>
+          <Auth authKey="updateApp">
+            <Link key="viewer" to={`/app/viewer?id=${record.id}`}>
+              {t('edit')}
+            </Link>
+          </Auth>
+          <Link key="actions" to={`/app/actions?id=${record.id}`} >
+            {t('permission')}
+          </Link>
+          <Dropdown trigger={['click']} menu={{
+            items
+          }} >
+            <a><EllipsisOutlined /></a>
+          </Dropdown>
+        </Space>
+      }
+    },
+  )
 
 
   const
@@ -205,7 +203,7 @@ const PageAppList = (props: {
   return (
     <>
       {
-        ['modal', 'orgApp'].includes(props.scene || '') ? (
+        ['orgApp'].includes(props.scene || '') ? (
           <>
             <ProTable
               actionRef={proTableRef}
@@ -217,7 +215,7 @@ const PageAppList = (props: {
               }}
               toolbar={{
                 title: props?.title || t("{{field}} list", { field: t('app') }),
-                actions: props.scene === 'orgApp' ? [
+                actions: [
                   <Auth authKey="assignOrganizationApp">
                     <Button type="primary" onClick={() => {
                       setModal({ open: true, title: t("search {{field}}", { field: t("app") }), id: '' })
@@ -225,33 +223,28 @@ const PageAppList = (props: {
                       {t('Authorized application')}
                     </Button>
                   </Auth>
-                ] : []
+                ]
               }}
               scroll={{ x: 'max-content', y: 300 }}
               columns={columns}
               request={getRequest}
               pagination={{ showSizeChanger: true }}
-              rowSelection={props?.scene === 'modal' ? {
-                selectedRowKeys: selectedRowKeys,
-                onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-                type: props.isMultiple ? "checkbox" : "radio"
-              } : false}
+              rowSelection={false}
             />
-            {props.scene === 'orgApp' ? (
-              <ModalApp
-                open={modal.open}
-                title={modal.title}
-                onClose={async (selectData) => {
-                  const sdata = selectData?.[0]
-                  if (sdata && props.orgId) {
-                    const result = await assignOrgApp(props.orgId, sdata.id)
-                    if (result) {
-                      proTableRef.current?.reload();
-                    }
+            <ModalApp
+              open={modal.open}
+              title={modal.title}
+              onClose={async (selectData) => {
+                const sdata = selectData?.[0]
+                if (sdata && props.orgId) {
+                  const result = await assignOrgApp(props.orgId, sdata.id)
+                  if (result) {
+                    proTableRef.current?.reload();
                   }
-                  setModal({ open: false, title: modal.title, id: '' })
-                }}
-              />) : ""}
+                }
+                setModal({ open: false, title: modal.title, id: '' })
+              }}
+            />
 
           </>
         ) : (

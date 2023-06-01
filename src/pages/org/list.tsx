@@ -27,7 +27,6 @@ export type OrgListRef = {
 const OrgList = (props: {
   ref?: MutableRefObject<OrgListRef>
   title?: string
-  scene?: 'modal'
   isMultiple?: boolean
   tenantId?: string
   appId?: string
@@ -73,83 +72,81 @@ const OrgList = (props: {
       scene: "editor",
     })
 
-  if (props.scene !== 'modal') {
-    columns.push(
-      {
-        title: t('operation'), dataIndex: 'actions', fixed: 'right',
-        align: 'center', search: false, width: 150,
-        render: (text, record) => {
-          const createAction = [
-            {
-              key: 'child', label: <a onClick={(e) => {
-                editorAction(record, 'child')
-              }}>
-                {t('sublayer')}
-              </a>
-            }
-          ]
-          if (record.parentID != '0') {
-            createAction.unshift({
-              key: 'peer', label: <a onClick={(e) => {
-                editorAction(record, 'peer')
-              }}>
-                {t('same level')}
-              </a>
-            })
+  columns.push(
+    {
+      title: t('operation'), dataIndex: 'actions', fixed: 'right',
+      align: 'center', search: false, width: 150,
+      render: (text, record) => {
+        const createAction = [
+          {
+            key: 'child', label: <a onClick={(e) => {
+              editorAction(record, 'child')
+            }}>
+              {t('sublayer')}
+            </a>
           }
-          const items: ItemType[] = []
-          if (kind == 'root') {
+        ]
+        if (record.parentID != '0') {
+          createAction.unshift({
+            key: 'peer', label: <a onClick={(e) => {
+              editorAction(record, 'peer')
+            }}>
+              {t('same level')}
+            </a>
+          })
+        }
+        const items: ItemType[] = []
+        if (kind == 'root') {
+          items.push(
+            { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>{t('policy')}</Link> },
+            { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>{t('authorized application')}</Link> },
+            { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >{t('organizational department management')}</Link> },
+            { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>{t('organizational user management')}</Link> },
+          )
+        } else {
+          if (checkAuth("createOrganization", auth)) {
             items.push(
-              { key: "policy", label: <Link to={`/org/policys?id=${record.id}`}>{t('policy')}</Link> },
-              { key: "app", label: <Link to={`/org/apps?id=${record.id}`}>{t('authorized application')}</Link> },
-              { key: "org", label: <Link to={`/org/departments?id=${record.id}`} >{t('organizational department management')}</Link> },
-              { key: "orgUser", label: <Link to={`/org/users?id=${record.id}`}>{t('organizational user management')}</Link> },
+              { key: 'create', label: t('created'), children: createAction }
             )
-          } else {
-            if (checkAuth("createOrganization", auth)) {
-              items.push(
-                { key: 'create', label: t('created'), children: createAction }
-              )
-            }
-            if (record.kind === kind && checkAuth("deleteOrganization", auth)) {
-              items.push(
-                { key: "delete", label: <a onClick={() => onDelOrg(record)}>{t('delete')}</a> }
-              )
-            }
           }
+          if (record.kind === kind && checkAuth("deleteOrganization", auth)) {
+            items.push(
+              { key: "delete", label: <a onClick={() => onDelOrg(record)}>{t('delete')}</a> }
+            )
+          }
+        }
 
-          return <Space>
-            {record.kind === kind ? <>
-              <Auth authKey="updateOrganization">
-                <a key="editor" onClick={() => editorAction(record, 'editor')}>
-                  {t('edit')}
-                </a>
-              </Auth>
-            </> : <></>}
-            {
-              kind == 'root' ? <>
-                <Link key="userGroup" to={`/org/groups?id=${record.id}`}>
-                  {t('user group')}
-                </Link>
+        return <Space>
+          {record.kind === kind ? <>
+            <Auth authKey="updateOrganization">
+              <a key="editor" onClick={() => editorAction(record, 'editor')}>
+                {t('edit')}
+              </a>
+            </Auth>
+          </> : <></>}
+          {
+            kind == 'root' ? <>
+              <Link key="userGroup" to={`/org/groups?id=${record.id}`}>
+                {t('user group')}
+              </Link>
+              {items.length ? <Dropdown trigger={['click']} menu={{
+                items
+              }} >
+                <a><EllipsisOutlined /></a>
+              </Dropdown> : ''}
+            </>
+              : <>
                 {items.length ? <Dropdown trigger={['click']} menu={{
                   items
                 }} >
                   <a><EllipsisOutlined /></a>
                 </Dropdown> : ''}
               </>
-                : <>
-                  {items.length ? <Dropdown trigger={['click']} menu={{
-                    items
-                  }} >
-                    <a><EllipsisOutlined /></a>
-                  </Dropdown> : ''}
-                </>
-            }
-          </Space>
-        }
-      },
-    )
-  }
+          }
+        </Space>
+      }
+    },
+  )
 
 
   const
@@ -243,91 +240,58 @@ const OrgList = (props: {
 
   return (
     <>
-      {
-        ['modal'].includes(props.scene || '') ? (
-          <ProTable
-            actionRef={proTableRef}
-            rowKey={"id"}
-            search={props.appId ? {
-              searchText: `${t('query')}`,
-              resetText: `${t('reset')}`,
-              labelWidth: 'auto',
-            } : false}
-            toolbar={{
-              title: props?.title || (kind === 'org' ? t('organizational department management') : t('organizational management'))
-            }}
-            expandable={{
-              expandedRowKeys: expandedRowKeys,
-              onExpandedRowsChange: (expandedKeys: string[]) => {
-                setExpandedRowKeys(expandedKeys)
-              }
-            }}
-            scroll={{ x: 'max-content', y: 300 }}
-            columns={columns}
-            request={getRequest}
-            pagination={false}
-            rowSelection={props?.scene === 'modal' ? {
-              selectedRowKeys: selectedRowKeys,
-              onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys) },
-              type: props.isMultiple ? "checkbox" : "radio"
-            } : false}
-          />
-        ) : (
-          <PageContainer
-            header={{
-              title: kind == 'org' ? t('organizational department management') : t("{{field}} management", { field: t('organization') }),
-              style: { background: token.colorBgContainer },
-              breadcrumb: {
-                items: kind == 'org' ? [
-                  { title: t('organization and cooperation'), },
-                  { title: t('organizational department management'), },
-                ] : [
-                  { title: t('System configuration'), },
-                  { title: t("{{field}} management", { field: t('organization') }), },
-                ],
-              },
-            }}
-          >
-            <ProTable
-              actionRef={proTableRef}
-              rowKey={"id"}
-              search={false}
-              toolbar={{
-                title: kind === 'org' ? t('organizational department management') : t('organizational management'),
-                actions: kind == 'org' ? [] : [
-                  <Auth authKey={kind === 'root' ? "createRoot" : "createOrganization"}>
-                    <Button
-                      type="primary" onClick={() => {
-                        setModal({ open: true, title: t("create {{field}}", { field: t('organization') }), id: "", scene: "editor" })
+      <PageContainer
+        header={{
+          title: kind == 'org' ? t('organizational department management') : t("{{field}} management", { field: t('organization') }),
+          style: { background: token.colorBgContainer },
+          breadcrumb: {
+            items: kind == 'org' ? [
+              { title: t('organization and cooperation'), },
+              { title: t('organizational department management'), },
+            ] : [
+              { title: t('System configuration'), },
+              { title: t("{{field}} management", { field: t('organization') }), },
+            ],
+          },
+        }}
+      >
+        <ProTable
+          actionRef={proTableRef}
+          rowKey={"id"}
+          search={false}
+          toolbar={{
+            title: kind === 'org' ? t('organizational department management') : t('organizational management'),
+            actions: kind == 'org' ? [] : [
+              <Auth authKey={kind === 'root' ? "createRoot" : "createOrganization"}>
+                <Button
+                  type="primary" onClick={() => {
+                    setModal({ open: true, title: t("create {{field}}", { field: t('organization') }), id: "", scene: "editor" })
 
-                      }}>
-                      {t("create {{field}}", { field: t('organization') })}
-                    </Button>
-                  </Auth>
-                ]
-              }}
-              expandable={{
-                expandedRowKeys: expandedRowKeys,
-                onExpandedRowsChange: (expandedKeys: string[]) => {
-                  setExpandedRowKeys(expandedKeys)
-                }
-              }}
-              scroll={{ x: 'max-content' }}
-              columns={columns}
-              request={getRequest}
-              pagination={false}
-            />
-            <OrgCreate
-              open={modal.open}
-              title={modal.title}
-              id={modal.id}
-              scene={modal.scene}
-              kind={kind}
-              onClose={onDrawerClose} />
-          </PageContainer>
-        )
-      }
-
+                  }}>
+                  {t("create {{field}}", { field: t('organization') })}
+                </Button>
+              </Auth>
+            ]
+          }}
+          expandable={{
+            expandedRowKeys: expandedRowKeys,
+            onExpandedRowsChange: (expandedKeys: string[]) => {
+              setExpandedRowKeys(expandedKeys)
+            }
+          }}
+          scroll={{ x: 'max-content' }}
+          columns={columns}
+          request={getRequest}
+          pagination={false}
+        />
+        <OrgCreate
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          scene={modal.scene}
+          kind={kind}
+          onClose={onDrawerClose} />
+      </PageContainer>
     </>
   );
 };
