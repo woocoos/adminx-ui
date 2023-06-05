@@ -10,22 +10,27 @@ interface LoginResponse {
     user?: {
         displayName: string
         domainId: string | number
-        domainName: string
-        id: string | number
+        domains: Array<Domain>
     },
     errors?: {
         code: number
         message: string
     }[]
 }
+interface Domain {
+    domainName: string
+    id: string | number
+}
 
-const token = "eyJhbGciOiJSUzI1NiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjgwNDkxMDkwLCJpc3MiOiJPbmxpbmUgWUF1dGggQnVpbGRlciIsImV4cCI6MTY4MDQ5ODU5MH0.JRwXrpQR1FFmPtb62dg5DOMl78tR8-H-BRuRCLzBDRkBV7la4JQy9yUctT0ZDielqhIyySebtlDrgG6DCXRCOVeF8joEKstOP_mAtvxtxPX5BAzMZRUYXoehvTZeZuBYNXVGY1TbzGkW-r90u5igIXUpl7eoWL-kVfKMU4jqzYgL1SakdfI6HP78y10xKAmHg3cIk4yd7gNDp9161htxDna36BVbo0NO46zo8M1PjFkwsJD4_HzlQpSRB-lLyNxGvmzA4mgWEgqs9TbMBF1VELr0PH0sgXuQ8q9u4Qbf-Yl8SnA3XcKNEmIVo213hVmrd54tGIIUBlcsqyKQoVPJxg",
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzIwMTM1ODExLCJpYXQiOjE2ODQxMzU4MTEsImp0aSI6InRva2VuOjE6YTU0YjdiNzMtYjFlNS00YmE0LWFlZDktMjMwMmVhMDgwOTUwIn0.Roi6QokXVLSOUGziglXPP8rBFwhkfEhf7mRSXEL-Wu0",
     refreshToken = "",
     user = {
         displayName: "admin",
         domainId: 1,
-        domainName: "wooocoo",
-        id: 1
+        domains: [{
+            domainName: "wooocoo",
+            id: 1
+        }]
     };
 
 export default {
@@ -34,7 +39,7 @@ export default {
             const result: LoginResponse = {}
             const { username, password, captcha } = request.body;
             const cookies = request.headers.cookie?.split('; ')
-            if (username === 'woocoo.com' && password === '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92' && cookies?.includes(`captcha=${captcha}`)) {
+            if (username === 'admin' && password === '8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92' && cookies?.includes(`captcha=${captcha}`)) {
                 result.accessToken = token
                 result.stateToken = token
                 result.expiresIn = 3600
@@ -48,12 +53,11 @@ export default {
                     }
                 ]
             }
-            // response.status(500);
             response.send(result);
         })
     },
     // 
-    'POST /api/login/verify-facto': (request: Request, response: Response) => {
+    'POST /api/login/verify-factor': (request: Request, response: Response) => {
         bodyParser.json()(request, response, async () => {
             const result: LoginResponse = {}
             const { deviceId, stateToken, otpToken } = request.body;
@@ -108,12 +112,14 @@ export default {
             fontSize: 48,
             width: 150,
             height: 50,
-            size: 4,
-            ignoreChars: "0o1i",
+            size: 6,
+            ignoreChars: "0o1lIi",
             background: "rgba(0, 0, 0, 0.02)"
         })
         response.cookie('captcha', captcha.text.toLowerCase())
-        response.type('svg');
-        response.send(captcha.data);
+        response.send({
+            captchaId:captcha.text.toLowerCase(),
+            captchaImage:"data:image/svg+xml;utf8,"+encodeURIComponent(captcha.data)
+        });
     },
 }
