@@ -1,26 +1,25 @@
 import store from "@/store";
-import { useEffect, useState } from "react";
-import { userMenuList } from "@/components/FrameworkLayout/menuConfig";
-import ProLayout from "@ant-design/pro-layout";
+import {useEffect, useState} from "react";
+import {userMenuList} from "@/components/FrameworkLayout/menuConfig";
+import {ProLayout} from "@ant-design/pro-components";
 import AvatarDropdown from "@/components/Header/AvatarDropdown";
 import I18nDropdown from "@/components/Header/I18nDropdown";
 import DarkMode from "@/components/Header/DarkMode";
 import styles from "./layout.module.css";
 import logo from "@/assets/logo.png";
 import defaultAvatar from "@/assets/images/default-avatar.png";
-import { Outlet } from "@ice/runtime";
+import {Outlet} from "@ice/runtime";
 import i18n from "@/i18n";
-import { ProConfigProvider, useToken } from "@ant-design/pro-components";
-import LeavePrompt, { Link } from "@/components/LeavePrompt";
-import { AliveScope } from 'react-activation'
+import {ProConfigProvider, useToken} from "@ant-design/pro-components";
+import LeavePrompt, {Link} from "@/components/LeavePrompt";
+import {AliveScope} from 'react-activation'
 import TenantDropdown from "@/components/Header/TenantDropdown";
-import { monitorKeyChange } from "@/pkg/localStore";
-
+import {monitorKeyChange} from "@/pkg/localStore";
 
 
 export default function Layout() {
   const [basisState, basisDispatcher] = store.useModel("basis"),
-    { token } = useToken();
+    {token} = useToken();
 
   useEffect(() => {
     i18n.changeLanguage(basisState.locale);
@@ -52,15 +51,15 @@ export default function Layout() {
         onChange(value) {
           basisDispatcher.updateLocale(value)
         },
-      },     
+      },
     ])
   }, [])
 
-  return ["/login","/login/retrievePassword"].includes(location.pathname) ? <Outlet /> :
+  return ["/login", "/login/retrievePassword"].includes(location.pathname) ? <Outlet/> :
     <ProConfigProvider
       dark={basisState.darkMode}
     >
-      <LeavePrompt />
+      <LeavePrompt/>
       <ProLayout
         token={{
           sider: {
@@ -73,7 +72,7 @@ export default function Layout() {
           request: userMenuList
         }}
         fixSiderbar
-        logo={<img src={logo} alt="logo" />}
+        logo={<img src={logo} alt="logo"/>}
         title="Adminx"
         location={{
           pathname: location.pathname,
@@ -81,19 +80,19 @@ export default function Layout() {
         layout="mix"
         rightContentRender={() => (
           <>
-            <I18nDropdown />
-            <TenantDropdown />
+            <I18nDropdown/>
+            <TenantDropdown/>
             <AvatarDropdown
               avatar={defaultAvatar}
               name={basisState.user?.displayName || ""}
             />
-            <DarkMode />
+            <DarkMode/>
           </>
         )}
         menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
       >
         <AliveScope>
-          <Outlet />
+          <Outlet/>
         </AliveScope>
       </ProLayout>
     </ProConfigProvider>
