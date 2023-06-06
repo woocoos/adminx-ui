@@ -9,3 +9,10 @@ adminx前端项目
 - 本地存储 [localforage](https://localforage.docschina.org/)
 - keep-alive [react-activation](https://github.com/CJY0208/react-activation/blob/HEAD/README_CN.md)
 
+## 快速开始
+```shell
+# 启动开发环境,默认使用mock
+pnpm dev
+# 启动,使用proxy
+pnpm start
+```

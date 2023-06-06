@@ -56,7 +56,7 @@ export default {
             response.send(result);
         })
     },
-    // 
+    //
     'POST /api/login/verify-factor': (request: Request, response: Response) => {
         bodyParser.json()(request, response, async () => {
             const result: LoginResponse = {}
@@ -112,8 +112,8 @@ export default {
             fontSize: 48,
             width: 150,
             height: 50,
-            size: 6,
-            ignoreChars: "0o1lIi",
+            size: 1,
+            ignoreChars: "0o1i",
             background: "rgba(0, 0, 0, 0.02)"
         })
         response.cookie('captcha', captcha.text.toLowerCase())
