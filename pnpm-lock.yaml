@@ -100,6 +100,9 @@ devDependencies:
   body-parser:
     specifier: ^1.20.2
     version: registry.npmjs.org/body-parser@1.20.2
+  casual:
+    specifier: ^1.6.2
+    version: registry.npmjs.org/casual@1.6.2
   eslint:
     specifier: ^8.42.0
     version: registry.npmjs.org/eslint@8.42.0
@@ -557,8 +560,8 @@ packages:
       eslint-plugin-react-hooks: registry.npmjs.org/eslint-plugin-react-hooks@4.6.0(eslint@8.42.0)
       eslint-plugin-vue: registry.npmjs.org/eslint-plugin-vue@8.7.1(eslint@8.42.0)
       postcss: registry.npmjs.org/postcss@8.4.12
-      postcss-less: registry.npmjs.org/postcss-less@6.0.0(postcss@8.4.12)
-      postcss-scss: registry.npmjs.org/postcss-scss@4.0.6(postcss@8.4.12)
+      postcss-less: registry.npmjs.org/postcss-less@6.0.0(postcss@8.4.24)
+      postcss-scss: registry.npmjs.org/postcss-scss@4.0.6(postcss@8.4.24)
       require-all: registry.npmjs.org/require-all@3.0.0
       stylelint: registry.npmjs.org/stylelint@15.6.3
       stylelint-scss: registry.npmjs.org/stylelint-scss@4.7.0(stylelint@15.6.3)
@@ -583,8 +586,8 @@ packages:
       stylelint-scss: '>=3.18.0'
     dependencies:
       postcss: registry.npmjs.org/postcss@8.4.12
-      postcss-less: registry.npmjs.org/postcss-less@6.0.0(postcss@8.4.12)
-      postcss-scss: registry.npmjs.org/postcss-scss@4.0.6(postcss@8.4.12)
+      postcss-less: registry.npmjs.org/postcss-less@6.0.0(postcss@8.4.24)
+      postcss-scss: registry.npmjs.org/postcss-scss@4.0.6(postcss@8.4.24)
       stylelint: registry.npmjs.org/stylelint@15.6.3
       stylelint-scss: registry.npmjs.org/stylelint-scss@4.7.0(stylelint@15.6.3)
     dev: true
@@ -3095,6 +3098,15 @@ packages:
     version: 1.0.30001494
     dev: true
 
+  registry.npmjs.org/casual@1.6.2:
+    resolution: {integrity: sha512-NQObL800rg32KZ9bBajHbyDjxLXxxuShChQg7A4tbSeG3n1t7VYGOSkzFSI9gkSgOHp+xilEJ7G0L5l6M30KYA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/casual/-/casual-1.6.2.tgz}
+    name: casual
+    version: 1.6.2
+    dependencies:
+      mersenne-twister: registry.npmjs.org/mersenne-twister@1.1.0
+      moment: registry.npmjs.org/moment@2.29.4
+    dev: true
+
   registry.npmjs.org/chalk@2.4.2:
     resolution: {integrity: sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/chalk/-/chalk-2.4.2.tgz}
     name: chalk
@@ -5484,6 +5496,12 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
+  registry.npmjs.org/mersenne-twister@1.1.0:
+    resolution: {integrity: sha512-mUYWsMKNrm4lfygPkL3OfGzOPTR2DBlTkBNHM//F6hGp8cLThY897crAlk3/Jo17LEOOjQUrNAx6DvgO77QJkA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/mersenne-twister/-/mersenne-twister-1.1.0.tgz}
+    name: mersenne-twister
+    version: 1.1.0
+    dev: true
+
   registry.npmjs.org/micromatch@4.0.5:
     resolution: {integrity: sha512-DMy+ERcEW2q8Z2Po+WNXuw3c5YaUSFjAO5GsJqfEl7UjvtIuFKO6ZrKvcItdy98dwFI2N1tg3zNIdKaQT+aNdA==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/micromatch/-/micromatch-4.0.5.tgz}
     name: micromatch
@@ -5577,6 +5595,12 @@ packages:
       pathe: registry.npmjs.org/pathe@1.1.1
       pkg-types: registry.npmjs.org/pkg-types@1.0.3
       ufo: registry.npmjs.org/ufo@1.1.2
+    dev: true
+
+  registry.npmjs.org/moment@2.29.4:
+    resolution: {integrity: sha512-5LC9SOxjSc2HF6vO2CyuTDNivEdoz2IvyJJGj6X8DJ0eFyfszE0QiEd+iXmBvUP3WHxSjFH/vIsA0EN00cgr8w==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/moment/-/moment-2.29.4.tgz}
+    name: moment
+    version: 2.29.4
     dev: true
 
   registry.npmjs.org/monaco-editor@0.38.0:
@@ -6007,7 +6031,7 @@ packages:
       pathe: registry.npmjs.org/pathe@1.1.1
     dev: true
 
-  registry.npmjs.org/postcss-less@6.0.0(postcss@8.4.12):
+  registry.npmjs.org/postcss-less@6.0.0(postcss@8.4.24):
     resolution: {integrity: sha512-FPX16mQLyEjLzEuuJtxA8X3ejDLNGGEG503d2YGZR5Ask1SpDN8KmZUMpzCvyalWRywAn1n1VOA5dcqfCLo5rg==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/postcss-less/-/postcss-less-6.0.0.tgz}
     id: registry.npmjs.org/postcss-less/6.0.0
     name: postcss-less
@@ -6016,7 +6040,7 @@ packages:
     peerDependencies:
       postcss: ^8.3.5
     dependencies:
-      postcss: registry.npmjs.org/postcss@8.4.12
+      postcss: registry.npmjs.org/postcss@8.4.24
     dev: true
 
   registry.npmjs.org/postcss-media-query-parser@0.2.3:
@@ -6043,7 +6067,7 @@ packages:
       postcss: registry.npmjs.org/postcss@8.4.24
     dev: true
 
-  registry.npmjs.org/postcss-scss@4.0.6(postcss@8.4.12):
+  registry.npmjs.org/postcss-scss@4.0.6(postcss@8.4.24):
     resolution: {integrity: sha512-rLDPhJY4z/i4nVFZ27j9GqLxj1pwxE80eAzUNRMXtcpipFYIeowerzBgG3yJhMtObGEXidtIgbUpQ3eLDsf5OQ==, registry: https://registry.yarnpkg.com/, tarball: https://registry.npmjs.org/postcss-scss/-/postcss-scss-4.0.6.tgz}
     id: registry.npmjs.org/postcss-scss/4.0.6
     name: postcss-scss
@@ -6052,7 +6076,7 @@ packages:
     peerDependencies:
       postcss: ^8.4.19
     dependencies:
-      postcss: registry.npmjs.org/postcss@8.4.12
+      postcss: registry.npmjs.org/postcss@8.4.24
     dev: true
 
   registry.npmjs.org/postcss-selector-parser@6.0.13:

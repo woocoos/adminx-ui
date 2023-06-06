@@ -36,6 +36,7 @@
     "@types/react": "^18.2.8",
     "@types/react-dom": "^18.2.4",
     "body-parser": "^1.20.2",
+    "casual": "^1.6.2",
     "eslint": "^8.42.0",
     "stylelint": "^15.6.3",
     "svg-captcha": "^1.4.0",
