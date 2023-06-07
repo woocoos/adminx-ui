@@ -1,5 +1,9 @@
 const { getESLintConfig } = require('@applint/spec');
 
 module.exports = getESLintConfig(
-  'react-ts',
+  'react-ts', {
+  rules: {
+    "react-hooks/exhaustive-deps": 0
+  }
+}
 );

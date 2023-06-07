@@ -1,1 +1,1 @@
-export type TreeEditorAction = 'editor' | 'peer' | 'child'
+export type TreeEditorAction = 'editor' | 'peer' | 'child';

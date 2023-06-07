@@ -1,177 +1,176 @@
-import { gid } from "@/util"
-import { App, AppNodeField } from "."
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from "../graphql"
+import { gid } from '@/util';
+import { App, AppNodeField } from '.';
+import { TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi } from '../graphql';
 
 export type AppPolicy = {
-    id: string
-    createdBy: string
-    createdAt: string
-    updatedBy: string
-    updatedAt: string
-    appID: string
-    name: string
-    comments: string
-    autoGrant: boolean
-    status: AppPolicyStatus
-    rules?: PolicyRule[]
-    app?: App
-    isGrantAppRole?: boolean
-}
+  id: string;
+  createdBy: string;
+  createdAt: string;
+  updatedBy: string;
+  updatedAt: string;
+  appID: string;
+  name: string;
+  comments: string;
+  autoGrant: boolean;
+  status: AppPolicyStatus;
+  rules?: PolicyRule[];
+  app?: App;
+  isGrantAppRole?: boolean;
+};
 
 export type PolicyRule = {
-    effect: PolicyRuleEffect
-    actions: string[]
-    resources: string[] | null
-    conditions: string[] | null
-}
+  effect: PolicyRuleEffect;
+  actions: string[];
+  resources: string[] | null;
+  conditions: string[] | null;
+};
 
-export type PolicyRuleEffect = "allow" | "deny"
+export type PolicyRuleEffect = 'allow' | 'deny';
 
-export type AppPolicyStatus = "active" | "inactive" | "processing"
+export type AppPolicyStatus = 'active' | 'inactive' | 'processing';
 
 export const EnumAppPolicyStatus = {
-    active: { text: "活跃", status: 'success' },
-    inactive: { text: "失活", status: 'default' },
-    processing: { text: "处理中", status: 'warning' }
-}
+  active: { text: '活跃', status: 'success' },
+  inactive: { text: '失活', status: 'default' },
+  processing: { text: '处理中', status: 'warning' },
+};
 
 export const EnumPolicyRuleEffect = {
-    allow: { text: "允许", status: 'success' },
-    deny: { text: "拒绝", status: 'default' },
-}
+  allow: { text: '允许', status: 'success' },
+  deny: { text: '拒绝', status: 'default' },
+};
 
-export const AppPolicyField = `#graphql
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,
-    autoGrant,status,rules{ effect,actions,resources,conditions }
-`
+export const AppPolicyField = `
+  id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,
+  autoGrant,status,rules{ effect,actions,resources,conditions }
+`;
 
 
 /**
  * 获取应用权限
- * @param appId 
- * @param params 
- * @param filter 
- * @param sort 
+ * @param appId
+ * @param params
+ * @param filter
+ * @param sort
  * @param isGrant
- * @returns 
+ * @returns
  */
-export async function getAppPolicyList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
-    appRoleId?: string
-}) {
-    const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-        result = await graphqlApi(
-            `#graphql
-            query appPolicies{
-                node(id:"${gid('app', appId)}"){
-                    ... on App{  
-                        id,
-                        list:policies{
-                            ${AppPolicyField}
-                            ${isGrant?.appRoleId ? `isGrantAppRole(appRoleID: "${isGrant.appRoleId}")` : ''}
-                        }
-                    }
-                }
-                
-            }`
-        )
-
-    if (result?.data?.node?.list) {
-        return result.data.node.list as AppPolicy[]
-    } else {
-        return null
-    }
-}
-
-
-
-/**
- * 获取应用权限
- * @param appPolicyId 
- * @returns 
- */
-export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<"app">) {
-    const result = await graphqlApi(
-        `#graphql
-        query node{
-          node(id:"${gid('app_policy', appPolicyId)}"){
-            ... on AppPolicy{        
-               ${AppPolicyField}
-               ${scene?.includes('app') ? `
-                app{
-                    ${AppNodeField}
-                }
-               ` : ''}
+export async function getAppPolicyList(
+  appId: string,
+  params: TableParams,
+  filter: TableFilter,
+  sort: TableSort,
+  isGrant?: {
+    appRoleId?: string;
+  },
+) {
+  const { } = getGraphqlFilter(params, filter, sort),
+    result = await graphqlApi(
+      `query appPolicies{
+        node(id:"${gid('app', appId)}"){
+          ... on App{
+            id,
+            list:policies{
+              ${AppPolicyField}
+              ${isGrant?.appRoleId ? `isGrantAppRole(appRoleID: "${isGrant.appRoleId}")` : ''}
             }
           }
-        }`)
+        }
+      }`,
+    );
 
-    if (result?.data?.node) {
-        return result.data.node as AppPolicy
-    } else {
-        return null
-    }
+  if (result?.data?.node?.list) {
+    return result.data.node.list as AppPolicy[];
+  } else {
+    return null;
+  }
+}
+
+
+/**
+ * 获取应用权限
+ * @param appPolicyId
+ * @returns
+ */
+export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<'app'>) {
+  const result = await graphqlApi(
+    `query node{
+      node(id:"${gid('app_policy', appPolicyId)}"){
+        ... on AppPolicy{
+          ${AppPolicyField}
+          ${scene?.includes('app') ? `
+          app{
+              ${AppNodeField}
+          }
+          ` : ''}
+        }
+      }
+    }`);
+
+  if (result?.data?.node) {
+    return result.data.node as AppPolicy;
+  } else {
+    return null;
+  }
 }
 
 
 /**
  * 创建
- * @param input 
- * @returns 
+ * @param input
+ * @returns
  */
 export async function createAppPolicy(appId: string, input: AppPolicy | Record<string, any>) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation createAppPolicy($input: CreateAppPolicyInput!){
-          action:createAppPolicy(appID:"${appId}",input:$input){
-            ${AppPolicyField}
-          }
-        }`, { input: input })
+  const result = await graphqlApi(
+    `mutation createAppPolicy($input: CreateAppPolicyInput!){
+      action:createAppPolicy(appID:"${appId}",input:$input){
+        ${AppPolicyField}
+      }
+    }`, { input: input });
 
-    if (result?.data?.action?.id) {
-        return result.data.action as AppPolicy
-    } else {
-        return null
-    }
+  if (result?.data?.action?.id) {
+    return result.data.action as AppPolicy;
+  } else {
+    return null;
+  }
 }
 
 
 /**
  * 更新
- * @param appPolicyId 
- * @param input 
- * @returns 
+ * @param appPolicyId
+ * @param input
+ * @returns
  */
 export async function updateAppPolicy(appPolicyId: string, input: AppPolicy | Record<string, any>) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation updateAppPolicy($input: UpdateAppPolicyInput!){
-          action:updateAppPolicy(policyID:"${appPolicyId}",input:$input){
-            ${AppPolicyField}
-          }
-        }`, { input: input })
+  const result = await graphqlApi(
+    `mutation updateAppPolicy($input: UpdateAppPolicyInput!){
+      action:updateAppPolicy(policyID:"${appPolicyId}",input:$input){
+        ${AppPolicyField}
+      }
+    }`, { input: input });
 
-    if (result?.data?.action?.id) {
-        return result.data.action as AppPolicy
-    } else {
-        return null
-    }
+  if (result?.data?.action?.id) {
+    return result.data.action as AppPolicy;
+  } else {
+    return null;
+  }
 }
 
 /**
  * 删除
- * @param appPolicyId 
- * @returns 
+ * @param appPolicyId
+ * @returns
  */
 export async function delAppPolicy(appPolicyId: string) {
-    const result = await graphqlApi(
-        `#graphql
-        mutation deleteAppPolicy{
-          action:deleteAppPolicy(policyID: "${appPolicyId}")
-        }`)
+  const result = await graphqlApi(
+    `mutation deleteAppPolicy{
+      action:deleteAppPolicy(policyID: "${appPolicyId}")
+    }`);
 
-    if (result?.data?.action) {
-        return result?.data?.action as boolean
-    } else {
-        return null
-    }
+  if (result?.data?.action) {
+    return result?.data?.action as boolean;
+  } else {
+    return null;
+  }
 }

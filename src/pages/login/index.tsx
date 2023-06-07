@@ -1,27 +1,27 @@
-import styles from "./index.module.css";
-import store from "@/store";
-import { useTranslation } from "react-i18next";
-import Login from "./components/login";
-import { LoginRes } from "@/services/basis";
-import { useState } from "react";
-import MfaVerify from "./components/mfaVerify";
-import { Result, message } from "antd";
-import ResetPassword from "./components/resetPassword";
+import styles from './index.module.css';
+import store from '@/store';
+import { useTranslation } from 'react-i18next';
+import Login from './components/login';
+import { LoginRes } from '@/services/basis';
+import { useState } from 'react';
+import MfaVerify from './components/mfaVerify';
+import { Result, message } from 'antd';
+import ResetPassword from './components/resetPassword';
 
 export default () => {
   const { t } = useTranslation(),
     [res, setRes] = useState<LoginRes>(),
-    [, basisDispatcher] = store.useModel("basis");
+    [, basisDispatcher] = store.useModel('basis');
 
-  document.title = t('login')
+  document.title = t('login');
 
   async function loginSuccess(result: LoginRes) {
-    setRes(result)
+    setRes(result);
     if (result?.accessToken) {
-      await basisDispatcher.login(result)
-      message.success(t("login success"));
+      await basisDispatcher.login(result);
+      message.success(t('login success'));
       const urlParams = (new URL(window.location.href)).searchParams;
-      location.replace(urlParams.get("redirect") || "/");
+      location.replace(urlParams.get('redirect') || '/');
     }
   }
 
@@ -29,36 +29,32 @@ export default () => {
     <div className={styles.container}>
       <div className="container-item">
         {
-          !res ?
-            <Login
-              onSuccess={loginSuccess}
-            /> : ''
+          res ? <></> : <Login
+            onSuccess={loginSuccess}
+          />
         }
         {
-          res?.stateToken && res?.callbackUrl === '/login/verify-factor' ?
-            <MfaVerify
-              stateToken={res.stateToken}
-              onSuccess={loginSuccess}
-            /> : ''
+          res?.stateToken && res?.callbackUrl === '/login/verify-factor' ? <MfaVerify
+            stateToken={res.stateToken}
+            onSuccess={loginSuccess}
+          /> : <></>
         }
         {
-          res?.stateToken && res?.callbackUrl === '/login/reset-password' ?
-            <ResetPassword
-              stateToken={res.stateToken}
-              onSuccess={loginSuccess}
-            /> : ''
+          res?.stateToken && res?.callbackUrl === '/login/reset-password' ? <ResetPassword
+            stateToken={res.stateToken}
+            onSuccess={loginSuccess}
+          /> : <></>
         }
         {
-          res?.accessToken ?
-            <Result
-              status="success"
-              style={{
-                height: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-              }}
-            /> : ''
+          res?.accessToken ? <Result
+            status="success"
+            style={{
+              height: '100%',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}
+          /> : <></>
         }
       </div>
     </div>

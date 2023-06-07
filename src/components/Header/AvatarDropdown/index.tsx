@@ -1,12 +1,11 @@
-import React, { useCallback } from "react";
-import { LogoutOutlined } from "@ant-design/icons";
-import { Dropdown, Avatar } from "antd";
-import type { MenuInfo } from "rc-menu/lib/interface";
-import styles from "./index.module.css";
-import { logout } from "@/services/basis";
-import store from "@/store";
-import { useTranslation } from "react-i18next";
-import { checkLave } from "@/components/LeavePrompt";
+import React, { useCallback } from 'react';
+import { LogoutOutlined } from '@ant-design/icons';
+import { Dropdown, Avatar } from 'antd';
+import styles from './index.module.css';
+import { logout } from '@/services/basis';
+import store from '@/store';
+import { useTranslation } from 'react-i18next';
+import { checkLave } from '@/components/LeavePrompt';
 
 interface AvatarDropdownProps {
   name: string;
@@ -15,23 +14,23 @@ interface AvatarDropdownProps {
 
 const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
   const { t } = useTranslation(),
-    [, basisDispatcher] = store.useModel("basis");
+    [, basisDispatcher] = store.useModel('basis');
 
-  const onMenuClick = useCallback((event: MenuInfo) => {
+  const onMenuClick = useCallback((event) => {
     const { key } = event;
-    if (key === "logout") {
+    if (key === 'logout') {
       checkLave(() => {
         // 即使退出接口异常前端也需要直接退出掉所以不需要同步处理
         logout();
-        basisDispatcher.logout()
-      })
+        basisDispatcher.logout();
+      });
     }
   }, []);
 
   const menu = {
     items: [
       {
-        key: "logout",
+        key: 'logout',
         label: t('logout'),
         icon: <LogoutOutlined />,
         onClick: onMenuClick,

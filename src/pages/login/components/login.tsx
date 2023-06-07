@@ -1,18 +1,18 @@
-import {LockOutlined, UserOutlined} from "@ant-design/icons";
-import {ProFormText, LoginForm} from "@ant-design/pro-components";
-import logo from "@/assets/logo.png";
-import Sha256 from "crypto-js/sha256";
-import {useTranslation} from "react-i18next";
-import {CaptchaRes, LoginRes, captcha, login} from "@/services/basis";
-import {useEffect, useState} from "react";
-import {Link} from "@ice/runtime";
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { ProFormText, LoginForm } from '@ant-design/pro-components';
+import logo from '@/assets/logo.png';
+import Sha256 from 'crypto-js/sha256';
+import { useTranslation } from 'react-i18next';
+import { CaptchaRes, LoginRes, captcha, login } from '@/services/basis';
+import { useEffect, useState } from 'react';
+import { Link } from '@ice/runtime';
 
 export default (
   props: {
-    onSuccess(result: LoginRes): void
-  }
+    onSuccess: (result: LoginRes) => void;
+  },
 ) => {
-  const {t} = useTranslation(),
+  const { t } = useTranslation(),
     [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -20,94 +20,103 @@ export default (
 
   const
     getCaptcha = async () => {
-      setCaptchaInfo(await captcha())
+      setCaptchaInfo(await captcha());
     },
-    onFinish = async (values: { username: string; password: string; captcha: string; }) => {
+    onFinish = async (values: { username: string; password: string; captcha: string }) => {
       if (captchaInfo) {
-        setSaveLoading(true)
-        const result = await login(values.username, Sha256(values.password).toString(), values.captcha, captchaInfo.captchaId)
+        setSaveLoading(true);
+        const result = await login(
+          values.username,
+          Sha256(values.password).toString(),
+          values.captcha,
+          captchaInfo.captchaId,
+        );
         if (result && !result.errors) {
-          props.onSuccess(result)
+          props.onSuccess(result);
         }
-        setSaveLoading(false)
+        setSaveLoading(false);
       }
-      return false
-    }
+      return false;
+    };
   useEffect(() => {
-    getCaptcha()
-  }, [])
+    getCaptcha();
+  }, []);
 
   return (
     <LoginForm
       title="Adminx Pro"
-      logo={<img alt="logo" src={logo}/>}
+      logo={<img alt="logo" src={logo} />}
       subTitle={t('Management system')}
       initialValues={{
-        username: "admin",
-        password: "123456",
+        username: 'admin',
+        password: '123456',
       }}
       submitter={{
         searchConfig: {
           submitText: t('login'),
-          resetText: t('cancel')
+          resetText: t('cancel'),
         },
         submitButtonProps: {
           loading: saveLoading,
           disabled: saveDisabled,
-        }
+        },
       }}
       onValuesChange={() => {
-        setSaveDisabled(false)
+        setSaveDisabled(false);
       }}
       onFinish={onFinish}
     >
       <ProFormText
         name="username"
         fieldProps={{
-          size: "large",
-          prefix: <UserOutlined className={"prefixIcon"}/>,
+          size: 'large',
+          prefix: <UserOutlined className={'prefixIcon'} />,
         }}
-        placeholder={`${t("Please enter {{field}}", {field: t('principal name')})}`}
+        placeholder={`${t('Please enter {{field}}', { field: t('principal name') })}`}
         rules={[
           {
             required: true,
-            message: `${t("Please enter {{field}}", {field: t('principal name')})}`,
+            message: `${t('Please enter {{field}}', { field: t('principal name') })}`,
           },
         ]}
       />
       <ProFormText.Password
         name="password"
         fieldProps={{
-          size: "large",
-          prefix: <LockOutlined className={"prefixIcon"}/>,
+          size: 'large',
+          prefix: <LockOutlined className={'prefixIcon'} />,
         }}
-        placeholder={`${t("Please enter {{field}}", {field: t('password')})}`}
+        placeholder={`${t('Please enter {{field}}', { field: t('password') })}`}
         rules={[
           {
             required: true,
-            message: `${t("Please enter {{field}}", {field: t('password')})}`,
+            message: `${t('Please enter {{field}}', { field: t('password') })}`,
           },
         ]}
       />
       <ProFormText
         name="captcha"
         fieldProps={{
-          size: "large",
-          addonAfter: <img src={captchaInfo?.captchaImage} height="32px" onClick={() => {
-            getCaptcha()
-          }}/>,
+          size: 'large',
+          addonAfter: <img
+            src={captchaInfo?.captchaImage}
+            height="32px"
+            onClick={() => {
+              getCaptcha();
+            }}
+          />,
         }}
         placeholder={`${t('verification code')}`}
         rules={[
           {
             required: true,
-            message: `${t("Please enter {{field}}", {field: t('verification code')})}`,
+            message: `${t('Please enter {{field}}', { field: t('verification code') })}`,
           },
         ]}
       />
-      <div style={{marginBottom: 24,}}>
+      <div style={{ marginBottom: 24 }}>
         <Link
-          style={{float: "right",}}
+          style={{ float: 'right' }}
           to="/login/retrievePassword"
         >
           {t('forget your password')}

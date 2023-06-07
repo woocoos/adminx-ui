@@ -1,78 +1,75 @@
-import store from "@/store";
-import {useEffect, useState} from "react";
-import {userMenuList} from "@/components/FrameworkLayout/menuConfig";
-import {ProLayout} from "@ant-design/pro-components";
-import AvatarDropdown from "@/components/Header/AvatarDropdown";
-import I18nDropdown from "@/components/Header/I18nDropdown";
-import DarkMode from "@/components/Header/DarkMode";
-import styles from "./layout.module.css";
-import logo from "@/assets/logo.png";
-import defaultAvatar from "@/assets/images/default-avatar.png";
-import {Outlet} from "@ice/runtime";
-import i18n from "@/i18n";
-import {ProConfigProvider, useToken} from "@ant-design/pro-components";
-import LeavePrompt, {Link} from "@/components/LeavePrompt";
-import {AliveScope} from 'react-activation'
-import TenantDropdown from "@/components/Header/TenantDropdown";
-import {monitorKeyChange} from "@/pkg/localStore";
+import store from '@/store';
+import { useEffect } from 'react';
+import { userMenuList } from '@/components/FrameworkLayout/menuConfig';
+import AvatarDropdown from '@/components/Header/AvatarDropdown';
+import I18nDropdown from '@/components/Header/I18nDropdown';
+import DarkMode from '@/components/Header/DarkMode';
+import styles from './layout.module.css';
+import logo from '@/assets/logo.png';
+import defaultAvatar from '@/assets/images/default-avatar.png';
+import { Outlet } from '@ice/runtime';
+import i18n from '@/i18n';
+import { ProLayout, ProConfigProvider, useToken } from '@ant-design/pro-components';
+import LeavePrompt, { Link } from '@/components/LeavePrompt';
+import { AliveScope } from 'react-activation';
+import TenantDropdown from '@/components/Header/TenantDropdown';
+import { monitorKeyChange } from '@/pkg/localStore';
 
 
 export default function Layout() {
-  const [basisState, basisDispatcher] = store.useModel("basis"),
-    {token} = useToken();
+  const [basisState, basisDispatcher] = store.useModel('basis'),
+    { token } = useToken();
 
   useEffect(() => {
     i18n.changeLanguage(basisState.locale);
-  }, [basisState.locale])
+  }, [basisState.locale]);
 
 
   useEffect(() => {
     monitorKeyChange([
       {
-        key: "tenantId",
+        key: 'tenantId',
         onChange(value) {
-          basisDispatcher.updateTenantId(value)
+          basisDispatcher.updateTenantId(value);
         },
       },
       {
-        key: "token",
+        key: 'token',
         onChange(value) {
-          basisDispatcher.updateToken(value)
+          basisDispatcher.updateToken(value);
         },
       },
       {
-        key: "user",
+        key: 'user',
         onChange(value) {
-          basisDispatcher.updateUser(value)
+          basisDispatcher.updateUser(value);
         },
       },
       {
-        key: "locale",
+        key: 'locale',
         onChange(value) {
-          basisDispatcher.updateLocale(value)
+          basisDispatcher.updateLocale(value);
         },
       },
-    ])
-  }, [])
+    ]);
+  }, []);
 
-  return ["/login", "/login/retrievePassword"].includes(location.pathname) ? <Outlet/> :
-    <ProConfigProvider
-      dark={basisState.darkMode}
-    >
-      <LeavePrompt/>
+  return ['/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
+    : <ProConfigProvider dark={basisState.darkMode} >
+      <LeavePrompt />
       <ProLayout
         token={{
           sider: {
-            colorMenuBackground: basisState.darkMode ? "linear-gradient(#141414, #000000 28%)" : token.colorBgContainer
-          }
+            colorMenuBackground: basisState.darkMode ? 'linear-gradient(#141414, #000000 28%)' : token.colorBgContainer,
+          },
         }}
         className={styles.layout}
         menu={{
           locale: true,
-          request: userMenuList
+          request: userMenuList,
         }}
         fixSiderbar
-        logo={<img src={logo} alt="logo"/>}
+        logo={<img src={logo} alt="logo" />}
         title="Adminx"
         location={{
           pathname: location.pathname,
@@ -80,20 +77,20 @@ export default function Layout() {
         layout="mix"
         rightContentRender={() => (
           <>
-            <I18nDropdown/>
-            <TenantDropdown/>
+            <I18nDropdown />
+            <TenantDropdown />
             <AvatarDropdown
               avatar={defaultAvatar}
-              name={basisState.user?.displayName || ""}
+              name={basisState.user?.displayName || ''}
             />
-            <DarkMode/>
+            <DarkMode />
           </>
         )}
-        menuItemRender={(item, defaultDom) => item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom}
+        menuItemRender={(item, defaultDom) => (item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom)}
       >
         <AliveScope>
-          <Outlet/>
+          <Outlet />
         </AliveScope>
       </ProLayout>
-    </ProConfigProvider>
+    </ProConfigProvider>;
 }

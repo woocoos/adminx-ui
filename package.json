@@ -46,10 +46,10 @@
     "dev": "ice start",
     "start": "ice start --no-mock",
     "build": "ice build",
-    "eslint": "eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
-    "eslint:fix": "pnpm run eslint -- --fix",
-    "stylelint": "stylelint \"src/**/*.{css,scss,less}\" --cache",
-    "stylelint:fix": "pnpm run stylelint -- --fix"
+    "eslint": "eslint ./src --ext .js,.jsx,.ts,.tsx --cache",
+    "eslint:fix": "pnpm eslint --fix",
+    "stylelint": "stylelint ./src/**/*.{css,scss,less} --cache",
+    "stylelint:fix": "pnpm stylelint --fix"
   },
   "private": true,
   "packageManager": "pnpm@8.6.0"

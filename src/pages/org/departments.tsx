@@ -1,12 +1,12 @@
-import store from '@/store'
-import OrgList from './list'
-import { useSearchParams } from '@ice/runtime'
+import store from '@/store';
+import OrgList from './list';
+import { useSearchParams } from '@ice/runtime';
 
 export default () => {
-    const [basisState] = store.useModel("basis"),
-        [searchParams, setSearchParams] = useSearchParams()
+  const [basisState] = store.useModel('basis'),
+    [searchParams] = useSearchParams();
 
-    return (
-        <OrgList kind='org' tenantId={searchParams.get('id') || basisState.tenantId} />
-    )
-}
+  return (
+    <OrgList kind="org" tenantId={searchParams.get('id') || basisState.tenantId} />
+  );
+};

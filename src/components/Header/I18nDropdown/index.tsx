@@ -1,16 +1,15 @@
-import React, { useState, useEffect } from "react";
-import { Dropdown } from "antd";
-import type { MenuInfo } from "rc-menu/lib/interface";
-import styles from "./index.module.css";
-import store from "@/store";
-import { LocalLanguage } from "@/models/basis";
+import React, { useState, useEffect } from 'react';
+import { Dropdown } from 'antd';
+import styles from './index.module.css';
+import store from '@/store';
+import { LocalLanguage } from '@/models/basis';
 
 const I18nDropdown: React.FC = () => {
-  const [basisState, basisDispatcher] = store.useModel("basis");
-  const [locale, setLocale] = useState("");
+  const [basisState, basisDispatcher] = store.useModel('basis');
+  const [locale, setLocale] = useState('');
 
   const
-    onMenuClick = (ev: MenuInfo) => {
+    onMenuClick = (ev) => {
       const mItem = menu.items.find((item) => item.key === ev.key);
       if (mItem) {
         basisDispatcher.updateLocale(mItem.key as LocalLanguage);
@@ -21,13 +20,13 @@ const I18nDropdown: React.FC = () => {
   const menu = {
     items: [
       {
-        key: "zh-CN",
-        label: "简体",
+        key: 'zh-CN',
+        label: '简体',
         onClick: onMenuClick,
       },
       {
-        key: "en-US",
-        label: "English",
+        key: 'en-US',
+        label: 'English',
         onClick: onMenuClick,
       },
     ],

@@ -1,27 +1,27 @@
-import {ProFormText, LoginForm} from "@ant-design/pro-components";
-import {useTranslation} from "react-i18next";
-import {LoginRes, loginVerifyFactor} from "@/services/basis";
-import {useState} from "react";
+import { ProFormText, LoginForm } from '@ant-design/pro-components';
+import { useTranslation } from 'react-i18next';
+import { LoginRes, loginVerifyFactor } from '@/services/basis';
+import { useState } from 'react';
 
 export default (
   props: {
-    stateToken: string
-    onSuccess(result: LoginRes): void
-  }
+    stateToken: string;
+    onSuccess: (result: LoginRes) => void;
+  },
 ) => {
-  const {t} = useTranslation(),
+  const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
   const onFinish = async (values: { code: string }) => {
-    setSaveLoading(true)
-    const result = await loginVerifyFactor('loginVerifyFactor', props.stateToken, values.code)
+    setSaveLoading(true);
+    const result = await loginVerifyFactor('loginVerifyFactor', props.stateToken, values.code);
     if (result && !result.errors) {
-      props.onSuccess(result)
+      props.onSuccess(result);
     }
-    setSaveLoading(false)
-    return false
-  }
+    setSaveLoading(false);
+    return false;
+  };
 
   return (
     <LoginForm
@@ -29,26 +29,26 @@ export default (
       submitter={{
         searchConfig: {
           submitText: t('verify'),
-          resetText: t('cancel')
+          resetText: t('cancel'),
         },
         submitButtonProps: {
           loading: saveLoading,
           disabled: saveDisabled,
-        }
+        },
       }}
       onValuesChange={() => {
-        setSaveDisabled(false)
+        setSaveDisabled(false);
       }}
       onFinish={onFinish}
     >
-      <br/>
+      <br />
       <ProFormText
         name="code"
-        placeholder={`${t("Please enter {{field}}", {field: t('security code')})}`}
+        placeholder={`${t('Please enter {{field}}', { field: t('security code') })}`}
         rules={[
           {
             required: true,
-            message: `${t("Please enter {{field}}", {field: t('security code')})}`,
+            message: `${t('Please enter {{field}}', { field: t('security code') })}`,
           },
         ]}
       />

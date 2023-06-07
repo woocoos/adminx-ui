@@ -1,3 +1,3 @@
-import Viewer from '../role/viewer'
+import Viewer from '../role/viewer';
 
-export default () => <Viewer />
+export default () => <Viewer />;

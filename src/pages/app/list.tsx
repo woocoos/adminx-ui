@@ -1,36 +1,30 @@
-import {
-  ActionType,
-  PageContainer,
-  ProColumns,
-  ProTable,
-  useToken,
-} from "@ant-design/pro-components";
-import { Button, Space, Dropdown, Modal } from "antd";
-import { EllipsisOutlined } from "@ant-design/icons";
-import { App, EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from "@/services/app";
-import defaultApp from "@/assets/images/default-app.png";
-import AppCreate from "./components/create";
-import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { TableParams, TableSort, TableFilter, List } from "@/services/graphql";
-import { Link, useAuth } from "ice";
-import { assignOrgApp, getOrgAppList, revokeOrgApp } from "@/services/org/app";
-import ModalApp from "./components/modalApp"
-import { useTranslation } from "react-i18next";
-import Auth, { checkAuth } from "@/components/Auth";
-import { ItemType } from "antd/es/menu/hooks/useItems";
-import KeepAlive from "@/components/KeepAlive";
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
+import { Button, Space, Dropdown, Modal } from 'antd';
+import { EllipsisOutlined } from '@ant-design/icons';
+import { App, EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/app';
+import defaultApp from '@/assets/images/default-app.png';
+import AppCreate from './components/create';
+import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { TableParams, TableSort, TableFilter, List } from '@/services/graphql';
+import { Link, useAuth } from 'ice';
+import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/org/app';
+import ModalApp from './components/modalApp';
+import { useTranslation } from 'react-i18next';
+import Auth, { checkAuth } from '@/components/Auth';
+import { ItemType } from 'antd/es/menu/hooks/useItems';
+import KeepAlive from '@/components/KeepAlive';
 
 export type AppListRef = {
-  getSelect: () => App[]
-  reload: (resetPageIndex?: boolean) => void
-}
+  getSelect: () => App[];
+  reload: (resetPageIndex?: boolean) => void;
+};
 
 const PageAppList = (props: {
-  ref?: MutableRefObject<AppListRef>
-  title?: string
-  orgId?: string
-  scene?: "orgApp",
-  isMultiple?: boolean,
+  ref?: MutableRefObject<AppListRef>;
+  title?: string;
+  orgId?: string;
+  scene?: 'orgApp';
+  isMultiple?: boolean;
 }, ref: MutableRefObject<AppListRef>) => {
   const { token } = useToken(),
     { t } = useTranslation(),
@@ -38,20 +32,27 @@ const PageAppList = (props: {
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<App>[] = [
-      // 有需要排序配置  sorter: true 
-      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: "image", search: false },
+      // 有需要排序配置  sorter: true
+      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
       {
-        title: t('name'), dataIndex: 'name', width: 120, search: {
-          transform: (value) => ({ nameContains: value || undefined })
-        }
+        title: t('name'),
+        dataIndex: 'name',
+        width: 120,
+        search: {
+          transform: (value) => ({ nameContains: value || undefined }),
+        },
       },
       {
-        title: t('code'), dataIndex: 'code', width: 120, search: {
-          transform: (value) => ({ codeContains: value || undefined })
-        }
+        title: t('code'),
+        dataIndex: 'code',
+        width: 120,
+        search: {
+          transform: (value) => ({ codeContains: value || undefined }),
+        },
       },
       {
-        title: t('type'), dataIndex: 'kind',
+        title: t('type'),
+        dataIndex: 'kind',
         filters: true,
         search: false,
         width: 100,
@@ -59,7 +60,11 @@ const PageAppList = (props: {
       },
       { title: t('description'), dataIndex: 'comments', width: 160, search: false },
       {
-        title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
+        title: t('status'),
+        dataIndex: 'status',
+        filters: true,
+        search: false,
+        width: 100,
         valueEnum: EnumAppStatus,
       },
     ],
@@ -69,34 +74,39 @@ const PageAppList = (props: {
     // 弹出层处理
     [modal, setModal] = useState({
       open: false,
-      title: "",
-      id: ""
-    })
+      title: '',
+      id: '',
+    });
 
   columns.push(
     {
-      title: t('operation'), dataIndex: 'actions', fixed: 'right',
-      align: 'center', search: false, width: 170,
+      title: t('operation'),
+      dataIndex: 'actions',
+      fixed: 'right',
+      align: 'center',
+      search: false,
+      width: 170,
       render: (text, record) => {
         const items: ItemType[] = [
-          { key: "policys", label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
-          { key: "menu", label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
-          { key: "roles", label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
-          { key: "resource", label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
+          { key: 'policys', label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
+          { key: 'menu', label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
+          { key: 'roles', label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
+          { key: 'resource', label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
 
-        ]
+        ];
 
         if (checkAuth('deleteApp', auth)) {
           items.push(
-            { key: "delete", label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> }
-          )
+            { key: 'delete', label: <a onClick={() => onDelApp(record)}>{t('delete')}</a> },
+          );
         }
 
         return props.scene === 'orgApp' ? <Space>
           <Auth authKey="revokeOrganizationApp">
             <a onClick={() => {
-              revokeOrg(record)
-            }}>
+              revokeOrg(record);
+            }}
+            >
               {t('disauthorization')}
             </a>
           </Auth>
@@ -109,15 +119,18 @@ const PageAppList = (props: {
           <Link key="actions" to={`/app/actions?id=${record.id}`} >
             {t('permission')}
           </Link>
-          <Dropdown trigger={['click']} menu={{
-            items
-          }} >
+          <Dropdown
+            trigger={['click']}
+            menu={{
+              items,
+            }}
+          >
             <a><EllipsisOutlined /></a>
           </Dropdown>
-        </Space>
-      }
+        </Space>;
+      },
     },
-  )
+  );
 
 
   const
@@ -125,42 +138,41 @@ const PageAppList = (props: {
       const table = { data: [] as App[], success: true, total: 0 };
       let result: List<App> | null = null;
       if (props.orgId) {
-        result = await getOrgAppList(props.orgId, params, filter, sort)
+        result = await getOrgAppList(props.orgId, params, filter, sort);
       } else {
-        result = await getAppList(params, filter, sort)
+        result = await getAppList(params, filter, sort);
       }
 
       if (result) {
         table.data = result.edges.map(item => {
-          item.node.logo = item.node.logo || defaultApp
-          return item.node
-        })
-        table.total = result.totalCount
-
+          item.node.logo = item.node.logo || defaultApp;
+          return item.node;
+        });
+        table.total = result.totalCount;
       } else {
-        table.total = 0
+        table.total = 0;
       }
-      setSelectedRowKeys([])
-      setDataSource(table.data)
-      return table
+      setSelectedRowKeys([]);
+      setDataSource(table.data);
+      return table;
     },
     onDelApp = (record: App) => {
       Modal.confirm({
         title: t('delete'),
         content: `${t('confirm delete')}：${record.name}?`,
         onOk: async (close) => {
-          const result = await delAppInfo(record.id)
+          const result = await delAppInfo(record.id);
           if (result === true) {
             if (dataSource.length === 1) {
-              const pageInfo = { ...proTableRef.current?.pageInfo }
-              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
-              proTableRef.current?.setPageInfo?.(pageInfo)
+              const pageInfo = { ...proTableRef.current?.pageInfo };
+              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
+              proTableRef.current?.setPageInfo?.(pageInfo);
             }
             proTableRef.current?.reload();
             close();
           }
-        }
-      })
+        },
+      });
     },
     revokeOrg = (record: App) => {
       Modal.confirm({
@@ -168,37 +180,37 @@ const PageAppList = (props: {
         content: `${t('confirm disauthorization')}：${record.name}?`,
         onOk: async (close) => {
           if (props.orgId) {
-            const result = await revokeOrgApp(props.orgId, record.id)
+            const result = await revokeOrgApp(props.orgId, record.id);
             if (result === true) {
               if (dataSource.length === 1) {
-                const pageInfo = { ...proTableRef.current?.pageInfo }
-                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
-                proTableRef.current?.setPageInfo?.(pageInfo)
+                const pageInfo = { ...proTableRef.current?.pageInfo };
+                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
+                proTableRef.current?.setPageInfo?.(pageInfo);
               }
               proTableRef.current?.reload();
               close();
             }
           }
-        }
-      })
+        },
+      });
     },
     onDrawerClose = (isSuccess: boolean) => {
       if (isSuccess) {
         proTableRef.current?.reload();
       }
-      setModal({ open: false, title: '', id: '' })
-    }
+      setModal({ open: false, title: '', id: '' });
+    };
 
   useImperativeHandle(ref, () => {
     return {
       getSelect: () => {
-        return dataSource.filter(item => selectedRowKeys.includes(item.id))
+        return dataSource.filter(item => selectedRowKeys.includes(item.id));
       },
       reload: (resetPageIndex?: boolean) => {
         proTableRef.current?.reload(resetPageIndex);
-      }
-    }
-  })
+      },
+    };
+  });
 
   return (
     <>
@@ -207,23 +219,26 @@ const PageAppList = (props: {
           <>
             <ProTable
               actionRef={proTableRef}
-              rowKey={"id"}
+              rowKey={'id'}
               search={{
                 searchText: `${t('query')}`,
                 resetText: `${t('reset')}`,
                 labelWidth: 'auto',
               }}
               toolbar={{
-                title: props?.title || t("{{field}} list", { field: t('app') }),
+                title: props?.title || t('{{field}} list', { field: t('app') }),
                 actions: [
                   <Auth authKey="assignOrganizationApp">
-                    <Button type="primary" onClick={() => {
-                      setModal({ open: true, title: t("search {{field}}", { field: t("app") }), id: '' })
-                    }}>
+                    <Button
+                      type="primary"
+                      onClick={() => {
+                        setModal({ open: true, title: t('search {{field}}', { field: t('app') }), id: '' });
+                      }}
+                    >
                       {t('Authorized application')}
                     </Button>
-                  </Auth>
-                ]
+                  </Auth>,
+                ],
               }}
               scroll={{ x: 'max-content', y: 300 }}
               columns={columns}
@@ -235,14 +250,14 @@ const PageAppList = (props: {
               open={modal.open}
               title={modal.title}
               onClose={async (selectData) => {
-                const sdata = selectData?.[0]
+                const sdata = selectData?.[0];
                 if (sdata && props.orgId) {
-                  const result = await assignOrgApp(props.orgId, sdata.id)
+                  const result = await assignOrgApp(props.orgId, sdata.id);
                   if (result) {
                     proTableRef.current?.reload();
                   }
                 }
-                setModal({ open: false, title: modal.title, id: '' })
+                setModal({ open: false, title: modal.title, id: '' });
               }}
             />
 
@@ -250,37 +265,41 @@ const PageAppList = (props: {
         ) : (
           <PageContainer
             header={{
-              title: t("{{field}} management", { field: t('app') }),
+              title: t('{{field}} management', { field: t('app') }),
               style: { background: token.colorBgContainer },
               breadcrumb: {
                 items: [
-                  { title: t('System configuration'), },
-                  { title: t("{{field}} management", { field: t('app') }), },
+                  { title: t('System configuration') },
+                  { title: t('{{field}} management', { field: t('app') }) },
                 ],
               },
             }}
           >
             <ProTable
               actionRef={proTableRef}
-              rowKey={"id"}
+              rowKey={'id'}
               search={{
                 searchText: `${t('query')}`,
                 resetText: `${t('reset')}`,
                 labelWidth: 'auto',
               }}
               toolbar={{
-                title: t("{{field}} list", { field: t('app') }),
+                title: t('{{field}} list', { field: t('app') }),
                 actions: [
                   <Auth authKey="createApp">
-                    <Button key="create" type="primary" onClick={
-                      () => {
-                        setModal({ open: true, title: t("create {{field}}", { field: t('app') }), id: '' })
+                    <Button
+                      key="create"
+                      type="primary"
+                      onClick={
+                        () => {
+                          setModal({ open: true, title: t('create {{field}}', { field: t('app') }), id: '' });
+                        }
                       }
-                    }>
-                      {t("create {{field}}", { field: t('app') })}
+                    >
+                      {t('create {{field}}', { field: t('app') })}
                     </Button >
-                  </Auth>
-                ]
+                  </Auth>,
+                ],
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}
@@ -292,18 +311,19 @@ const PageAppList = (props: {
               open={modal.open}
               title={modal.title}
               id={modal.id}
-              onClose={onDrawerClose} />
+              onClose={onDrawerClose}
+            />
           </PageContainer >
-        )}
+        )
+      }
     </>
   );
 };
 
-export const AppList = forwardRef(PageAppList)
+export const AppList = forwardRef(PageAppList);
 
 export default () => {
-
-  return <KeepAlive>
+  return (<KeepAlive>
     <AppList />
-  </KeepAlive>
-}
+  </KeepAlive>);
+};
