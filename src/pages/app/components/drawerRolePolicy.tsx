@@ -68,7 +68,7 @@ export default (props: {
           selectedDatas.map(item => item.id),
         );
         if (result) {
-          message.success(t('submit success'));
+          message.success(t('submit_success'));
           props.onClose?.(true);
           setSaveDisabled(true);
         }
@@ -115,7 +115,7 @@ export default (props: {
             <div>
               <Input.Search
                 value={keyword}
-                placeholder={`${t('search {{field}}', { field: t('keyword') })}`}
+                placeholder={`${t('search_keyword')}`}
                 onChange={(event) => {
                   setKeyword(event.target.value);
                 }}

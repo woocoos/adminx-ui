@@ -11,7 +11,7 @@ import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, u
 import { TableParams, TableSort, TableFilter, List } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { EnumUserStatus, User, UserType, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/user';
-import AccountCreate from './create';
+import AccountCreate from '../list/components/create';
 import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from '@/services/org/user';
 import { OrgRole, revokeOrgRoleUser } from '@/services/org/role';
 import DrawerUser from '@/pages/account/components/drawerUser';
@@ -50,7 +50,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     columns: ProColumns<User>[] = [
       // 有需要排序配置  sorter: true
       {
-        title: t('principal name'),
+        title: t('principal_name'),
         dataIndex: 'principalName',
         width: 90,
         search: {
@@ -58,7 +58,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         },
       },
       {
-        title: t('display name'),
+        title: t('display_name'),
         dataIndex: 'displayName',
         width: 120,
         search: {
@@ -89,7 +89,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         width: 100,
         valueEnum: EnumUserStatus,
       },
-      { title: t('created at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
+      { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
 
     ],
     // 选中处理
@@ -123,10 +123,10 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               {
                 key: 'addGroup',
                 label: <a onClick={() => {
-                  setModal({ open: true, data: record, title: t('add {{field}}', { field: t('user group') }), scene: 'addGroup' });
+                  setModal({ open: true, data: record, title: t('add_user_group'), scene: 'addGroup' });
                 }}
                 >
-                  {t('add {{field}}', { field: t('user group') })}
+                  {t('add_user_group')}
                 </a>,
               },
             );
@@ -136,10 +136,10 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               {
                 key: 'addPermission',
                 label: <a onClick={() => {
-                  setModal({ open: true, data: record, title: t('add {{field}}', { field: t('permission') }), scene: 'addPermission' });
+                  setModal({ open: true, data: record, title: t('add_permission'), scene: 'addPermission' });
                 }}
                 >
-                  {t('add {{field}}', { field: t('permission') })}
+                  {t('add_permission')}
                 </a>,
               },
             );
@@ -148,7 +148,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
 
         if (checkAuth('resetUserPasswordByEmail', auth)) {
           items.push(
-            { key: 'resetPwd', label: <a onClick={() => onResetPwd(record)}>{t('reset password')}</a> },
+            { key: 'resetPwd', label: <a onClick={() => onResetPwd(record)}>{t('reset_pwd')}</a> },
           );
         }
         if (props.scene === 'orgUser') {
@@ -230,15 +230,15 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     },
     onResetPwd = (record: User) => {
       Modal.confirm({
-        title: `${t('reset password')} ${record.displayName}`,
+        title: `${t('reset_pwd')} ${record.displayName}`,
         content: <>
-          <div>{t("After the password is reset, an email will be sent to the customer's email address")}</div>
-          <div>{t('The login password must be reset after the user logs in to the system')}</div>
+          <div>{t("reset_pwd_confirm_content_1")}</div>
+          <div>{t('reset_pwd_confirm_content_2')}</div>
         </>,
         onOk: async (close) => {
           const result = await resetUserPasswordByEmail(record.id);
           if (result) {
-            message.success(t('submit success'));
+            message.success(t('submit_success'));
             close();
           }
         },
@@ -247,7 +247,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     onDelUser = (record: User) => {
       Modal.confirm({
         title: t('delete'),
-        content: `${t('confirm delete')}：${record.displayName} ?`,
+        content: `${t('confirm_delete')}：${record.displayName} ?`,
         onOk: async (close) => {
           const result = await delUserInfo(record.id);
           if (result === true) {
@@ -257,7 +257,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               proTableRef.current?.setPageInfo?.(pageInfo);
             }
             proTableRef.current?.reload();
-            message.success(t('submit success'));
+            message.success(t('submit_success'));
             close();
           }
         },
@@ -266,7 +266,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     onRemoveOrg = (record: User) => {
       Modal.confirm({
         title: t('remove'),
-        content: `${t('confirm remove')}：${record.displayName} ?`,
+        content: `${t('confirm_remove')}：${record.displayName} ?`,
         onOk: async (close) => {
           if (props?.orgId) {
             const result = props.orgInfo?.kind === 'root' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id);
@@ -277,7 +277,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                 proTableRef.current?.setPageInfo?.(pageInfo);
               }
               proTableRef.current?.reload();
-              message.success(t('submit success'));
+              message.success(t('submit_success'));
               close();
             }
           }
@@ -287,7 +287,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     onRemoveRole = (record: User) => {
       Modal.confirm({
         title: t('remove'),
-        content: `${t('confirm remove')}：${record.displayName}`,
+        content: `${t('confirm_remove')}：${record.displayName}`,
         onOk: async (close) => {
           if (props.orgRole) {
             const result = await revokeOrgRoleUser(props.orgRole.id, record.id);
@@ -298,7 +298,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                 proTableRef.current?.setPageInfo?.(pageInfo);
               }
               proTableRef.current?.reload();
-              message.success(t('submit success'));
+              message.success(t('submit_success'));
               close();
             }
           }
@@ -334,16 +334,16 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             }}
             rowKey={'id'}
             toolbar={{
-              title: props.title || t('{{field}} list', { field: t(props.userType || '') }),
+              title: props.title || (props.userType === 'account' ? t('account_list') : t('member_list')),
               actions: props.scene === 'roleUser' ? [
                 <Auth authKey="assignRoleUser">
                   <Button
                     type="primary"
                     onClick={() => {
-                      setModal({ open: true, title: t('add {{field}}', { field: t('member') }), scene: 'add' });
+                      setModal({ open: true, title: t('add_member'), scene: 'add' });
                     }}
                   >
-                    {t('add {{field}}', { field: t('member') })}
+                    {t('add_member')}
                   </Button>
                 </Auth>,
               ] : props.scene === 'orgUser' ? [
@@ -352,24 +352,24 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
                     <Button
                       type="primary"
                       onClick={() => {
-                        setModal({ open: true, title: t('create {{field}}', { field: t('user') }), scene: 'create' });
+                        setModal({ open: true, title: t('create_user'), scene: 'create' });
                       }}
                     >
-                      {t('create {{field}}', { field: t('user') })}
+                      {t('create_user')}
                     </Button>
                   </Auth> : '',
                 props.orgInfo?.kind === 'root'
                   ? <Button>
-                    <Link to="/account/recycle">{t('Recycling station')}</Link>
+                    <Link to="/account/recycle">{t('recycle_bin')}</Link>
                   </Button> : '',
                 props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
                   <Button
                     type="primary"
                     onClick={() => {
-                      setModal({ open: true, title: t('add {{field}}', { field: t('user') }), scene: 'add' });
+                      setModal({ open: true, title: t('add_user'), scene: 'add' });
                     }}
                   >
-                    {t('add {{field}}', { field: t('user') })}
+                    {t('add_user')}
                   </Button>
                 </Auth> : '',
               ] : [],
@@ -383,12 +383,12 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         ) : (
           <PageContainer
             header={{
-              title: t('{{field}} management', { field: t(props.userType || '') }),
+              title: props.userType === 'account' ? t('account_manage') : t('member_manage'),
               style: { background: token.colorBgContainer },
               breadcrumb: {
                 items: [
-                  { title: t('System configuration') },
-                  { title: t('{{field}} management', { field: t(props.userType || '') }) },
+                  { title: t('system_conf') },
+                  { title: props.userType === 'account' ? t('account_manage') : t('member_manage') },
                 ],
               },
             }}
@@ -402,16 +402,20 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
               }}
               rowKey={'id'}
               toolbar={{
-                title: props?.title || t('{{field}} list', { field: t(props.userType || '') }),
+                title: props?.title || props.userType === 'account' ? t('account_list') : t('member_list'),
                 actions: [
                   <Auth authKey="createOrganizationAccount">
                     <Button
                       type="primary"
                       onClick={() => {
-                        setModal({ open: true, title: t('create {{field}}', { field: t(props.userType || '') }), scene: 'create' });
+                        setModal({
+                          open: true,
+                          title: props.userType === 'account' ? t('create_account') : t('create_member'),
+                          scene: 'create',
+                        });
                       }}
                     >
-                      {t('create {{field}}', { field: t(props.userType || '') })}
+                      {props.userType === 'account' ? t('create_account') : t('create_member')}
                     </Button>
                   </Auth>,
                 ],
@@ -433,7 +437,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         onClose={(isSuccess) => {
           if (isSuccess) {
             proTableRef.current?.reload();
-            message.success(t('submit success'));
+            message.success(t('submit_success'));
           }
           setModal({ open: false, title: '', scene: modal.scene });
         }}
@@ -451,7 +455,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           onClose={(isSuccess) => {
             if (isSuccess) {
               proTableRef.current?.reload();
-              message.success(t('submit success'));
+              message.success(t('submit_success'));
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
@@ -468,7 +472,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           onClose={(isSuccess) => {
             if (isSuccess) {
               proTableRef.current?.reload();
-              message.success(t('submit success'));
+              message.success(t('submit_success'));
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
@@ -483,7 +487,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           onClose={(isSuccess) => {
             if (isSuccess) {
               proTableRef.current?.reload();
-              message.success(t('submit success'));
+              message.success(t('submit_success'));
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}

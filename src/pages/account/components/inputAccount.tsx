@@ -24,7 +24,7 @@ export default (props: {
       <Input.Search
         value={props.value?.displayName}
         disabled={props.disabled}
-        placeholder={`${t('click search {{field}}', { field: t(props.userType) })}`}
+        placeholder={`${props.userType === "account" ? t('click_search_account') : t('click_search_member')}`}
         suffix={props.value && props.disabled != true ? <CloseCircleFilled
           style={{ fontSize: '12px', cursor: 'pointer', color: 'rgba(0, 0, 0, 0.25)' }}
           onClick={() => {
@@ -38,7 +38,7 @@ export default (props: {
       />
       <ModalAccount
         open={modal.open}
-        title={t('search {{field}}', { field: t('account') })}
+        title={t('click_search_account')}
         userType={props.userType}
         onClose={(selectData) => {
           if (selectData?.length) {

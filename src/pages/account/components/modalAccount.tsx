@@ -21,7 +21,7 @@ export default (props: {
     columns: ProColumns<User>[] = [
       // 有需要排序配置  sorter: true
       {
-        title: t('principal name'),
+        title: t('principal_name'),
         dataIndex: 'principalName',
         width: 90,
         search: {
@@ -29,7 +29,7 @@ export default (props: {
         },
       },
       {
-        title: t('display name'),
+        title: t('display_name'),
         dataIndex: 'displayName',
         width: 120,
         search: {
@@ -60,7 +60,7 @@ export default (props: {
         width: 100,
         valueEnum: EnumUserStatus,
       },
-      { title: t('created at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
+      { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
 
     ],
     [dataSource, setDataSource] = useState<User[]>([]),

@@ -1,6 +1,6 @@
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { ProFormText, LoginForm } from '@ant-design/pro-components';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/images/woocoo.png';
 import Sha256 from 'crypto-js/sha256';
 import { useTranslation } from 'react-i18next';
 import { CaptchaRes, LoginRes, captcha, login } from '@/services/basis';
@@ -46,7 +46,7 @@ export default (
     <LoginForm
       title="Adminx Pro"
       logo={<img alt="logo" src={logo} />}
-      subTitle={t('Management system')}
+      subTitle={t('manage_system')}
       initialValues={{
         username: 'admin',
         password: '123456',
@@ -72,11 +72,11 @@ export default (
           size: 'large',
           prefix: <UserOutlined className={'prefixIcon'} />,
         }}
-        placeholder={`${t('Please enter {{field}}', { field: t('principal name') })}`}
+        placeholder={`${t('please_enter_principal_name')}`}
         rules={[
           {
             required: true,
-            message: `${t('Please enter {{field}}', { field: t('principal name') })}`,
+            message: `${t('please_enter_principal_name')}`,
           },
         ]}
       />
@@ -86,11 +86,11 @@ export default (
           size: 'large',
           prefix: <LockOutlined className={'prefixIcon'} />,
         }}
-        placeholder={`${t('Please enter {{field}}', { field: t('password') })}`}
+        placeholder={`${t('please_enter_password')}`}
         rules={[
           {
             required: true,
-            message: `${t('Please enter {{field}}', { field: t('password') })}`,
+            message: `${t('please_enter_password')}`,
           },
         ]}
       />
@@ -106,11 +106,11 @@ export default (
             }}
           />,
         }}
-        placeholder={`${t('verification code')}`}
+        placeholder={`${t('auth_code')}`}
         rules={[
           {
             required: true,
-            message: `${t('Please enter {{field}}', { field: t('verification code') })}`,
+            message: `${t('please_enter_auth_code')}`,
           },
         ]}
       />
@@ -119,7 +119,7 @@ export default (
           style={{ float: 'right' }}
           to="/login/retrievePassword"
         >
-          {t('forget your password')}
+          {t('forget_password')}
         </Link>
       </div>
     </LoginForm>

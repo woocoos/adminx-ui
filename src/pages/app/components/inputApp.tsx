@@ -23,7 +23,7 @@ export default (props: {
       <Input.Search
         value={props.value?.name || ''}
         disabled={props.disabled}
-        placeholder={`${t('click search {{field}}', { field: t('app') })}`}
+        placeholder={`${t('click_search_app')}`}
         suffix={props.value && props.disabled != true ? <CloseCircleFilled
           style={{ fontSize: '12px', cursor: 'pointer', color: 'rgba(0, 0, 0, 0.25)' }}
           onClick={() => {
@@ -37,7 +37,7 @@ export default (props: {
       />
       <ModalApp
         open={modal.open}
-        title={`${t('search {{field}}', { field: t('app') })}`}
+        title={`${t('search_app')}`}
         orgId={props.orgId}
         onClose={(selectData) => {
           if (selectData?.length) {

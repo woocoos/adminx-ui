@@ -70,7 +70,7 @@ export default (props: {
           }
         }
         if (isTree) {
-          message.success(t('submit success'));
+          message.success(t('submit_success'));
           setSaveDisabled(true);
           props.onClose?.(true);
         }
@@ -112,14 +112,14 @@ export default (props: {
           </> : ''
         }
         <div>
-          {props.kind === 'role' ? t('role') : t('user group')}
+          {props.kind === 'role' ? t('role') : t('user_group')}
         </div>
         <Row gutter={20}>
           <Col span="16">
             <div>
               <Input.Search
                 value={keyword}
-                placeholder={`${t('search {{field}}', { field: t('keyword') })}`}
+                placeholder={`${t('search_keyword')}`}
                 onChange={(event) => {
                   setKeyword(event.target.value);
                 }}

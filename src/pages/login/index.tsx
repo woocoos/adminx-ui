@@ -19,7 +19,7 @@ export default () => {
     setRes(result);
     if (result?.accessToken) {
       await basisDispatcher.login(result);
-      message.success(t('login success'));
+      message.success(t('login_success'));
       const urlParams = (new URL(window.location.href)).searchParams;
       location.replace(urlParams.get('redirect') || '/');
     }

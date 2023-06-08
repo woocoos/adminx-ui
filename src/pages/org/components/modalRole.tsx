@@ -39,7 +39,7 @@ export default (props: {
       fixed: 'right',
       search: false,
       renderText(text, record) {
-        return record.isAppRole ? t('system role') : t('custom role');
+        return record.isAppRole ? t('system_role') : t('custom_role');
       },
     });
   }

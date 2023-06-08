@@ -44,11 +44,11 @@ export default (
       <br />
       <ProFormText
         name="code"
-        placeholder={`${t('Please enter {{field}}', { field: t('security code') })}`}
+        placeholder={`${t('please_enter_security_code')}`}
         rules={[
           {
             required: true,
-            message: `${t('Please enter {{field}}', { field: t('security code') })}`,
+            message: `${t('please_enter_security_code')}`,
           },
         ]}
       />

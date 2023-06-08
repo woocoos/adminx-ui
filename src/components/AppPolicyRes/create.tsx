@@ -99,7 +99,7 @@ export default (props: {
         submitter={false}
       >
         <div style={{ lineHeight: '50px' }}>
-          {t('Resource ARN format')}：{newArn}
+          {t('res_arn_format')}：{newArn}
         </div>
         {Object.keys(model).map(key =>
         (<Row key={key} gutter={20}>
@@ -109,7 +109,7 @@ export default (props: {
               name={key}
               label={key}
               rules={[
-                { required: true, message: `${t('Please enter {{field}}', { field: key })}` },
+                { required: true, message: `${t('please_enter_{{field}}', { field: key })}` },
               ]}
             />
           </Col>
@@ -128,7 +128,7 @@ export default (props: {
                 }
               }}
             >
-              {t('match all')}
+              {t('match_all')}
             </Checkbox>
           </Col>
         </Row>),

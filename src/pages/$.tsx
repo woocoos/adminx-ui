@@ -9,10 +9,10 @@ export default () => {
     <Result
       status="404"
       title="404"
-      subTitle={t('你访问的页面不存在')}
+      subTitle={t('page_404_title')}
       extra={
-        <Button type="primary" onClick={() => history?.push('/dashboard')}>
-          {t('返回')}
+        <Button type="primary" onClick={() => history?.go(-1)}>
+          {t('back')}
         </Button>
       }
     />

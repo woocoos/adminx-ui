@@ -24,8 +24,8 @@ export default (props: {
     { t } = useTranslation(),
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<User>[] = [
-      { title: t('display name'), dataIndex: 'displayName' },
-      { title: t('principal name'), dataIndex: 'principalName' },
+      { title: t('display_name'), dataIndex: 'displayName' },
+      { title: t('principal_name'), dataIndex: 'principalName' },
     ],
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
@@ -82,7 +82,7 @@ export default (props: {
         }
       }
       if (isTree) {
-        message.success(t('submit success'));
+        message.success(t('submit_success'));
         props.onClose?.(true);
         setSaveDisabled(true);
       }
@@ -115,8 +115,8 @@ export default (props: {
       <Space direction="vertical">
         {
           props.orgRole ? <>
-            <Alert showIcon message={t('after a user is added to a user group, the user has all the permissions of the group')} />
-            <div>{props.orgRole.kind === 'role' ? t('role') : t('user group')}</div>
+            <Alert showIcon message={t('drawer_org_role_alert_msg')} />
+            <div>{props.orgRole.kind === 'role' ? t('role') : t('user_group')}</div>
             <div>
               <Input value={props.orgRole.name} />
             </div>
@@ -139,7 +139,7 @@ export default (props: {
             <div>
               <Input.Search
                 value={keyword}
-                placeholder={`${t('search {{field}}', { field: t('keyword') })}`}
+                placeholder={`${t('search_keyword')}`}
                 onChange={(event) => {
                   setKeyword(event.target.value);
                 }}

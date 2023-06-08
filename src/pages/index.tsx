@@ -67,7 +67,7 @@ export default () => {
         </Row>,
       }}
     >
-      <ProCard title={t('Basic data')} direction="row">
+      <ProCard title={t('basic_data')} direction="row">
         <ProCard>
           <Statistic
             title={t('user')}
@@ -79,7 +79,7 @@ export default () => {
         </ProCard>
         <ProCard>
           <Statistic
-            title={t('user group')}
+            title={t('user_group')}
             value={userGroupQty}
             formatter={(value) => (<Link to="/org/groups">
               {value}
@@ -97,7 +97,7 @@ export default () => {
         </ProCard>
         <ProCard>
           <Statistic
-            title={t('Custom policy')}
+            title={t('custom_policy')}
             value={policyQty}
             formatter={(value) => (<Link to="/org/policys">
               {value}
@@ -106,7 +106,7 @@ export default () => {
         </ProCard>
       </ProCard>
       <br />
-      <ProCard title={t('My application')}>
+      <ProCard title={t('my_app')}>
         {
           myApps.map(item =>
           (<ProCard

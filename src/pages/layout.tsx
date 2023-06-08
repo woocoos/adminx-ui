@@ -5,7 +5,7 @@ import AvatarDropdown from '@/components/Header/AvatarDropdown';
 import I18nDropdown from '@/components/Header/I18nDropdown';
 import DarkMode from '@/components/Header/DarkMode';
 import styles from './layout.module.css';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/images/woocoo.png';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { Outlet } from '@ice/runtime';
 import i18n from '@/i18n';

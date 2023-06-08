@@ -32,7 +32,7 @@ export default () => {
       const { key } = info;
       checkLave(() => {
         Modal.confirm({
-          title: t('Tenant switch reminder'),
+          title: t('tenant_switch_reminder'),
           content: t('tenant_switch_context'),
           onOk: () => {
             basisDispatcher.saveTenantId(key);

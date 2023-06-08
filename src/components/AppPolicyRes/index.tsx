@@ -77,17 +77,17 @@ export default (props: {
         <div className="appPolicyRes-content">
           <Row>
             <Col flex="auto">
-              {`${t('Resource ARN format')} ${item.arn}`}
+              {`${t('res_arn_format')} ${item.arn}`}
             </Col>
             <Col>
               <Space>
                 {
                   props.values?.find(vsItem => vsItem == item.allArn) ? ''
                     : props.readonly ? '' : <a onClick={() => {
-                      setModal({ open: true, title: t('add {{field}}', { field: t('resources') }), data: item.allArn, scene: 'create' });
+                      setModal({ open: true, title: t('add_resources'), data: item.allArn, scene: 'create' });
                     }}
                     >
-                      {t('add {{field}}', { field: t('resources') })}
+                      {t('add_resources')}
                     </a>
                 }
                 <Checkbox
@@ -107,7 +107,7 @@ export default (props: {
                     props.onChange(values);
                   }}
                 >
-                  {t('match all')}
+                  {t('match_all')}
                 </Checkbox>
               </Space>
             </Col>
@@ -127,7 +127,7 @@ export default (props: {
                   </a>
                   <Popconfirm
                     title={t('delete')}
-                    description={t('confirm delete')}
+                    description={t('confirm_delete')}
                     okText={t('confirm')}
                     cancelText={t('cancel')}
                     onConfirm={() => {

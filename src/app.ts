@@ -9,6 +9,8 @@ import { getItem } from '@/pkg/localStore';
 import { User, userPermissions } from './services/user';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
+import i18n from './i18n';
+
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({
@@ -117,6 +119,8 @@ export const requestConfig = defineRequestConfig(() => {
             return response;
           },
           onError: (error) => {
+
+
             const errRes = error.response as any;
             let msg = '';
             if (errRes?.data?.errors?.[0]?.message) {
@@ -126,22 +130,22 @@ export const requestConfig = defineRequestConfig(() => {
               case 401:
                 store.dispatch.basis.logout();
                 if (!msg) {
-                  msg = '登录过期';
+                  msg = i18n.t('401');
                 }
                 break;
               case 403:
                 if (!msg) {
-                  msg = '无访问权限';
+                  msg = i18n.t('403');
                 }
                 break;
               case 404:
                 if (!msg) {
-                  msg = '找不到方法';
+                  msg = i18n.t('404');
                 }
                 break;
               case 500:
                 if (!msg) {
-                  msg = '服务端系统异常';
+                  msg = i18n.t('500');
                 }
                 break;
               default:

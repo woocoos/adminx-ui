@@ -28,7 +28,7 @@ export default (
   return (
     <LoginForm
       formRef={formRef}
-      title={t('reset password')}
+      title={t('reset_pwd')}
       submitter={{
         searchConfig: {
           submitText: t('submit'),
@@ -47,28 +47,28 @@ export default (
       <br />
       <ProFormText.Password
         name="password"
-        label={t('new password')}
-        placeholder={`${t('Please enter {{field}}', { field: t('new password') })}`}
+        label={t('new_pwd')}
+        placeholder={`${t('please_enter_new_pwd')}`}
         rules={[
           {
             required: true,
-            message: `${t('Please enter {{field}}', { field: t('new password') })}`,
+            message: `${t('please_enter_new_pwd')}`,
           },
         ]}
       />
       <ProFormText.Password
         name="reNewPwd"
-        label={t('confirm new password')}
-        placeholder={`${t('Please enter {{field}}', { field: t('confirm new password') })}`}
+        label={t('confirm_new_pwd')}
+        placeholder={`${t('please_enter_confirm_new_pwd')}`}
         rules={[
           {
             required: true,
-            message: `${t('Please enter {{field}}', { field: t('confirm new password') })}`,
+            message: `${t('please_enter_confirm_new_pwd')}`,
           },
           {
             validator: (rule, value) => {
               if (value != formRef?.current?.getFieldValue('password')) {
-                return Promise.reject(t('confirm the new password must be the same as the new password'));
+                return Promise.reject(t('confirm_new_pwd_accord'));
               }
               return Promise.resolve();
             },

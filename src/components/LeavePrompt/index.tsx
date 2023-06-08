@@ -1,7 +1,8 @@
 import { history } from 'ice';
 import { ReactNode, useEffect } from 'react';
+import i18n from '../../i18n';
 
-const tipStr = '您还有内容未保存，是否离开！';
+
 const pathName = {
   when: true,
 };
@@ -14,7 +15,7 @@ export const checkLave = (callback: () => void) => {
   if (pathName.when) {
     callback();
   } else {
-    if (confirm(tipStr)) {
+    if (confirm(`${i18n.t('leave_prompt_tip')}`)) {
       pathName.when = true;
       callback();
     }
@@ -39,8 +40,8 @@ export default () => {
     if (pathName.when) {
       return true;
     } else {
-      event.returnValue = tipStr;
-      return tipStr;
+      event.returnValue = i18n.t('leave_prompt_tip');
+      return i18n.t('leave_prompt_tip');
     }
   };
 

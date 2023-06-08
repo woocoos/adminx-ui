@@ -83,7 +83,7 @@ export default (props: {
         }
       }
       if (isTree) {
-        message.success(t('submit success'));
+        message.success(t('submit_success'));
         setSaveDisabled(true);
         props.onClose?.(true);
       }
@@ -116,7 +116,7 @@ export default (props: {
       <Space direction="vertical">
         {
           props.orgRoleInfo ? <>
-            <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user group')}</div>
+            <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user_group')}</div>
             <div>
               <Input value={props.orgRoleInfo.name} />
             </div>
@@ -138,7 +138,7 @@ export default (props: {
             <div>
               <Input.Search
                 value={keyword}
-                placeholder={`${t('search {{field}}', { field: t('keyword') })}`}
+                placeholder={`${t('search_keyword')}`}
                 onChange={(event) => {
                   setKeyword(event.target.value);
                 }}

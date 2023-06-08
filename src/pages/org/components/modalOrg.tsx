@@ -27,9 +27,9 @@ export default (props: {
       { title: t('code'), dataIndex: 'code', width: 120 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
       { title: t('domain'), dataIndex: 'domain', width: 120, search: false },
-      { title: t('country/region'), dataIndex: 'countryCode', width: 120, search: false },
+      { title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false },
       {
-        title: t('manage account'),
+        title: t('manage_account'),
         dataIndex: 'owner',
         width: 120,
         search: false,

@@ -33,7 +33,7 @@ export default function (props: {
             title={props.titles?.[0] || t('all')}
           >
             <Input.Search
-              placeholder={`${t('filter operation')}`}
+              placeholder={`${t('filter_operation')}`}
               onSearch={(value) => {
                 if (value) {
                   setDataSource(props.dataSource.filter(item => {
