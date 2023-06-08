@@ -53,9 +53,7 @@ export default {
                     }
                 ]
             }
-            // response.send(result);
-            response.status(500)
-            response.send({a:1})
+            response.send(result);
         })
     },
     //
