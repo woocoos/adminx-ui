@@ -18,7 +18,6 @@ export default (props: {
     if (props.clearAlive) {
       let cachingNodes = getCachingNodes() || []
       cachingNodes.forEach(item => {
-        console.log(pathname + "  --  " + item.name)
         if (pathname != item.name) {
           item.name ? dropScope(item.name) : null
         }
