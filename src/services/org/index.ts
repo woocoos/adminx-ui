@@ -78,7 +78,7 @@ export async function getOrgList(params: TableParams, filter: TableFilter, sort:
         }
       }`,
       {
-        first: params.pageSize,
+        first: params.pageSize || 99,
         where,
         orderBy,
       },
