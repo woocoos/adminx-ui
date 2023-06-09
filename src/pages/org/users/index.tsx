@@ -167,7 +167,7 @@ export default () => {
     [searchParams] = useSearchParams(),
     orgId = searchParams.get('id') || basisState.tenantId;
 
-  return (<KeepAlive>
+  return (<KeepAlive clearAlive={true}>
     <PageOrgUsers orgId={orgId} />
   </KeepAlive>
   );

@@ -323,7 +323,7 @@ const PageAppList = (props: {
 export const AppList = forwardRef(PageAppList);
 
 export default () => {
-  return (<KeepAlive>
+  return (<KeepAlive clearAlive={true}>
     <AppList />
   </KeepAlive>);
 };

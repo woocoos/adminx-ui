@@ -180,7 +180,7 @@ export default () => {
   const [searchParams] = useSearchParams(),
     appId = searchParams.get('id') || '';
 
-  return (<KeepAlive>
+  return (<KeepAlive clearAlive={true}>
     <PageAppPolicys appId={appId} />
   </KeepAlive>);
 };

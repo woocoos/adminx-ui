@@ -145,7 +145,7 @@ export default () => {
   }, [searchParams]);
 
   return (
-    <KeepAlive>
+    <KeepAlive clearAlive={true}>
       <PageContainer
         header={{
           title: t('policy'),

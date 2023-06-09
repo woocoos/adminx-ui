@@ -8,7 +8,7 @@ export default () => {
     [basisState] = store.useModel('basis'),
     orgId = searchParams.get('id') || basisState.tenantId;
 
-  return (<KeepAlive>
+  return (<KeepAlive clearAlive={true}>
     <OrgRoleList kind="group" orgId={orgId} />
   </KeepAlive>
   );
