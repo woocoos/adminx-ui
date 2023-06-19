@@ -4,7 +4,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/graphql';
 
@@ -32,13 +32,13 @@ export default (props: {
   setLeavePromptWhen(saveDisabled);
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as OrgRole[], success: true, total: 0 },
         where: OrgRoleWhereInput = {};
       if (keyword) {
         where.nameContains = keyword;
       }
-      where.kind = props.kind
+      where.kind = props.kind;
       const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
         current: params.current,
         pageSize: params.pageSize,

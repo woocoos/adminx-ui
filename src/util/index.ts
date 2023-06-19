@@ -220,14 +220,14 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
 export const updateFormat = <T>(target: T, original: Record<string, any>) => {
   const ud: Record<string, any> = {};
   for (const key in target) {
-    const tValue = target[key]
+    const tValue = target[key];
     if (tValue !== original[key]) {
-      ud[key] = tValue
+      ud[key] = tValue;
       if (typeof tValue != 'boolean' && !tValue) {
-        const clearKey = `clear${firstUpper(key)}`.replace('ID', '')
-        ud[clearKey] = true
+        const clearKey = `clear${firstUpper(key)}`.replace('ID', '');
+        ud[clearKey] = true;
       }
     }
   }
-  return ud as T
-}
+  return ud as T;
+};

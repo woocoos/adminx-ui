@@ -7,9 +7,9 @@
     "start": "ice start --no-mock",
     "build": "ice build",
     "eslint": "eslint ./src --cache --ext .js,.jsx,.ts,.tsx",
-    "eslint:fix": "pnpm run eslint -- --fix",
+    "eslint:fix": "pnpm run eslint --fix",
     "stylelint": "stylelint \"src/**/*.{css,scss,less}\" --cache",
-    "stylelint:fix": "pnpm run stylelint -- --fix",
+    "stylelint:fix": "pnpm run stylelint --fix",
     "gqlgen": "graphql-code-generator --config ./script/gqlgen.ts",
     "gqlgen:watch": "pnpm gqlgen --watch"
   },

@@ -7,11 +7,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProFormData = {
-  name: string
-  kind: AppActionKind
-  method: AppActionMethod
-  comments?: string
-}
+  name: string;
+  kind: AppActionKind;
+  method: AppActionMethod;
+  comments?: string;
+};
 
 export default (props: {
   open?: boolean;
@@ -40,7 +40,7 @@ export default (props: {
       if (props.id) {
         const result = await getAppActionInfo(props.id);
         if (result?.id) {
-          setAppActionInfo(result)
+          setAppActionInfo(result);
           return result;
         }
       }
@@ -58,9 +58,9 @@ export default (props: {
           kind: values.kind,
           method: values.method,
           name: values.name,
-        }, appActionInfo || {}))
+        }, appActionInfo || {}));
         if (result?.id) {
-          isTrue = true
+          isTrue = true;
         }
       } else {
         if (props.appId) {
@@ -72,7 +72,7 @@ export default (props: {
             name: values.name,
           });
           if (result?.[0]?.id) {
-            isTrue = true
+            isTrue = true;
           }
         }
       }

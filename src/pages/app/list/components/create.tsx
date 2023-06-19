@@ -7,16 +7,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProFormData = {
-  redirectURI?: string
-  scopes?: string
-  tokenValidity?: number
-  refreshTokenValidity?: number
-  logo?: string
-  name?: string
-  code?: string
-  kind?: AppKind
-  comments?: string
-}
+  redirectURI?: string;
+  scopes?: string;
+  tokenValidity?: number;
+  refreshTokenValidity?: number;
+  logo?: string;
+  name?: string;
+  code?: string;
+  kind?: AppKind;
+  comments?: string;
+};
 
 export default (props: {
   open?: boolean;
@@ -45,7 +45,7 @@ export default (props: {
       if (props.id) {
         const result = await getAppInfo(props.id);
         if (result?.id) {
-          setAppInfo(result as App)
+          setAppInfo(result as App);
           return result;
         }
       }
@@ -56,8 +56,8 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      const result = props.id ?
-        await updateAppInfo(props.id, updateFormat({
+      const result = props.id
+        ? await updateAppInfo(props.id, updateFormat({
           kind: values.kind || AppKind.Native,
           name: values.name || '',
           redirectURI: values.redirectURI,
@@ -66,8 +66,8 @@ export default (props: {
           refreshTokenValidity: values.refreshTokenValidity,
           logo: values.logo,
           comments: values.comments,
-        }, appInfo || {})) :
-        await createAppInfo({
+        }, appInfo || {}))
+        : await createAppInfo({
           code: values.code || '',
           kind: values.kind || AppKind.Native,
           name: values.name || '',

@@ -2,7 +2,7 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
 import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/org/role';
@@ -66,11 +66,11 @@ export default (props: {
     });
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as OrgRole[], success: true, total: 0 },
         where: OrgRoleWhereInput = {};
-      where.nameContains = params.nameContains
-      where.createdAt = params.createdAt
+      where.nameContains = params.nameContains;
+      where.createdAt = params.createdAt;
       const result = await getUserJoinGroupList(props.userInfo.id, {
         current: params.current,
         pageSize: params.pageSize,

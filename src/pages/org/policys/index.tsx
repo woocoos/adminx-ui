@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableSort, TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getOrgInfo } from '@/services/org';
 import { delOrgPolicy, getOrgPolicyList } from '@/services/org/policy';
@@ -89,12 +89,12 @@ export default () => {
         const result = await getOrgInfo(orgId);
         if (result?.id) {
           setOrgInfo(result as Org);
-          return result
+          return result;
         }
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams, sort: TableSort) => {
       const table = { data: [] as OrgPolicy[], success: true, total: 0 },
         where: OrgPolicyWhereInput = {},
         info = orgInfo || await getOrg();
@@ -103,7 +103,7 @@ export default () => {
           where.appPolicyIDNotNil = params.type === 'sys' ? true : undefined;
           where.appPolicyIDIsNil = params.type === 'cust' ? true : undefined;
         }
-        where.nameContains = params.nameContains
+        where.nameContains = params.nameContains;
         const result = await getOrgPolicyList(info?.id, {
           current: params.current,
           pageSize: params.pageSize,
@@ -145,7 +145,7 @@ export default () => {
   }, [searchParams]);
 
   return (
-    <KeepAlive clearAlive={true}>
+    <KeepAlive clearAlive>
       <PageContainer
         header={{
           title: t('policy'),

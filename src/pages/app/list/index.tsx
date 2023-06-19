@@ -138,9 +138,9 @@ const PageAppList = (props: {
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as App[], success: true, total: 0 },
         where: AppWhereInput = {};
-      where.nameContains = params.nameContains
-      where.codeContains = params.codeContains
-      where.kindIn = filter.kind as AppKind[]
+      where.nameContains = params.nameContains;
+      where.codeContains = params.codeContains;
+      where.kindIn = filter.kind as AppKind[];
       if (props.orgId) {
         const result = await getOrgAppList(props.orgId, {
           current: params.current,
@@ -345,7 +345,7 @@ const PageAppList = (props: {
 export const AppList = forwardRef(PageAppList);
 
 export default () => {
-  return (<KeepAlive clearAlive={true}>
+  return (<KeepAlive clearAlive>
     <AppList />
   </KeepAlive>);
 };

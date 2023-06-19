@@ -1,6 +1,6 @@
 import { Org, OrgKind, OrgWhereInput } from '@/__generated__/graphql';
 import { getAppOrgList } from '@/services/app/org';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { EnumOrgKind, getOrgList, getOrgPathList } from '@/services/org';
 import store from '@/store';
 import { formatTreeData } from '@/util';
@@ -47,14 +47,14 @@ export default (props: {
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as Org[], success: true, total: 0 },
         where: OrgWhereInput = {};
       setExpandedRowKeys([]);
       if (props.appId) {
-        where.nameContains = params.name
-        where.codeContains = params.code
-        where.kind = params.kind
+        where.nameContains = params.name;
+        where.codeContains = params.code;
+        where.kind = params.kind;
         const data = await getAppOrgList(props.appId, {
           current: params.current,
           pageSize: params.pageSize,
@@ -71,7 +71,7 @@ export default (props: {
           list = await getOrgPathList(props.orgId || basisState.tenantId, props.kind);
           table.total = list.length;
         } else {
-          where.kind = props.kind
+          where.kind = props.kind;
           const result = await getOrgList({
             pageSize: 999,
             where,

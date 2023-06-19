@@ -26,7 +26,7 @@ const queryAppList = gql(/* GraphQL */`query appList($first: Int,$orderBy:AppOrd
       }
     }
   }
-}`)
+}`);
 
 const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
   node(id:$gid){
@@ -35,19 +35,19 @@ const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
       refreshTokenValidity,logo,comments,status,createdAt
     }
   }
-}`)
+}`);
 
 const mutationUpdateApp = gql(/* GraphQL */`mutation updateApp($appId:ID!,$input: UpdateAppInput!){
   action:updateApp(appID:$appId,input:$input){id}
-}`)
+}`);
 
 const mutationCreateApp = gql(/* GraphQL */`mutation createApp($input: CreateAppInput!){
   action:createApp(input:$input){ id }
-}`)
+}`);
 
 const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){
   action:deleteApp(appID: $appId)
-}`)
+}`);
 
 /**
  * 获取应用信息
@@ -58,11 +58,11 @@ const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){
  */
 export async function getAppList(
   gather: {
-    current?: number
-    pageSize?: number
-    where?: AppWhereInput
-    orderBy?: AppOrder
-  }
+    current?: number;
+    pageSize?: number;
+    where?: AppWhereInput;
+    orderBy?: AppOrder;
+  },
 ) {
   const koc = koClient(),
     result = await koc.client.query(
@@ -71,13 +71,13 @@ export async function getAppList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
 
   if (result.data?.list) {
-    return result.data.list
+    return result.data.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -90,12 +90,12 @@ export async function getAppInfo(appId: string) {
     result = await koc.client.query(
       queryAppInfo, {
       gid: gid('app', appId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -110,12 +110,12 @@ export async function updateAppInfo(appId: string, input: UpdateAppInput) {
       mutationUpdateApp, {
       appId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -128,12 +128,12 @@ export async function createAppInfo(input: CreateAppInput) {
     result = await koc.client.mutation(
       mutationCreateApp, {
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -146,11 +146,11 @@ export async function delAppInfo(appId: string) {
     result = await koc.client.mutation(
       mutationDelApp, {
       appId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 

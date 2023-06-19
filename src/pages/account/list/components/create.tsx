@@ -11,15 +11,15 @@ import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
 
 type ProFormData = {
-  principalName?: string
-  password?: string
-  displayName?: string
-  email?: string
-  mobile?: string
-  comments?: string
-  canLogin?: boolean
-  passwordReset?: boolean
-}
+  principalName?: string;
+  password?: string;
+  displayName?: string;
+  email?: string;
+  mobile?: string;
+  comments?: string;
+  canLogin?: boolean;
+  passwordReset?: boolean;
+};
 
 export default (props: {
   open: boolean;
@@ -66,7 +66,7 @@ export default (props: {
               info = result.loginProfile as UserLoginProfile;
             }
           } else {
-            info = result as User
+            info = result as User;
           }
         }
       } else if (props.scene === 'recycle' && props.recycleInfo) {
@@ -103,14 +103,14 @@ export default (props: {
           values.principalName = `${values.principalName}@${domain}`;
         }
         if (props.scene == 'recycle' && props.recycleInfo) {
-          let pwdInput: CreateUserPasswordInput | undefined = undefined
+          let pwdInput: CreateUserPasswordInput | undefined;
           if (setKind === UserLoginProfileSetKind.Customer) {
             pwdInput = {
               scene: UserPasswordScene.Login,
               status: UserPasswordSimpleStatus.Active,
               password: Sha256(values.password || '').toString(),
               userID: props.recycleInfo.id,
-            }
+            };
           }
           const result = await restoreRecycleUser(props.recycleInfo.id, {
             comments: values.comments,
@@ -123,13 +123,13 @@ export default (props: {
             isTrue = true;
           }
         } else {
-          let password: CreateUserPasswordInput | undefined = undefined
+          let password: CreateUserPasswordInput | undefined;
           if (setKind === UserLoginProfileSetKind.Customer) {
             password = {
               scene: UserPasswordScene.Login,
               status: UserPasswordSimpleStatus.Active,
-              password: Sha256(values.password || '').toString()
-            }
+              password: Sha256(values.password || '').toString(),
+            };
           }
           const result = await createUserInfo(props?.orgId || basisState.tenantId, {
             mobile: values.mobile,

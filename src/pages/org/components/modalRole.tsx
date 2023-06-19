@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql';
 
 
@@ -46,12 +46,12 @@ export default (props: {
   }
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as OrgRole[], success: true, total: 0 },
         where: OrgRoleWhereInput = {};
       where.kind = props.kind;
       where.orgID = props.orgId;
-      where.nameContains = params.nameContains
+      where.nameContains = params.nameContains;
       const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
         current: params.current,
         pageSize: params.pageSize,

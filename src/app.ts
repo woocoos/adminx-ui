@@ -63,7 +63,10 @@ export const authConfig = defineAuthConfig(async (appData) => {
     initialAuth = {};
   // 判断路由权限
   if (basis.token) {
-    const ups = await userPermissions({});
+    const ups = await userPermissions({}, {
+      Authorization: `Bearer ${basis.token}`,
+      'X-Tenant-ID': basis.tenantId,
+    });
     if (ups) {
       ups.forEach(item => {
         if (item) {
@@ -119,8 +122,6 @@ export const requestConfig = defineRequestConfig(() => {
             return response;
           },
           onError: (error) => {
-
-
             const errRes = error.response as any;
             let msg = '';
             if (errRes?.data?.errors?.[0]?.message) {

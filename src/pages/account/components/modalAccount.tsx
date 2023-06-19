@@ -71,7 +71,7 @@ export default (props: {
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as User[], success: true, total: 0 },
         where: UserWhereInput = {};
-      let orderBy: UserOrder | undefined = undefined;
+      let orderBy: UserOrder | undefined;
       where.userType = props.userType;
       where.principalNameContains = params.principalNameContains;
       where.displayNameContains = params.displayNameContains;
@@ -81,8 +81,8 @@ export default (props: {
       if (sort.createdAt) {
         orderBy = {
           direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
-          field: UserOrderField.CreatedAt
-        }
+          field: UserOrderField.CreatedAt,
+        };
       }
       if (props.orgRoleId) {
         const result = await getOrgRoleUserList(props.orgRoleId, {

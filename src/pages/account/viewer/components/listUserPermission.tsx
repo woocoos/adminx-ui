@@ -2,7 +2,7 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/permission';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
@@ -127,7 +127,7 @@ export default (props: {
         setAllUserGroup([]);
       }
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as Permission[], success: true, total: 0 },
         where: PermissionWhereInput = {};
       where.principalKind = props.principalKind;

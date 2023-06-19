@@ -2,7 +2,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { useSearchParams } from '@ice/runtime';
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppRoleAssignedOrgList } from '@/services/app/org';
@@ -84,11 +84,11 @@ export default () => {
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as Org[], success: true, total: 0 },
         where: OrgWhereInput = {},
         info = await getInfo();
-      where.nameContains = params.nameContains
+      where.nameContains = params.nameContains;
       if (info) {
         const result = await getAppRoleAssignedOrgList(info.id, where);
         if (result) {

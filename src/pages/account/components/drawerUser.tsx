@@ -3,7 +3,7 @@ import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { assignOrgRoleUser } from '@/services/org/role';
 import { allotOrgUser, getOrgUserList } from '@/services/org/user';
 import { getDate } from '@/util';
@@ -35,7 +35,7 @@ export default (props: {
   setLeavePromptWhen(saveDisabled);
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as User[], success: true, total: 0 },
         where: UserWhereInput = {};
       if (keyword) {

@@ -300,11 +300,18 @@ export default () => {
                     {
                       label: t('personal_auth'),
                       key: 'user-permission',
-                      children: <ListUserPermission userInfo={info} principalKind={PermissionPrincipalKind.User} />,
+                      children: <ListUserPermission
+                        userInfo={info}
+                        principalKind={PermissionPrincipalKind.User}
+                      />,
                     }, {
                       label: t('extend_user_group_permissions'),
                       key: 'group-permission',
-                      children: <ListUserPermission userInfo={info} isExtendGroup principalKind={PermissionPrincipalKind.Role} />,
+                      children: <ListUserPermission
+                        userInfo={info}
+                        isExtendGroup
+                        principalKind={PermissionPrincipalKind.Role}
+                      />,
                     },
                   ],
                 }}

@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/app';
 import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/app/policy';
 import { useTranslation } from 'react-i18next';
@@ -70,12 +70,12 @@ const PageAppPolicys = (props: {
         const result = await getAppInfo(props.appId);
         if (result?.id) {
           setAppInfo(result as App);
-          return result
+          return result;
         }
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as AppPolicy[], success: true, total: 0 },
         info = props.appId == appInfo?.id ? appInfo : await getApp();
       if (info) {
@@ -181,7 +181,7 @@ export default () => {
   const [searchParams] = useSearchParams(),
     appId = searchParams.get('id') || '';
 
-  return (<KeepAlive clearAlive={true}>
+  return (<KeepAlive clearAlive>
     <PageAppPolicys appId={appId} />
   </KeepAlive>);
 };

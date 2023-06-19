@@ -18,21 +18,21 @@ const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: In
       }
     }
   }
-}`)
+}`);
 
 const mutationAssignOrgApp = gql(/* GraphQL */`mutation assignOrgApp($orgId:ID!,$appId:ID!){
   action:assignOrganizationApp(orgID: $orgId,appID: $appId)
-}`)
+}`);
 
 const mutationRevOrgApp = gql(/* GraphQL */`mutation revokeOrgApp($orgId:ID!,$appId:ID!){
   action:revokeOrganizationApp(orgID: $orgId,appID: $appId)
-}`)
+}`);
 
 const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!){
   list:orgAppActions(appCode: $appCode){
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
   }
-}`)
+}`);
 
 /**
  * 组织下的应用
@@ -45,10 +45,10 @@ const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:
 export async function getOrgAppList(
   orgId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: AppWhereInput
-    orderBy?: AppOrder
+    current?: number;
+    pageSize?: number;
+    where?: AppWhereInput;
+    orderBy?: AppOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(
@@ -58,13 +58,13 @@ export async function getOrgAppList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
 
-  if (result.data?.node?.__typename === "Org") {
-    return result.data.node.list
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -80,12 +80,12 @@ export async function assignOrgApp(orgId: string, appId: string) {
       mutationAssignOrgApp, {
       orgId,
       appId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -100,12 +100,12 @@ export async function revokeOrgApp(orgId: string, appId: string) {
       mutationRevOrgApp, {
       orgId,
       appId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -119,10 +119,10 @@ export async function getOrgAppActionList(appCode: string) {
     result = await koc.client.query(
       queryOrgAppActionList, {
       appCode,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.list) {
-    return result.data.list
+    return result.data.list;
   }
-  return []
+  return [];
 }

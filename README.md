@@ -9,6 +9,7 @@ adminx前端项目
 - 本地存储 [localforage](https://localforage.docschina.org/)
 - keep-alive [react-activation](https://github.com/CJY0208/react-activation/blob/HEAD/README_CN.md)
 - gql生成工具 [GraphQL Code Generator](https://the-guild.dev/graphql/codegen/docs)
+- urql [urql](https://formidable.com/open-source/urql/)
 
 ## 快速开始
 ```shell

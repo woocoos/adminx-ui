@@ -7,9 +7,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProFormData = {
-  name: string
-  comments?: string
-}
+  name: string;
+  comments?: string;
+};
 
 export default (props: {
   open?: boolean;
@@ -41,7 +41,7 @@ export default (props: {
       if (props.id) {
         const info = await getOrgRoleInfo(props.id);
         if (info?.id) {
-          setOrgRoleInfo(info as OrgRole)
+          setOrgRoleInfo(info as OrgRole);
           return info;
         }
       }
@@ -52,7 +52,7 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false
+      let isTrue = false;
 
       if (props.id) {
         const result = await updateOrgRole(props.id, updateFormat({
@@ -61,7 +61,7 @@ export default (props: {
           comments: values.comments,
         }, orgRoleInfo || {}));
         if (result?.id) {
-          isTrue = true
+          isTrue = true;
         }
       } else {
         const result = await createOrgRole({
@@ -71,7 +71,7 @@ export default (props: {
           orgID: props.orgId,
         });
         if (result?.id) {
-          isTrue = true
+          isTrue = true;
         }
       }
 

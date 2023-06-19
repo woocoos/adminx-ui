@@ -17,7 +17,7 @@ const queryAppResList = gql(/* GraphQL */`query appResList($gid: GID!,$first: In
       }
     }
   }
-}`)
+}`);
 
 const queryAppResInfo = gql(/* GraphQL */`query appResInfo($gid:GID!){
   node(id:$gid){
@@ -25,11 +25,11 @@ const queryAppResInfo = gql(/* GraphQL */`query appResInfo($gid:GID!){
       id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern
     }
   }
-}`)
+}`);
 
 const mutationUpdateAppRes = gql(/* GraphQL */`mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){
   action:updateAppRes(appResID:$appResId,input:$input){id}
-}`)
+}`);
 
 
 /**
@@ -40,10 +40,10 @@ const mutationUpdateAppRes = gql(/* GraphQL */`mutation updateAppRes($appResId:I
 export async function getAppResList(
   appId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: AppResWhereInput
-    orderBy?: AppResOrder
+    current?: number;
+    pageSize?: number;
+    where?: AppResWhereInput;
+    orderBy?: AppResOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(
@@ -53,12 +53,12 @@ export async function getAppResList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -72,12 +72,12 @@ export async function getAppResInfo(appResId: string) {
     result = await koc.client.query(
       queryAppResInfo, {
       gid: gid('app_res', appResId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'AppRes') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 
@@ -93,10 +93,10 @@ export async function updateAppRes(appResId: string, input: UpdateAppResInput) {
       mutationUpdateAppRes, {
       appResId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }

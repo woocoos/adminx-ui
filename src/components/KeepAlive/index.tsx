@@ -4,29 +4,29 @@ import { ReactNode, useEffect } from 'react';
 import KeepAlive, { useAliveController } from 'react-activation';
 
 export default (props: {
-  children: ReactNode,
-  clearAlive?: Boolean
+  children: ReactNode;
+  clearAlive?: boolean;
 }) => {
   const [basisState] = store.useModel('basis'),
     [searchParams] = useSearchParams(),
     location = useLocation(),
     id = searchParams.get('id') || basisState.tenantId;
-  const { dropScope, getCachingNodes } = useAliveController()
-  let pathname = location.pathname
+  const { dropScope, getCachingNodes } = useAliveController();
+  let { pathname } = location;
 
   useEffect(() => {
     if (props.clearAlive) {
-      let cachingNodes = getCachingNodes() || []
+      let cachingNodes = getCachingNodes() || [];
       cachingNodes.forEach(item => {
         if (pathname != item.name) {
-          item.name ? dropScope(item.name) : null
+          item.name ? dropScope(item.name) : null;
         }
       });
     }
-  }, [])
+  }, []);
 
   // 先关闭掉 等测试通过后开启
-  return (<KeepAlive when={true} autoFreeze={false} cacheKey={btoa(pathname)} name={pathname} id={id}>
+  return (<KeepAlive when autoFreeze={false} cacheKey={btoa(pathname)} name={pathname} id={id}>
     {props.children}
   </KeepAlive>);
 };

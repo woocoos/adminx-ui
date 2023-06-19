@@ -14,10 +14,10 @@ import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/
 import { updateFormat } from '@/util';
 
 type ProFormData = {
-  name: string
-  comments?: string
-  autoGrant: boolean
-}
+  name: string;
+  comments?: string;
+  autoGrant: boolean;
+};
 
 export default () => {
   const { token } = useToken(),
@@ -68,7 +68,7 @@ export default () => {
         if (result?.id) {
           setRules(result.rules as PolicyRule[] || []);
           getBase(result.appID || '');
-          setAppPolicyInfo(result as AppPolicy)
+          setAppPolicyInfo(result as AppPolicy);
           return result;
         }
       } else {
@@ -116,7 +116,7 @@ export default () => {
           rules: rules,
         }, appPolicyInfo || {}));
         if (result?.id) {
-          id = result.id
+          id = result.id;
         }
       } else {
         const appId = searchParams.get('appId');
@@ -130,7 +130,7 @@ export default () => {
             status: AppPolicySimpleStatus.Active,
           });
           if (result?.id) {
-            id = result.id
+            id = result.id;
           }
         }
       }

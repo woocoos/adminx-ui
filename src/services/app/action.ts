@@ -30,7 +30,7 @@ const queryAppActionList = gql(/* GraphQL */`query appActionList($gid: GID!,$fir
       }
     }
   }
-}`)
+}`);
 
 const queryAppActionInfo = gql(/* GraphQL */`query AppActionInfo($gid:GID!){
   node(id:$gid){
@@ -38,19 +38,19 @@ const queryAppActionInfo = gql(/* GraphQL */`query AppActionInfo($gid:GID!){
       id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
     }
   }
-}`)
+}`);
 
 const mutationCreateAppAction = gql(/* GraphQL */`mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){
   action:createAppActions(appID:$appId,input:$input){id}
-}`)
+}`);
 
 const mutationUpdateAppAction = gql(/* GraphQL */`mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){
   action:updateAppAction(actionID:$appActionId,input:$input){id}
-}`)
+}`);
 
 const mutationDelAppAction = gql(/* GraphQL */`mutation delAppAction($appActionId:ID!){
   action:deleteAppAction(actionID: $appActionId)
-}`)
+}`);
 
 /**
  * 获取应用权限
@@ -60,10 +60,10 @@ const mutationDelAppAction = gql(/* GraphQL */`mutation delAppAction($appActionI
 export async function getAppActionList(
   appId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: AppActionWhereInput
-    orderBy?: AppActionOrder
+    current?: number;
+    pageSize?: number;
+    where?: AppActionWhereInput;
+    orderBy?: AppActionOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(
@@ -73,13 +73,13 @@ export async function getAppActionList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -93,12 +93,12 @@ export async function getAppActionInfo(appActionId: string) {
     result = await koc.client.query(
       queryAppActionInfo, {
       gid: gid('app_action', appActionId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'AppAction') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 
@@ -113,12 +113,12 @@ export async function createAppAction(appId: string, input: CreateAppActionInput
       mutationCreateAppAction, {
       appId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -141,12 +141,12 @@ export async function updateAppAction(appActionId: string, input: UpdateAppActio
       mutationUpdateAppAction, {
       appActionId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -159,10 +159,10 @@ export async function delAppAction(appActionId: string) {
     result = await koc.client.mutation(
       mutationDelAppAction, {
       appActionId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }

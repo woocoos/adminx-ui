@@ -26,59 +26,58 @@ export default function Layout() {
   }, [basisState.locale]);
 
 
-  // useEffect(() => {
-  //   monitorKeyChange([
-  //     {
-  //       key: 'tenantId',
-  //       onChange(value) {
-  //         basisDispatcher.updateTenantId(value);
-  //       },
-  //     },
-  //     {
-  //       key: 'token',
-  //       onChange(value) {
-  //         basisDispatcher.updateToken(value);
-  //       },
-  //     },
-  //     {
-  //       key: 'user',
-  //       onChange(value) {
-  //         basisDispatcher.updateUser(value);
-  //       },
-  //     },
-  //     {
-  //       key: 'locale',
-  //       onChange(value) {
-  //         basisDispatcher.updateLocale(value);
-  //       },
-  //     },
-  //   ]);
-  // }, []);
-
+  useEffect(() => {
+    monitorKeyChange([
+      {
+        key: 'tenantId',
+        onChange(value) {
+          basisDispatcher.updateTenantId(value);
+        },
+      },
+      {
+        key: 'token',
+        onChange(value) {
+          basisDispatcher.updateToken(value);
+        },
+      },
+      {
+        key: 'user',
+        onChange(value) {
+          basisDispatcher.updateUser(value);
+        },
+      },
+      {
+        key: 'locale',
+        onChange(value) {
+          basisDispatcher.updateLocale(value);
+        },
+      },
+    ]);
+  }, []);
 
   const client = new Client({
     url: '/api/graphql/query',
-    requestPolicy: "cache-and-network",
+    requestPolicy: 'cache-and-network',
     fetchOptions: {
       headers: {
-        "Authorization": `Bearer ${basisState.token}`,
-        "X-Tenant-ID": basisState.tenantId,
-      }
+        Authorization: `Bearer ${basisState.token}`,
+        'X-Tenant-ID': basisState.tenantId,
+      },
     },
     exchanges: [cacheExchange, fetchExchange, mapExchange({
       onResult: (result) => {
         console.log('onResult', result);
       },
       onError: (error, operation) => {
-        console.log('onError', error, operation)
-      }
+        console.log('onError', error, operation);
+      },
     }), errorExchange({
       onResult: (result) => {
         console.log('--onResult', result);
       },
       onError: (error, operation) => {
-        console.log('--onError', error, operation)
-      }
+        console.log('--onError', error, operation);
+      },
     })],
   });
 

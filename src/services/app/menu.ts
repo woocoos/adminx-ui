@@ -18,23 +18,23 @@ const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: I
       }
     }
   }
-}`)
+}`);
 
 const mutationUpdateAppMenu = gql(/* GraphQL */`mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){
   action:updateAppMenu(menuID:$menuId,input:$input){id}
-}`)
+}`);
 
 const mutationCreateAppMenu = gql(/* GraphQL */`mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){
   action:createAppMenus(appID:$appId,input:$input){id}
-}`)
+}`);
 
 const mutationDelAppMenu = gql(/* GraphQL */`mutation delAppMenu($menuId:ID!){
   action:deleteAppMenu(menuID: $menuId)
-}`)
+}`);
 
 const mutationMoveAppMenu = gql(/* GraphQL */`mutation moveAppMenu($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
   action:moveAppMenu(sourceID:$sourceId,targetID:$targetId,action:$action)
-}`)
+}`);
 
 /**
  * 获取应用菜单
@@ -44,10 +44,10 @@ const mutationMoveAppMenu = gql(/* GraphQL */`mutation moveAppMenu($sourceId:ID!
 export async function getAppMenus(
   appId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: AppMenuWhereInput
-    orderBy?: AppMenuOrder
+    current?: number;
+    pageSize?: number;
+    where?: AppMenuWhereInput;
+    orderBy?: AppMenuOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(
@@ -59,13 +59,13 @@ export async function getAppMenus(
         field: AppMenuOrderField.DisplaySort,
       },
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.menus
+    return result.data.node.menus;
   }
-  return null
+  return null;
 }
 
 
@@ -81,12 +81,12 @@ export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
       mutationUpdateAppMenu, {
       menuId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -100,12 +100,12 @@ export async function createAppMenu(appId: string, input: CreateAppMenuInput | C
       mutationCreateAppMenu, {
       appId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -118,12 +118,12 @@ export async function delAppMenu(menuId: string) {
     result = await koc.client.mutation(
       mutationDelAppMenu, {
       menuId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -139,10 +139,10 @@ export async function moveAppMenu(sourceId: string, targetId: string, action: Tr
       sourceId,
       targetId,
       action,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }

@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space } from 'antd';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/app';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from '@ice/runtime';
@@ -81,18 +81,18 @@ export default () => {
       if (appId) {
         const result = await getAppInfo(appId);
         if (result?.id) {
-          setAppInfo(result as App)
-          return result
+          setAppInfo(result as App);
+          return result;
         }
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as AppRes[], success: true, total: 0 },
         where: AppResWhereInput = {},
         info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
-      where.nameContains = params.nameContains
-      where.typeNameContains = params.typeNameContains
+      where.nameContains = params.nameContains;
+      where.typeNameContains = params.typeNameContains;
       if (info) {
         const result = await getAppResList(info.id, {
           current: params.current,

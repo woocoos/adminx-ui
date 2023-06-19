@@ -1,7 +1,7 @@
 import { gid } from '@/util';
 import { koClient } from '../graphql';
 import { gql } from '@/__generated__';
-import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserIdentity, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/graphql';
+import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
@@ -35,7 +35,7 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
       }
     }
   }
-}`)
+}`);
 
 const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
@@ -44,7 +44,7 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
       email,mobile,userType,creationType,registerIP,status,comments
     }
   }
-}`)
+}`);
 
 const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($gid:GID!){
   node(id:$gid){
@@ -57,7 +57,7 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
       }
     }
   }
-}`)
+}`);
 
 const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLoginProfileIdentities($gid:GID!){
   node(id:$gid){
@@ -73,7 +73,7 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
       }
     }
   }
-}`)
+}`);
 
 const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:GID!){
   node(id:$gid){
@@ -85,77 +85,77 @@ const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:
       }
     }
   }
-}`)
+}`);
 
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
   action:createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
-}`)
+}`);
 
 const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
   action:createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }
-}`)
+}`);
 
 const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
   action:updateUser(userID:$userId,input:$input){ id,displayName }
-}`)
+}`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){
   action:updateLoginProfile(userID:$userId,input:$input){ id }
-}`)
+}`);
 
 const mutationBindUserIdentity = gql(/* GraphQL */`mutation bindUserIdentity($input: CreateUserIdentityInput!){
   action:bindUserIdentity(input:$input){ id }
-}`)
+}`);
 
 const mutationDelUserIdentity = gql(/* GraphQL */`mutation deleteUserIdentity($identityId:ID!){
   action:deleteUserIdentity(id:$identityId)
-}`)
+}`);
 
 const mutationDelUser = gql(/* GraphQL */`mutation deleteUser($userId:ID!){
   action:deleteUser(userID:$userId)
-}`)
+}`);
 
 const mutationResetUserPwdEmail = gql(/* GraphQL */`mutation resetUserPasswordByEmail($userId:ID!){
   action:resetUserPasswordByEmail(userId: $userId)
-}`)
+}`);
 
 const mutationChangePwd = gql(/* GraphQL */`mutation changePassword($oldPwd:String!,$newPwd:String!){
   action:changePassword(oldPwd:$oldPwd,newPwd:$newPwd)
-}`)
+}`);
 
 const mutationEnableMfa = gql(/* GraphQL */`mutation enableMfa($userId:ID!){
   action:enableMFA(userID:$userId){secret,account}
-}`)
+}`);
 
 const mutationDisableMfa = gql(/* GraphQL */`mutation disableMfa($userId:ID!){
   action:disableMFA(userID:$userId)
-}`)
+}`);
 
 const mutationSendMfaEmail = gql(/* GraphQL */`mutation sendMfaEmail($userId:ID!){
   action:sendMFAToUserByEmail(userID:$userId)
-}`)
+}`);
 
 const queryCheckPermission = gql(/* GraphQL */`query  checkPermission($permission:String!){
   action:checkPermission(permission: $permission)
-}`)
+}`);
 
 const queryUserPermissionList = gql(/* GraphQL */`query userPermissionList($where: AppActionWhereInput){
   list:userPermissions(where: $where){
     id,appID,name,kind,method
   }
-}`)
+}`);
 
 const queryUserMenuList = gql(/* GraphQL */`query userMenuList($appCode:String!){
   list:userMenus(appCode: $appCode){
     id,parentID,kind,name,comments,displaySort,icon,route
   }
-}`)
+}`);
 
 const queryUserRootOrgList = gql(/* GraphQL */`query userRootOrgs{
   list:userRootOrgs{
     id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone
   }
-}`)
+}`);
 
 const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   list:orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){
@@ -167,11 +167,11 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
       }
     }
   }
-}`)
+}`);
 
 const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
   action:recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
-}`)
+}`);
 
 
 /**
@@ -181,10 +181,10 @@ const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!
  * @returns
  */
 export async function getUserList(gather: {
-  current?: number
-  pageSize?: number
-  where?: UserWhereInput
-  orderBy?: UserOrder
+  current?: number;
+  pageSize?: number;
+  where?: UserWhereInput;
+  orderBy?: UserOrder;
 }) {
   const koc = koClient(),
     result = await koc.client.query(queryUserList, {
@@ -192,12 +192,12 @@ export async function getUserList(gather: {
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.list.__typename === 'UserConnection') {
-    return result.data.list
+    return result.data.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -211,12 +211,12 @@ export async function getUserInfo(userId: string) {
       gid: gid('user', userId),
     }, {
 
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'User') {
-    return result.data?.node
+    return result.data?.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -228,12 +228,12 @@ export async function getUserInfoLoginProfile(userId: string) {
   const koc = koClient(),
     result = await koc.client.query(queryUserInfoLoginProfile, {
       gid: gid('user', userId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'User') {
-    return result.data?.node
+    return result.data?.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -245,12 +245,12 @@ export async function getUserInfoIdentities(userId: string) {
   const koc = koClient(),
     result = await koc.client.query(queryUserInfoIdentities, {
       gid: gid('user', userId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'User') {
-    return result.data?.node
+    return result.data?.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -262,12 +262,12 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
   const koc = koClient(),
     result = await koc.client.query(queryUserInfoLoginProfileIdentities, {
       gid: gid('user', userId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'User') {
-    return result.data?.node
+    return result.data?.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -281,13 +281,13 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
     result = await koc.client.mutation(
       userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
       rootOrgID: rootOrgID,
-      input
-    }).toPromise()
+      input,
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data?.action
+    return result.data?.action;
   }
-  return null
+  return null;
 }
 
 
@@ -303,12 +303,12 @@ export async function updateUserInfo(userId: string, input: UpdateUserInput) {
       mutationUpdateUser, {
       userId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -323,12 +323,12 @@ export async function updateUserProfile(userId: string, input: UpdateUserLoginPr
       mutationUpdateUserLoginProfile, {
       userId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -342,12 +342,12 @@ export async function bindUserIdentity(input: CreateUserIdentityInput) {
     result = await koc.client.mutation(
       mutationBindUserIdentity, {
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -360,12 +360,12 @@ export async function delUserIdentity(identityId: string) {
     result = await koc.client.mutation(
       mutationDelUserIdentity, {
       identityId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -378,12 +378,12 @@ export async function delUserInfo(userId: string) {
     result = await koc.client.mutation(
       mutationDelUser, {
       userId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -396,12 +396,12 @@ export async function resetUserPasswordByEmail(userId: string) {
     result = await koc.client.mutation(
       mutationResetUserPwdEmail, {
       userId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -416,12 +416,12 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
       mutationChangePwd, {
       oldPwd,
       newPwd,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result?.data?.action
+    return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 
@@ -435,12 +435,12 @@ export async function enableMFA(userId: string) {
     result = await koc.client.mutation(
       mutationEnableMfa, {
       userId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -453,12 +453,12 @@ export async function disableMFA(userId: string) {
     result = await koc.client.mutation(
       mutationDisableMfa, {
       userId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -471,12 +471,12 @@ export async function sendMFAEmail(userId: string) {
     result = await koc.client.mutation(
       mutationSendMfaEmail, {
       userId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 
@@ -490,12 +490,12 @@ export async function checkPermission(permission: string) {
     result = await koc.client.query(
       queryCheckPermission, {
       permission,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 
@@ -504,17 +504,17 @@ export async function checkPermission(permission: string) {
  * @param where
  * @returns
  */
-export async function userPermissions(where: AppActionWhereInput) {
-  const koc = koClient(),
+export async function userPermissions(where: AppActionWhereInput, headers?: Record<string, any>) {
+  const koc = koClient(headers),
     result = await koc.client.query(
       queryUserPermissionList, {
-      where
-    }).toPromise()
+      where,
+    }).toPromise();
 
   if (result.data?.list) {
     return result?.data?.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -527,12 +527,12 @@ export async function userMenus(appCode: string) {
     result = await koc.client.query(
       queryUserMenuList, {
       appCode,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.list) {
     return result?.data?.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -541,11 +541,11 @@ export async function userMenus(appCode: string) {
  */
 export async function userRootOrgs() {
   const koc = koClient(),
-    result = await koc.client.query(queryUserRootOrgList, {}).toPromise()
+    result = await koc.client.query(queryUserRootOrgList, {}).toPromise();
   if (result.data?.list) {
     return result?.data?.list;
   }
-  return null
+  return null;
 }
 
 
@@ -556,10 +556,10 @@ export async function userRootOrgs() {
  * @returns
  */
 export async function getRecycleUserList(gather: {
-  current?: number
-  pageSize?: number
-  where?: UserWhereInput
-  orderBy?: UserOrder
+  current?: number;
+  pageSize?: number;
+  where?: UserWhereInput;
+  orderBy?: UserOrder;
 }) {
   const koc = koClient(),
     result = await koc.client.query(queryOrgRecycleUserList, {
@@ -567,12 +567,12 @@ export async function getRecycleUserList(gather: {
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.list) {
     return result?.data?.list;
   }
-  return null
+  return null;
 }
 
 
@@ -585,7 +585,7 @@ export async function restoreRecycleUser(
   userId: string,
   userInput: UpdateUserInput,
   setKind: UserLoginProfileSetKind,
-  pwdInput?: CreateUserPasswordInput
+  pwdInput?: CreateUserPasswordInput,
 ) {
   const koc = koClient(),
     result = await koc.client.mutation(
@@ -594,10 +594,10 @@ export async function restoreRecycleUser(
       setKind,
       userInput,
       pwdInput,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }

@@ -1,4 +1,4 @@
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { getRecycleUserList } from '@/services/user';
 import store from '@/store';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
@@ -70,13 +70,13 @@ export default () => {
     });
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as User[], success: true, total: 0 },
         where: UserWhereInput = {};
-      let orderBy: UserOrder | undefined = undefined;
-      where.displayNameContains = params.displayNameContains
-      where.emailContains = params.emailContains
-      where.mobileContains = params.mobileContains
+      let orderBy: UserOrder | undefined;
+      where.displayNameContains = params.displayNameContains;
+      where.emailContains = params.emailContains;
+      where.mobileContains = params.mobileContains;
       const result = await getRecycleUserList({
         current: params.current,
         pageSize: params.pageSize,

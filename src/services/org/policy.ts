@@ -16,14 +16,14 @@ const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$fir
       }
     }
   }
-}`)
+}`);
 const queryOrgPolicyListNum = gql(/* GraphQL */`query orgPolicyListNum($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
     ... on Org{
       list:policies(first:$first,orderBy: $orderBy,where: $where){ totalCount }
     }
   }
-}`)
+}`);
 
 const queryOrgPolicyListAndIsGrantUser = gql(/* GraphQL */`query orgPolicyListAndIsGrantUser($gid: GID!,$userId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
@@ -39,7 +39,7 @@ const queryOrgPolicyListAndIsGrantUser = gql(/* GraphQL */`query orgPolicyListAn
       }
     }
   }
-}`)
+}`);
 
 const queryOrgPolicyListAndIsGrantRole = gql(/* GraphQL */`query orgPolicyListAndIsGrantRole($gid: GID!,$roleId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
@@ -55,7 +55,7 @@ const queryOrgPolicyListAndIsGrantRole = gql(/* GraphQL */`query orgPolicyListAn
       }
     }
   }
-}`)
+}`);
 
 const queryOrgPolicyInfo = gql(/* GraphQL */`query orgPolicyInfo($gid:GID!){
   node(id:$gid){
@@ -64,27 +64,27 @@ const queryOrgPolicyInfo = gql(/* GraphQL */`query orgPolicyInfo($gid:GID!){
       rules{ effect,actions,resources,conditions }
     }
   }
-}`)
+}`);
 
 const mutationCreateOrgPolicy = gql(/* GraphQL */`mutation createOrgPolicy($input: CreateOrgPolicyInput!){
   action:createOrganizationPolicy(input:$input){id}
-}`)
+}`);
 
 const mutationUpdateOrgPolicy = gql(/* GraphQL */`mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){
   action:updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}
-}`)
+}`);
 
 const mutationDelOrgPolicy = gql(/* GraphQL */`mutation deleteOrgPolicy($orgPolicyId:ID!){
   action:deleteOrganizationPolicy(orgPolicyID:$orgPolicyId)
-}`)
+}`);
 
 const mutationAssignOrgAppPolicy = gql(/* GraphQL */`mutation assignOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){
   action:assignOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
-}`)
+}`);
 
 const mutationRevOrgAppPolicy = gql(/* GraphQL */`mutation revokeOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){
   action:revokeOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
-}`)
+}`);
 
 
 /**
@@ -95,10 +95,10 @@ const mutationRevOrgAppPolicy = gql(/* GraphQL */`mutation revokeOrgAppPolicy($o
 export async function getOrgPolicyList(
   orgId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: OrgPolicyWhereInput
-    orderBy?: OrgPolicyOrder
+    current?: number;
+    pageSize?: number;
+    where?: OrgPolicyWhereInput;
+    orderBy?: OrgPolicyOrder;
   },
   isGrant?: {
     roleId?: string;
@@ -114,7 +114,7 @@ export async function getOrgPolicyList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
+    url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise() : isGrant?.userId ? await koc.client.query(
     queryOrgPolicyListAndIsGrantUser, {
     gid: gid('org', orgId),
@@ -123,7 +123,7 @@ export async function getOrgPolicyList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
+    url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise() : await koc.client.query(
     queryOrgPolicyList, {
     gid: gid('org', orgId),
@@ -131,13 +131,13 @@ export async function getOrgPolicyList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
-  }).toPromise()
+    url: `${koc.url}?p=${gather.current || 1}`,
+  }).toPromise();
 
-  if (result.data?.node?.__typename === "Org") {
-    return result.data.node.list
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -151,12 +151,12 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
     result = await koc.client.query(
       queryOrgPolicyInfo, {
       gid: gid('org_policy', orgPolicyId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'OrgPolicy') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 
@@ -170,12 +170,12 @@ export async function createOrgPolicy(input: CreateOrgPolicyInput) {
     result = await koc.client.mutation(
       mutationCreateOrgPolicy, {
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -190,12 +190,12 @@ export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolic
       mutationUpdateOrgPolicy, {
       orgPolicyId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -208,12 +208,12 @@ export async function delOrgPolicy(orgPolicyId: string) {
     result = await koc.client.mutation(
       mutationDelOrgPolicy, {
       orgPolicyId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -229,12 +229,12 @@ export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
       mutationAssignOrgAppPolicy, {
       orgId,
       appPolicyId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -249,12 +249,12 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
       mutationRevOrgAppPolicy, {
       orgId,
       appPolicyId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -270,10 +270,10 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
       queryOrgPolicyListNum, {
       gid: gid('org', orgId),
       where,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list.totalCount
+    return result.data.node.list.totalCount;
   }
-  return 0
+  return 0;
 }

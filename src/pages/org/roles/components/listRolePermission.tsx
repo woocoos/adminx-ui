@@ -2,7 +2,7 @@
 import { ActionType, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { delPermssion, getOrgPermissionList } from '@/services/permission';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
@@ -90,7 +90,7 @@ export default (props: {
   }
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as Permission[], success: true, total: 0 },
         where: PermissionWhereInput = {};
       if (props.orgRoleInfo.orgID) {

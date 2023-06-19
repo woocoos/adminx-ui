@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/app';
 import CreateAppAction from './components/create';
 import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/app/action';
@@ -94,18 +94,18 @@ const AppActionList = (props: {
         const result = await getAppInfo(appId);
         if (result?.id) {
           setAppInfo(result as App);
-          return result
+          return result;
         }
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as AppAction[], success: true, total: 0 },
         where: AppActionWhereInput = {},
         info = appInfo?.id === appId ? appInfo : await getApp();
-      where.nameContains = params.nameContains
-      where.kind = params.kind
-      where.method = params.method
+      where.nameContains = params.nameContains;
+      where.kind = params.kind;
+      where.method = params.method;
       if (info) {
         const result = await getAppActionList(info.id, {
           current: params.current,

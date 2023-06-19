@@ -53,7 +53,7 @@ export default (props: {
             arnParams,
             allArn: props.orgId ? arn.replace(':tenant_id:', `:${props.orgId}:`) : arn,
           };
-        }) || []
+        }) || [];
 
         setDataSource(list);
       }

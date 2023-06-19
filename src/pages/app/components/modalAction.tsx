@@ -3,7 +3,7 @@ import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/serv
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useState } from 'react';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { AppAction, AppActionWhereInput } from '@/__generated__/graphql';
 
 export default (props: {
@@ -35,12 +35,12 @@ export default (props: {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as AppAction[], success: true, total: 0 },
         where: AppActionWhereInput = {};
-      where.nameContains = params.nameContains
-      where.kind = params.kind
-      where.method = params.method
+      where.nameContains = params.nameContains;
+      where.kind = params.kind;
+      where.method = params.method;
       const result = await getAppActionList(props.appId, {
         current: params.current,
         pageSize: params.pageSize,

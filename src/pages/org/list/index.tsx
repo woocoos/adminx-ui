@@ -2,7 +2,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/org';
 import OrgCreate from './components/create';
@@ -161,14 +161,14 @@ const OrgList = (props: {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as Org[], success: true, total: 0 },
         where: OrgWhereInput = {};
       setExpandedRowKeys([]);
       if (props.appId) {
-        where.nameContains = params.name
-        where.codeContains = params.code
-        where.kind = params.kind
+        where.nameContains = params.name;
+        where.codeContains = params.code;
+        where.kind = params.kind;
         const data = await getAppOrgList(props.appId, {
           current: params.current,
           pageSize: params.pageSize,
@@ -187,7 +187,7 @@ const OrgList = (props: {
             table.total = list.length;
           }
         } else {
-          where.kind = props.kind
+          where.kind = props.kind;
           const result = await getOrgList({
             pageSize: 999,
             where,

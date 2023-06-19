@@ -69,7 +69,7 @@ export default (props: {
               description={`${t('confirm_delete')}?`}
               onConfirm={async () => {
                 setIsAction(true);
-                const reulst = await delUserIdentity(record.id)
+                const reulst = await delUserIdentity(record.id);
                 if (reulst === true) {
                   message.success(t('submit_success'));
                   proTableRef.current?.reload();

@@ -12,9 +12,9 @@ import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { Org, PolicyRule } from '@/__generated__/graphql';
 
 type ProFormData = {
-  name: string
-  comments: string
-}
+  name: string;
+  comments: string;
+};
 
 export default () => {
   const { token } = useToken(),
@@ -115,7 +115,7 @@ export default () => {
           rules,
         });
         if (result?.id) {
-          id = result.id
+          id = result.id;
         }
       } else {
         const result = await createOrgPolicy({
@@ -125,7 +125,7 @@ export default () => {
           orgID: orgInfo?.id || '',
         });
         if (result?.id) {
-          id = result.id
+          id = result.id;
         }
       }
 

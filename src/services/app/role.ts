@@ -12,7 +12,7 @@ const queryAppRoleList = gql(/* GraphQL */`query appRoleList($gid:GID!){
       }
     }
   }
-}`)
+}`);
 
 const queryAppRoleInfo = gql(/* GraphQL */`query appRoleInfo($gid:GID!){
   node(id:$gid){
@@ -21,7 +21,7 @@ const queryAppRoleInfo = gql(/* GraphQL */`query appRoleInfo($gid:GID!){
       app{ id,name,code }
     }
   }
-}`)
+}`);
 
 const queryAppRoleInfoPolicieList = gql(/* GraphQL */`query appRoleInfoPolicieList($gid:GID!){
   node(id:$gid){
@@ -34,28 +34,27 @@ const queryAppRoleInfoPolicieList = gql(/* GraphQL */`query appRoleInfoPolicieLi
       }
     }
   }
-}`)
+}`);
 
 const mutationCreateAppRole = gql(/* GraphQL */`mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){
   action:createAppRole(appID:$appId,input:$input){id}
-}`)
+}`);
 
 const mutationUpdateAppRole = gql(/* GraphQL */`mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){
   action:updateAppRole(roleID:$appRoleId,input:$input){id}
-}`)
+}`);
 
 const mutationDelAppRole = gql(/* GraphQL */`mutation delAppRole($appRoleId:ID!){
   action:deleteAppRole(roleID: $appRoleId)
-}`)
+}`);
 
 const mutationAssignAppRolePolicy = gql(/* GraphQL */`mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){
   action:assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
-}`)
+}`);
 
 const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){
   action:revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
-}`)
-
+}`);
 
 
 /**
@@ -68,12 +67,12 @@ export async function getAppRoleList(appId: string) {
     result = await koc.client.query(
       queryAppRoleList, {
       gid: gid('app', appId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -87,12 +86,12 @@ export async function getAppRoleInfo(appRoleId: string) {
     result = await koc.client.query(
       queryAppRoleInfo, {
       gid: gid('app_role', appRoleId),
-    }).toPromise()
+    }).toPromise();
 
-  if (result.data?.node?.__typename === "AppRole") {
-    return result.data.node
+  if (result.data?.node?.__typename === 'AppRole') {
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -105,12 +104,12 @@ export async function getAppRoleInfoPolicieList(appRoleId: string) {
     result = await koc.client.query(
       queryAppRoleInfoPolicieList, {
       gid: gid('app_role', appRoleId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'AppRole') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 
@@ -125,12 +124,12 @@ export async function createAppRole(appId: string, input: CreateAppRoleInput) {
       mutationCreateAppRole, {
       appId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -145,12 +144,12 @@ export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput
       mutationUpdateAppRole, {
       appRoleId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -163,12 +162,12 @@ export async function delAppRole(appRoleId: string) {
     result = await koc.client.mutation(
       mutationDelAppRole, {
       appRoleId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -186,12 +185,12 @@ export async function assignAppRolePolicy(appId: string, appRoleId: string, appP
       appRoleId,
       appId,
       policyIds: appPolicyIDs,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -208,10 +207,10 @@ export async function revokeAppRolePolicy(appId: string, appRoleId: string, appP
       appRoleId,
       appId,
       policyIds: appPolicyIDs,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }

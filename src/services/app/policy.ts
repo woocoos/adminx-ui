@@ -23,7 +23,7 @@ const queryAppPolicieList = gql(/* GraphQL */`query appPolicieList($gid:GID!){
       }
     }
   }
-}`)
+}`);
 
 const queryAppPolicieListAndIsGrant = gql(/* GraphQL */`query appPolicieListAndIsGrant($gid:GID!,$appRoleId:ID!){
   node(id:$gid){
@@ -35,7 +35,7 @@ const queryAppPolicieListAndIsGrant = gql(/* GraphQL */`query appPolicieListAndI
       }
     }
   }
-}`)
+}`);
 
 const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
   node(id:$gid){
@@ -45,19 +45,19 @@ const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
       app{ id,name }
     }
   }
-}`)
+}`);
 
 const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){
   action:createAppPolicy(appID:$appId,input:$input){id}
-}`)
+}`);
 
 const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){
   action:updateAppPolicy(policyID:$appPolicyId,input:$input){id}
-}`)
+}`);
 
 const mutationDelAppPolicy = gql(/* GraphQL */`mutation delAppPolicy($appPolicyId:ID!){
   action:deleteAppPolicy(policyID: $appPolicyId)
-}`)
+}`);
 
 /**
  * 获取应用权限
@@ -78,12 +78,12 @@ export async function getAppPolicyList(
     }).toPromise() : await koc.client.query(
       queryAppPolicieList, {
       gid: gid('app', appId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -92,17 +92,17 @@ export async function getAppPolicyList(
  * @param appPolicyId
  * @returns
  */
-export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<'app'>) {
+export async function getAppPolicyInfo(appPolicyId: string) {
   const koc = koClient(),
     result = await koc.client.query(
       queryAppPolicyInfo, {
       gid: gid('app_policy', appPolicyId),
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'AppPolicy') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 
@@ -117,12 +117,12 @@ export async function createAppPolicy(appId: string, input: CreateAppPolicyInput
       mutationCreateAppPolicy, {
       appId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -138,12 +138,12 @@ export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolic
       mutationUpdateAppPolicy, {
       appPolicyId,
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -156,10 +156,10 @@ export async function delAppPolicy(appPolicyId: string) {
     result = await koc.client.mutation(
       mutationDelAppPolicy, {
       appPolicyId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }

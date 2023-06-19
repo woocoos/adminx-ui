@@ -5,7 +5,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { getOrgPolicyList } from '@/services/org/policy';
 import { createPermission } from '@/services/permission';
 import { useTranslation } from 'react-i18next';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/__generated__/graphql';
 
@@ -33,7 +33,7 @@ export default (props: {
   setLeavePromptWhen(saveDisabled);
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as OrgPolicy[], success: true, total: 0 },
         where: OrgPolicyWhereInput = {};
       if (keyword) {

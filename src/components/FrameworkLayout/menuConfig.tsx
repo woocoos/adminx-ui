@@ -97,7 +97,7 @@ export const userMenuList = async () => {
     if (process.env.ICE_APP_CODE) {
       const menus = await userMenus(process.env.ICE_APP_CODE);
       if (menus) {
-        const menuList: MenuDataItem[] = []
+        const menuList: MenuDataItem[] = [];
         menus.forEach(item => {
           if (item) {
             const data: MenuDataItem = {
@@ -109,7 +109,7 @@ export const userMenuList = async () => {
             if (item.route) {
               data.path = item.route;
             }
-            menuList.push(data)
+            menuList.push(data);
           }
         });
         list.push(...formatTreeData(menuList, undefined, { key: 'id' }));

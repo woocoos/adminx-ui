@@ -5,10 +5,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProFormData = {
-  name: string
-  typeName?: string
-  arnPattern?: string
-}
+  name: string;
+  typeName?: string;
+  arnPattern?: string;
+};
 
 export default (props: {
   open: boolean;

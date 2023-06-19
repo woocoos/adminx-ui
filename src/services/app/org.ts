@@ -19,7 +19,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
       }
     }
   }
-}`)
+}`);
 
 const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToOrgList($appRoleId:ID!,$where: OrgWhereInput){
   list:appRoleAssignedToOrgs(roleID:$appRoleId,where:$where){
@@ -27,7 +27,7 @@ const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToO
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,
     owner { id,displayName }
   }
-}`)
+}`);
 
 const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssignedToOrgList($appPolicyId:ID!,$where: OrgWhereInput){
   list:appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
@@ -35,7 +35,7 @@ const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssigne
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,
     owner { id,displayName }
   }
-}`)
+}`);
 
 const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPolicyAssignedToOrgListAndIsGrant($appPolicyId:ID!,$appPolicyIdToIsAllow:ID!,$where: OrgWhereInput){
   list:appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
@@ -44,7 +44,7 @@ const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPol
     owner { id,displayName }
     isAllowRevokeAppPolicy(appPolicyID: $appPolicyIdToIsAllow)
   }
-}`)
+}`);
 
 /**
  * 获取应用授权的组织列表
@@ -57,10 +57,10 @@ const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPol
 export async function getAppOrgList(
   appId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: OrgWhereInput
-    orderBy?: OrgOrder
+    current?: number;
+    pageSize?: number;
+    where?: OrgWhereInput;
+    orderBy?: OrgOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(
@@ -70,13 +70,13 @@ export async function getAppOrgList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 
@@ -94,12 +94,12 @@ export async function getAppRoleAssignedOrgList(
       queryAppRoleAssignedToOrgList, {
       appRoleId,
       where,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.list) {
-    return result.data.list
+    return result.data.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -124,10 +124,10 @@ export async function getAppPolicyAssignedOrgList(
       queryAppPolicyAssignedToOrgList, {
       appPolicyId,
       where,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.list) {
-    return result.data.list
+    return result.data.list;
   }
-  return null
+  return null;
 }

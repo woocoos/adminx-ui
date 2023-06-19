@@ -2,7 +2,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Dropdown, Modal, Alert } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppInfo } from '@/services/app';
 import CreateAppRole from './components/create';
@@ -125,12 +125,12 @@ export default () => {
         const result = await getAppInfo(appId);
         if (result?.id) {
           setAppInfo(result as App);
-          return result
+          return result;
         }
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as AppRole[], success: true, total: 0 },
         info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
       if (info) {

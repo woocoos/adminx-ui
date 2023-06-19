@@ -17,13 +17,13 @@ type SelectTreeData = {
 };
 
 type ProFormData = {
-  name: string
-  parentID: string
-  domain?: string
-  countryCode?: string
-  owner?: User
-  profile?: string
-}
+  name: string;
+  parentID: string;
+  domain?: string;
+  countryCode?: string;
+  owner?: User;
+  profile?: string;
+};
 
 export default (props: {
   open?: boolean;
@@ -54,7 +54,7 @@ export default (props: {
           pageSize: 999,
           where: {
             kind: props.kind,
-          }
+          },
         });
         if (data?.totalCount) {
           result.push(...(data.edges?.map(item => item?.node) as Org[] || []));

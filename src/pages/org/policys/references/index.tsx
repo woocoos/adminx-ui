@@ -66,14 +66,14 @@ export default () => {
         const info = orgPolicyInfo?.id == orgPolicyId ? orgPolicyInfo : await getOrgPolicyInfo(orgPolicyId);
         if (info?.id) {
           setOrgPolicy(info as OrgPolicy);
-          const where: PermissionWhereInput = {}
+          const where: PermissionWhereInput = {};
           if (params.keyword) {
             where.or = [
               { hasRoleWith: [{ nameContains: params.keyword }] },
               { hasUserWith: [{ displayNameContains: params.keyword }] },
             ];
           }
-          where.principalKindIn = filter.principalKind as PermissionPrincipalKind[] | null
+          where.principalKindIn = filter.principalKind as PermissionPrincipalKind[] | null;
           const result = await getOrgPolicyReferenceList(orgPolicyId, {
             current: params.current,
             pageSize: params.pageSize,

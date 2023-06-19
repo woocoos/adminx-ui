@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Alert, message } from 'antd';
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import CreateOrgRole from './components/create';
 import { delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
@@ -133,7 +133,7 @@ const PageOrgRoleList = (props: {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as OrgRole[], success: true, total: 0 },
         where: OrgRoleWhereInput = {};
       where.kind = kind;
@@ -310,7 +310,7 @@ export default () => {
     [searchParams] = useSearchParams(),
     orgId = searchParams.get('id') || basisState.tenantId;
 
-  return (<KeepAlive clearAlive={true}>
+  return (<KeepAlive clearAlive>
     <OrgRoleList orgId={orgId} />
   </KeepAlive>);
 };

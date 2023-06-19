@@ -28,7 +28,7 @@ const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($or
       }
     }
   }
-}`)
+}`);
 
 const queryOrgPrmissionList = gql(/* GraphQL */`query orgPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
   node(id:$gid){
@@ -47,7 +47,7 @@ const queryOrgPrmissionList = gql(/* GraphQL */`query orgPrmissionList($gid: GID
       }
     }
   }
-}`)
+}`);
 
 const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
   node(id:$gid){
@@ -66,7 +66,7 @@ const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: G
       }
     }
   }
-}`)
+}`);
 
 const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
   list:userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
@@ -81,7 +81,7 @@ const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupP
       }
     }
   }
-}`)
+}`);
 
 const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
   node(id:$gid){
@@ -93,19 +93,19 @@ const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
       user{ id,displayName }
     }
   }
-}`)
+}`);
 
 const mutationCreatePermission = gql(/* GraphQL */`mutation createPermission($input: CreatePermissionInput!){
   action:grant(input:$input){id}
-}`)
+}`);
 
 const mutationUpdatePermission = gql(/* GraphQL */`mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){
   action:updatePermission(permissionID:$permissionId,input:$input){id}
-}`)
+}`);
 
 const mutationDelPermission = gql(/* GraphQL */`mutation revoke($permissionId:ID!,$orgId:ID!){
   action:revoke(permissionID:$permissionId,orgID:$orgId)
-}`)
+}`);
 
 
 /**
@@ -116,10 +116,10 @@ const mutationDelPermission = gql(/* GraphQL */`mutation revoke($permissionId:ID
 export async function getOrgPolicyReferenceList(
   orgPolicyId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: PermissionWhereInput
-    orderBy?: PermissionOrder
+    current?: number;
+    pageSize?: number;
+    where?: PermissionWhereInput;
+    orderBy?: PermissionOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(queryOrgPolicyReferences, {
@@ -128,12 +128,12 @@ export async function getOrgPolicyReferenceList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.list.__typename === 'PermissionConnection') {
-    return result.data.list
+    return result.data.list;
   }
-  return null
+  return null;
 }
 
 
@@ -145,10 +145,10 @@ export async function getOrgPolicyReferenceList(
 export async function getOrgPermissionList(
   orgId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: PermissionWhereInput
-    orderBy?: PermissionOrder
+    current?: number;
+    pageSize?: number;
+    where?: PermissionWhereInput;
+    orderBy?: PermissionOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(queryOrgPrmissionList, {
@@ -157,12 +157,12 @@ export async function getOrgPermissionList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -173,10 +173,10 @@ export async function getOrgPermissionList(
 export async function getUserPermissionList(
   userId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: PermissionWhereInput
-    orderBy?: PermissionOrder
+    current?: number;
+    pageSize?: number;
+    where?: PermissionWhereInput;
+    orderBy?: PermissionOrder;
   }) {
   const koc = koClient(),
     result = await koc.client.query(queryUserPrmissionList, {
@@ -185,12 +185,12 @@ export async function getUserPermissionList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.node?.__typename === 'User') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -204,11 +204,11 @@ export async function getUserPermissionList(
 export async function getUserExtendGroupPolicyList(
   userId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: PermissionWhereInput
-    orderBy?: PermissionOrder
-  }
+    current?: number;
+    pageSize?: number;
+    where?: PermissionWhereInput;
+    orderBy?: PermissionOrder;
+  },
 ) {
   const koc = koClient(),
     result = await koc.client.query(queryUserExtendGroupPolicieList, {
@@ -217,12 +217,12 @@ export async function getUserExtendGroupPolicyList(
       where: gather.where,
       orderBy: gather.orderBy,
     }, {
-      url: `${koc.url}?p=${gather.current || 1}`
-    }).toPromise()
+      url: `${koc.url}?p=${gather.current || 1}`,
+    }).toPromise();
   if (result.data?.list) {
-    return result.data.list
+    return result.data.list;
   }
-  return null
+  return null;
 }
 
 
@@ -235,11 +235,11 @@ export async function getPermissionInfo(permissionId: string) {
   const koc = koClient(),
     result = await koc.client.query(queryPermissionInfo, {
       gid: gid('permission', permissionId),
-    }).toPromise()
+    }).toPromise();
   if (result.data?.node?.__typename === 'Permission') {
-    return result.data.node
+    return result.data.node;
   }
-  return null
+  return null;
 }
 
 /**
@@ -251,11 +251,11 @@ export async function createPermission(input: CreatePermissionInput) {
   const koc = koClient(),
     result = await koc.client.mutation(mutationCreatePermission, {
       input,
-    }).toPromise()
+    }).toPromise();
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -269,11 +269,11 @@ export async function updatePermission(permissionId: string, input: UpdatePermis
     result = await koc.client.mutation(mutationUpdatePermission, {
       input,
       permissionId,
-    }).toPromise()
+    }).toPromise();
   if (result.data?.action?.id) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }
 
 
@@ -288,9 +288,9 @@ export async function delPermssion(permissionId: string, orgId: string) {
     result = await koc.client.mutation(mutationDelPermission, {
       permissionId,
       orgId,
-    }).toPromise()
+    }).toPromise();
   if (result.data?.action) {
-    return result.data.action
+    return result.data.action;
   }
-  return null
+  return null;
 }

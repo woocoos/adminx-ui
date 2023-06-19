@@ -23,12 +23,12 @@ type TreeSelectedData = {
 };
 
 type ProFormData = {
-  name: string
-  kind: AppMenuKind
-  icon?: string
-  route?: string
-  comments?: string
-}
+  name: string;
+  kind: AppMenuKind;
+  icon?: string;
+  route?: string;
+  comments?: string;
+};
 
 export default () => {
   const { token } = useToken(),
@@ -48,7 +48,7 @@ export default () => {
       action: 'editor',
     }),
     [actionTitle, setActionTitle] = useState<string>(''),
-    [formFieldsValue, setFormFieldsValue] = useState<AppMenu>(),
+    [, setFormFieldsValue] = useState<AppMenu>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -115,14 +115,14 @@ export default () => {
         if (isInit) {
           setLoading(true);
         }
-        const appResult = await getAppInfo(id)
+        const appResult = await getAppInfo(id);
         if (appResult?.id) {
           setAppInfo(appResult as App);
           const result = await getAppMenus(appResult.id, {
             pageSize: 9999,
           });
           if (result?.totalCount) {
-            const menuList = result.edges?.map(item => item?.node) as AppMenu[]
+            const menuList = result.edges?.map(item => item?.node) as AppMenu[];
             setMenus(menuList);
             setTreeData(
               formatTreeData(
@@ -221,9 +221,9 @@ export default () => {
               kind: values.kind,
               name: values.name,
               route: values.kind === AppMenuKind.Menu ? values.route : null,
-            }, selectedTree.info))
+            }, selectedTree.info));
             if (result?.id) {
-              isTrue = true
+              isTrue = true;
             }
           } else {
             const input = {
@@ -234,9 +234,9 @@ export default () => {
               parentID: selectedTree.info?.parentID || 0,
               route: values.route,
             },
-              result = await createAppMenu(appInfo.id, input)
+              result = await createAppMenu(appInfo.id, input);
             if (result?.[0]?.id) {
-              isTrue = true
+              isTrue = true;
               editorMenuAction({
                 id: result[0].id,
                 ...input,
@@ -252,9 +252,9 @@ export default () => {
             parentID: Number(selectedTree.info?.id) || 0,
             route: values.route,
           },
-            result = await createAppMenu(appInfo.id, input)
+            result = await createAppMenu(appInfo.id, input);
           if (result?.[0]?.id) {
-            isTrue = true
+            isTrue = true;
             editorMenuAction({
               id: result[0].id,
               ...input,
@@ -269,9 +269,9 @@ export default () => {
             parentID: selectedTree.info?.parentID || 0,
             route: values.route,
           },
-            result = await createAppMenu(appInfo.id, input)
+            result = await createAppMenu(appInfo.id, input);
           if (result?.[0]?.id) {
-            isTrue = true
+            isTrue = true;
             editorMenuAction({
               id: result[0].id,
               ...input,

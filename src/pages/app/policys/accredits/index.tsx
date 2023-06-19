@@ -2,7 +2,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableSort, TableParams, TableFilter } from '@/services/graphql';
+import { TableParams } from '@/services/graphql';
 import { useSearchParams } from '@ice/runtime';
 import { getAppPolicyInfo } from '@/services/app/policy';
 import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/org/policy';
@@ -74,19 +74,19 @@ export default () => {
     getInfo = async () => {
       const appPolicyId = searchParams.get('id');
       if (appPolicyId) {
-        const restult = await getAppPolicyInfo(appPolicyId, ['app']);
+        const restult = await getAppPolicyInfo(appPolicyId);
         if (restult?.id) {
           setAppPolicyInfo(restult as AppPolicy);
-          return restult
+          return restult;
         }
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
+    getRequest = async (params: TableParams) => {
       const table = { data: [] as Org[], success: true, total: 0 },
         where: OrgWhereInput = {},
         info = searchParams.get('id') == appPolicyInfo?.id ? appPolicyInfo : await getInfo();
-      where.nameContains = params.nameContains
+      where.nameContains = params.nameContains;
       if (info) {
         const result = await getAppPolicyAssignedOrgList(info.id, where, {
           appPolicyId: info.id,

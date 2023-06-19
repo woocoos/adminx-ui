@@ -7,11 +7,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProFormData = {
-  name: string
-  autoGrant: boolean
-  editable: boolean
-  comments: string
-}
+  name: string;
+  autoGrant: boolean;
+  editable: boolean;
+  comments: string;
+};
 
 export default (props: {
   open?: boolean;
@@ -40,7 +40,7 @@ export default (props: {
       if (props.id) {
         const info = await getAppRoleInfo(props.id);
         if (info?.id) {
-          setAppRoleInfo(info as AppRole)
+          setAppRoleInfo(info as AppRole);
           return info;
         }
       }
@@ -61,9 +61,9 @@ export default (props: {
           comments: values.comments,
           editable: values.editable,
           name: values.name,
-        }, appRoleInfo || {}))
+        }, appRoleInfo || {}));
         if (result?.id) {
-          isTrue = true
+          isTrue = true;
         }
       } else {
         if (props?.appId) {
@@ -75,7 +75,7 @@ export default (props: {
             name: values.name,
           });
           if (result?.id) {
-            isTrue = true
+            isTrue = true;
           }
         }
       }

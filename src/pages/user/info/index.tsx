@@ -26,7 +26,7 @@ export default () => {
       if (basisState.user?.id) {
         const result = await getUserInfo(basisState.user.id);
         if (result?.id) {
-          setUserInfo(result as User)
+          setUserInfo(result as User);
           return result;
         }
       }

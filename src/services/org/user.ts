@@ -19,7 +19,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
       }
     }
   }
-}`)
+}`);
 
 const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrgRole($gid: GID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
@@ -38,7 +38,7 @@ const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrg
       }
     }
   }
-}`)
+}`);
 
 const queryOrgRoleUserList = gql(/* GraphQL */`query orgRoleUserList($roleId: ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   list:orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){
@@ -50,7 +50,7 @@ const queryOrgRoleUserList = gql(/* GraphQL */`query orgRoleUserList($roleId: ID
       }
     }
   }
-}`)
+}`);
 
 const queryOrgRoleUserListAndIsOrgRole = gql(/* GraphQL */`query orgRoleUserListAndIsOrgRole($roleId: ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   list:orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){
@@ -64,7 +64,7 @@ const queryOrgRoleUserListAndIsOrgRole = gql(/* GraphQL */`query orgRoleUserList
       }
     }
   }
-}`)
+}`);
 
 const queryOrgUserNum = gql(/* GraphQL */`query orgUserNum($gid:GID!,$where:UserWhereInput){
   node(id:$gid){
@@ -73,15 +73,15 @@ const queryOrgUserNum = gql(/* GraphQL */`query orgUserNum($gid:GID!,$where:User
       list:users(where: $where){ totalCount }
     }
   }
-}`)
+}`);
 
 const mutationAllotOrgUser = gql(/* GraphQL */`mutation allotOrgUser($input:CreateOrgUserInput!){
   action:allotOrganizationUser(input:$input)
-}`)
+}`);
 
 const mutationRemoveOrgUser = gql(/* GraphQL */`mutation removeOrgUser($orgId:ID!,$userId:ID!){
   action:removeOrganizationUser(orgID: $orgId,userID: $userId)
-}`)
+}`);
 
 /**
  * 组织下的用户信息
@@ -91,10 +91,10 @@ const mutationRemoveOrgUser = gql(/* GraphQL */`mutation removeOrgUser($orgId:ID
 export async function getOrgUserList(
   orgId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: UserWhereInput
-    orderBy?: UserOrder
+    current?: number;
+    pageSize?: number;
+    where?: UserWhereInput;
+    orderBy?: UserOrder;
   },
   isGrant?: {
     orgRoleId?: string;
@@ -109,7 +109,7 @@ export async function getOrgUserList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
+    url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise() : await koc.client.query(
     queryOrgUserList, {
     gid: gid('org', orgId),
@@ -117,13 +117,13 @@ export async function getOrgUserList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
+    url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list
+    return result.data.node.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -137,10 +137,10 @@ export async function getOrgUserList(
 export async function getOrgRoleUserList(
   roleId: string,
   gather: {
-    current?: number
-    pageSize?: number
-    where?: UserWhereInput
-    orderBy?: UserOrder
+    current?: number;
+    pageSize?: number;
+    where?: UserWhereInput;
+    orderBy?: UserOrder;
   },
   isGrant?: {
     orgRoleId?: string;
@@ -155,7 +155,7 @@ export async function getOrgRoleUserList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
+    url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise() : await koc.client.query(
     queryOrgRoleUserList, {
     roleId,
@@ -163,13 +163,13 @@ export async function getOrgRoleUserList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, {
-    url: `${koc.url}?p=${gather.current || 1}`
+    url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise();
 
   if (result.data?.list) {
-    return result.data?.list
+    return result.data?.list;
   }
-  return null
+  return null;
 }
 
 /**
@@ -182,12 +182,12 @@ export async function allotOrgUser(input: CreateOrgUserInput) {
     result = await koc.client.mutation(
       mutationAllotOrgUser, {
       input,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -202,12 +202,12 @@ export async function removeOrgUser(orgId: string, userId: string) {
       mutationRemoveOrgUser, {
       orgId,
       userId,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.action) {
     return result?.data?.action;
   }
-  return null
+  return null;
 }
 
 /**
@@ -222,11 +222,10 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
       queryOrgUserNum, {
       gid: gid('org', orgId),
       where,
-    }).toPromise()
+    }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
     return result?.data?.node.list.totalCount;
   }
-  return 0
-
+  return 0;
 }

@@ -202,7 +202,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as User[], success: true, total: 0 },
         where: UserWhereInput = {};
-      let orderBy: UserOrder | undefined = undefined;
+      let orderBy: UserOrder | undefined;
       where.userType = props.userType;
       where.principalNameContains = params.principalNameContains;
       where.displayNameContains = params.displayNameContains;
@@ -212,8 +212,8 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       if (sort.createdAt) {
         orderBy = {
           direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
-          field: UserOrderField.CreatedAt
-        }
+          field: UserOrderField.CreatedAt,
+        };
       }
       if (props.orgRole) {
         const result = await getOrgRoleUserList(props.orgRole.id, {
@@ -260,7 +260,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
       Modal.confirm({
         title: `${t('reset_pwd')} ${record.displayName}`,
         content: <>
-          <div>{t("reset_pwd_confirm_content_1")}</div>
+          <div>{t('reset_pwd_confirm_content_1')}</div>
           <div>{t('reset_pwd_confirm_content_2')}</div>
         </>,
         onOk: async (close) => {
@@ -464,7 +464,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         scene="create"
         onClose={(isSuccess) => {
           if (isSuccess) {
-            proTableRef.current?.reload()
+            proTableRef.current?.reload();
           }
           setModal({ open: false, title: '', scene: modal.scene });
         }}
@@ -481,7 +481,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           userType={props.userType}
           onClose={(isSuccess) => {
             if (isSuccess) {
-              proTableRef.current?.reload()
+              proTableRef.current?.reload();
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
@@ -497,7 +497,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           userInfo={modal.data}
           onClose={(isSuccess) => {
             if (isSuccess) {
-              proTableRef.current?.reload()
+              proTableRef.current?.reload();
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
@@ -511,7 +511,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           title={modal.title}
           onClose={(isSuccess) => {
             if (isSuccess) {
-              proTableRef.current?.reload()
+              proTableRef.current?.reload();
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
