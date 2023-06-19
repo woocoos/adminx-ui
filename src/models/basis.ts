@@ -1,8 +1,7 @@
 import { createModel, history } from 'ice';
-
 import { LoginRes } from '@/services/basis';
-import { User } from '@/services/user';
 import { setItem, removeItem } from '@/pkg/localStore';
+import { User } from '@/__generated__/graphql';
 
 type BasisUserState = {
   id: string;

@@ -4,13 +4,13 @@ import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { useSearchParams } from '@ice/runtime';
-import { AppPolicy, getAppPolicyInfo } from '@/services/app/policy';
-import { Org } from '@/services/org';
+import { getAppPolicyInfo } from '@/services/app/policy';
 import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/org/policy';
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppPolicyAssignedOrgList } from '@/services/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
+import { AppPolicy, Org, OrgWhereInput } from '@/__generated__/graphql';
 
 
 export default () => {
@@ -72,25 +72,27 @@ export default () => {
 
   const
     getInfo = async () => {
-      let info: AppPolicy | null = null,
-        appPolicyId = searchParams.get('id');
+      const appPolicyId = searchParams.get('id');
       if (appPolicyId) {
-        info = await getAppPolicyInfo(appPolicyId, ['app']);
-        if (info?.id) {
-          setAppPolicyInfo(info);
+        const restult = await getAppPolicyInfo(appPolicyId, ['app']);
+        if (restult?.id) {
+          setAppPolicyInfo(restult as AppPolicy);
+          return restult
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as Org[], success: true, total: 0 },
+        where: OrgWhereInput = {},
         info = searchParams.get('id') == appPolicyInfo?.id ? appPolicyInfo : await getInfo();
+      where.nameContains = params.nameContains
       if (info) {
-        const result = await getAppPolicyAssignedOrgList(info.id, params, filter, sort, {
+        const result = await getAppPolicyAssignedOrgList(info.id, where, {
           appPolicyId: info.id,
         });
         if (result) {
-          table.data = result;
+          table.data = result as Org[];
           table.total = result.length;
         }
       }
@@ -170,7 +172,7 @@ export default () => {
         open={modal.open}
         title={t('search_org')}
         tableTitle={`${t('app')}：${appPolicyInfo?.app?.name} ${t('auth_org_list', { field: t('auth_org') })}`}
-        appId={appPolicyInfo?.appID}
+        appId={appPolicyInfo?.appID || ''}
         onClose={async (selectData) => {
           const sdata = selectData?.[0];
           if (sdata && appPolicyInfo) {

@@ -1,38 +1,7 @@
 import { gid } from '@/util';
-import { List, TableFilter, TableParams, TableSort, TreeMoveAction, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from '../graphql';
-import { User, UserNodeField } from '../user';
-
-export type OrgStatus = 'active' | 'inactive' | 'processing';
-
-/**
- * root：组织
- * org:部门
- */
-export type OrgKind = 'root' | 'org';
-export interface Org {
-  id: string;
-  createdBy: number;
-  createdAt: Date;
-  updatedBy: number;
-  updatedAt: Date;
-  deletedAt: Date;
-  ownerID: string;
-  kind: OrgKind;
-  parentID: string;
-  domain: string;
-  code: string;
-  name: string;
-  profile: string;
-  status: OrgStatus;
-  path: string;
-  displaySort: number;
-  countryCode: string;
-  timezone: string;
-  parent?: Org;
-  owner?: User;
-  children?: Org[];
-  isAllowRevokeAppPolicy?: boolean;
-}
+import { koClient } from '../graphql';
+import { gql } from '@/__generated__';
+import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/__generated__/graphql';
 
 export const EnumOrgStatus = {
   active: { text: '活跃', status: 'success' },
@@ -44,15 +13,52 @@ export const EnumOrgStatus = {
     org: { text: '部门' },
   };
 
-export const OrgNodeField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-  domain,code,name,profile,status,path,displaySort,countryCode,timezone,
-  owner {
-    id,displayName
-    # 不知道为什么 undefined
-    # ${UserNodeField}
+const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
+  list:organizations(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+        domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+        owner { id,displayName }
+      }
+    }
   }
-`;
+}`)
+
+const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
+  node(id: $gid){
+    ... on Org{
+      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+      domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+      owner { id,displayName }
+    }
+  }
+}`)
+
+const mutationCreateRootOrg = gql(/* GraphQL */`mutation createRootOrg($input: CreateOrgInput!){
+  action:createRoot(input:$input){id}
+}`)
+
+const mutationUpdateOrg = gql(/* GraphQL */`mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){
+  action:updateOrganization(orgID:$orgId,input:$input){id}
+}`)
+
+const mutationCreateOrg = gql(/* GraphQL */`mutation createOrg($input: CreateOrgInput!){
+  action:createOrganization(input:$input){id}
+}`)
+
+const mutationEnableDirectory = gql(/* GraphQL */`mutation enableDirectory($input: EnableDirectoryInput!){
+  action:enableDirectory(input:$input){id}
+}`)
+
+const mutationDelOrg = gql(/* GraphQL */`mutation delOrg($orgId:ID!){
+  action:deleteOrganization(orgID: $orgId)
+}`)
+
+const mutationMoveOrg = gql(/* GraphQL */`mutation moveOrg($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
+  action:moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)
+}`)
 
 /**
  * 获取组织信息
@@ -61,35 +67,27 @@ export const OrgNodeField = `
  * @param sort
  * @returns
  */
-export async function getOrgList(params: TableParams, filter: TableFilter, sort: TableSort) {
-  if (Object.keys(sort).length === 0) {
-    sort.displaySort = 'ascend';
-  }
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query organizations($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
-        list:organizations(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${OrgNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize || 99,
-        where,
-        orderBy,
+export async function getOrgList(gather: {
+  current?: number
+  pageSize?: number
+  where?: OrgWhereInput
+  orderBy?: OrgOrder
+}) {
+  const koc = koClient(),
+    result = await koc.client.query(queryOrgList, {
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy || {
+        direction: OrderDirection.Asc,
+        field: OrgOrderField.DisplaySort,
       },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<Org>;
-  } else {
-    return null;
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.list.__typename === "OrgConnection") {
+    return result.data.list
   }
+  return null
 }
 
 /**
@@ -101,10 +99,16 @@ export async function getOrgPathList(orgId: string, kind: OrgKind) {
   const topOrg = await getOrgInfo(orgId),
     orgList: Org[] = [];
   if (topOrg?.id) {
-    orgList.push(topOrg);
-    const result = await getOrgList({ pathHasPrefix: `${topOrg.path}/`, kind: kind }, {}, {});
-    if (result?.edges) {
-      orgList.push(...result.edges.map(item => item.node));
+    orgList.push(topOrg as Org);
+    const result = await getOrgList({
+      pageSize: 9999,
+      where: {
+        pathHasPrefix: `${topOrg.path}/`,
+        kind: kind
+      }
+    });
+    if (result?.totalCount) {
+      orgList.push(...(result.edges?.map(item => item?.node) as Org[] || []));
     }
   }
   return orgList;
@@ -117,64 +121,50 @@ export async function getOrgPathList(orgId: string, kind: OrgKind) {
  * @returns
  */
 export async function getOrgInfo(orgId: string) {
-  const appGid = gid('org', orgId);
-  const result = await graphqlApi(
-    `query {
-      node(id:"${appGid}"){
-        ... on Org{
-          ${OrgNodeField}
-        }
-      }
-    }`);
-
-  if (result?.data?.node) {
-    return result?.data?.node as Org;
-  } else {
-    return null;
+  const koc = koClient(),
+    result = await koc.client.query(queryOrgInfo, {
+      gid: gid('org', orgId)
+    }).toPromise()
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node
   }
+  return null
 }
 
 /**
  * 更新组织信息
- * @param appId
+ * @param orgId
  * @param input
  * @returns
  */
-export async function updateOrgInfo(orgId: string, input: Org | Record<string, any>) {
-  delete input['code'];
-  delete input['domain'];
-  const result = await graphqlApi(
-    `mutation updateOrganization($input: UpdateOrgInput!){
-      action:updateOrganization(orgID:"${orgId}",input:$input){
-        ${OrgNodeField}
-      }
-    }`, { input: setClearInputField(input) });
-
-  if (result?.data?.action) {
-    return result?.data?.action as Org;
-  } else {
-    return null;
+export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationUpdateOrg, {
+      orgId,
+      input,
+    }).toPromise()
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
  * 创建组织信息
  * @param input
+ * @param kind
  * @returns
  */
-export async function createOrgInfo(input: Org, kind: OrgKind) {
-  const result = await graphqlApi(
-    `mutation createOrg($input: CreateOrgInput!){
-      action:${kind === 'root' ? 'createRoot' : 'createOrganization'}(input:$input){
-        ${OrgNodeField}
-      }
-    }`, { input });
-
-  if (result?.data?.action) {
-    return result?.data?.action as Org;
-  } else {
-    return null;
+export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      kind === OrgKind.Root ? mutationCreateRootOrg : mutationCreateOrg, {
+      input,
+    }).toPromise()
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -182,37 +172,31 @@ export async function createOrgInfo(input: Org, kind: OrgKind) {
  * @param input
  * @returns
  */
-export async function createRootOrgInfo(input: { domain: string; name: string }) {
-  const result = await graphqlApi(
-    `mutation enableDirectory($input: EnableDirectoryInput!){
-      action:enableDirectory(input:$input){
-        ${OrgNodeField}
-      }
-    }`, { input });
-
-  if (result?.data?.action) {
-    return result?.data?.action as Org;
-  } else {
-    return null;
+export async function createRootOrgInfo(input: EnableDirectoryInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationEnableDirectory, {
+      input,
+    }).toPromise()
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
  * 删除组织信息
- * @param appId
+ * @param orgId
  * @returns
  */
 export async function delOrgInfo(orgId: string) {
-  const result = await graphqlApi(
-    `mutation deleteOrganization{
-      action:deleteOrganization(orgID: "${orgId}")
-    }`);
-
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationDelOrg, {
+      orgId,
+    }).toPromise()
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -221,15 +205,15 @@ export async function delOrgInfo(orgId: string) {
  * @param input
  * @returns
  */
-export async function moveOrg(sourceId: string, targetId: string, action: TreeMoveAction) {
-  const result = await graphqlApi(
-    `mutation moveOrganization{
-      action:moveOrganization(sourceID:"${sourceId}",targetId:"${targetId}",action:${action})
-    }`);
-
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+export async function moveOrg(sourceId: string, targetId: string, action: TreeAction) {
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationMoveOrg, {
+      sourceId,
+      targetId,
+      action,
+    }).toPromise()
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }

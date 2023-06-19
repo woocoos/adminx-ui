@@ -1,15 +1,23 @@
-import { AppPolicy, PolicyRule, createAppPolicy, getAppPolicyInfo, updateAppPolicy } from '@/services/app/policy';
+import { createAppPolicy, getAppPolicyInfo, updateAppPolicy } from '@/services/app/policy';
 import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormSwitch, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
 import { useSearchParams } from '@ice/runtime';
 import { useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
-import { AppAction, getAppActionList } from '@/services/app/action';
-import { App, getAppInfo } from '@/services/app';
+import { getAppActionList } from '@/services/app/action';
+import { getAppInfo } from '@/services/app';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/__generated__/graphql';
+import { updateFormat } from '@/util';
+
+type ProFormData = {
+  name: string
+  comments?: string
+  autoGrant: boolean
+}
 
 export default () => {
   const { token } = useToken(),
@@ -20,6 +28,7 @@ export default () => {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [appInfo, setAppInfo] = useState<App>(),
+    [appPolicyInfo, setAppPolicyInfo] = useState<AppPolicy>(),
     [rules, setRules] = useState<PolicyRule[]>([]),
     [appActions, setAppActions] = useState<AppAction[]>([]),
     policyId = searchParams.get('id');
@@ -37,13 +46,15 @@ export default () => {
       }
     },
     getBase = async (appId: string) => {
-      const info = await getAppInfo(appId);
-      if (info?.id) {
-        setAppInfo(info);
-        const result = await getAppActionList(info.id, {}, {}, {});
-        if (result?.edges) {
-          setAppActions(result?.edges.map(item => item.node));
+      const appResult = await getAppInfo(appId);
+      if (appResult?.id) {
+        const result = await getAppActionList(appResult.id, {
+          pageSize: 9999,
+        });
+        if (result?.totalCount) {
+          setAppActions(result.edges?.map(item => item?.node) as AppAction[]);
         }
+        setAppInfo(appResult as App);
       }
     },
     onValuesChange = () => {
@@ -55,8 +66,9 @@ export default () => {
       if (policyId) {
         const result = await getAppPolicyInfo(policyId);
         if (result?.id) {
-          setRules(result.rules || []);
-          getBase(result.appID);
+          setRules(result.rules as PolicyRule[] || []);
+          getBase(result.appID || '');
+          setAppPolicyInfo(result as AppPolicy)
           return result;
         }
       } else {
@@ -74,7 +86,7 @@ export default () => {
         if (rules.length) {
           for (let idx in rules) {
             const item = rules[idx];
-            if (!item.actions.length) {
+            if (!item.actions?.length) {
               errMsg = t('required_operation');
             }
             if (errMsg.length) {
@@ -90,28 +102,43 @@ export default () => {
       }
       return errMsg;
     },
-    onFinish = async (values: AppPolicy) => {
+    onFinish = async (values: ProFormData) => {
       if (verifyRules()) {
         return;
       }
-      let result: AppPolicy | null = null;
+      let id: string | null = null;
       setSaveLoading(true);
-      values.status = 'active';
       if (policyId) {
-        values.rules = rules;
-        result = await updateAppPolicy(policyId, values);
+        const result = await updateAppPolicy(policyId, updateFormat({
+          name: values.name,
+          autoGrant: values.autoGrant,
+          comments: values.comments,
+          rules: rules,
+        }, appPolicyInfo || {}));
+        if (result?.id) {
+          id = result.id
+        }
       } else {
-        values.rules = rules;
         const appId = searchParams.get('appId');
         if (appId) {
-          result = await createAppPolicy(appId, values);
+          const result = await createAppPolicy(appId, {
+            name: values.name,
+            rules: rules,
+            appID: appId,
+            autoGrant: values.autoGrant,
+            comments: values.comments,
+            status: AppPolicySimpleStatus.Active,
+          });
+          if (result?.id) {
+            id = result.id
+          }
         }
       }
 
-      if (result?.id) {
+      if (id) {
         message.success(t('submit_success'));
         if (!policyId) {
-          setSearchParams({ id: result.id });
+          setSearchParams({ id: id });
         }
         await getRequest();
       }

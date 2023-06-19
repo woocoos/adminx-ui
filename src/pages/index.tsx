@@ -1,4 +1,4 @@
-import { User, getUserInfo } from '@/services/user';
+import { getUserInfo } from '@/services/user';
 import store from '@/store';
 import { PageContainer, ProCard, useToken } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import defaultApp from '@/assets/images/default-app.png';
 import { Avatar, Col, Empty, Row, Space, Statistic } from 'antd';
-import { App } from '@/services/app';
 import { getOrgUserQty } from '@/services/org/user';
 import { getOrgGroupQty, getOrgRoleQty } from '@/services/org/role';
 import { getOrgPolicyQty } from '@/services/org/policy';
 import { getOrgAppList } from '@/services/org/app';
 import { Link } from '@ice/runtime';
+import { App, OrgRoleKind, User } from '@/__generated__/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -30,16 +30,18 @@ export default () => {
     if (basisState.user?.id) {
       const result = await getUserInfo(basisState.user.id);
       if (result?.id) {
-        setInfo(result);
+        setInfo(result as User);
 
-        setUserQty(await getOrgUserQty(basisState.tenantId, {}));
-        setUserGroupQty(await getOrgGroupQty({}));
-        setRoleQty(await getOrgRoleQty({ kind: 'role' }));
+        setUserQty(await getOrgUserQty(basisState.tenantId));
+        setUserGroupQty(await getOrgGroupQty());
+        setRoleQty(await getOrgRoleQty({ kind: OrgRoleKind.Role }));
         setPolicyQty(await getOrgPolicyQty(basisState.tenantId, { appPolicyIDIsNil: true }));
 
-        const orgApps = await getOrgAppList(basisState.tenantId, {}, {}, {});
+        const orgApps = await getOrgAppList(basisState.tenantId, {
+          pageSize: 999,
+        });
         if (orgApps) {
-          setMyApps(orgApps.edges.map(item => item.node));
+          setMyApps(orgApps.edges?.map(item => item?.node) as App[]);
         }
       }
     }

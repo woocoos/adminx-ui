@@ -1,5 +1,5 @@
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
-import { User, getRecycleUserList } from '@/services/user';
+import { getRecycleUserList } from '@/services/user';
 import store from '@/store';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space, message } from 'antd';
@@ -7,6 +7,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/Auth';
+import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -70,10 +71,20 @@ export default () => {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as User[], success: true, total: 0 };
-      const result = await getRecycleUserList(params, filter, sort);
+      const table = { data: [] as User[], success: true, total: 0 },
+        where: UserWhereInput = {};
+      let orderBy: UserOrder | undefined = undefined;
+      where.displayNameContains = params.displayNameContains
+      where.emailContains = params.emailContains
+      where.mobileContains = params.mobileContains
+      const result = await getRecycleUserList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where: where,
+        orderBy: orderBy,
+      });
       if (result?.totalCount) {
-        table.data = result.edges.map(item => item.node);
+        table.data = result.edges?.map(item => item?.node) as User[] || [];
         table.total = result.totalCount;
       }
       setDataSource(table.data);
@@ -115,7 +126,7 @@ export default () => {
       orgId={basisState.tenantId}
       recycleInfo={modal.data}
       scene="recycle"
-      userType="member"
+      userType={UserUserType.Member}
       onClose={(isSuccess) => {
         if (isSuccess) {
           proTableRef.current?.reload();

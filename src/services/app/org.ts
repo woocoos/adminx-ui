@@ -1,7 +1,50 @@
 import { gid } from '@/util';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from '../graphql';
-import { Org, OrgNodeField } from '../org';
+import { gql } from '@/__generated__';
+import { OrgOrder, OrgWhereInput } from '@/__generated__/graphql';
+import { koClient } from '../graphql';
 
+const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
+  node(id:$gid){
+    ... on App{
+      id,
+      list:orgs(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+            domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+            owner { id,displayName }
+          }
+        }
+      }
+    }
+  }
+}`)
+
+const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToOrgList($appRoleId:ID!,$where: OrgWhereInput){
+  list:appRoleAssignedToOrgs(roleID:$appRoleId,where:$where){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+  }
+}`)
+
+const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssignedToOrgList($appPolicyId:ID!,$where: OrgWhereInput){
+  list:appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+  }
+}`)
+
+const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPolicyAssignedToOrgListAndIsGrant($appPolicyId:ID!,$appPolicyIdToIsAllow:ID!,$where: OrgWhereInput){
+  list:appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+    isAllowRevokeAppPolicy(appPolicyID: $appPolicyIdToIsAllow)
+  }
+}`)
 
 /**
  * 获取应用授权的组织列表
@@ -11,37 +54,29 @@ import { Org, OrgNodeField } from '../org';
  * @param sort
  * @returns
  */
-export async function getAppOrgList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query appOrgss($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
-        node(id:"${gid('app', appId)}"){
-          ... on App{
-            id,
-            list:orgs(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${OrgNodeField}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
+export async function getAppOrgList(
+  appId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: OrgWhereInput
+    orderBy?: OrgOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppOrgList, {
+      gid: gid('app', appId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
 
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<Org>;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -52,25 +87,19 @@ export async function getAppOrgList(appId: string, params: TableParams, filter: 
  */
 export async function getAppRoleAssignedOrgList(
   appRoleId: string,
-  params: TableParams,
-  filter: TableFilter,
-  sort: TableSort,
+  where?: OrgWhereInput,
 ) {
-  const { where } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlApi(
-      `query appRoleAssignedToOrgs($where: OrgWhereInput){
-        list:appRoleAssignedToOrgs(roleID:"${appRoleId}",where:$where){
-          ${OrgNodeField}
-        }
-      }`, {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppRoleAssignedToOrgList, {
+      appRoleId,
       where,
-    });
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result?.data?.list as Org[];
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result.data.list
   }
+  return null
 }
 
 /**
@@ -80,27 +109,25 @@ export async function getAppRoleAssignedOrgList(
  */
 export async function getAppPolicyAssignedOrgList(
   appPolicyId: string,
-  params: TableParams,
-  filter: TableFilter,
-  sort: TableSort,
+  where?: OrgWhereInput,
   isGrant?: {
     appPolicyId?: string;
   },
 ) {
-  const { where } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlApi(
-      `query appPolicyAssignedToOrgs($where: OrgWhereInput){
-        list:appPolicyAssignedToOrgs(policyID:"${appPolicyId}",where:$where){
-          ${OrgNodeField}
-          ${isGrant?.appPolicyId ? `isAllowRevokeAppPolicy(appPolicyID: "${isGrant.appPolicyId}")` : ''}
-        }
-      }`, {
+  const koc = koClient(),
+    result = isGrant?.appPolicyId ? await koc.client.query(
+      queryAppPolicyAssignedToOrgListAndIsGrant, {
+      appPolicyId,
+      appPolicyIdToIsAllow: isGrant.appPolicyId,
       where,
-    });
+    }).toPromise() : await koc.client.query(
+      queryAppPolicyAssignedToOrgList, {
+      appPolicyId,
+      where,
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result?.data?.list as Org[];
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result.data.list
   }
+  return null
 }

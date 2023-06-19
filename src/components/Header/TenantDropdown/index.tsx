@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { checkLave } from '@/components/LeavePrompt';
 import store from '@/store';
 import { useEffect, useState } from 'react';
-import { Org } from '@/services/org';
 import { userRootOrgs } from '@/services/user';
+import { Org } from '@/__generated__/graphql';
 
 export default () => {
   const { t } = useTranslation(),
@@ -16,12 +16,12 @@ export default () => {
     getRequest = async () => {
       const result = await userRootOrgs();
       if (result) {
-        setOrgInfo(result.find(item => item.id == basis.tenantId));
+        setOrgInfo(result.find(item => item?.id == basis.tenantId) as Org);
         setMenu({
-          items: result.filter(item => item.id != basis.tenantId).map(item => {
+          items: result.filter(item => item?.id != basis.tenantId).map(item => {
             return {
-              key: item.id,
-              label: item.name,
+              key: item?.id || '',
+              label: item?.name || '',
               onClick: onMenuClick,
             };
           }),

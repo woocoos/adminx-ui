@@ -1,8 +1,38 @@
+import { gql } from '@/__generated__';
 import { gid } from '@/util';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from '../graphql';
-import { App, AppNodeField } from '../app';
-import { AppAction, AppActionField } from '../app/action';
+import { koClient } from '../graphql';
+import { AppOrder, AppWhereInput } from '@/__generated__/graphql';
 
+const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
+  node(id:$gid){
+    ... on Org{
+      id
+      list:apps(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,name,code,kind,redirectURI,appKey,appSecret,scopes,
+            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt
+          }
+        }
+      }
+    }
+  }
+}`)
+
+const mutationAssignOrgApp = gql(/* GraphQL */`mutation assignOrgApp($orgId:ID!,$appId:ID!){
+  action:assignOrganizationApp(orgID: $orgId,appID: $appId)
+}`)
+
+const mutationRevOrgApp = gql(/* GraphQL */`mutation revokeOrgApp($orgId:ID!,$appId:ID!){
+  action:revokeOrganizationApp(orgID: $orgId,appID: $appId)
+}`)
+
+const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!){
+  list:orgAppActions(appCode: $appCode){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+  }
+}`)
 
 /**
  * 组织下的应用
@@ -12,37 +42,29 @@ import { AppAction, AppActionField } from '../app/action';
  * @param sort
  * @returns
  */
-export async function getOrgAppList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgApp($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:AppOrder,$where:AppWhereInput){
-        node(id:"${gid('org', orgId)}"){
-          ... on Org{
-            id
-            list:apps(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${AppNodeField}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
+export async function getOrgAppList(
+  orgId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: AppWhereInput
+    orderBy?: AppOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgAppList, {
+      gid: gid('org', orgId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
 
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<App>;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === "Org") {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -53,16 +75,17 @@ export async function getOrgAppList(orgId: string, params: TableParams, filter: 
  * @returns
  */
 export async function assignOrgApp(orgId: string, appId: string) {
-  const result = await graphqlApi(
-    `mutation assignOrganizationApp{
-      action:assignOrganizationApp(orgID: "${orgId}",appID: "${appId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationAssignOrgApp, {
+      orgId,
+      appId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -72,16 +95,17 @@ export async function assignOrgApp(orgId: string, appId: string) {
  * @returns
  */
 export async function revokeOrgApp(orgId: string, appId: string) {
-  const result = await graphqlApi(
-    `mutation revokeOrganizationApp{
-      action:revokeOrganizationApp(orgID: "${orgId}",appID: "${appId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationRevOrgApp, {
+      orgId,
+      appId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -91,17 +115,14 @@ export async function revokeOrgApp(orgId: string, appId: string) {
  * @returns
  */
 export async function getOrgAppActionList(appCode: string) {
-  const result = await graphqlApi(
-    `query orgAppActions{
-      list:orgAppActions(appCode: "${appCode}"){
-        ${AppActionField}
-      }
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgAppActionList, {
+      appCode,
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result.data.list as AppAction[];
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result.data.list
   }
+  return []
 }

@@ -1,24 +1,7 @@
+import { gql } from '@/__generated__';
 import { gid } from '@/util';
-import { App } from '.';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from '../graphql';
-
-export type AppAction = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  appID: string;
-  name: string;
-  kind: AppActionKind;
-  method: AppActionMethod;
-  comments: string;
-  app: App;
-};
-
-export type AppActionKind = 'restful' | 'graphql' | 'rpc' | 'function';
-
-export type AppActionMethod = 'read' | 'write' | 'list';
+import { koClient } from '../graphql';
+import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/__generated__/graphql';
 
 export const EnumAppActionKind = {
   restful: { text: 'restful' },
@@ -33,50 +16,70 @@ export const EnumAppActionMethod = {
   list: { text: 'list' },
 };
 
-export const AppActionField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
-`;
+const queryAppActionList = gql(/* GraphQL */`query appActionList($gid: GID!,$first: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){
+  node(id:$gid){
+    ... on App{
+      id,
+      list:actions(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+          }
+        }
+      }
+    }
+  }
+}`)
 
+const queryAppActionInfo = gql(/* GraphQL */`query AppActionInfo($gid:GID!){
+  node(id:$gid){
+    ... on AppAction{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+    }
+  }
+}`)
+
+const mutationCreateAppAction = gql(/* GraphQL */`mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){
+  action:createAppActions(appID:$appId,input:$input){id}
+}`)
+
+const mutationUpdateAppAction = gql(/* GraphQL */`mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){
+  action:updateAppAction(actionID:$appActionId,input:$input){id}
+}`)
+
+const mutationDelAppAction = gql(/* GraphQL */`mutation delAppAction($appActionId:ID!){
+  action:deleteAppAction(actionID: $appActionId)
+}`)
 
 /**
  * 获取应用权限
  * @param appId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
-export async function getAppActionList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){
-        node(id:"${gid('app', appId)}"){
-          ... on App{
-            id,
-            list:actions(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${AppActionField}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
+export async function getAppActionList(
+  appId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: AppActionWhereInput
+    orderBy?: AppActionOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppActionList, {
+      gid: gid('app', appId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
 
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<AppAction>;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -86,21 +89,16 @@ export async function getAppActionList(appId: string, params: TableParams, filte
  * @returns
  */
 export async function getAppActionInfo(appActionId: string) {
-  const appGid = gid('app_action', appActionId);
-  const result = await graphqlApi(
-    `query node{
-      node(id:"${appGid}"){
-        ... on AppAction{
-          ${AppActionField}
-        }
-      }
-    }`);
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppActionInfo, {
+      gid: gid('app_action', appActionId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result.data.node as AppAction;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'AppAction') {
+    return result.data.node
   }
+  return null
 }
 
 
@@ -109,19 +107,18 @@ export async function getAppActionInfo(appActionId: string) {
  * @param input
  * @returns
  */
-export async function createAppAction(appId: string, input: AppAction | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation createAppActions($input: [CreateAppActionInput!]){
-      action:createAppActions(appID:"${appId}",input:$input){
-        ${AppActionField}
-      }
-    }`, { input: [input] });
+export async function createAppAction(appId: string, input: CreateAppActionInput | CreateAppActionInput[]) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateAppAction, {
+      appId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.[0]?.id) {
-    return result.data.action[0] as AppAction;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -129,19 +126,7 @@ export async function createAppAction(appId: string, input: AppAction | Record<s
  * @param input
  * @returns
  */
-export async function createAppActions(appId: string, input: Array<AppAction | Record<string, any>>) {
-  const result = await graphqlApi(
-    `mutation createAppActions($input: [CreateAppActionInput!]){
-      action:createAppActions(appID:"${appId}",input:$input){
-        ${AppActionField}
-      }
-    }`, { input: input });
-
-  if (result?.data?.action?.length) {
-    return result.data.action as AppAction[];
-  } else {
-    return null;
-  }
+export async function createAppActions() {
 }
 
 /**
@@ -150,19 +135,18 @@ export async function createAppActions(appId: string, input: Array<AppAction | R
  * @param input
  * @returns
  */
-export async function updateAppAction(appActionId: string, input: AppAction | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updateAppAction($input: UpdateAppActionInput!){
-      action:updateAppAction(actionID:"${appActionId}",input:$input){
-        ${AppActionField}
-      }
-    }`, { input: setClearInputField(input) });
+export async function updateAppAction(appActionId: string, input: UpdateAppActionInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateAppAction, {
+      appActionId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result.data.action as AppAction;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -171,15 +155,14 @@ export async function updateAppAction(appActionId: string, input: AppAction | Re
  * @returns
  */
 export async function delAppAction(appActionId: string) {
-  const result = await graphqlApi(
-    `mutation deleteAppAction{
-      action:deleteAppAction(actionID: "${appActionId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelAppAction, {
+      appActionId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }

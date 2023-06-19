@@ -1,14 +1,14 @@
-import { User, UserType } from '@/services/user';
 import { Input } from 'antd';
 import ModalAccount from './modalAccount';
 import { useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { User, UserUserType } from '@/__generated__/graphql';
 
 export default (props: {
   value?: User;
   disabled?: boolean;
-  userType: UserType;
+  userType: UserUserType;
   onChange?: (value?: User) => void;
 }) => {
   const

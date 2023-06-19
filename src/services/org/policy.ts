@@ -1,82 +1,143 @@
+import { gql } from '@/__generated__';
 import { gid } from '@/util';
-import { Org } from '.';
-import { PolicyRule } from '../app/policy';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from '../graphql';
-import { Permission } from '../permission';
+import { koClient } from '../graphql';
+import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/__generated__/graphql';
 
-export type OrgPolicy = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  orgID: string;
-  appPolicyID: string;
-  name: string;
-  comments: string;
-  rules?: PolicyRule[];
-  org?: Org;
-  permissions?: Permission[];
-  isGrantRole?: boolean;
-  isGrantUser?: boolean;
-};
+const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
+  node(id:$gid){
+    ... on Org{
+      list:policies(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+          }
+        }
+      }
+    }
+  }
+}`)
+const queryOrgPolicyListNum = gql(/* GraphQL */`query orgPolicyListNum($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
+  node(id:$gid){
+    ... on Org{
+      list:policies(first:$first,orderBy: $orderBy,where: $where){ totalCount }
+    }
+  }
+}`)
 
+const queryOrgPolicyListAndIsGrantUser = gql(/* GraphQL */`query orgPolicyListAndIsGrantUser($gid: GID!,$userId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
+  node(id:$gid){
+    ... on Org{
+      list:policies(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+            isGrantUser(userID: $userId)
+          }
+        }
+      }
+    }
+  }
+}`)
 
-export const OrgPolicyNodeField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments,
-  rules{ effect,actions,resources,conditions }
-`;
+const queryOrgPolicyListAndIsGrantRole = gql(/* GraphQL */`query orgPolicyListAndIsGrantRole($gid: GID!,$roleId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
+  node(id:$gid){
+    ... on Org{
+      list:policies(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+            isGrantRole(roleID: $roleId)
+          }
+        }
+      }
+    }
+  }
+}`)
+
+const queryOrgPolicyInfo = gql(/* GraphQL */`query orgPolicyInfo($gid:GID!){
+  node(id:$gid){
+    ... on OrgPolicy{
+      id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments,
+      rules{ effect,actions,resources,conditions }
+    }
+  }
+}`)
+
+const mutationCreateOrgPolicy = gql(/* GraphQL */`mutation createOrgPolicy($input: CreateOrgPolicyInput!){
+  action:createOrganizationPolicy(input:$input){id}
+}`)
+
+const mutationUpdateOrgPolicy = gql(/* GraphQL */`mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){
+  action:updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}
+}`)
+
+const mutationDelOrgPolicy = gql(/* GraphQL */`mutation deleteOrgPolicy($orgPolicyId:ID!){
+  action:deleteOrganizationPolicy(orgPolicyID:$orgPolicyId)
+}`)
+
+const mutationAssignOrgAppPolicy = gql(/* GraphQL */`mutation assignOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){
+  action:assignOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
+}`)
+
+const mutationRevOrgAppPolicy = gql(/* GraphQL */`mutation revokeOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){
+  action:revokeOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
+}`)
 
 
 /**
  * 组织策略
  * @param orgId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
 export async function getOrgPolicyList(
   orgId: string,
-  params: TableParams,
-  filter: TableFilter,
-  sort: TableSort,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: OrgPolicyWhereInput
+    orderBy?: OrgPolicyOrder
+  },
   isGrant?: {
     roleId?: string;
     userId?: string;
   },
 ) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgPolicy($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
-        node(id:"${gid('org', orgId)}"){
-          ... on Org{
-            list:policies(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${OrgPolicyNodeField}
-                  ${isGrant?.roleId ? `isGrantRole(roleID: "${isGrant.roleId}")` : ''}
-                  ${isGrant?.userId ? `isGrantUser(userID: "${isGrant.userId}")` : ''}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
+  const koc = koClient();
+  const result = isGrant?.roleId ? await koc.client.query(
+    queryOrgPolicyListAndIsGrantRole, {
+    gid: gid('org', orgId),
+    roleId: isGrant.roleId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, {
+    url: `${koc.url}?p=${gather.current || 1}`
+  }).toPromise() : isGrant?.userId ? await koc.client.query(
+    queryOrgPolicyListAndIsGrantUser, {
+    gid: gid('org', orgId),
+    userId: isGrant.userId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, {
+    url: `${koc.url}?p=${gather.current || 1}`
+  }).toPromise() : await koc.client.query(
+    queryOrgPolicyList, {
+    gid: gid('org', orgId),
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, {
+    url: `${koc.url}?p=${gather.current || 1}`
+  }).toPromise()
 
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<OrgPolicy>;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === "Org") {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -86,21 +147,16 @@ export async function getOrgPolicyList(
  * @returns
  */
 export async function getOrgPolicyInfo(orgPolicyId: string) {
-  const result = await graphqlApi(
-    `query{
-      node(id:"${gid('org_policy', orgPolicyId)}"){
-        ... on OrgPolicy{
-          ${OrgPolicyNodeField}
-        }
-      }
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgPolicyInfo, {
+      gid: gid('org_policy', orgPolicyId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result?.data?.node as OrgPolicy;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'OrgPolicy') {
+    return result.data.node
   }
+  return null
 }
 
 
@@ -109,21 +165,17 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
  * @param input
  * @returns
  */
-export async function createOrgPolicy(input: OrgPolicy) {
-  const result = await graphqlApi(
-    `mutation createOrganizationPolicy($input: CreateOrgPolicyInput!){
-      action:createOrganizationPolicy(input:$input){
-        ${OrgPolicyNodeField}
-      }
-    }`, {
-    input,
-  });
+export async function createOrgPolicy(input: CreateOrgPolicyInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateOrgPolicy, {
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as OrgPolicy;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -132,21 +184,18 @@ export async function createOrgPolicy(input: OrgPolicy) {
  * @param input
  * @returns
  */
-export async function updateOrgPolicy(orgPolicyId: string, input: OrgPolicy | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updateOrganizationPolicy($input: UpdateOrgPolicyInput!){
-      action:updateOrganizationPolicy(orgPolicyID:"${orgPolicyId}",input:$input){
-        ${OrgPolicyNodeField}
-      }
-    }`, {
-    input: setClearInputField(input),
-  });
+export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolicyInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateOrgPolicy, {
+      orgPolicyId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as OrgPolicy;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -155,16 +204,16 @@ export async function updateOrgPolicy(orgPolicyId: string, input: OrgPolicy | Re
  * @returns
  */
 export async function delOrgPolicy(orgPolicyId: string) {
-  const result = await graphqlApi(
-    `mutation deleteOrganizationPolicy{
-      action:deleteOrganizationPolicy(orgPolicyID:"${orgPolicyId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelOrgPolicy, {
+      orgPolicyId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -175,16 +224,17 @@ export async function delOrgPolicy(orgPolicyId: string) {
  * @returns
  */
 export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
-  const result = await graphqlApi(
-    `mutation assignOrganizationAppPolicy{
-      action:assignOrganizationAppPolicy(orgID: "${orgId}",appPolicyID: "${appPolicyId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationAssignOrgAppPolicy, {
+      orgId,
+      appPolicyId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -194,16 +244,17 @@ export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
  * @returns
  */
 export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
-  const result = await graphqlApi(
-    `mutation revokeOrganizationAppPolicy{
-      action:revokeOrganizationAppPolicy(orgID: "${orgId}",appPolicyID: "${appPolicyId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationRevOrgAppPolicy, {
+      orgId,
+      appPolicyId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -213,26 +264,16 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
  * @param where
  * @returns
  */
-export async function getOrgPolicyQty(orgId: string, where: Record<string, any>) {
-  const result = await graphqlApi(
-    `query orgPolicy($where:OrgPolicyWhereInput){
-      node(id:"${gid('org', orgId)}"){
-        ... on Org{
-          list:policies(where: $where){
-            totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          }
-        }
-      }
-    }`,
-    {
+export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgPolicyListNum, {
+      gid: gid('org', orgId),
       where,
-    },
-  );
+    }).toPromise()
 
-  if (result?.data?.node?.list) {
-    const data = result.data.node.list as List<OrgPolicy>;
-    return data.totalCount;
-  } else {
-    return 0;
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node.list.totalCount
   }
+  return 0
 }

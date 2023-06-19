@@ -4,15 +4,16 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { App, getAppInfo } from '@/services/app';
+import { getAppInfo } from '@/services/app';
 import CreateAppRole from './components/create';
-import { AppRole, delAppRole, getAppRoleList } from '@/services/app/role';
+import { delAppRole, getAppRoleList } from '@/services/app/role';
 import { useTranslation } from 'react-i18next';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import KeepAlive from '@/components/KeepAlive';
+import { App, AppRole } from '@/__generated__/graphql';
 
 
 export default () => {
@@ -119,21 +120,21 @@ export default () => {
 
   const
     getApp = async () => {
-      let info: App | null = null,
-        appId = searchParams.get('id');
+      const appId = searchParams.get('id');
       if (appId) {
-        info = await getAppInfo(appId);
-        if (info?.id) {
-          setAppInfo(info);
+        const result = await getAppInfo(appId);
+        if (result?.id) {
+          setAppInfo(result as App);
+          return result
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as AppRole[], success: true, total: 0 },
         info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
       if (info) {
-        const result = await getAppRoleList(info.id, params, filter, sort);
+        const result = await getAppRoleList(info.id);
         if (result) {
           table.data = result.filter(item => {
             let isTrue = true;

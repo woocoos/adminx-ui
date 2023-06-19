@@ -1,27 +1,21 @@
-import {
-  ActionType,
-  PageContainer,
-  ProColumns,
-  ProTable,
-  useToken,
-} from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal, message } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
-import { TableParams, TableSort, TableFilter, List } from '@/services/graphql';
+import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
-import { EnumUserStatus, User, UserType, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/user';
+import { EnumUserStatus, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/user';
 import AccountCreate from '../list/components/create';
 import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from '@/services/org/user';
-import { OrgRole, revokeOrgRoleUser } from '@/services/org/role';
+import { revokeOrgRoleUser } from '@/services/org/role';
 import DrawerUser from '@/pages/account/components/drawerUser';
 import { useTranslation } from 'react-i18next';
-import { Org } from '@/services/org';
 import DrawerRole from '@/pages/org/components/drawerRole';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import store from '@/store';
+import { OrderDirection, Org, OrgRole, OrgRoleKind, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
 type UserListProps = {
   title?: string;
@@ -29,7 +23,7 @@ type UserListProps = {
   orgRole?: OrgRole;
   orgInfo?: Org;
   scene?: 'user' | 'orgUser' | 'roleUser';
-  userType?: UserType;
+  userType?: UserUserType;
   isMultiple?: boolean;
   ref?: MutableRefObject<UserListRef>;
 };
@@ -90,7 +84,6 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         valueEnum: EnumUserStatus,
       },
       { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
-
     ],
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
@@ -207,23 +200,58 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as User[], success: true, total: 0 };
-      let result: List<User> | null;
-      params['userType'] = props.userType;
+      const table = { data: [] as User[], success: true, total: 0 },
+        where: UserWhereInput = {};
+      let orderBy: UserOrder | undefined = undefined;
+      where.userType = props.userType;
+      where.principalNameContains = params.principalNameContains;
+      where.displayNameContains = params.displayNameContains;
+      where.emailContains = params.emailContains;
+      where.mobileContains = params.mobileContains;
+      where.statusIn = filter.status as UserSimpleStatus[] | null;
+      if (sort.createdAt) {
+        orderBy = {
+          direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
+          field: UserOrderField.CreatedAt
+        }
+      }
       if (props.orgRole) {
-        result = await getOrgRoleUserList(props.orgRole.id, params, filter, sort, {
+        const result = await getOrgRoleUserList(props.orgRole.id, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        }, {
           orgRoleId: props.orgRole.id,
         });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
       } else if (props.orgId) {
-        result = await getOrgUserList(props.orgId, params, filter, sort);
+        const result = await getOrgUserList(props.orgId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
       } else {
-        result = await getUserList(params, filter, sort);
+        const result = await getUserList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
       }
 
-      if (result) {
-        table.data = result.edges.map(item => item.node);
-        table.total = result.totalCount;
-      }
       setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;
@@ -237,7 +265,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         </>,
         onOk: async (close) => {
           const result = await resetUserPasswordByEmail(record.id);
-          if (result) {
+          if (result === true) {
             message.success(t('submit_success'));
             close();
           }
@@ -432,12 +460,11 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         open={modal.open}
         title={modal.title}
         orgId={basisState.tenantId}
-        userType={props.userType || 'member'}
+        userType={props.userType || UserUserType.Member}
         scene="create"
         onClose={(isSuccess) => {
           if (isSuccess) {
-            proTableRef.current?.reload();
-            message.success(t('submit_success'));
+            proTableRef.current?.reload()
           }
           setModal({ open: false, title: '', scene: modal.scene });
         }}
@@ -454,8 +481,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           userType={props.userType}
           onClose={(isSuccess) => {
             if (isSuccess) {
-              proTableRef.current?.reload();
-              message.success(t('submit_success'));
+              proTableRef.current?.reload()
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
@@ -467,12 +493,11 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           title={modal.title}
           open={modal.open}
           orgId={props.orgId}
-          kind={'group'}
+          kind={OrgRoleKind.Group}
           userInfo={modal.data}
           onClose={(isSuccess) => {
             if (isSuccess) {
-              proTableRef.current?.reload();
-              message.success(t('submit_success'));
+              proTableRef.current?.reload()
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
@@ -486,8 +511,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
           title={modal.title}
           onClose={(isSuccess) => {
             if (isSuccess) {
-              proTableRef.current?.reload();
-              message.success(t('submit_success'));
+              proTableRef.current?.reload()
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}

@@ -1,16 +1,12 @@
 import { useState } from 'react';
-import {
-  PageContainer,
-  ProForm,
-  ProFormText,
-  ProFormTextArea,
-  useToken,
-} from '@ant-design/pro-components';
+import { PageContainer, ProForm, ProFormText, ProFormTextArea, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
-import { User, getUserInfo, updateUserInfo } from '@/services/user';
+import { getUserInfo, updateUserInfo } from '@/services/user';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { User } from '@/__generated__/graphql';
+import { updateFormat } from '@/util';
 
 export default () => {
   const
@@ -18,6 +14,7 @@ export default () => {
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
+    [userInfo, setUserInfo] = useState<User>(),
     [basisState, basisDispatcher] = store.useModel('basis');
 
   setLeavePromptWhen(saveDisabled);
@@ -27,21 +24,24 @@ export default () => {
       setSaveLoading(false);
       setSaveDisabled(true);
       if (basisState.user?.id) {
-        const userInfo = await getUserInfo(basisState.user.id);
-        return userInfo || {};
+        const result = await getUserInfo(basisState.user.id);
+        if (result?.id) {
+          setUserInfo(result as User)
+          return result;
+        }
       }
       return {};
     },
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: User) => {
+    onFinish = async (values) => {
       if (basisState.user?.id) {
         setSaveLoading(true);
-        const userInfo = await updateUserInfo(basisState.user.id, values);
-        if (userInfo?.id) {
+        const result = await updateUserInfo(basisState.user.id, updateFormat(values, userInfo || {}));
+        if (result?.id) {
           message.success(t('submit_success'));
-          await basisDispatcher.saveUser(userInfo);
+          await basisDispatcher.saveUser(result as User);
           setSaveDisabled(true);
         }
         setSaveLoading(false);

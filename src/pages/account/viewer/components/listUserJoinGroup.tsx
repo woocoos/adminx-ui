@@ -5,10 +5,10 @@ import { useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
-import { User } from '@/services/user';
-import { OrgRole, getUserJoinGroupList, revokeOrgRoleUser } from '@/services/org/role';
+import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/org/role';
 import DrawerRole from '@/pages/org/components/drawerRole';
 import Auth from '@/components/Auth';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/graphql';
 
 
 export default (props: {
@@ -32,7 +32,7 @@ export default (props: {
         title: t('description'), dataIndex: 'comments', width: 120, search: false,
       },
       {
-        title: t('created_at'), dataIndex: 'type', width: 120, valueType: 'dateTime',
+        title: t('created_at'), dataIndex: 'createdAt', width: 120, valueType: 'dateTime',
       },
       {
         title: t('operation'),
@@ -67,10 +67,17 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 };
-      const result = await getUserJoinGroupList(props.userInfo.id, params, filter, sort);
+      const table = { data: [] as OrgRole[], success: true, total: 0 },
+        where: OrgRoleWhereInput = {};
+      where.nameContains = params.nameContains
+      where.createdAt = params.createdAt
+      const result = await getUserJoinGroupList(props.userInfo.id, {
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      });
       if (result?.totalCount) {
-        table.data = result.edges.map(item => item.node);
+        table.data = result.edges?.map(item => item?.node) as OrgRole[];
         table.total = result.totalCount;
       }
       setSelectedRowKeys([]);
@@ -136,7 +143,7 @@ export default (props: {
         title={`${t('add_user_group')}`}
         open={modal.open}
         orgId={basisState.tenantId}
-        kind={'group'}
+        kind={OrgRoleKind.Group}
         userInfo={props.userInfo}
         onClose={(isSuccess) => {
           if (isSuccess) {

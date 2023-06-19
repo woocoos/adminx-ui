@@ -5,8 +5,9 @@ import { Alert, QRCode, Result, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MfaPrepare, bindMfa, bindPrepareMfa } from '@/services/basis';
-import { User, getUserInfo } from '@/services/user';
+import { getUserInfoLoginProfile } from '@/services/user';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { User } from '@/__generated__/graphql';
 
 export default () => {
   const { t } = useTranslation(),
@@ -28,9 +29,9 @@ export default () => {
     getRequest = async () => {
       if (basisState.user?.id) {
         setLoading(true);
-        const result = await getUserInfo(basisState.user.id, ['loginProfile']);
+        const result = await getUserInfoLoginProfile(basisState.user.id);
         if (result?.id) {
-          setInfo(result);
+          setInfo(result as User);
           if (!result.loginProfile?.mfaEnabled) {
             await onRefresh();
           }

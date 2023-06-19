@@ -2,8 +2,8 @@ import { Input } from 'antd';
 import ModalApp from './modalApp';
 import { useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
-import { App } from '@/services/app';
 import { useTranslation } from 'react-i18next';
+import { App } from '@/__generated__/graphql';
 
 export default (props: {
   value?: App;

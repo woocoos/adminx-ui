@@ -1,8 +1,14 @@
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { AppRes, getAppResInfo, updateAppRes } from '@/services/app/resource';
+import { getAppResInfo, updateAppRes } from '@/services/app/resource';
 import { DrawerForm, ProFormText } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+type ProFormData = {
+  name: string
+  typeName?: string
+  arnPattern?: string
+}
 
 export default (props: {
   open: boolean;
@@ -38,7 +44,7 @@ export default (props: {
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: AppRes) => {
+    onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
       const info = props.id ? await updateAppRes(props.id, {
         name: values.name,

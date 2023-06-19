@@ -1,8 +1,17 @@
+import { AppRole } from '@/__generated__/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { AppRole, createAppRole, getAppRoleInfo, updateAppRole } from '@/services/app/role';
+import { createAppRole, getAppRoleInfo, updateAppRole } from '@/services/app/role';
+import { updateFormat } from '@/util';
 import { DrawerForm, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+type ProFormData = {
+  name: string
+  autoGrant: boolean
+  editable: boolean
+  comments: string
+}
 
 export default (props: {
   open?: boolean;
@@ -12,6 +21,7 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [appRoleInfo, setAppRoleInfo] = useState<AppRole>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -30,6 +40,7 @@ export default (props: {
       if (props.id) {
         const info = await getAppRoleInfo(props.id);
         if (info?.id) {
+          setAppRoleInfo(info as AppRole)
           return info;
         }
       }
@@ -41,10 +52,34 @@ export default (props: {
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: AppRole) => {
+    onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      const info = props.id ? await updateAppRole(props.id, values) : await createAppRole(props?.appId || '', values);
-      if (info?.id) {
+      let isTrue = false;
+      if (props.id) {
+        const result = await updateAppRole(props.id, updateFormat({
+          autoGrant: values.autoGrant,
+          comments: values.comments,
+          editable: values.editable,
+          name: values.name,
+        }, appRoleInfo || {}))
+        if (result?.id) {
+          isTrue = true
+        }
+      } else {
+        if (props?.appId) {
+          const result = await createAppRole(props.appId, {
+            appID: props.appId,
+            autoGrant: values.autoGrant,
+            comments: values.comments,
+            editable: values.editable,
+            name: values.name,
+          });
+          if (result?.id) {
+            isTrue = true
+          }
+        }
+      }
+      if (isTrue) {
         setSaveDisabled(true);
         props.onClose?.(true);
       }

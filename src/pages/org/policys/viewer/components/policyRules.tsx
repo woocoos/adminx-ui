@@ -1,16 +1,15 @@
-import { PolicyRule } from '@/services/app/policy';
 import { ProCard } from '@ant-design/pro-components';
 import { Divider, Radio, Tabs, Row, Col, Button, Popconfirm } from 'antd';
 import { CSSProperties, useEffect, useState } from 'react';
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { AppAction } from '@/services/app/action';
 import ActionsTransfer from '@/components/ActionsTransfer';
-import { App, getAppList } from '@/services/app';
+import { getAppList } from '@/services/app';
 import Editor from '@monaco-editor/react';
 import InputApp from '@/pages/app/components/inputApp';
 import { useTranslation } from 'react-i18next';
 import AppPolicyRes from '@/components/AppPolicyRes';
 import { getOrgAppActionList } from '@/services/org/app';
+import { AppAction, PolicyEffect, PolicyRule, App } from '@/__generated__/graphql';
 
 const RuleItem = (props: {
   orgId: string;
@@ -32,7 +31,7 @@ const RuleItem = (props: {
       setAppInfo(info);
       if (info?.code) {
         const actionsList = await getOrgAppActionList(info.code);
-        setAppActions(actionsList || []);
+        setAppActions(actionsList as AppAction[]);
       } else {
         setAppActions([]);
       }
@@ -40,9 +39,14 @@ const RuleItem = (props: {
     getAppInfo = async () => {
       const appCode = props.rule.actions?.[0]?.split(':')?.[0];
       if (appCode && appInfo?.code != appCode) {
-        const result = await getAppList({ code: appCode }, {}, {});
+        const result = await getAppList({
+          pageSize: 1,
+          where: {
+            code: appCode,
+          },
+        });
         if (result?.totalCount) {
-          updateAppInfo(result.edges[0].node);
+          updateAppInfo(result.edges?.[0]?.node as App);
         }
       }
     },
@@ -50,10 +54,10 @@ const RuleItem = (props: {
       const titles: string[] = [];
       if (appInfo) {
         titles.push(appInfo.name);
-        if (props.rule.actions[0] === `${appInfo.code}:*`) {
+        if (props.rule.actions?.[0] === `${appInfo.code}:*`) {
           titles.push(t('all_operation'));
         } else {
-          titles.push(t('{{num}}_operations', { num: props.rule.actions.length }));
+          titles.push(t('{{num}}_operations', { num: props.rule.actions?.length }));
         }
       } else {
         titles.push(t('please_select_app'));
@@ -149,13 +153,13 @@ const RuleItem = (props: {
         <Col flex="auto">
           <div x-if={appInfo}>
             <div>
-              <a>{props.rule.actions[0] == `${appInfo?.code}:*` ? t('all_operation') : t('{{num}}_operations', { num: props.rule.actions.length })}</a>
+              <a>{props.rule.actions?.[0] == `${appInfo?.code}:*` ? t('all_operation') : t('{{num}}_operations', { num: props.rule.actions?.length || 0 })}</a>
             </div>
             <div x-if={stretch1}>
               <div>
                 <Radio.Group
                   disabled={props.readonly}
-                  value={props.rule.actions[0] == `${appInfo?.code}:*`}
+                  value={props.rule.actions?.[0] == `${appInfo?.code}:*`}
                   options={[
                     { label: `${t('all_operation')}(*)`, value: true },
                     { label: t('specify'), value: false },
@@ -172,12 +176,12 @@ const RuleItem = (props: {
                 />
               </div>
               {
-                props.rule.actions[0] == `${appInfo?.code}:*` ? <></> : <>
+                props.rule.actions?.[0] == `${appInfo?.code}:*` ? <></> : <>
                   <br />
                   <ActionsTransfer
                     readonly={props.readonly}
                     appCode={appInfo?.code || ''}
-                    targetKeys={props.rule.actions}
+                    targetKeys={props.rule.actions || []}
                     dataSource={appActions}
                     onChange={(values) => {
                       const nRule = { ...props.rule };
@@ -322,7 +326,7 @@ export default (props: {
                 size="small"
                 onClick={() => {
                   props.rules.push({
-                    effect: 'allow',
+                    effect: PolicyEffect.Allow,
                     actions: [],
                     resources: null,
                     conditions: null,

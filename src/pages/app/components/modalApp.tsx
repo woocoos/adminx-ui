@@ -1,11 +1,12 @@
-import { App, EnumAppKind, EnumAppStatus, getAppList } from '@/services/app';
+import { EnumAppKind, EnumAppStatus, getAppList } from '@/services/app';
 import { Modal } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { List, TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgAppList } from '@/services/org/app';
 import defaultApp from '@/assets/images/default-app.png';
+import { App, AppKind, AppWhereInput } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
@@ -59,22 +60,42 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as App[], success: true, total: 0 };
-      let result: List<App> | null = null;
-      if (props.orgId) {
-        result = await getOrgAppList(props.orgId, params, filter, sort);
-      } else {
-        result = await getAppList(params, filter, sort);
-      }
+      const table = { data: [] as App[], success: true, total: 0 },
+        where: AppWhereInput = {};
+      where.nameContains = params.nameContains
+      where.codeContains = params.codeContains
+      where.kindIn = filter.kind as AppKind[]
 
-      if (result) {
-        table.data = result.edges.map(item => {
-          item.node.logo = item.node.logo || defaultApp;
-          return item.node;
+      if (props.orgId) {
+        const result = await getOrgAppList(props.orgId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
         });
-        table.total = result.totalCount;
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => {
+            if (item?.node) {
+              item.node.logo = item?.node?.logo || defaultApp;
+            }
+            return item?.node;
+          }) as App[];
+          table.total = result.totalCount;
+        }
       } else {
-        table.total = 0;
+        const result = await getAppList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => {
+            if (item?.node) {
+              item.node.logo = item?.node?.logo || defaultApp;
+            }
+            return item?.node;
+          }) as App[];
+          table.total = result.totalCount;
+        }
       }
       setSelectedRowKeys([]);
       setDataSource(table.data);

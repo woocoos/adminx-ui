@@ -2,9 +2,9 @@ import { Col, Input, Row } from 'antd';
 import { useEffect, useState } from 'react';
 import { SwapOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-components';
-import { AppAction } from '@/services/app/action';
 import CardTree from './cardTree';
 import { useTranslation } from 'react-i18next';
+import { AppAction, AppActionMethod } from '@/__generated__/graphql';
 
 
 export default function (props: {
@@ -37,7 +37,7 @@ export default function (props: {
               onSearch={(value) => {
                 if (value) {
                   setDataSource(props.dataSource.filter(item => {
-                    return item.name.indexOf(value) > -1 || item.comments.indexOf(value) > -1;
+                    return item.name.indexOf(value) > -1 || (item.comments || '').indexOf(value) > -1;
                   }));
                 } else {
                   setDataSource([...props.dataSource]);
@@ -46,7 +46,7 @@ export default function (props: {
             />
             <div style={{ overflow: 'auto', height: '300px', marginTop: '10px' }}>
               <CardTree
-                method="read"
+                method={AppActionMethod.Read}
                 checkedKeys={props.targetKeys}
                 dataSource={dataSource}
                 appCode={props.appCode}
@@ -56,7 +56,7 @@ export default function (props: {
                 }}
               />
               <CardTree
-                method="write"
+                method={AppActionMethod.Write}
                 checkedKeys={props.targetKeys}
                 dataSource={dataSource}
                 appCode={props.appCode}
@@ -66,7 +66,7 @@ export default function (props: {
                 }}
               />
               <CardTree
-                method="list"
+                method={AppActionMethod.List}
                 checkedKeys={props.targetKeys}
                 dataSource={dataSource}
                 appCode={props.appCode}

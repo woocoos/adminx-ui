@@ -1,19 +1,20 @@
-import {
-  PageContainer, ProCard, ProForm,
-  ProFormInstance,
-  ProFormText, useToken,
-} from '@ant-design/pro-components';
+import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
 import { useSearchParams } from '@ice/runtime';
 import { useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
-import { Org, getOrgInfo } from '@/services/org';
-import { PolicyRule } from '@/services/app/policy';
-import { OrgPolicy, createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from '@/services/org/policy';
+import { getOrgInfo } from '@/services/org';
+import { createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from '@/services/org/policy';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { Org, PolicyRule } from '@/__generated__/graphql';
+
+type ProFormData = {
+  name: string
+  comments: string
+}
 
 export default () => {
   const { token } = useToken(),
@@ -42,7 +43,7 @@ export default () => {
     getBase = async (orgId: string) => {
       const info = await getOrgInfo(orgId);
       if (info?.id) {
-        setOrgInfo(info);
+        setOrgInfo(info as Org);
       }
     },
     onValuesChange = () => {
@@ -54,8 +55,10 @@ export default () => {
       if (policyId) {
         const result = await getOrgPolicyInfo(policyId);
         if (result?.id) {
-          setRules(result.rules || []);
-          getBase(result.orgID);
+          setRules(result.rules as PolicyRule[] || []);
+          if (result.orgID) {
+            getBase(result.orgID);
+          }
           return result;
         }
       } else {
@@ -72,7 +75,7 @@ export default () => {
         for (let idx in rules) {
           const item = rules[idx];
           let appCode = '';
-          if (item.actions.length) {
+          if (item.actions?.length) {
             appCode = item.actions[0].split(':')[0];
             const action = item.actions.find(key => key.split(':')[0] != appCode);
             if (action) {
@@ -99,25 +102,37 @@ export default () => {
       }
       return errMsg;
     },
-    onFinish = async (values: OrgPolicy) => {
+    onFinish = async (values: ProFormData) => {
       if (verifyRules()) {
         return;
       }
-      let result: OrgPolicy | null;
+      let id: string | null = null;
       setSaveLoading(true);
       if (policyId) {
-        values.rules = rules;
-        result = await updateOrgPolicy(policyId, values);
+        const result = await updateOrgPolicy(policyId, {
+          name: values.name,
+          comments: values.comments,
+          rules,
+        });
+        if (result?.id) {
+          id = result.id
+        }
       } else {
-        values.rules = rules;
-        values.orgID = orgInfo?.id || '';
-        result = await createOrgPolicy(values);
+        const result = await createOrgPolicy({
+          name: values.name,
+          comments: values.comments,
+          rules,
+          orgID: orgInfo?.id || '',
+        });
+        if (result?.id) {
+          id = result.id
+        }
       }
 
-      if (result?.id) {
+      if (id) {
         message.success(t('submit_success'));
         if (!policyId) {
-          setSearchParams({ id: result.id });
+          setSearchParams({ id: id });
         }
         await getRequest();
       }

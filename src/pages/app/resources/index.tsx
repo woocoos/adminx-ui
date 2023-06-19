@@ -2,12 +2,13 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Space } from 'antd';
 import { useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
-import { App, getAppInfo } from '@/services/app';
+import { getAppInfo } from '@/services/app';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from '@ice/runtime';
-import { AppRes, getAppResList } from '@/services/app/resource';
+import { getAppResList } from '@/services/app/resource';
 import CreateRes from './components/createRes';
 import Auth from '@/components/Auth';
+import { App, AppRes, AppResWhereInput } from '@/__generated__/graphql';
 
 
 export default () => {
@@ -76,24 +77,30 @@ export default () => {
 
   const
     getApp = async () => {
-      let info: App | null = null,
-        appId = searchParams.get('id');
+      const appId = searchParams.get('id');
       if (appId) {
-        info = await getAppInfo(appId);
-        if (info?.id) {
-          setAppInfo(info);
+        const result = await getAppInfo(appId);
+        if (result?.id) {
+          setAppInfo(result as App)
+          return result
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as AppRes[], success: true, total: 0 },
+        where: AppResWhereInput = {},
         info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
+      where.nameContains = params.nameContains
+      where.typeNameContains = params.typeNameContains
       if (info) {
-        const result = await getAppResList(info.id, params, filter, sort);
-        if (result) {
-          // 前端过滤
-          table.data = result.edges.map(item => item.node);
+        const result = await getAppResList(info.id, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as AppRes[];
           table.total = result.totalCount;
         }
       }

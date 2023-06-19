@@ -6,10 +6,11 @@ import { message } from 'antd';
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem } from '@/pkg/localStore';
-import { User, userPermissions } from './services/user';
+import { userPermissions } from './services/user';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';
+import { User } from './__generated__/graphql';
 
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
@@ -62,13 +63,12 @@ export const authConfig = defineAuthConfig(async (appData) => {
     initialAuth = {};
   // 判断路由权限
   if (basis.token) {
-    const ups = await userPermissions({}, {
-      Authorization: `Bearer ${basis.token}`,
-      'X-Tenant-ID': basis.tenantId,
-    });
+    const ups = await userPermissions({});
     if (ups) {
       ups.forEach(item => {
-        initialAuth[item.name] = true;
+        if (item) {
+          initialAuth[item.name] = true;
+        }
       });
     }
   } else {

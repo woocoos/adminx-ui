@@ -1,5 +1,6 @@
+import { UserIdentity } from '@/__generated__/graphql';
 import Auth, { checkAuth } from '@/components/Auth';
-import { EnumUserIdentityKind, EnumUserStatus, UserIdentity, bindUserIdentity, delUserIdentity, getUserInfo } from '@/services/user';
+import { EnumUserIdentityKind, EnumUserStatus, bindUserIdentity, delUserIdentity, getUserInfoIdentities } from '@/services/user';
 import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-components';
 import { Drawer, Popconfirm, message } from 'antd';
 import { useRef, useState } from 'react';
@@ -68,7 +69,8 @@ export default (props: {
               description={`${t('confirm_delete')}?`}
               onConfirm={async () => {
                 setIsAction(true);
-                if (await delUserIdentity(record.id)) {
+                const reulst = await delUserIdentity(record.id)
+                if (reulst === true) {
                   message.success(t('submit_success'));
                   proTableRef.current?.reload();
                 }
@@ -90,7 +92,7 @@ export default (props: {
       setLoading(true);
       const table = { data: [] as UserIdentity[], success: true, total: 0 };
       if (props.id) {
-        const userInfo = await getUserInfo(props.id, ['identity']);
+        const userInfo = await getUserInfoIdentities(props.id);
         if (userInfo?.identities) {
           table.data = userInfo.identities;
           table.total = userInfo?.identities.length;
@@ -127,10 +129,13 @@ export default (props: {
           cancelText: t('cancel'),
           onSave: async (_key: string, record: UserIdentity) => {
             if (props.id) {
-              const input: any = { ...record };
-              delete input.id;
-              delete input.index;
-              const result = await bindUserIdentity(props.id, input);
+              const result = await bindUserIdentity({
+                kind: record.kind,
+                code: record.code,
+                status: record.status,
+                codeExtend: record.codeExtend,
+                userID: props.id,
+              });
               if (result?.id) {
                 message.success(t('submit_success'));
                 proTableRef.current?.reload();

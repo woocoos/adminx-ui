@@ -1,6 +1,7 @@
+import { Org, OrgKind, OrgWhereInput } from '@/__generated__/graphql';
 import { getAppOrgList } from '@/services/app/org';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
-import { EnumOrgKind, Org, OrgKind, getOrgList, getOrgPathList } from '@/services/org';
+import { EnumOrgKind, getOrgList, getOrgPathList } from '@/services/org';
 import store from '@/store';
 import { formatTreeData } from '@/util';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
@@ -47,12 +48,20 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as Org[], success: true, total: 0 };
+      const table = { data: [] as Org[], success: true, total: 0 },
+        where: OrgWhereInput = {};
       setExpandedRowKeys([]);
       if (props.appId) {
-        const data = await getAppOrgList(props.appId, params, filter, sort);
+        where.nameContains = params.name
+        where.codeContains = params.code
+        where.kind = params.kind
+        const data = await getAppOrgList(props.appId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
         if (data?.totalCount) {
-          table.data = data.edges.map(item => item.node);
+          table.data = data.edges?.map(item => item?.node) as Org[];
           table.total = data.totalCount;
         }
         setAllList(table.data);
@@ -62,9 +71,13 @@ export default (props: {
           list = await getOrgPathList(props.orgId || basisState.tenantId, props.kind);
           table.total = list.length;
         } else {
-          const result = await getOrgList({ kind: props.kind }, {}, {});
-          if (result) {
-            list = result.edges.map(item => item.node);
+          where.kind = props.kind
+          const result = await getOrgList({
+            pageSize: 999,
+            where,
+          });
+          if (result?.totalCount) {
+            list = result.edges?.map(item => item?.node) as Org[];
             table.total = result.totalCount;
           }
         }

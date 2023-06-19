@@ -1,14 +1,10 @@
-import {
-  PageContainer,
-  ProCard,
-  useToken,
-} from '@ant-design/pro-components';
+import { PageContainer, ProCard, useToken } from '@ant-design/pro-components';
 import { Tree, Input, Button, Row, Col, message } from 'antd';
 import { useEffect, useState, useRef } from 'react';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import UserList, { UserListRef } from '@/pages/account/components/listAccount';
 import { formatTreeData, getTreeDropData } from '@/util';
-import { Org, getOrgPathList, moveOrg } from '@/services/org';
+import { getOrgPathList, moveOrg } from '@/services/org';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from '@ice/runtime';
@@ -16,6 +12,7 @@ import { TreeDataState } from '@/services/graphql';
 import KeepAlive from '@/components/KeepAlive';
 import styles from './index.module.css';
 import Auth from '@/components/Auth';
+import { Org, OrgKind } from '@/__generated__/graphql';
 
 const PageOrgUsers = (props: {
   orgId: string;
@@ -34,7 +31,7 @@ const PageOrgUsers = (props: {
   const
     getRequest = async () => {
       setLoading(true);
-      const orgList = await getOrgPathList(props.orgId, 'org'),
+      const orgList = await getOrgPathList(props.orgId, OrgKind.Org),
         topData = orgList[0];
       if (topData?.id) {
         setSelectedData(topData);

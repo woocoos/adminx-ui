@@ -1,10 +1,10 @@
-import { App } from '@/services/app';
 import { getAppResList } from '@/services/app/resource';
 import { Checkbox, Col, Popconfirm, Row, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './index.module.css';
 import Create from './create';
+import { App } from '@/__generated__/graphql';
 
 export type AppResItem = {
   title: string;
@@ -38,23 +38,24 @@ export default (props: {
 
   const
     getRequest = async () => {
-      const result = await getAppResList(props.appInfo.id, {}, {}, {});
-      if (result) {
-        setDataSource(
-          result.edges.map(item => {
-            const arn = props.isShowAppCode ? `${props.appInfo.code}${item.node.arnPattern}` : item.node.arnPattern,
-              arnParams = arn.split(':').filter(sItem => sItem.indexOf('/') > -1).map(sItem => sItem.split('/')[0]);
+      const result = await getAppResList(props.appInfo.id, {
+        pageSize: 999,
+      });
+      if (result?.totalCount) {
+        const list: AppResItem[] = result.edges?.map(item => {
+          const arn = props.isShowAppCode ? `${props.appInfo.code}${item?.node?.arnPattern}` : (item?.node?.arnPattern || ''),
+            arnParams = arn.split(':').filter(sItem => sItem.indexOf('/') > -1).map(sItem => sItem.split('/')[0]);
 
-            return {
-              title: item.node.name,
-              typeName: item.node.typeName,
-              arn,
-              arnParams,
-              allArn: props.orgId ? arn.replace(':tenant_id:', `:${props.orgId}:`) : arn,
+          return {
+            title: item?.node?.name || '',
+            typeName: item?.node?.typeName || '',
+            arn,
+            arnParams,
+            allArn: props.orgId ? arn.replace(':tenant_id:', `:${props.orgId}:`) : arn,
+          };
+        }) || []
 
-            };
-          }),
-        );
+        setDataSource(list);
       }
     },
     valueArns = (item: AppResItem) => {

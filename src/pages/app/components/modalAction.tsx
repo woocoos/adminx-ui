@@ -1,9 +1,10 @@
 import { Modal } from 'antd';
-import { AppAction, EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/app/action';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { AppAction, AppActionWhereInput } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
@@ -35,10 +36,18 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as AppAction[], success: true, total: 0 };
-      const result = await getAppActionList(props.appId, params, filter, sort);
-      if (result) {
-        table.data = result.edges.map(item => item.node);
+      const table = { data: [] as AppAction[], success: true, total: 0 },
+        where: AppActionWhereInput = {};
+      where.nameContains = params.nameContains
+      where.kind = params.kind
+      where.method = params.method
+      const result = await getAppActionList(props.appId, {
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      });
+      if (result?.totalCount) {
+        table.data = result.edges?.map(item => item?.node) as AppAction[];
         table.total = result.totalCount;
       }
       setSelectedRowKeys([]);

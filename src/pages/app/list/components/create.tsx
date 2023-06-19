@@ -1,8 +1,22 @@
+import { App, AppKind } from '@/__generated__/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, createAppInfo, getAppInfo, updateAppInfo } from '@/services/app';
+import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/app';
+import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+type ProFormData = {
+  redirectURI?: string
+  scopes?: string
+  tokenValidity?: number
+  refreshTokenValidity?: number
+  logo?: string
+  name?: string
+  code?: string
+  kind?: AppKind
+  comments?: string
+}
 
 export default (props: {
   open?: boolean;
@@ -12,6 +26,7 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [appInfo, setAppInfo] = useState<App>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -28,9 +43,10 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       if (props.id) {
-        const appInfo = await getAppInfo(props.id);
-        if (appInfo?.id) {
-          return appInfo;
+        const result = await getAppInfo(props.id);
+        if (result?.id) {
+          setAppInfo(result as App)
+          return result;
         }
       }
       return {};
@@ -38,10 +54,31 @@ export default (props: {
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: App) => {
+    onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      const appInfo = props.id ? await updateAppInfo(props.id, values) : await createAppInfo(values);
-      if (appInfo?.id) {
+      const result = props.id ?
+        await updateAppInfo(props.id, updateFormat({
+          kind: values.kind || AppKind.Native,
+          name: values.name || '',
+          redirectURI: values.redirectURI,
+          scopes: values.scopes,
+          tokenValidity: values.tokenValidity,
+          refreshTokenValidity: values.refreshTokenValidity,
+          logo: values.logo,
+          comments: values.comments,
+        }, appInfo || {})) :
+        await createAppInfo({
+          code: values.code || '',
+          kind: values.kind || AppKind.Native,
+          name: values.name || '',
+          redirectURI: values.redirectURI,
+          scopes: values.scopes,
+          tokenValidity: values.tokenValidity,
+          refreshTokenValidity: values.refreshTokenValidity,
+          logo: values.logo,
+          comments: values.comments,
+        });
+      if (result?.id) {
         setSaveDisabled(true);
         props.onClose?.(true);
       }
@@ -106,9 +143,9 @@ export default (props: {
           name="kind"
           label={t('type')}
           options={[
-            { value: 'web', label: 'web' },
-            { value: 'native', label: 'native' },
-            { value: 'server', label: 'server' },
+            { value: AppKind.Web, label: AppKind.Web },
+            { value: AppKind.Native, label: AppKind.Native },
+            { value: AppKind.Server, label: AppKind.Server },
           ]}
           rules={[
             { required: true, message: `${t('please_enter_type')}` },

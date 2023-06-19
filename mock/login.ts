@@ -120,4 +120,13 @@ export default {
       captchaImage: "data:image/svg+xml;utf8," + encodeURIComponent(captcha.data)
     });
   },
+  'POST /api/mfa/bind-prepare': (request: Request, response: Response) => {
+    response.send({
+      principalName: 'admin',
+      secret: 'adminsecret',
+      qrCodeUri: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
+      stateToken: 'stateToken',
+      stateTokenTTL: 1000
+    });
+  },
 }

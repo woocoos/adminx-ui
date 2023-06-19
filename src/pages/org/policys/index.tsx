@@ -1,20 +1,15 @@
-import {
-  ActionType,
-  PageContainer,
-  ProColumns,
-  ProTable,
-  useToken,
-} from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { Org, getOrgInfo } from '@/services/org';
-import { OrgPolicy, delOrgPolicy, getOrgPolicyList } from '@/services/org/policy';
+import { getOrgInfo } from '@/services/org';
+import { delOrgPolicy, getOrgPolicyList } from '@/services/org/policy';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
+import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/__generated__/graphql';
 
 
 export default () => {
@@ -89,28 +84,33 @@ export default () => {
 
   const
     getOrg = async () => {
-      let result: Org | null = null;
       const orgId = searchParams.get('id') || basisState.tenantId;
       if (orgId) {
-        result = await getOrgInfo(orgId);
+        const result = await getOrgInfo(orgId);
         if (result?.id) {
-          setOrgInfo(result);
+          setOrgInfo(result as Org);
+          return result
         }
       }
-      return result;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as OrgPolicy[], success: true, total: 0 },
-        info = await getOrg();
+        where: OrgPolicyWhereInput = {},
+        info = orgInfo || await getOrg();
       if (info?.id) {
         if (params.type) {
-          params.appPolicyIDNotNil = params.type === 'sys' ? true : undefined;
-          params.appPolicyIDIsNil = params.type === 'cust' ? true : undefined;
+          where.appPolicyIDNotNil = params.type === 'sys' ? true : undefined;
+          where.appPolicyIDIsNil = params.type === 'cust' ? true : undefined;
         }
-        delete params.type;
-        const result = await getOrgPolicyList(info?.id, params, filter, sort);
+        where.nameContains = params.nameContains
+        const result = await getOrgPolicyList(info?.id, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        }, sort);
         if (result) {
-          table.data = result.edges.map(item => item.node);
+          table.data = result.edges?.map(item => item?.node) as OrgPolicy[];
           table.total = result.totalCount;
         } else {
           table.total = 0;

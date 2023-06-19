@@ -1,30 +1,7 @@
+import { gql } from '@/__generated__';
+import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/__generated__/graphql';
 import { gid } from '@/util';
-import { TableParams, graphqlApi, getGraphqlFilter, TableSort, setClearInputField, List, graphqlPageApi, TableFilter } from '../graphql';
-import { AppMenu } from './menu';
-
-export type AppKind = 'web' | 'native' | 'server';
-export type AppStatus = 'active' | 'inactive' | 'processing';
-
-export interface App {
-  id: string;
-  name: string;
-  code: string;
-  kind: AppKind;
-  redirectURI: string;
-  appKey: string;
-  appSecret: string;
-  scopes: string;
-  tokenValidity: number;
-  refreshTokenValidity: number;
-  logo: string;
-  comments: string;
-  status: AppStatus;
-  createdAt: Date;
-  createdBy: string;
-  updatedAt: Date;
-  updatedBy: string;
-  menus?: List<AppMenu>;
-}
+import { koClient } from '../graphql';
 
 export const EnumAppStatus = {
   active: { text: '活跃', status: 'success' },
@@ -39,11 +16,38 @@ export const EnumAppKind = {
 };
 
 
-export const AppNodeField = `
-  id,name,code,kind,redirectURI,appKey,appSecret,
-  scopes,tokenValidity,refreshTokenValidity,logo,comments,
-  status,createdAt
-`;
+const queryAppList = gql(/* GraphQL */`query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){
+  list:apps(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+        refreshTokenValidity,logo,comments,status,createdAt
+      }
+    }
+  }
+}`)
+
+const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
+  node(id:$gid){
+    ... on App{
+      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+      refreshTokenValidity,logo,comments,status,createdAt
+    }
+  }
+}`)
+
+const mutationUpdateApp = gql(/* GraphQL */`mutation updateApp($appId:ID!,$input: UpdateAppInput!){
+  action:updateApp(appID:$appId,input:$input){id}
+}`)
+
+const mutationCreateApp = gql(/* GraphQL */`mutation createApp($input: CreateAppInput!){
+  action:createApp(input:$input){ id }
+}`)
+
+const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){
+  action:deleteApp(appID: $appId)
+}`)
 
 /**
  * 获取应用信息
@@ -52,32 +56,28 @@ export const AppNodeField = `
  * @param sort
  * @returns
  */
-export async function getAppList(params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:AppOrder,$where:AppWhereInput){
-        list:apps(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${AppNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<App>;
-  } else {
-    return null;
+export async function getAppList(
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: AppWhereInput
+    orderBy?: AppOrder
   }
+) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppList, {
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+
+  if (result.data?.list) {
+    return result.data.list
+  }
+  return null
 }
 
 /**
@@ -86,21 +86,16 @@ export async function getAppList(params: TableParams, filter: TableFilter, sort:
  * @returns
  */
 export async function getAppInfo(appId: string) {
-  const appGid = gid('app', appId);
-  const result = await graphqlApi(
-    `query {
-      node(id:"${appGid}"){
-        ... on App{
-          ${AppNodeField}
-        }
-      }
-    }`);
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppInfo, {
+      gid: gid('app', appId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result?.data?.node as App;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node
   }
+  return null
 }
 
 /**
@@ -109,20 +104,18 @@ export async function getAppInfo(appId: string) {
  * @param input
  * @returns
  */
-export async function updateAppInfo(appId: string, input: App | Record<string, any>) {
-  delete input['code'];
-  const result = await graphqlApi(
-    `mutation updateApp($input: UpdateAppInput!){
-      action:updateApp(appID:"${appId}",input:$input){
-        ${AppNodeField}
-      }
-    }`, { input: setClearInputField(input) });
+export async function updateAppInfo(appId: string, input: UpdateAppInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateApp, {
+      appId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as App;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -130,19 +123,17 @@ export async function updateAppInfo(appId: string, input: App | Record<string, a
  * @param input
  * @returns
  */
-export async function createAppInfo(input: App) {
-  const result = await graphqlApi(
-    `mutation createApp($input: CreateAppInput!){
-      action:createApp(input:$input){
-        ${AppNodeField}
-      }
-    }`, { input });
+export async function createAppInfo(input: CreateAppInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateApp, {
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as App;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -151,15 +142,15 @@ export async function createAppInfo(input: App) {
  * @returns
  */
 export async function delAppInfo(appId: string) {
-  const result = await graphqlApi(
-    `mutation deleteApp{
-      action:deleteApp(appID: "${appId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelApp, {
+      appId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 

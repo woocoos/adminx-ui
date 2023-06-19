@@ -3,13 +3,13 @@ import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
-import { Permission, PermissionPrincipalKind, delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/permission';
+import { delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/permission';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
-import { User } from '@/services/user';
-import { OrgRole, getUserJoinGroupList } from '@/services/org/role';
+import { getUserJoinGroupList } from '@/services/org/role';
 import Auth from '@/components/Auth';
+import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/__generated__/graphql';
 
 
 export default (props: {
@@ -118,38 +118,45 @@ export default (props: {
 
   const
     getUserGroup = async () => {
-      const result = await getUserJoinGroupList(props.userInfo.id, {}, {}, {});
+      const result = await getUserJoinGroupList(props.userInfo.id, {
+        pageSize: 999,
+      });
       if (result?.totalCount) {
-        setAllUserGroup(result.edges.map(item => item.node));
+        setAllUserGroup(result.edges?.map(item => item?.node) as OrgRole[]);
       } else {
         setAllUserGroup([]);
       }
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as Permission[], success: true, total: 0 };
-      params.principalKind = props.principalKind;
-      params.orgID = basisState.tenantId;
+      const table = { data: [] as Permission[], success: true, total: 0 },
+        where: PermissionWhereInput = {};
+      where.principalKind = props.principalKind;
+      where.orgID = basisState.tenantId;
       if (params.orgRoleId) {
-        params.hasRoleWith = {
+        where.hasRoleWith = [{
           id: params.orgRoleId || undefined,
-        };
+        }];
       }
       if (params.name || params.comments || params.type) {
-        params.hasOrgPolicyWith = {
+        where.hasOrgPolicyWith = [{
           nameContains: params.name || null,
           commentsContains: params.comments || null,
           appPolicyIDNotNil: params.type === 'sys' ? true : undefined,
           appPolicyIDIsNil: params.type === 'cust' ? true : undefined,
-        };
+        }];
       }
-      delete params.orgRoleId;
-      delete params.name;
-      delete params.comments;
-      delete params.type;
-      const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, params, filter, sort)
-        : await getUserPermissionList(props.userInfo.id, params, filter, sort);
+
+      const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, {
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }) : await getUserPermissionList(props.userInfo.id, {
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      });
       if (result?.totalCount) {
-        table.data = result.edges.map(item => item.node);
+        table.data = result.edges?.map(item => item?.node) as Permission[] || [];
         table.total = result.totalCount;
       }
       setSelectedRowKeys([]);

@@ -1,29 +1,113 @@
 import { gid } from '@/util';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from '../graphql';
+import { gql } from '@/__generated__';
+import { koClient } from '../graphql';
+import { AssignRoleUserInput, CreateOrgRoleInput, OrgRoleOrder, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/__generated__/graphql';
 
-export type OrgRole = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  orgID: string;
-  kind: OrgRoleKind;
-  name: string;
-  comments: string;
-  isAppRole: boolean;
-  isGrantUser?: boolean;
-};
+const queryOrgGroupList = gql(/* GraphQL */`query orgGroupList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  list:orgGroups(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+      }
+    }
+  }
+}`)
 
-/**
- * group:组
- * role:角色
- */
-export type OrgRoleKind = 'group' | 'role';
+const queryOrgGroupListAndIsGrant = gql(/* GraphQL */`query orgGroupListAndIsGrant($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  list:orgGroups(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+        isGrantUser(userID: $userId)
+      }
+    }
+  }
+}`)
 
-export const OrgRoleNodeField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
-`;
+const queryUserGroupList = gql(/* GraphQL */`query userGroupList($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  list:userGroups(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+      }
+    }
+  }
+}`)
+
+const queryOrgRoleList = gql(/* GraphQL */`query orgRoleList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  list:orgRoles(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+      }
+    }
+  }
+}`)
+
+const queryOrgRoleListAndIsGrant = gql(/* GraphQL */`query orgRoleListAndIsGrant($userId:ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  list:orgRoles(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+        isGrantUser(userID: $userId)
+      }
+    }
+  }
+}`)
+
+const queryOrgRoleInfo = gql(/* GraphQL */`query orgRoleInfo($gid:GID!){
+  node(id:$gid){
+    ... on OrgRole{
+      id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+    }
+  }
+}`)
+
+const mutationCreateOrgRole = gql(/* GraphQL */`mutation createOrgRole($input: CreateOrgRoleInput!){
+  action:createRole(input:$input){id}
+}`)
+
+const mutationUpdateOrgRole = gql(/* GraphQL */`mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){
+  action:updateRole(roleID:$orgRoleId,input:$input){id}
+}`)
+
+const mutationDelOrgRole = gql(/* GraphQL */`mutation deleteOrgRole($orgRoleId:ID!){
+  action:deleteRole(roleID:$orgRoleId)
+}`)
+
+const mutationAssignOrgRoleUser = gql(/* GraphQL */`mutation assignOrgRoleUser($input: AssignRoleUserInput!){
+  action:assignRoleUser(input:$input)
+}`)
+
+const mutationRevOrgRoleUser = gql(/* GraphQL */`mutation revokeOrgRoleUser($orgRoleId:ID!,$userId:ID!){
+  action:revokeRoleUser(roleID:$orgRoleId,userID:$userId)
+}`)
+
+const mutationAssignOrgAppRole = gql(/* GraphQL */`mutation assignOrgAppRole($orgId:ID!,$appRoleId:ID!){
+  action:assignOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
+}`)
+
+const mutationRevOrgAppRole = gql(/* GraphQL */`mutation revokeOrgAppRole($orgId:ID!,$appRoleId:ID!){
+  action:revokeOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
+}`)
+
+const queryOrgGroupListNum = gql(/* GraphQL */`query orgGroupListNum($where:OrgRoleWhereInput){
+  list:orgGroups(where: $where){ totalCount }
+}`)
+
+const queryUserGroupListNum = gql(/* GraphQL */`query userGroupListNum($userId:ID!,$where:OrgRoleWhereInput){
+  list:userGroups(userID:$userId,where: $where){ totalCount }
+}`)
+
+const queryOrgRoleListNum = gql(/* GraphQL */`query orgRoleListNum($where:OrgRoleWhereInput){
+  list:orgRoles(where: $where){ totalCount }
+}`)
+
 
 /**
  * 获取组织用户组
@@ -32,35 +116,37 @@ export const OrgRoleNodeField = `
  * @param sort
  * @returns
  */
-export async function getOrgGroupList(params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
-  userId?: string;
-}) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgGroups($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-        list:orgGroups(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${OrgRoleNodeField}
-              ${isGrant?.userId ? `isGrantUser(userID: "${isGrant.userId}")` : ''}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<OrgRole>;
-  } else {
-    return null;
+export async function getOrgGroupList(
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: OrgRoleWhereInput
+    orderBy?: OrgRoleOrder
+  },
+  isGrant?: {
+    userId?: string;
+  }) {
+  const koc = koClient();
+  const result = isGrant?.userId ? await koc.client.query(
+    queryOrgGroupListAndIsGrant, {
+    userId: isGrant.userId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, {
+    url: `${koc.url}?p=${gather.current || 1}`
+  }).toPromise() : await koc.client.query(
+    queryOrgGroupList, {
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, {
+    url: `${koc.url}?p=${gather.current || 1}`
+  }).toPromise()
+  if (result.data?.list) {
+    return result.data?.list
   }
+  return null
 }
 
 /**
@@ -71,32 +157,29 @@ export async function getOrgGroupList(params: TableParams, filter: TableFilter, 
  * @param sort
  * @returns
  */
-export async function getUserJoinGroupList(userId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query userGroups($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-        list:userGroups(userID:"${userId}"after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${OrgRoleNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
+export async function getUserJoinGroupList(
+  userId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: OrgRoleWhereInput
+    orderBy?: OrgRoleOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryUserGroupList, {
+      userId: userId,
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result.data.list as List<OrgRole>;
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result.data.list
   }
+  return null
 }
 
 /**
@@ -106,35 +189,38 @@ export async function getUserJoinGroupList(userId: string, params: TableParams, 
  * @param sort
  * @returns
  */
-export async function getOrgRoleList(params: TableParams, filter: TableFilter, sort: TableSort, isGrant?: {
-  userId?: string;
-}) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgRoles($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-        list:orgRoles(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${OrgRoleNodeField}
-              ${isGrant?.userId ? `isGrantUser(userID: "${isGrant.userId}")` : ''}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
+export async function getOrgRoleList(
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: OrgRoleWhereInput
+    orderBy?: OrgRoleOrder
+  },
+  isGrant?: {
+    userId?: string;
+  }) {
+  const koc = koClient(),
+    result = isGrant?.userId ? await koc.client.query(
+      queryOrgRoleListAndIsGrant, {
+      userId: isGrant.userId,
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise() : await koc.client.query(
+      queryOrgRoleList, {
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result.data.list as List<OrgRole>;
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result.data.list
   }
+  return null
 }
 
 
@@ -144,21 +230,16 @@ export async function getOrgRoleList(params: TableParams, filter: TableFilter, s
  * @returns
  */
 export async function getOrgRoleInfo(orgRoleId: string) {
-  const result = await graphqlApi(
-    `query{
-      node(id:"${gid('org_role', orgRoleId)}"){
-        ... on OrgRole{
-          ${OrgRoleNodeField}
-        }
-      }
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgRoleInfo, {
+      gid: gid('org_role', orgRoleId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result?.data?.node as OrgRole;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'OrgRole') {
+    return result.data.node
   }
+  return null
 }
 
 /**
@@ -166,21 +247,17 @@ export async function getOrgRoleInfo(orgRoleId: string) {
  * @param input
  * @returns
  */
-export async function createOrgRole(input: OrgRole | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation createRole($input: CreateOrgRoleInput!){
-      action:createRole(input:$input){
-        ${OrgRoleNodeField}
-      }
-    }`,
-    { input },
-  );
+export async function createOrgRole(input: CreateOrgRoleInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateOrgRole, {
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as OrgRole;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -189,21 +266,18 @@ export async function createOrgRole(input: OrgRole | Record<string, any>) {
  * @param input
  * @returns
  */
-export async function updateOrgRole(orgRoleId: string, input: OrgRole | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updateRole($input: UpdateOrgRoleInput!){
-      action:updateRole(roleID:"${orgRoleId}",input:$input){
-        ${OrgRoleNodeField}
-      }
-    }`,
-    { input: setClearInputField(input) },
-  );
+export async function updateOrgRole(orgRoleId: string, input: UpdateOrgRoleInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateOrgRole, {
+      input,
+      orgRoleId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as OrgRole;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -213,17 +287,16 @@ export async function updateOrgRole(orgRoleId: string, input: OrgRole | Record<s
  * @returns
  */
 export async function delOrgRole(orgRoleId: string) {
-  const result = await graphqlApi(
-    `mutation deleteRole{
-      action:deleteRole(roleID:"${orgRoleId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelOrgRole, {
+      orgRoleId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -232,26 +305,17 @@ export async function delOrgRole(orgRoleId: string) {
  * @param input
  * @returns
  */
-export async function assignOrgRoleUser(input: {
-  orgRoleID: string;
-  userID: string;
-  startAt?: string;
-  endAt?: string;
-}) {
-  const result = await graphqlApi(
-    `mutation assignRoleUser($input: AssignRoleUserInput!){
-      action:assignRoleUser(input:$input)
-    }`,
-    {
+export async function assignOrgRoleUser(input: AssignRoleUserInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationAssignOrgRoleUser, {
       input,
-    },
-  );
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -261,17 +325,17 @@ export async function assignOrgRoleUser(input: {
  * @returns
  */
 export async function revokeOrgRoleUser(orgRoleId: string, userId: string) {
-  const result = await graphqlApi(
-    `mutation {
-      action:revokeRoleUser(roleID:"${orgRoleId}",userID:"${userId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationRevOrgRoleUser, {
+      orgRoleId,
+      userId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -282,17 +346,17 @@ export async function revokeOrgRoleUser(orgRoleId: string, userId: string) {
  * @returns
  */
 export async function assignOrgAppRole(orgId: string, appRoleId: string) {
-  const result = await graphqlApi(
-    `mutation assignOrganizationAppRole{
-      action:assignOrganizationAppRole(orgID:"${orgId}",appRoleID:"${appRoleId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationAssignOrgAppRole, {
+      orgId,
+      appRoleId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -302,17 +366,17 @@ export async function assignOrgAppRole(orgId: string, appRoleId: string) {
  * @returns
  */
 export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
-  const result = await graphqlApi(
-    `mutation revokeOrganizationAppRole{
-      action:revokeOrganizationAppRole(orgID:"${orgId}",appRoleID:"${appRoleId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationRevOrgAppRole, {
+      orgId,
+      appRoleId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -321,24 +385,17 @@ export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
  * @param where
  * @returns
  */
-export async function getOrgGroupQty(where: Record<string, any>) {
-  const result = await graphqlApi(
-    `query orgGroups($where:OrgRoleWhereInput){
-      list:orgGroups(where: $where){
-        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-      }
-    }`,
-    {
+export async function getOrgGroupQty(where?: OrgRoleWhereInput) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgGroupListNum, {
       where,
-    },
-  );
+    }).toPromise()
 
-  if (result?.data?.list) {
-    const data = result.data.list as List<OrgRole>;
-    return data.totalCount;
-  } else {
-    return 0;
+  if (result.data?.list.__typename === 'OrgRoleConnection') {
+    return result.data.list.totalCount
   }
+  return 0
 }
 
 
@@ -348,24 +405,18 @@ export async function getOrgGroupQty(where: Record<string, any>) {
  * @param where
  * @returns
  */
-export async function getUserJoinGroupQty(userId: string, where: Record<string, any>) {
-  const result = await graphqlApi(
-    `query userGroups($where:OrgRoleWhereInput){
-      list:userGroups(userID:"${userId}",where: $where){
-        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-      }
-    }`,
-    {
+export async function getUserJoinGroupQty(userId: string, where?: OrgRoleWhereInput) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryUserGroupListNum, {
       where,
-    },
-  );
+      userId,
+    }).toPromise()
 
-  if (result?.data?.list) {
-    const data = result.data.list as List<OrgRole>;
-    return data.totalCount;
-  } else {
-    return 0;
+  if (result.data?.list.__typename === 'OrgRoleConnection') {
+    return result.data.list.totalCount
   }
+  return 0
 }
 
 /**
@@ -373,22 +424,15 @@ export async function getUserJoinGroupQty(userId: string, where: Record<string, 
  * @param where
  * @returns
  */
-export async function getOrgRoleQty(where: Record<string, any>) {
-  const result = await graphqlApi(
-    `query orgRoles($where:OrgRoleWhereInput){
-      list:orgRoles(where: $where){
-        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-      }
-    }`,
-    {
+export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryOrgRoleListNum, {
       where,
-    },
-  );
+    }).toPromise()
 
-  if (result?.data?.list) {
-    const data = result.data.list as List<OrgRole>;
-    return data.totalCount;
-  } else {
-    return 0;
+  if (result.data?.list.__typename === 'OrgRoleConnection') {
+    return result.data.list.totalCount
   }
+  return 0
 }

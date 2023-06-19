@@ -1,14 +1,12 @@
-import { PolicyRule } from '@/services/app/policy';
 import { ProCard } from '@ant-design/pro-components';
 import { Divider, Radio, Tabs, Row, Col, Button, Popconfirm } from 'antd';
 import { CSSProperties, useState } from 'react';
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import { AppAction } from '@/services/app/action';
 import ActionsTransfer from '@/components/ActionsTransfer';
-import { App } from '@/services/app';
 import Editor from '@monaco-editor/react';
 import { useTranslation } from 'react-i18next';
 import AppPolicyRes from '@/components/AppPolicyRes';
+import { App, AppAction, PolicyEffect, PolicyRule } from '@/__generated__/graphql';
 
 const RuleItem = (props: {
   rule: PolicyRule;
@@ -28,10 +26,10 @@ const RuleItem = (props: {
     getTitle = () => {
       const titles: string[] = [];
       titles.push(props.appInfo.name);
-      if (props.rule.actions[0] === '*') {
+      if (props.rule?.actions?.[0] === '*') {
         titles.push(t('all_operation'));
       } else {
-        titles.push(t('{{num}}_operations', { num: props.rule.actions.length }));
+        titles.push(t('{{num}}_operations', { num: props.rule.actions?.length || 0 }));
       }
       return titles.join('/');
     };
@@ -110,13 +108,13 @@ const RuleItem = (props: {
         </Col>
         <Col flex="auto">
           <div>
-            <a>{props.rule.actions[0] === '*' ? t('all_operation') : t('{{num}}_operations', { num: props.rule.actions.length })}</a>
+            <a>{props.rule.actions?.[0] === '*' ? t('all_operation') : t('{{num}}_operations', { num: props.rule.actions?.length || 0 })}</a>
           </div>
           <div x-if={stretch1}>
             <div>
               <Radio.Group
                 disabled={props.readonly}
-                value={props.rule.actions[0] === '*'}
+                value={props.rule.actions?.[0] === '*'}
                 options={[
                   { label: `${t('all_operation')}(*)`, value: true },
                   { label: t('specify'), value: false },
@@ -133,11 +131,11 @@ const RuleItem = (props: {
               />
             </div>
             {
-              props.rule.actions[0] == '*' ? <></> : <>
+              props.rule.actions?.[0] == '*' ? <></> : <>
                 <br />
                 <ActionsTransfer
                   readonly={props.readonly}
-                  targetKeys={props.rule.actions}
+                  targetKeys={props.rule.actions || []}
                   dataSource={props.appActions}
                   onChange={(values) => {
                     const nRule = { ...props.rule };
@@ -285,7 +283,7 @@ export default (props: {
               size="small"
               onClick={() => {
                 props.rules.push({
-                  effect: 'allow',
+                  effect: PolicyEffect.Allow,
                   actions: [],
                   resources: null,
                   conditions: null,

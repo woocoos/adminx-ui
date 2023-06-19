@@ -1,33 +1,42 @@
+import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType } from '@/__generated__/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { getOrgInfo } from '@/services/org';
-import { UpdateUserInfoScene, User, UserLoginProfile, UserLoginProfileSetKind, UserType, createUserInfo, getUserInfo, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/user';
+import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/user';
 import store from '@/store';
-import {
-  DrawerForm,
-  ProFormText,
-  ProFormTextArea,
-  ProFormSwitch,
-} from '@ant-design/pro-components';
-import { Alert, Radio } from 'antd';
+import { DrawerForm, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
+import { Alert, Radio, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Sha256 from 'crypto-js/sha256';
+import { updateFormat } from '@/util';
 
+type ProFormData = {
+  principalName?: string
+  password?: string
+  displayName?: string
+  email?: string
+  mobile?: string
+  comments?: string
+  canLogin?: boolean
+  passwordReset?: boolean
+}
 
 export default (props: {
-  open?: boolean;
+  open: boolean;
   title?: string;
   id?: string | null;
   orgId?: string;
-  userType: UserType;
+  userType: UserUserType;
   recycleInfo?: User;
   scene: UpdateUserInfoScene;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
+    [initValues, setInitValues] = useState<User | UserLoginProfile | null>(null),
     [domain, setDomain] = useState<string>(''),
-    [setKind, setSetKind] = useState<UserLoginProfileSetKind>('auto'),
+    [setKind, setSetKind] = useState<UserLoginProfileSetKind>(UserLoginProfileSetKind.Auto),
     [basisState] = store.useModel('basis');
 
   setLeavePromptWhen(saveDisabled);
@@ -43,22 +52,22 @@ export default (props: {
     },
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        props.onClose();
       }
       setSaveDisabled(true);
     },
     getRequest = async () => {
       let info: User | UserLoginProfile | null = null;
       if (props.id) {
-        info = await getUserInfo(props.id, ['loginProfile']);
-        switch (props.scene) {
-          case 'loginProfile':
-            if (info?.loginProfile) {
-              info = info.loginProfile;
+        const result = await getUserInfoLoginProfile(props.id);
+        if (result?.id) {
+          if (props.scene === 'loginProfile') {
+            if (result?.loginProfile) {
+              info = result.loginProfile as UserLoginProfile;
             }
-            break;
-          default:
-            break;
+          } else {
+            info = result as User
+          }
         }
       } else if (props.scene === 'recycle' && props.recycleInfo) {
         info = props.recycleInfo;
@@ -68,38 +77,82 @@ export default (props: {
       }
       setSaveLoading(false);
       setSaveDisabled(true);
+      setInitValues(info);
       return info || {};
     },
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: User) => {
+    onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let result: User | UserLoginProfile | null = null;
+      let isTrue = false;
       if (props.id) {
-        switch (props.scene) {
-          case 'base':
-            result = await updateUserInfo(props.id, values);
-            break;
-          case 'loginProfile':
-            result = await updateUserProfile(props.id, values);
-            break;
-          default:
-            break;
+        if (props.scene === 'base') {
+          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}));
+          if (result?.id) {
+            isTrue = true;
+          }
+        } else if (props.scene === 'loginProfile') {
+          const result = await updateUserProfile(props.id, updateFormat(values, initValues || {}));
+          if (result?.id) {
+            isTrue = true;
+          }
         }
       } else {
         if (props.userType === 'member' && domain) {
           values.principalName = `${values.principalName}@${domain}`;
         }
         if (props.scene == 'recycle' && props.recycleInfo) {
-          result = await restoreRecycleUser(props.recycleInfo.id, values, setKind);
+          let pwdInput: CreateUserPasswordInput | undefined = undefined
+          if (setKind === UserLoginProfileSetKind.Customer) {
+            pwdInput = {
+              scene: UserPasswordScene.Login,
+              status: UserPasswordSimpleStatus.Active,
+              password: Sha256(values.password || '').toString(),
+              userID: props.recycleInfo.id,
+            }
+          }
+          const result = await restoreRecycleUser(props.recycleInfo.id, {
+            comments: values.comments,
+            displayName: values.displayName,
+            email: values.email,
+            mobile: values.mobile,
+            principalName: values.principalName,
+          }, setKind, pwdInput);
+          if (result?.id) {
+            isTrue = true;
+          }
         } else {
-          result = await createUserInfo(props?.orgId || basisState.tenantId, values, props.userType, setKind);
+          let password: CreateUserPasswordInput | undefined = undefined
+          if (setKind === UserLoginProfileSetKind.Customer) {
+            password = {
+              scene: UserPasswordScene.Login,
+              status: UserPasswordSimpleStatus.Active,
+              password: Sha256(values.password || '').toString()
+            }
+          }
+          const result = await createUserInfo(props?.orgId || basisState.tenantId, {
+            mobile: values.mobile,
+            email: values.email,
+            principalName: values.principalName || '',
+            displayName: values.displayName || '',
+            comments: values.comments,
+            status: UserSimpleStatus.Active,
+            loginProfile: {
+              setKind,
+              verifyDevice: false,
+            },
+            password,
+          }, props.userType);
+          if (result?.id) {
+            isTrue = true;
+          }
         }
       }
-      if (result?.id) {
+      if (isTrue) {
+        message.success(t('submit_success'));
         setSaveDisabled(true);
-        props.onClose?.(true);
+        props.onClose(true);
       }
       setSaveLoading(false);
       return false;

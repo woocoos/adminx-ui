@@ -4,13 +4,13 @@ import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { useSearchParams } from '@ice/runtime';
-import { Org } from '@/services/org';
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppRoleAssignedOrgList } from '@/services/app/org';
-import { AppRole, getAppRoleInfo } from '@/services/app/role';
+import { getAppRoleInfo } from '@/services/app/role';
 import { assignOrgAppRole, revokeOrgAppRole } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
+import { AppRole, Org, OrgWhereInput } from '@/__generated__/graphql';
 
 
 export default () => {
@@ -72,26 +72,27 @@ export default () => {
 
   const
     getInfo = async () => {
-      let info: AppRole | null = null,
-        appRoleId = searchParams.get('id');
+      const appRoleId = searchParams.get('id');
       if (appRoleInfo?.id == appRoleId) {
         return appRoleInfo;
       }
       if (appRoleId) {
-        info = await getAppRoleInfo(appRoleId, ['app']);
-        if (info?.id) {
-          setAppRoleInfo(info);
+        const result = await getAppRoleInfo(appRoleId);
+        if (result?.id) {
+          setAppRoleInfo(result as AppRole);
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as Org[], success: true, total: 0 },
+        where: OrgWhereInput = {},
         info = await getInfo();
+      where.nameContains = params.nameContains
       if (info) {
-        const result = await getAppRoleAssignedOrgList(info.id, params, filter, sort);
+        const result = await getAppRoleAssignedOrgList(info.id, where);
         if (result) {
-          table.data = result;
+          table.data = result as Org[];
           table.total = result.length;
         }
       }
@@ -172,7 +173,7 @@ export default () => {
         open={modal.open}
         title={t('search_org')}
         tableTitle={`${t('app')}：${appRoleInfo?.app?.name} ${t('auth_org_list')}`}
-        appId={appRoleInfo?.appID}
+        appId={appRoleInfo?.appID || ''}
         onClose={async (selectData) => {
           const sdata = selectData?.[0];
           if (sdata && appRoleInfo) {

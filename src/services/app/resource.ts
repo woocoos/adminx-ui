@@ -1,64 +1,64 @@
 import { gid } from '@/util';
-import { App } from '.';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi } from '../graphql';
+import { gql } from '@/__generated__';
+import { AppResOrder, AppResWhereInput, UpdateAppResInput } from '@/__generated__/graphql';
+import { koClient } from '../graphql';
 
-export type AppRes = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  appID: string;
-  name: string;
-  typeName: string;
-  arnPattern: string;
-  app?: App;
-};
+const queryAppResList = gql(/* GraphQL */`query appResList($gid: GID!,$first: Int,$orderBy:AppResOrder,$where:AppResWhereInput){
+  node(id:$gid){
+    ... on App{
+      id,
+      list:resources(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern
+          }
+        }
+      }
+    }
+  }
+}`)
 
-const AppResNodeField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern
-`;
+const queryAppResInfo = gql(/* GraphQL */`query appResInfo($gid:GID!){
+  node(id:$gid){
+    ... on AppRes{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern
+    }
+  }
+}`)
+
+const mutationUpdateAppRes = gql(/* GraphQL */`mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){
+  action:updateAppRes(appResID:$appResId,input:$input){id}
+}`)
 
 
 /**
  * 获取应用权限
  * @param appId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
-export async function getAppResList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query apps($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:AppResOrder,$where:AppResWhereInput){
-        node(id:"${gid('app', appId)}"){
-          ... on App{
-            id,
-            list:resources(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${AppResNodeField}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<AppRes>;
-  } else {
-    return null;
+export async function getAppResList(
+  appId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: AppResWhereInput
+    orderBy?: AppResOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppResList, {
+      gid: gid('app', appId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -68,21 +68,16 @@ export async function getAppResList(appId: string, params: TableParams, filter: 
  * @returns
  */
 export async function getAppResInfo(appResId: string) {
-  const appGid = gid('app_res', appResId);
-  const result = await graphqlApi(
-    `query node{
-      node(id:"${appGid}"){
-        ... on AppRes{
-          ${AppResNodeField}
-        }
-      }
-    }`);
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppResInfo, {
+      gid: gid('app_res', appResId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result.data.node as AppRes;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'AppRes') {
+    return result.data.node
   }
+  return null
 }
 
 
@@ -92,18 +87,16 @@ export async function getAppResInfo(appResId: string) {
  * @param input
  * @returns
  */
-export async function updateAppRes(appResId: string, input: { name: string }) {
-  //  input: AppRes | Record<string, any>
-  const result = await graphqlApi(
-    `mutation updateAppRes($input: UpdateAppResInput!){
-      action:updateAppRes(appResID:"${appResId}",input:$input){
-        ${AppResNodeField}
-      }
-    }`, { input: input });
+export async function updateAppRes(appResId: string, input: UpdateAppResInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateAppRes, {
+      appResId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result.data.action as AppRes;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }

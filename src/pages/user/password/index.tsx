@@ -1,11 +1,5 @@
 import { useRef, useState } from 'react';
-import {
-  PageContainer,
-  ProForm,
-  ProFormInstance,
-  ProFormText,
-  useToken,
-} from '@ant-design/pro-components';
+import { PageContainer, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
 import store from '@/store';
 import { updatePassword } from '@/services/user';
@@ -36,7 +30,7 @@ export default () => {
     onFinish = async (values: FormValues) => {
       setSaveLoading(true);
       const result = await updatePassword(values.oldPwd, values.newPwd);
-      if (result) {
+      if (result === true) {
         message.success(t('submit_success'));
         await basisDispatcher.logout();
         setSaveDisabled(true);

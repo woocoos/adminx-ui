@@ -15,6 +15,7 @@ const mocks = {
   ID: () => casual.integer(1, 1000000000),
   Time: () => casual.date('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
   Cursor: () => casual._string(),
+  GID: () => casual._string(),
   App: () => ({
     logo: null
   }),
@@ -31,6 +32,9 @@ const schemaWithMocks = addMocksToSchema({
   store,
   resolvers: {
     Query: {
+      globalID: (_, { type, id }) => {
+        return btoa(`${type}:${id}`)
+      },
       apps: relayStylePaginationMock(store),
       users: relayStylePaginationMock(store),
       organizations: relayStylePaginationMock(store),
@@ -39,13 +43,13 @@ const schemaWithMocks = addMocksToSchema({
         const decoded = Buffer.from(id, 'base64').toString()
         const [type, did] = decoded?.split(':', 2)
         const nType = type.split('_').map(t => t.slice(0, 1).toUpperCase() + t.slice(1)).join('')
-        console.log(store['store'])
-        console.log("--------")
-        console.log("--------")
-        console.log("--------")
+        // console.log(store['store'])
+        // console.log("--------")
+        // console.log("--------")
+        // console.log("--------")
         return store.get(nType, did)
       }
-    }
+    },
   }
 })
 

@@ -1,11 +1,11 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { App, EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/app';
+import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/app';
 import defaultApp from '@/assets/images/default-app.png';
 import AppCreate from './components/create';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { TableParams, TableSort, TableFilter, List } from '@/services/graphql';
+import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/org/app';
 import ModalApp from '../components/modalApp';
@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import KeepAlive from '@/components/KeepAlive';
+import { App, AppKind, AppWhereInput } from '@/__generated__/graphql';
 
 export type AppListRef = {
   getSelect: () => App[];
@@ -135,23 +136,44 @@ const PageAppList = (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as App[], success: true, total: 0 };
-      let result: List<App> | null = null;
+      const table = { data: [] as App[], success: true, total: 0 },
+        where: AppWhereInput = {};
+      where.nameContains = params.nameContains
+      where.codeContains = params.codeContains
+      where.kindIn = filter.kind as AppKind[]
       if (props.orgId) {
-        result = await getOrgAppList(props.orgId, params, filter, sort);
+        const result = await getOrgAppList(props.orgId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => {
+            if (item?.node) {
+              item.node.logo = item?.node?.logo || defaultApp;
+            }
+            return item?.node;
+          }) as App[];
+          table.total = result.totalCount;
+        }
       } else {
-        result = await getAppList(params, filter, sort);
+        const result = await getAppList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => {
+            if (item?.node) {
+              item.node.logo = item?.node?.logo || defaultApp;
+            }
+            return item?.node;
+          }) as App[];
+          table.total = result.totalCount;
+        }
       }
 
-      if (result) {
-        table.data = result.edges.map(item => {
-          item.node.logo = item.node.logo || defaultApp;
-          return item.node;
-        });
-        table.total = result.totalCount;
-      } else {
-        table.total = 0;
-      }
+
       setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;

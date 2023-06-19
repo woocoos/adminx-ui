@@ -1,5 +1,6 @@
+import { Org } from '@/__generated__/graphql';
 import { AppList } from '@/pages/app/list';
-import { Org, getOrgInfo } from '@/services/org';
+import { getOrgInfo } from '@/services/org';
 import { PageContainer, useToken } from '@ant-design/pro-components';
 import { useSearchParams } from '@ice/runtime';
 import { useEffect, useState } from 'react';
@@ -16,7 +17,7 @@ export default () => {
     if (orgId) {
       const result = await getOrgInfo(orgId);
       if (result) {
-        setInfo(result);
+        setInfo(result as Org);
       }
     }
   };

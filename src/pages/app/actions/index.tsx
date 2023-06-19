@@ -2,12 +2,13 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal } from 'antd';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
-import { App, getAppInfo } from '@/services/app';
+import { getAppInfo } from '@/services/app';
 import CreateAppAction from './components/create';
-import { AppAction, EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/app/action';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
+import { App, AppAction, AppActionWhereInput } from '@/__generated__/graphql';
 
 export type AppActionListRef = {
   getSelect: () => AppAction[];
@@ -89,22 +90,30 @@ const AppActionList = (props: {
 
   const
     getApp = async () => {
-      let info: App | null = null;
       if (appId) {
-        info = await getAppInfo(appId);
-        if (info?.id) {
-          setAppInfo(info);
+        const result = await getAppInfo(appId);
+        if (result?.id) {
+          setAppInfo(result as App);
+          return result
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as AppAction[], success: true, total: 0 },
+        where: AppActionWhereInput = {},
         info = appInfo?.id === appId ? appInfo : await getApp();
+      where.nameContains = params.nameContains
+      where.kind = params.kind
+      where.method = params.method
       if (info) {
-        const result = await getAppActionList(info.id, params, filter, sort);
-        if (result) {
-          table.data = result.edges.map(item => item.node);
+        const result = await getAppActionList(info.id, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as AppAction[];
           table.total = result.totalCount;
         }
       }

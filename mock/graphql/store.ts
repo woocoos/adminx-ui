@@ -33,7 +33,12 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'users', listTemp([
     store.get('User', 1),
   ]))
-  store.set('User', 1, { id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com" })
+  store.set('User', 1, {
+    id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com",
+    loginProfile: {
+      mfaEnabled: false
+    }
+  })
 
   // app
   store.set('Query', 'ROOT', 'apps', listTemp([

@@ -1,18 +1,13 @@
-import {
-  ActionType,
-  PageContainer,
-  ProColumns,
-  ProTable,
-  useToken,
-} from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { useSearchParams } from '@ice/runtime';
-import { EnumPermissionPrincipalKind, Permission, delPermssion, getOrgPolicyReferenceList } from '@/services/permission';
-import { OrgPolicy, getOrgPolicyInfo } from '@/services/org/policy';
+import { EnumPermissionPrincipalKind, delPermssion, getOrgPolicyReferenceList } from '@/services/permission';
+import { getOrgPolicyInfo } from '@/services/org/policy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
+import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -39,10 +34,6 @@ export default () => {
         width: 100,
         valueEnum: EnumPermissionPrincipalKind,
       },
-      // {
-      //     title: t('status'), dataIndex: 'status', filters: true, search: false, width: 100,
-      //     valueEnum: EnumPermissionStatus,
-      // },
       {
         title: t('operation'),
         dataIndex: 'actions',
@@ -74,17 +65,22 @@ export default () => {
       if (orgPolicyId) {
         const info = orgPolicyInfo?.id == orgPolicyId ? orgPolicyInfo : await getOrgPolicyInfo(orgPolicyId);
         if (info?.id) {
-          setOrgPolicy(info);
+          setOrgPolicy(info as OrgPolicy);
+          const where: PermissionWhereInput = {}
           if (params.keyword) {
-            params.or = [
-              { hasRoleWith: { nameContains: params.keyword } },
-              { hasUserWith: { displayNameContains: params.keyword } },
+            where.or = [
+              { hasRoleWith: [{ nameContains: params.keyword }] },
+              { hasUserWith: [{ displayNameContains: params.keyword }] },
             ];
           }
-          delete params.keyword;
-          const result = await getOrgPolicyReferenceList(orgPolicyId, params, filter, sort);
+          where.principalKindIn = filter.principalKind as PermissionPrincipalKind[] | null
+          const result = await getOrgPolicyReferenceList(orgPolicyId, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
           if (result) {
-            table.data = result.edges.map(item => item.node);
+            table.data = result.edges?.map(item => item?.node) as Permission[] || [];
             table.total = result.totalCount;
           } else {
             table.total = 0;

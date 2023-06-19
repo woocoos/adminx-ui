@@ -1,9 +1,10 @@
 import { Modal } from 'antd';
 import { useState } from 'react';
-import { OrgRole, OrgRoleKind, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
+import { getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql';
 
 
 export default (props: {
@@ -32,7 +33,7 @@ export default (props: {
     [dataSource, setDataSource] = useState<OrgRole[]>([]),
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  if (props.kind === 'role') {
+  if (props.kind === OrgRoleKind.Role) {
     columns.push({
       title: t('type'),
       dataIndex: 'actions',
@@ -46,12 +47,22 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 };
-      params.kind = props.kind;
-      params.orgID = props.orgId;
-      const result = params.kind === 'role' ? await getOrgRoleList(params, filter, sort) : await getOrgGroupList(params, filter, sort);
-      if (result) {
-        table.data = result.edges.map(item => item.node);
+      const table = { data: [] as OrgRole[], success: true, total: 0 },
+        where: OrgRoleWhereInput = {};
+      where.kind = props.kind;
+      where.orgID = props.orgId;
+      where.nameContains = params.nameContains
+      const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }) : await getOrgGroupList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      });
+      if (result?.totalCount) {
+        table.data = result.edges?.map(item => item?.node) as OrgRole[];
         table.total = result.totalCount;
       }
       setDataSource(table.data);

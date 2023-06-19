@@ -2,17 +2,18 @@ import { PageContainer, ProCard, useToken, ProForm, ProFormText, ProFormSelect, 
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
-import { formatTreeData, getTreeDropData } from '@/util';
+import { formatTreeData, getTreeDropData, updateFormat } from '@/util';
 import { TreeDataState } from '@/services/graphql';
 import { TreeEditorAction } from '@/util/type';
-import { AppMenu, createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/app/menu';
-import { App } from '@/services/app';
+import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/app/menu';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/graphql';
+import { getAppInfo } from '@/services/app';
 
 
 type TreeSelectedData = {
@@ -20,6 +21,14 @@ type TreeSelectedData = {
   action: TreeEditorAction;
   info?: AppMenu;
 };
+
+type ProFormData = {
+  name: string
+  kind: AppMenuKind
+  icon?: string
+  route?: string
+  comments?: string
+}
 
 export default () => {
   const { token } = useToken(),
@@ -106,18 +115,22 @@ export default () => {
         if (isInit) {
           setLoading(true);
         }
-        const info = await getAppMenus(id);
-        if (info?.id) {
-          setAppInfo(info);
-          if (info.menus) {
-            setMenus(info.menus.edges.map(item => item.node));
+        const appResult = await getAppInfo(id)
+        if (appResult?.id) {
+          setAppInfo(appResult as App);
+          const result = await getAppMenus(appResult.id, {
+            pageSize: 9999,
+          });
+          if (result?.totalCount) {
+            const menuList = result.edges?.map(item => item?.node) as AppMenu[]
+            setMenus(menuList);
             setTreeData(
               formatTreeData(
-                info.menus.edges.map(item => ({
-                  key: item.node.id,
-                  title: item.node.name,
-                  parentId: item.node.parentID,
-                  node: item.node,
+                menuList.map(item => ({
+                  key: item.id,
+                  title: item.name,
+                  parentId: item.parentID,
+                  node: item,
                 })),
               ),
             );
@@ -196,38 +209,83 @@ export default () => {
       setSaveDisabled(true);
       return {};
     },
-    onFinish = async (values: AppMenu) => {
+    onFinish = async (values: ProFormData) => {
+      setSaveLoading(true);
+      let isTrue = false;
       if (appInfo) {
-        setSaveLoading(true);
-        if (formFieldsValue?.action) {
-          values.actionID = formFieldsValue.action.id;
-        }
-        if (selectedTree.info?.id && selectedTree.action === 'editor') {
-          if (values.kind === 'dir') {
-            values.actionID = null;
-          }
-          const ur = await updateAppMenu(selectedTree.info.id, values);
-          if (ur?.id) {
-            message.success(t('submit_success'));
-            await getMenusRequest();
-            setSaveDisabled(true);
-          }
-        } else {
+        if (selectedTree.action === 'editor') {
           if (selectedTree.info?.id) {
-            values.parentID = selectedTree.action === 'child' ? selectedTree.info.id : selectedTree.info.parentID;
+            const result = await updateAppMenu(selectedTree.info.id, updateFormat<UpdateAppMenuInput>({
+              comments: values.comments,
+              icon: values.icon,
+              kind: values.kind,
+              name: values.name,
+              route: values.kind === AppMenuKind.Menu ? values.route : null,
+            }, selectedTree.info))
+            if (result?.id) {
+              isTrue = true
+            }
           } else {
-            values.parentID = '0';
+            const input = {
+              comments: values.comments,
+              icon: values.icon,
+              kind: values.kind,
+              name: values.name,
+              parentID: selectedTree.info?.parentID || 0,
+              route: values.route,
+            },
+              result = await createAppMenu(appInfo.id, input)
+            if (result?.[0]?.id) {
+              isTrue = true
+              editorMenuAction({
+                id: result[0].id,
+                ...input,
+              } as AppMenu, 'editor');
+            }
           }
-          const cr = await createAppMenu(appInfo.id, values);
-          if (cr?.id) {
-            message.success(t('submit_success'));
-            await getMenusRequest();
-            setSaveDisabled(true);
-            editorMenuAction(cr, 'editor');
+        } else if (selectedTree.action === 'child') {
+          const input = {
+            comments: values.comments,
+            icon: values.icon,
+            kind: values.kind,
+            name: values.name,
+            parentID: Number(selectedTree.info?.id) || 0,
+            route: values.route,
+          },
+            result = await createAppMenu(appInfo.id, input)
+          if (result?.[0]?.id) {
+            isTrue = true
+            editorMenuAction({
+              id: result[0].id,
+              ...input,
+            } as AppMenu, 'editor');
+          }
+        } else if (selectedTree.action === 'peer') {
+          const input = {
+            comments: values.comments,
+            icon: values.icon,
+            kind: values.kind,
+            name: values.name,
+            parentID: selectedTree.info?.parentID || 0,
+            route: values.route,
+          },
+            result = await createAppMenu(appInfo.id, input)
+          if (result?.[0]?.id) {
+            isTrue = true
+            editorMenuAction({
+              id: result[0].id,
+              ...input,
+            } as AppMenu, 'editor');
           }
         }
-        setSaveLoading(false);
       }
+      if (isTrue) {
+        message.success(t('submit_success'));
+        await getMenusRequest();
+        setSaveDisabled(true);
+      }
+      setSaveLoading(false);
+      return false;
     };
 
   useEffect(() => {

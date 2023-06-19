@@ -1,18 +1,14 @@
-import {
-  PageContainer,
-  ProCard,
-  ProDescriptions,
-  useToken,
-} from '@ant-design/pro-components';
+import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import defaultApp from '@/assets/images/default-app.png';
 import { useSearchParams } from '@ice/runtime';
 import { useEffect, useState } from 'react';
-import { App, EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/app';
+import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/app';
 import { Button, Divider } from 'antd';
 import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
+import { App } from '@/__generated__/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -41,9 +37,9 @@ export default () => {
     getRequest = async () => {
       if (id) {
         setLoading(true);
-        const info = await getAppInfo(id);
-        if (info?.id) {
-          setAppInfo(info);
+        const result = await getAppInfo(id);
+        if (result?.id) {
+          setAppInfo(result as App);
           setLoading(false);
         }
       }

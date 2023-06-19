@@ -1,33 +1,7 @@
+import { gql } from '@/__generated__';
 import { gid } from '@/util';
-import { App, AppNodeField } from '.';
-import { TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi } from '../graphql';
-
-export type AppPolicy = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  appID: string;
-  name: string;
-  comments: string;
-  autoGrant: boolean;
-  status: AppPolicyStatus;
-  rules?: PolicyRule[];
-  app?: App;
-  isGrantAppRole?: boolean;
-};
-
-export type PolicyRule = {
-  effect: PolicyRuleEffect;
-  actions: string[];
-  resources: string[] | null;
-  conditions: string[] | null;
-};
-
-export type PolicyRuleEffect = 'allow' | 'deny';
-
-export type AppPolicyStatus = 'active' | 'inactive' | 'processing';
+import { koClient } from '../graphql';
+import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/__generated__/graphql';
 
 export const EnumAppPolicyStatus = {
   active: { text: '活跃', status: 'success' },
@@ -40,50 +14,76 @@ export const EnumPolicyRuleEffect = {
   deny: { text: '拒绝', status: 'default' },
 };
 
-export const AppPolicyField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,
-  autoGrant,status,rules{ effect,actions,resources,conditions }
-`;
+const queryAppPolicieList = gql(/* GraphQL */`query appPolicieList($gid:GID!){
+  node(id:$gid){
+    ... on App{
+      id,
+      list:policies{
+        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+      }
+    }
+  }
+}`)
 
+const queryAppPolicieListAndIsGrant = gql(/* GraphQL */`query appPolicieListAndIsGrant($gid:GID!,$appRoleId:ID!){
+  node(id:$gid){
+    ... on App{
+      id,
+      list:policies{
+        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+        isGrantAppRole(appRoleID: $appRoleId)
+      }
+    }
+  }
+}`)
+
+const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
+  node(id:$gid){
+    ... on AppPolicy{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,
+      rules{ effect,actions,resources,conditions }
+      app{ id,name }
+    }
+  }
+}`)
+
+const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){
+  action:createAppPolicy(appID:$appId,input:$input){id}
+}`)
+
+const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){
+  action:updateAppPolicy(policyID:$appPolicyId,input:$input){id}
+}`)
+
+const mutationDelAppPolicy = gql(/* GraphQL */`mutation delAppPolicy($appPolicyId:ID!){
+  action:deleteAppPolicy(policyID: $appPolicyId)
+}`)
 
 /**
  * 获取应用权限
  * @param appId
- * @param params
- * @param filter
- * @param sort
  * @param isGrant
  * @returns
  */
 export async function getAppPolicyList(
   appId: string,
-  params: TableParams,
-  filter: TableFilter,
-  sort: TableSort,
   isGrant?: {
     appRoleId?: string;
-  },
-) {
-  const { } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlApi(
-      `query appPolicies{
-        node(id:"${gid('app', appId)}"){
-          ... on App{
-            id,
-            list:policies{
-              ${AppPolicyField}
-              ${isGrant?.appRoleId ? `isGrantAppRole(appRoleID: "${isGrant.appRoleId}")` : ''}
-            }
-          }
-        }
-      }`,
-    );
+  }) {
+  const koc = koClient(),
+    result = isGrant?.appRoleId ? await koc.client.query(
+      queryAppPolicieListAndIsGrant, {
+      gid: gid('app', appId),
+      appRoleId: isGrant.appRoleId,
+    }).toPromise() : await koc.client.query(
+      queryAppPolicieList, {
+      gid: gid('app', appId),
+    }).toPromise()
 
-  if (result?.data?.node?.list) {
-    return result.data.node.list as AppPolicy[];
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -93,25 +93,16 @@ export async function getAppPolicyList(
  * @returns
  */
 export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<'app'>) {
-  const result = await graphqlApi(
-    `query node{
-      node(id:"${gid('app_policy', appPolicyId)}"){
-        ... on AppPolicy{
-          ${AppPolicyField}
-          ${scene?.includes('app') ? `
-          app{
-              ${AppNodeField}
-          }
-          ` : ''}
-        }
-      }
-    }`);
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppPolicyInfo, {
+      gid: gid('app_policy', appPolicyId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result.data.node as AppPolicy;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'AppPolicy') {
+    return result.data.node
   }
+  return null
 }
 
 
@@ -120,19 +111,18 @@ export async function getAppPolicyInfo(appPolicyId: string, scene?: Array<'app'>
  * @param input
  * @returns
  */
-export async function createAppPolicy(appId: string, input: AppPolicy | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation createAppPolicy($input: CreateAppPolicyInput!){
-      action:createAppPolicy(appID:"${appId}",input:$input){
-        ${AppPolicyField}
-      }
-    }`, { input: input });
+export async function createAppPolicy(appId: string, input: CreateAppPolicyInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateAppPolicy, {
+      appId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result.data.action as AppPolicy;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -142,19 +132,18 @@ export async function createAppPolicy(appId: string, input: AppPolicy | Record<s
  * @param input
  * @returns
  */
-export async function updateAppPolicy(appPolicyId: string, input: AppPolicy | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updateAppPolicy($input: UpdateAppPolicyInput!){
-      action:updateAppPolicy(policyID:"${appPolicyId}",input:$input){
-        ${AppPolicyField}
-      }
-    }`, { input: input });
+export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolicyInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateAppPolicy, {
+      appPolicyId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result.data.action as AppPolicy;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -163,14 +152,14 @@ export async function updateAppPolicy(appPolicyId: string, input: AppPolicy | Re
  * @returns
  */
 export async function delAppPolicy(appPolicyId: string) {
-  const result = await graphqlApi(
-    `mutation deleteAppPolicy{
-      action:deleteAppPolicy(policyID: "${appPolicyId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelAppPolicy, {
+      appPolicyId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }

@@ -1,8 +1,15 @@
+import { OrgRole, OrgRoleKind } from '@/__generated__/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { OrgRole, OrgRoleKind, createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/org/role';
+import { createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/org/role';
+import { updateFormat } from '@/util';
 import { DrawerForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+type ProFormData = {
+  name: string
+  comments?: string
+}
 
 export default (props: {
   open?: boolean;
@@ -14,6 +21,7 @@ export default (props: {
 }) => {
   const
     { t } = useTranslation(),
+    [orgRoleInfo, setOrgRoleInfo] = useState<OrgRole>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -33,6 +41,7 @@ export default (props: {
       if (props.id) {
         const info = await getOrgRoleInfo(props.id);
         if (info?.id) {
+          setOrgRoleInfo(info as OrgRole)
           return info;
         }
       }
@@ -41,18 +50,32 @@ export default (props: {
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: OrgRole) => {
+    onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      values.kind = props.kind;
-      let result: OrgRole | null;
+      let isTrue = false
+
       if (props.id) {
-        result = await updateOrgRole(props.id, values);
+        const result = await updateOrgRole(props.id, updateFormat({
+          kind: props.kind,
+          name: values.name,
+          comments: values.comments,
+        }, orgRoleInfo || {}));
+        if (result?.id) {
+          isTrue = true
+        }
       } else {
-        values.orgID = props.orgId;
-        result = await createOrgRole(values);
+        const result = await createOrgRole({
+          kind: props.kind,
+          name: values.name,
+          comments: values.comments,
+          orgID: props.orgId,
+        });
+        if (result?.id) {
+          isTrue = true
+        }
       }
 
-      if (result?.id) {
+      if (isTrue) {
         setSaveDisabled(true);
         props.onClose?.(true);
       }

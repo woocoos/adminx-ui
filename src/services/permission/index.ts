@@ -1,35 +1,7 @@
 import { gid } from '@/util';
-import { List, TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, graphqlPageApi, setClearInputField } from '../graphql';
-import { Org } from '../org';
-import { User, UserNodeField } from '../user';
-import { OrgPolicy, OrgPolicyNodeField } from '../org/policy';
-import { OrgRole, OrgRoleNodeField } from '../org/role';
-
-export type Permission = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  orgID: string;
-  principalKind: PermissionPrincipalKind;
-  userID: string;
-  roleID: string;
-  orgPolicyID: string;
-  startAt: string;
-  endAt: string;
-  status: PermissionStatus;
-  isAllowRevoke: boolean;
-  org?: Org;
-  user?: User;
-  role?: OrgRole;
-  orgPolicy?: OrgPolicy;
-};
-
-export type PermissionPrincipalKind = 'user' | 'role';
-
-export type PermissionStatus = 'active' | 'inactive' | 'processing';
-
+import { koClient } from '../graphql';
+import { gql } from '@/__generated__';
+import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/__generated__/graphql';
 
 export const EnumPermissionPrincipalKind = {
   user: { text: '用户' },
@@ -43,141 +15,182 @@ export const EnumPermissionStatus = {
 };
 
 
-export const PermissionNodeField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,userID,roleID,orgPolicyID,startAt,endAt,status,
-  isAllowRevoke,
-  role{
-    ${OrgRoleNodeField}
+const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  list:orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+        role{ id,orgID,kind,name,isAppRole }
+        orgPolicy{ id,orgID,appPolicyID,name }
+        user{ id,displayName }
+      }
+    }
   }
-  orgPolicy{
-    ${OrgPolicyNodeField}
+}`)
+
+const queryOrgPrmissionList = gql(/* GraphQL */`query orgPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  node(id:$gid){
+    ... on Org{
+      list:permissions(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+            userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+            role{ id,orgID,kind,name,isAppRole }
+            orgPolicy{ id,orgID,appPolicyID,name }
+            user{ id,displayName }
+          }
+        }
+      }
+    }
   }
-  user{
-    ${UserNodeField}
+}`)
+
+const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  node(id:$gid){
+    ... on User{
+      list:permissions(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+            userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+            role{ id,orgID,kind,name,isAppRole }
+            orgPolicy{ id,orgID,appPolicyID,name }
+            user{ id,displayName }
+          }
+        }
+      }
+    }
   }
-`;
+}`)
+
+const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  list:userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+        role{ id,orgID,kind,name,isAppRole }
+        orgPolicy{ id,orgID,appPolicyID,name }
+        user{ id,displayName }
+      }
+    }
+  }
+}`)
+
+const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
+  node(id:$gid){
+    ... on Permission{
+      id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+      userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+      role{ id,orgID,kind,name,isAppRole }
+      orgPolicy{ id,orgID,appPolicyID,name }
+      user{ id,displayName }
+    }
+  }
+}`)
+
+const mutationCreatePermission = gql(/* GraphQL */`mutation createPermission($input: CreatePermissionInput!){
+  action:grant(input:$input){id}
+}`)
+
+const mutationUpdatePermission = gql(/* GraphQL */`mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){
+  action:updatePermission(permissionID:$permissionId,input:$input){id}
+}`)
+
+const mutationDelPermission = gql(/* GraphQL */`mutation revoke($permissionId:ID!,$orgId:ID!){
+  action:revoke(permissionID:$permissionId,orgID:$orgId)
+}`)
 
 
 /**
  * 权限策略引用列表
  * @param orgPolicyId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
 export async function getOrgPolicyReferenceList(
   orgPolicyId: string,
-  params: TableParams,
-  filter: TableFilter,
-  sort: TableSort,
-) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgPolicyReferences($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-        list:orgPolicyReferences(policyID:"${orgPolicyId}",after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${PermissionNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<Permission>;
-  } else {
-    return null;
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: PermissionWhereInput
+    orderBy?: PermissionOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(queryOrgPolicyReferences, {
+      orgPolicyId,
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.list.__typename === 'PermissionConnection') {
+    return result.data.list
   }
+  return null
 }
 
 
 /**
  * 组织授权列表
  * @param orgId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
-export async function getOrgPermissionList(orgId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgpPrmissions($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-        node(id:"${gid('org', orgId)}"){
-          ... on Org{
-            list:permissions(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${PermissionNodeField}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<Permission>;
-  } else {
-    return null;
+export async function getOrgPermissionList(
+  orgId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: PermissionWhereInput
+    orderBy?: PermissionOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(queryOrgPrmissionList, {
+      gid: gid('org', orgId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node.list
   }
+  return null
 }
 
 /**
  * 用户授权列表
  * @param userId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
-export async function getUserPermissionList(userId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgpPrmissions($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-        node(id:"${gid('user', userId)}"){
-          ... on User{
-            list:permissions(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-              totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-              edges{
-                cursor,node{
-                  ${PermissionNodeField}
-                }
-              }
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.node?.list) {
-    return result.data.node.list as List<Permission>;
-  } else {
-    return null;
+export async function getUserPermissionList(
+  userId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: PermissionWhereInput
+    orderBy?: PermissionOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserPrmissionList, {
+      gid: gid('user', userId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.node?.__typename === 'User') {
+    return result.data.node.list
   }
+  return null
 }
 
 /**
@@ -190,35 +203,26 @@ export async function getUserPermissionList(userId: string, params: TableParams,
  */
 export async function getUserExtendGroupPolicyList(
   userId: string,
-  params: TableParams,
-  filter: TableFilter,
-  sort: TableSort,
-) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query userExtendGroupPolicies($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-        list:userExtendGroupPolicies(userID:"${userId}",after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${PermissionNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<Permission>;
-  } else {
-    return null;
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: PermissionWhereInput
+    orderBy?: PermissionOrder
   }
+) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserExtendGroupPolicieList, {
+      userId: userId,
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.list) {
+    return result.data.list
+  }
+  return null
 }
 
 
@@ -228,21 +232,14 @@ export async function getUserExtendGroupPolicyList(
  * @returns
  */
 export async function getPermissionInfo(permissionId: string) {
-  const result = await graphqlApi(
-    `query{
-      node(id:"${gid('permission', permissionId)}"){
-        ... on Permission{
-          ${PermissionNodeField}
-        }
-      }
-    }`,
-  );
-
-  if (result?.data?.node) {
-    return result?.data?.node as Permission;
-  } else {
-    return null;
+  const koc = koClient(),
+    result = await koc.client.query(queryPermissionInfo, {
+      gid: gid('permission', permissionId),
+    }).toPromise()
+  if (result.data?.node?.__typename === 'Permission') {
+    return result.data.node
   }
+  return null
 }
 
 /**
@@ -250,29 +247,15 @@ export async function getPermissionInfo(permissionId: string) {
  * @param input
  * @returns
  */
-export async function createPermission(input: {
-  principalKind: PermissionPrincipalKind;
-  orgID: string;
-  orgPolicyID: string;
-  userID?: string;
-  roleID?: string;
-  startAt?: string;
-  endAt?: string;
-}) {
-  const result = await graphqlApi(
-    `mutation createPermission($input: CreatePermissionInput!){
-      action:grant(input:$input){
-        ${PermissionNodeField}
-      }
-    }`,
-    { input },
-  );
-
-  if (result?.data?.action) {
-    return result?.data?.action as Permission;
-  } else {
-    return null;
+export async function createPermission(input: CreatePermissionInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationCreatePermission, {
+      input,
+    }).toPromise()
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -281,21 +264,16 @@ export async function createPermission(input: {
  * @param input
  * @returns
  */
-export async function updatePermission(permissionId: string, input: Permission | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updatePermission($input: UpdatePermissionInput!){
-      action:updatePermission(permissionID:"${permissionId}",input:$input){
-        ${PermissionNodeField}
-      }
-    }`,
-    { input: setClearInputField(input) },
-  );
-
-  if (result?.data?.action) {
-    return result?.data?.action as Permission;
-  } else {
-    return null;
+export async function updatePermission(permissionId: string, input: UpdatePermissionInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationUpdatePermission, {
+      input,
+      permissionId,
+    }).toPromise()
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -306,15 +284,13 @@ export async function updatePermission(permissionId: string, input: Permission |
  * @returns
  */
 export async function delPermssion(permissionId: string, orgId: string) {
-  const result = await graphqlApi(
-    `mutation revoke{
-      action:revoke(permissionID:"${permissionId}",orgID:"${orgId}")
-    }`,
-  );
-
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  const koc = koClient(),
+    result = await koc.client.mutation(mutationDelPermission, {
+      permissionId,
+      orgId,
+    }).toPromise()
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }

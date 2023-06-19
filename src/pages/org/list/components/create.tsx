@@ -1,8 +1,9 @@
+import { Org, OrgKind, User, UserUserType } from '@/__generated__/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import InputAccount from '@/pages/account/components/inputAccount';
-import { Org, OrgKind, createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';
+import { createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';
 import store from '@/store';
-import { formatTreeData } from '@/util';
+import { formatTreeData, updateFormat } from '@/util';
 import { TreeEditorAction } from '@/util/type';
 import { DrawerForm, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
 import { useState } from 'react';
@@ -14,6 +15,15 @@ type SelectTreeData = {
   parentId?: string;
   children?: SelectTreeData[];
 };
+
+type ProFormData = {
+  name: string
+  parentID: string
+  domain?: string
+  countryCode?: string
+  owner?: User
+  profile?: string
+}
 
 export default (props: {
   open?: boolean;
@@ -40,9 +50,14 @@ export default (props: {
           },
         ];
       if (props.kind === 'root') {
-        const data = await getOrgList({ kind: props.kind }, {}, {});
+        const data = await getOrgList({
+          pageSize: 999,
+          where: {
+            kind: props.kind,
+          }
+        });
         if (data?.totalCount) {
-          result.push(...data.edges.map(item => item.node));
+          result.push(...(data.edges?.map(item => item?.node) as Org[] || []));
         }
       } else {
         const data = await getOrgPathList(basisState.tenantId, props.kind);
@@ -98,33 +113,55 @@ export default (props: {
     onValuesChange = () => {
       setSaveDisabled(false);
     },
-    onFinish = async (values: Org) => {
+    onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let result: Org | null = null;
-
-      if (values.owner) {
-        values.ownerID = values.owner.id;
-        delete values.owner;
-      }
-      switch (props.scene) {
-        case 'editor':
-          if (props.id) {
-            result = await updateOrgInfo(props.id, values);
-          } else {
-            result = await createOrgInfo(values, props.kind);
+      let isTrue = false;
+      if (props.scene === 'editor') {
+        if (props.id) {
+          const result = await updateOrgInfo(props.id, updateFormat(values, oldInfo || {}));
+          if (result?.id) {
+            isTrue = true;
           }
-          break;
-        case 'peer':
-          result = await createOrgInfo(values, props.kind);
-          break;
-        case 'child':
-          result = await createOrgInfo(values, props.kind);
-          break;
-        default:
-          break;
+        } else {
+          const result = await createOrgInfo({
+            name: values.name,
+            parentID: values.parentID,
+            ownerID: values.owner?.id,
+            domain: values.domain,
+            countryCode: values.countryCode,
+            profile: values.profile,
+          }, props.kind);
+          if (result?.id) {
+            isTrue = true;
+          }
+        }
+      } else if (props.scene === 'peer') {
+        const result = await createOrgInfo({
+          name: values.name,
+          parentID: values.parentID,
+          ownerID: values.owner?.id,
+          domain: values.domain,
+          countryCode: values.countryCode,
+          profile: values.profile,
+        }, props.kind);
+        if (result?.id) {
+          isTrue = true;
+        }
+      } else if (props.scene === 'child') {
+        const result = await createOrgInfo({
+          name: values.name,
+          parentID: values.parentID,
+          ownerID: values.owner?.id,
+          domain: values.domain,
+          countryCode: values.countryCode,
+          profile: values.profile,
+        }, props.kind);
+        if (result?.id) {
+          isTrue = true;
+        }
       }
 
-      if (result?.id) {
+      if (isTrue) {
         setSaveDisabled(true);
         props.onClose?.(true);
       }
@@ -193,7 +230,7 @@ export default (props: {
       >
         <InputAccount
           disabled={!!oldInfo?.ownerID}
-          userType="account"
+          userType={UserUserType.Account}
         />
       </ProFormText>
       <ProFormTextArea

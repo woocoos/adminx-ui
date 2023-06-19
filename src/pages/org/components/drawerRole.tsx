@@ -2,11 +2,11 @@ import { Alert, Col, Input, List, Row, Space, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
-import { OrgRole, OrgRoleKind, assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
+import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
-import { User } from '@/services/user';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
@@ -33,13 +33,27 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 };
+      const table = { data: [] as OrgRole[], success: true, total: 0 },
+        where: OrgRoleWhereInput = {};
       if (keyword) {
-        params.nameContains = keyword;
+        where.nameContains = keyword;
       }
-      const result = props.kind === 'role' ? await getOrgRoleList(params, filter, sort, { userId: props.userInfo?.id }) : await getOrgGroupList(params, filter, sort, { userId: props.userInfo?.id });
+      where.kind = props.kind
+      const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }, {
+        userId: props.userInfo?.id,
+      }) : await getOrgGroupList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }, {
+        userId: props.userInfo?.id,
+      });
       if (result?.totalCount) {
-        table.data = result.edges.map(item => item.node);
+        table.data = result.edges?.map(item => item?.node) as OrgRole[];
         table.total = result.totalCount;
       }
       setdataSource(table.data);
@@ -47,24 +61,22 @@ export default (props: {
     },
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        props.onClose();
       }
       setSaveDisabled(true);
     },
     onFinish = async () => {
       let isTree = false,
-        result: boolean | null = null,
+
         userId = props.userInfo?.id;
       if (userId) {
         setSaveLoading(true);
         for (let idx in selectedDatas) {
           const item = selectedDatas[idx];
-
-          result = await assignOrgRoleUser({
+          const result = await assignOrgRoleUser({
             orgRoleID: item.id,
             userID: userId,
           });
-
           if (result) {
             isTree = true;
           }
@@ -72,7 +84,7 @@ export default (props: {
         if (isTree) {
           message.success(t('submit_success'));
           setSaveDisabled(true);
-          props.onClose?.(true);
+          props.onClose(true);
         }
         setSaveLoading(false);
       }

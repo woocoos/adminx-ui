@@ -1,4 +1,4 @@
-import { User, getUserInfo } from '@/services/user';
+import { getUserInfoLoginProfile } from '@/services/user';
 import store from '@/store';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Link } from '@ice/runtime';
@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import UnbindMFA from './components/unbindMFA';
 import styles from './index.module.css';
+import { User } from '@/__generated__/graphql';
 
 export default () => {
   const { t } = useTranslation(),
@@ -24,9 +25,9 @@ export default () => {
     getRequest = async () => {
       if (basisState.user?.id) {
         setLoading(true);
-        const result = await getUserInfo(basisState.user.id, ['loginProfile']);
+        const result = await getUserInfoLoginProfile(basisState.user.id);
         if (result?.id) {
-          setInfo(result);
+          setInfo(result as User);
         }
       }
       setLoading(false);

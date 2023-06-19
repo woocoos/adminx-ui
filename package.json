@@ -10,8 +10,8 @@
     "eslint:fix": "pnpm run eslint -- --fix",
     "stylelint": "stylelint \"src/**/*.{css,scss,less}\" --cache",
     "stylelint:fix": "pnpm run stylelint -- --fix",
-    "gqlgen": "pnpm graphql-code-generator --config ./script/gqlgen.ts",
-    "gqlgen:watch": "pnpm graphql-code-generator --config ./script/gqlgen.ts --watch"
+    "gqlgen": "graphql-code-generator --config ./script/gqlgen.ts",
+    "gqlgen:watch": "pnpm gqlgen --watch"
   },
   "dependencies": {
     "@ant-design/icons": "^5.1.4",

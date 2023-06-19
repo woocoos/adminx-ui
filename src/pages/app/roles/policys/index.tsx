@@ -4,11 +4,11 @@ import { Button, Space, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { useSearchParams } from '@ice/runtime';
-import { AppRole, getAppRoleInfo, revokeAppRolePolicy } from '@/services/app/role';
+import { getAppRoleInfo, getAppRoleInfoPolicieList, revokeAppRolePolicy } from '@/services/app/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { AppPolicy } from '@/services/app/policy';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
+import { AppRole, AppPolicy, App } from '@/__generated__/graphql';
 
 
 export default () => {
@@ -54,31 +54,30 @@ export default () => {
 
   const
     getInfo = async () => {
-      let info: AppRole | null = null,
-        appRoleId = searchParams.get('id');
+      const appRoleId = searchParams.get('id');
       if (appRoleInfo?.id == appRoleId) {
         return appRoleInfo;
       }
       if (appRoleId) {
-        info = await getAppRoleInfo(appRoleId, ['app']);
-        if (info?.id) {
-          setAppRoleInfo(info);
+        const result = await getAppRoleInfo(appRoleId);
+        if (result?.id) {
+          setAppRoleInfo(result as AppRole);
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams) => {
       const table = { data: [] as AppPolicy[], success: true, total: 0 },
         info = await getInfo();
       if (info) {
-        const result = await getAppRoleInfo(info.id, ['policies']);
+        const result = await getAppRoleInfoPolicieList(info.id);
         if (result) {
           table.data = result.policies?.filter(item => {
             if (params.name) {
               return item.name.indexOf(params.name) > -1;
             }
             return true;
-          }) || [];
+          }) as AppPolicy[] || [];
           table.total = table.data?.length;
         }
       }
@@ -91,7 +90,7 @@ export default () => {
           title: t('remove'),
           content: `${t('confirm_remove')}：${record.name}?`,
           onOk: async (close) => {
-            const result = await revokeAppRolePolicy(appRoleInfo.appID, appRoleInfo.id, [record.id]);
+            const result = await revokeAppRolePolicy(appRoleInfo.appID || '', appRoleInfo.id, [record.id]);
             if (result) {
               proTableRef.current?.reload();
               message.success(t('submit_success'));
@@ -158,7 +157,7 @@ export default () => {
         x-if={modal.open}
         open={modal.open}
         title={modal.title}
-        appInfo={appRoleInfo?.app}
+        appInfo={appRoleInfo?.app as App}
         roleInfo={appRoleInfo}
         onClose={(isSuccess) => {
           if (isSuccess) {

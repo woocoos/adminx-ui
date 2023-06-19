@@ -2,12 +2,13 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
-import { App, getAppInfo } from '@/services/app';
-import { AppPolicy, EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/app/policy';
+import { getAppInfo } from '@/services/app';
+import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/app/policy';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
+import { App, AppPolicy } from '@/__generated__/graphql';
 
 
 const PageAppPolicys = (props: {
@@ -65,20 +66,20 @@ const PageAppPolicys = (props: {
 
   const
     getApp = async () => {
-      let info: App | null = null;
       if (props.appId) {
-        info = await getAppInfo(props.appId);
-        if (info?.id) {
-          setAppInfo(info);
+        const result = await getAppInfo(props.appId);
+        if (result?.id) {
+          setAppInfo(result as App);
+          return result
         }
       }
-      return info;
+      return null;
     },
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
       const table = { data: [] as AppPolicy[], success: true, total: 0 },
         info = props.appId == appInfo?.id ? appInfo : await getApp();
       if (info) {
-        const result = await getAppPolicyList(info.id, params, filter, sort);
+        const result = await getAppPolicyList(info.id);
         if (result) {
           // 前端过滤
           table.data = result.filter(item => {
@@ -90,7 +91,7 @@ const PageAppPolicys = (props: {
               isTrue = item.status === params.status;
             }
             return isTrue;
-          });
+          }) as AppPolicy[];
           table.total = table.data.length;
         }
       }

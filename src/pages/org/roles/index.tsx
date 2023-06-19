@@ -1,16 +1,10 @@
-import {
-  ActionType,
-  PageContainer,
-  ProColumns,
-  ProTable,
-  useToken,
-} from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Alert, message } from 'antd';
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import CreateOrgRole from './components/create';
-import { OrgRole, OrgRoleKind, delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
+import { delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import DrawerUser from '../../account/components/drawerUser';
@@ -18,6 +12,7 @@ import DrawerRolePolicy from '../components/drawerRolePolicy';
 import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql';
 
 export type OrgRoleListRef = {
   getSelect: () => OrgRole[];
@@ -36,7 +31,7 @@ const PageOrgRoleList = (props: {
     { token } = useToken(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    kind: OrgRoleKind = props.kind || 'role',
+    kind: OrgRoleKind = props.kind || OrgRoleKind.Role,
     columns: ProColumns<OrgRole>[] = [
       // 有需要排序配置  sorter: true
       {
@@ -139,12 +134,22 @@ const PageOrgRoleList = (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 };
-      params.kind = kind;
-      params.orgID = props.orgId;
-      const result = params.kind === 'role' ? await getOrgRoleList(params, filter, sort) : await getOrgGroupList(params, filter, sort);
-      if (result) {
-        table.data = result.edges.map(item => item.node);
+      const table = { data: [] as OrgRole[], success: true, total: 0 },
+        where: OrgRoleWhereInput = {};
+      where.kind = kind;
+      where.orgID = props.orgId;
+      where.nameContains = params.nameContains;
+      const result = kind === OrgRoleKind.Role ? await getOrgRoleList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }) : await getOrgGroupList({
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      });
+      if (result?.totalCount) {
+        table.data = result.edges?.map(item => item?.node) as OrgRole[];
         table.total = result.totalCount;
       }
       setDataSource(table.data);

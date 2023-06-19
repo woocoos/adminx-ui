@@ -1,4 +1,4 @@
-import { OrgRole, getOrgRoleInfo } from '@/services/org/role';
+import { getOrgRoleInfo } from '@/services/org/role';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { useSearchParams } from '@ice/runtime';
@@ -8,6 +8,7 @@ import CreateOrgRole from '../../roles/components/create';
 import ListRolePermission from '../../roles/components/listRolePermission';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
+import { OrgRole } from '@/__generated__/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -32,7 +33,7 @@ export default () => {
       setLoading(true);
       const info = await getOrgRoleInfo(id);
       if (info?.id) {
-        setInfo(info);
+        setInfo(info as OrgRole);
       }
       setLoading(false);
     }
@@ -92,7 +93,7 @@ export default () => {
         <CreateOrgRole
           open={modal.open}
           id={info.id}
-          orgId={info.orgID}
+          orgId={info.orgID || ''}
           kind={info.kind}
           onClose={onDrawerClose}
         />) : ''}
@@ -107,7 +108,7 @@ export default () => {
                   scene="roleUser"
                   title={`${t('member_list')}`}
                   orgRole={info}
-                  orgId={info.orgID}
+                  orgId={info.orgID || ''}
                 />
               </> : '',
             },

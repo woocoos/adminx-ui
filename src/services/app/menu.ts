@@ -1,66 +1,71 @@
 import { gid } from '@/util';
-import { App, AppNodeField } from '.';
-import { TreeMoveAction, graphqlApi, setClearInputField } from '../graphql';
-import { AppAction } from './action';
+import { gql } from '@/__generated__';
+import { koClient } from '../graphql';
+import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/__generated__/graphql';
 
-export type AppMenuKind = 'dir' | 'menu';
-export interface AppMenu {
-  id: string;
-  createdBy: number;
-  createdAt: Date;
-  updatedBy: number;
-  updatedAt: Date;
-  appID: string;
-  parentID: string;
-  kind: AppMenuKind;
-  name: string;
-  icon: string;
-  route: string;
-  actionID: string | null;
-  comments: string;
-  displaySort: number;
-  app?: App;
-  action?: AppAction;
-}
+const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){
+  node(id:$gid){
+    ... on App{
+      id
+      menus(first:$first,where:$where,orderBy:$orderBy){
+        totalCount,
+        edges{
+          cursor,node{
+            id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
+            action{ id,name }
+          }
+        }
+      }
+    }
+  }
+}`)
 
-export const AppMenuField = `
-  id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
-  action{ id,name }
-`;
+const mutationUpdateAppMenu = gql(/* GraphQL */`mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){
+  action:updateAppMenu(menuID:$menuId,input:$input){id}
+}`)
+
+const mutationCreateAppMenu = gql(/* GraphQL */`mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){
+  action:createAppMenus(appID:$appId,input:$input){id}
+}`)
+
+const mutationDelAppMenu = gql(/* GraphQL */`mutation delAppMenu($menuId:ID!){
+  action:deleteAppMenu(menuID: $menuId)
+}`)
+
+const mutationMoveAppMenu = gql(/* GraphQL */`mutation moveAppMenu($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
+  action:moveAppMenu(sourceID:$sourceId,targetID:$targetId,action:$action)
+}`)
 
 /**
  * 获取应用菜单
  * @param appId
  * @returns
  */
-export async function getAppMenus(appId: string) {
-  const appGid = gid('app', appId);
-  const result = await graphqlApi(
-    `query menus($orderBy: AppMenuOrder){
-      node(id:"${appGid}"){
-        ... on App{
-          ${AppNodeField}
-          menus(orderBy:$orderBy){
-            edges{
-              cursor,node{
-                ${AppMenuField}
-              }
-            }
-          }
-        }
-      }
-    }`, {
-    orderBy: {
-      direction: 'ASC',
-      field: 'displaySort',
-    },
-  });
+export async function getAppMenus(
+  appId: string,
+  gather: {
+    current?: number
+    pageSize?: number
+    where?: AppMenuWhereInput
+    orderBy?: AppMenuOrder
+  }) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppMenuList, {
+      gid: gid('app', appId),
+      where: gather.where,
+      orderBy: gather.orderBy || {
+        direction: OrderDirection.Asc,
+        field: AppMenuOrderField.DisplaySort,
+      },
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result.data.node as App;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node.menus
   }
+  return null
 }
 
 
@@ -70,19 +75,18 @@ export async function getAppMenus(appId: string) {
  * @param input
  * @returns
  */
-export async function updateAppMenu(menuId: string, input: App | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updateAppMenu($input: UpdateAppMenuInput!){
-      action:updateAppMenu(menuID:"${menuId}",input:$input){
-        ${AppMenuField}
-      }
-    }`, { input: setClearInputField(input) });
+export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateAppMenu, {
+      menuId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as App;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -90,19 +94,18 @@ export async function updateAppMenu(menuId: string, input: App | Record<string, 
  * @param input
  * @returns
  */
-export async function createAppMenu(appId: string, input: AppMenu | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation createAppMenus($input: [CreateAppMenuInput!]){
-      action:createAppMenus(appID:"${appId}",input:$input){
-        ${AppMenuField}
-      }
-    }`, { input: [input] });
+export async function createAppMenu(appId: string, input: CreateAppMenuInput | CreateAppMenuInput[]) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateAppMenu, {
+      appId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.[0]?.id) {
-    return result.data.action[0] as AppMenu;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -111,16 +114,16 @@ export async function createAppMenu(appId: string, input: AppMenu | Record<strin
  * @returns
  */
 export async function delAppMenu(menuId: string) {
-  const result = await graphqlApi(
-    `mutation deleteAppMenu{
-      action:deleteAppMenu(menuID: "${menuId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelAppMenu, {
+      menuId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -129,15 +132,17 @@ export async function delAppMenu(menuId: string) {
  * @param input
  * @returns
  */
-export async function moveAppMenu(sourceId: string, targetId: string, action: TreeMoveAction) {
-  const result = await graphqlApi(
-    `mutation moveAppMenu{
-      action:moveAppMenu(sourceID:"${sourceId}",targetID:"${targetId}",action:${action})
-    }`);
+export async function moveAppMenu(sourceId: string, targetId: string, action: TreeAction) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationMoveAppMenu, {
+      sourceId,
+      targetId,
+      action,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }

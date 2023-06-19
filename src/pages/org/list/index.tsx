@@ -1,16 +1,10 @@
-import {
-  ActionType,
-  PageContainer,
-  ProColumns,
-  ProTable,
-  useToken,
-} from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TableSort, TableParams, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
-import { EnumOrgKind, Org, OrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/org';
+import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/org';
 import OrgCreate from './components/create';
 import { formatTreeData } from '@/util';
 import { TreeEditorAction } from '@/util/type';
@@ -18,6 +12,7 @@ import { getAppOrgList } from '@/services/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
+import { Org, OrgKind, OrgWhereInput } from '@/__generated__/graphql';
 
 export type OrgListRef = {
   getSelect: () => Org[];
@@ -37,7 +32,7 @@ const OrgList = (props: {
     [auth] = useAuth(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
-    kind = props.kind || 'root',
+    kind = props.kind || OrgKind.Root,
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
       { title: t('name'), dataIndex: 'name', width: 120 },
@@ -167,12 +162,20 @@ const OrgList = (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as Org[], success: true, total: 0 };
+      const table = { data: [] as Org[], success: true, total: 0 },
+        where: OrgWhereInput = {};
       setExpandedRowKeys([]);
       if (props.appId) {
-        const data = await getAppOrgList(props.appId, params, filter, sort);
+        where.nameContains = params.name
+        where.codeContains = params.code
+        where.kind = params.kind
+        const data = await getAppOrgList(props.appId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
         if (data?.totalCount) {
-          table.data = data.edges.map(item => item.node);
+          table.data = data.edges?.map(item => item?.node) as Org[];
           table.total = data.totalCount;
         }
         setAllList(table.data);
@@ -184,13 +187,16 @@ const OrgList = (props: {
             table.total = list.length;
           }
         } else {
-          const result = await getOrgList({ kind: kind }, {}, {});
-          if (result) {
-            list = result.edges.map(item => item.node);
+          where.kind = props.kind
+          const result = await getOrgList({
+            pageSize: 999,
+            where,
+          });
+          if (result?.totalCount) {
+            list = result.edges?.map(item => item?.node) as Org[] || [];
             table.total = result.totalCount;
           }
         }
-
         if (list.length) {
           table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
           setExpandedRowKeys(list.map(item => item.id));

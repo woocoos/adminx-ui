@@ -1,4 +1,5 @@
-import { TreeDataState, TreeMoveAction } from '@/services/graphql';
+import { TreeAction } from '@/__generated__/graphql';
+import { TreeDataState } from '@/services/graphql';
 import CryptoJS from 'crypto-js';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
@@ -171,7 +172,7 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
   const dragTreeData = JSON.parse(JSON.stringify(treeData));
 
   let dragObj: TreeDataState<T>,
-    action: TreeMoveAction = 'child',
+    action: TreeAction = TreeAction.Child,
     sourceId = '',
     targetId = '';
   loopTreeData<TreeDataState<T>>(dragTreeData, dragInfo.dragNode.key, (item, idx, pArr) => {
@@ -183,11 +184,11 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
     loopTreeData(dragTreeData, dragInfo.node.key, (_item, idx, arr) => {
       if (dragInfo.dropPosition === -1) {
         targetId = arr[0].key;
-        action = 'up';
+        action = TreeAction.Up;
         arr.splice(0, 0, dragObj);
       } else {
         targetId = arr[idx].key;
-        action = 'down';
+        action = TreeAction.Down;
         arr.splice(dragInfo.dropPosition, 0, dragObj);
       }
     });
@@ -197,10 +198,10 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
       item.children = item.children || [];
       if (item.children.length) {
         targetId = item.children[0].key;
-        action = 'up';
+        action = TreeAction.Up;
       } else {
         targetId = item.key;
-        action = 'child';
+        action = TreeAction.Child;
       }
       item.children.unshift(dragObj);
     });
@@ -210,3 +211,23 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
     sourceId, targetId, action, newTreeData: dragTreeData,
   };
 };
+
+/**
+ * 更新数据的时候使用  处理增加clear和只提交数值变化的数据
+ * @param target   update对象
+ * @param original 对比目标的原始数据
+ */
+export const updateFormat = <T>(target: T, original: Record<string, any>) => {
+  const ud: Record<string, any> = {};
+  for (const key in target) {
+    const tValue = target[key]
+    if (tValue !== original[key]) {
+      ud[key] = tValue
+      if (typeof tValue != 'boolean' && !tValue) {
+        const clearKey = `clear${firstUpper(key)}`.replace('ID', '')
+        ud[clearKey] = true
+      }
+    }
+  }
+  return ud as T
+}

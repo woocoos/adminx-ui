@@ -4,13 +4,14 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Button, Divider, Modal, Space, message } from 'antd';
 import UserCreate from '../list/components/create';
 import UserCreateIdentity from './components/createIdentity';
-import { EnumUserIdentityKind, UpdateUserInfoScene, User, UserType, disableMFA, enableMFA, getUserInfo, sendMFAEmail } from '@/services/user';
+import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, sendMFAEmail } from '@/services/user';
 import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
 import { useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import style from './index.module.css';
+import { PermissionPrincipalKind, User, UserUserType } from '@/__generated__/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -22,12 +23,12 @@ export default () => {
       open: boolean;
       title: string;
       scene: UpdateUserInfoScene;
-      userType: UserType;
+      userType: UserUserType;
     }>({
       open: false,
       title: '',
       scene: 'base',
-      userType: 'member',
+      userType: UserUserType.Member,
     });
 
   const
@@ -41,9 +42,9 @@ export default () => {
       const id = searchParams.get('id');
       if (id) {
         setLoading(true);
-        const info = await getUserInfo(id, ['loginProfile', 'identity']);
+        const info = await getUserInfoLoginProfileIdentities(id);
         if (info?.id) {
-          setInfo(info);
+          setInfo(info as User);
           setLoading(false);
         }
       }
@@ -73,7 +74,7 @@ export default () => {
           onOk: async (close) => {
             if (enable) {
               const result = await enableMFA(info.id);
-              if (result) {
+              if (result?.secret) {
                 message.success(t('submit_success'));
                 await getRequest();
                 close();
@@ -299,11 +300,11 @@ export default () => {
                     {
                       label: t('personal_auth'),
                       key: 'user-permission',
-                      children: <ListUserPermission userInfo={info} principalKind="user" />,
+                      children: <ListUserPermission userInfo={info} principalKind={PermissionPrincipalKind.User} />,
                     }, {
                       label: t('extend_user_group_permissions'),
                       key: 'group-permission',
-                      children: <ListUserPermission userInfo={info} isExtendGroup principalKind="role" />,
+                      children: <ListUserPermission userInfo={info} isExtendGroup principalKind={PermissionPrincipalKind.Role} />,
                     },
                   ],
                 }}

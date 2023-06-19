@@ -1,58 +1,79 @@
+import { gql } from '@/__generated__';
 import { gid } from '@/util';
-import { App, AppNodeField } from '.';
-import { TableFilter, TableParams, TableSort, getGraphqlFilter, graphqlApi, setClearInputField } from '../graphql';
-import { AppPolicy, AppPolicyField } from './policy';
+import { koClient } from '../graphql';
+import { CreateAppRoleInput, UpdateAppRoleInput } from '@/__generated__/graphql';
 
-export type AppRole = {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  appID: string;
-  name: string;
-  comments: string;
-  autoGrant: boolean;
-  editable: boolean;
-  app?: App;
-  policies?: AppPolicy[];
-};
+const queryAppRoleList = gql(/* GraphQL */`query appRoleList($gid:GID!){
+  node(id:$gid){
+    ... on App{
+      id,
+      list:roles{
+        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+      }
+    }
+  }
+}`)
 
+const queryAppRoleInfo = gql(/* GraphQL */`query appRoleInfo($gid:GID!){
+  node(id:$gid){
+    ... on AppRole{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+      app{ id,name,code }
+    }
+  }
+}`)
 
-const AppRoleField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,
-  autoGrant,editable
-`;
+const queryAppRoleInfoPolicieList = gql(/* GraphQL */`query appRoleInfoPolicieList($gid:GID!){
+  node(id:$gid){
+    ... on AppRole{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+      app{ id,name,code }
+      policies{
+        id,appID,name,comments,autoGrant,status,
+        rules{ effect,actions,resources,conditions }
+      }
+    }
+  }
+}`)
+
+const mutationCreateAppRole = gql(/* GraphQL */`mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){
+  action:createAppRole(appID:$appId,input:$input){id}
+}`)
+
+const mutationUpdateAppRole = gql(/* GraphQL */`mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){
+  action:updateAppRole(roleID:$appRoleId,input:$input){id}
+}`)
+
+const mutationDelAppRole = gql(/* GraphQL */`mutation delAppRole($appRoleId:ID!){
+  action:deleteAppRole(roleID: $appRoleId)
+}`)
+
+const mutationAssignAppRolePolicy = gql(/* GraphQL */`mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){
+  action:assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
+}`)
+
+const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){
+  action:revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
+}`)
+
 
 
 /**
  * 获取应用角色
  * @param appId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
-export async function getAppRoleList(appId: string, params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlApi(
-      `query appRoles{
-        node(id:"${gid('app', appId)}"){
-          ... on App{
-            id,
-            list:roles{
-              ${AppRoleField}
-            }
-          }
-        }
-      }`,
-    );
+export async function getAppRoleList(appId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppRoleList, {
+      gid: gid('app', appId),
+    }).toPromise()
 
-  if (result?.data?.node?.list) {
-    return result.data.node.list as AppRole[];
-  } else {
-    return null;
+  if (result.data?.node?.__typename === 'App') {
+    return result.data.node.list
   }
+  return null
 }
 
 
@@ -61,27 +82,35 @@ export async function getAppRoleList(appId: string, params: TableParams, filter:
  * @param appRoleId
  * @returns
  */
-export async function getAppRoleInfo(appRoleId: string, scene?: Array<'policies' | 'app'>) {
-  const result = await graphqlApi(
-    `query node{
-      node(id:"${gid('app_role', appRoleId)}"){
-        ... on AppRole{
-          ${AppRoleField}
-          ${scene?.includes('app') ? `app{
-            ${AppNodeField}
-          }` : ''}
-          ${scene?.includes('policies') ? `policies{
-            ${AppPolicyField}
-          }` : ''}
-        }
-      }
-    }`);
+export async function getAppRoleInfo(appRoleId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppRoleInfo, {
+      gid: gid('app_role', appRoleId),
+    }).toPromise()
 
-  if (result?.data?.node) {
-    return result.data.node as AppRole;
-  } else {
-    return null;
+  if (result.data?.node?.__typename === "AppRole") {
+    return result.data.node
   }
+  return null
+}
+
+/**
+ * 获取应用角色
+ * @param appRoleId
+ * @returns
+ */
+export async function getAppRoleInfoPolicieList(appRoleId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryAppRoleInfoPolicieList, {
+      gid: gid('app_role', appRoleId),
+    }).toPromise()
+
+  if (result.data?.node?.__typename === 'AppRole') {
+    return result.data.node
+  }
+  return null
 }
 
 
@@ -90,20 +119,18 @@ export async function getAppRoleInfo(appRoleId: string, scene?: Array<'policies'
  * @param input
  * @returns
  */
-export async function createAppRole(appId: string, input: AppRole | Record<string, any>) {
-  input.appID = appId;
-  const result = await graphqlApi(
-    `mutation createAppRole($input: CreateAppRoleInput!){
-      action:createAppRole(appID:"${appId}",input:$input){
-        ${AppRoleField}
-      }
-    }`, { input: input });
+export async function createAppRole(appId: string, input: CreateAppRoleInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationCreateAppRole, {
+      appId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result.data.action as AppRole;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -112,19 +139,18 @@ export async function createAppRole(appId: string, input: AppRole | Record<strin
  * @param input
  * @returns
  */
-export async function updateAppRole(appRoleId: string, input: AppRole | Record<string, any>) {
-  const result = await graphqlApi(
-    `mutation updateAppRole($input: UpdateAppRoleInput!){
-      action:updateAppRole(roleID:"${appRoleId}",input:$input){
-        ${AppRoleField}
-      }
-    }`, { input: setClearInputField(input) });
+export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateAppRole, {
+      appRoleId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result.data.action as AppRole;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -133,16 +159,16 @@ export async function updateAppRole(appRoleId: string, input: AppRole | Record<s
  * @returns
  */
 export async function delAppRole(appRoleId: string) {
-  const result = await graphqlApi(
-    `mutation deleteAppRole{
-      action:deleteAppRole(roleID: "${appRoleId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelAppRole, {
+      appRoleId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 
@@ -153,21 +179,19 @@ export async function delAppRole(appRoleId: string) {
  * @param appPolicyIDs
  * @returns
  */
-export async function assignAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs: string[]) {
-  const result = await graphqlApi(
-    `mutation assignAppRolePolicy($policyIds:[ID!]){
-      action:assignAppRolePolicy(appID: "${appId}",roleID: "${appRoleId}",policyIDs:$policyIds)
-    }`,
-    {
+export async function assignAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs?: string | string[]) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationAssignAppRolePolicy, {
+      appRoleId,
+      appId,
       policyIds: appPolicyIDs,
-    },
-  );
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
 
 /**
@@ -178,19 +202,16 @@ export async function assignAppRolePolicy(appId: string, appRoleId: string, appP
  * @returns
  */
 export async function revokeAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs: string[]) {
-  const result = await graphqlApi(
-    `mutation revokeAppRolePolicy($policyIds:[ID!]){
-      action:revokeAppRolePolicy(appID: "${appId}",roleID: "${appRoleId}",policyIDs:$policyIds)
-    }`, {
-    policyIds: appPolicyIDs,
-  },
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationRevokeAppRolePolicy, {
+      appRoleId,
+      appId,
+      policyIds: appPolicyIDs,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result.data.action
   }
+  return null
 }
-
-

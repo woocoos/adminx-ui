@@ -2,6 +2,7 @@ import { useSearchParams } from '@ice/runtime';
 import { OrgRoleList } from '../roles';
 import store from '@/store';
 import KeepAlive from '@/components/KeepAlive';
+import { OrgRoleKind } from '@/__generated__/graphql';
 
 export default () => {
   const [searchParams] = useSearchParams(),
@@ -9,7 +10,7 @@ export default () => {
     orgId = searchParams.get('id') || basisState.tenantId;
 
   return (<KeepAlive clearAlive={true}>
-    <OrgRoleList kind="group" orgId={orgId} />
+    <OrgRoleList kind={OrgRoleKind.Group} orgId={orgId} />
   </KeepAlive>
   );
 };

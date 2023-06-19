@@ -3,13 +3,12 @@ import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { User, UserType } from '@/services/user';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
-import { OrgRole, assignOrgRoleUser } from '@/services/org/role';
+import { assignOrgRoleUser } from '@/services/org/role';
 import { allotOrgUser, getOrgUserList } from '@/services/org/user';
-import { Org } from '@/services/org';
 import { getDate } from '@/util';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { Org, OrgRole, User, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
@@ -17,7 +16,7 @@ export default (props: {
   orgId: string;
   orgRole?: OrgRole;
   orgInfo?: Org;
-  userType?: UserType;
+  userType?: UserUserType;
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const
@@ -37,16 +36,21 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as User[], success: true, total: 0 };
+      const table = { data: [] as User[], success: true, total: 0 },
+        where: UserWhereInput = {};
       if (keyword) {
-        params.nameContains = keyword;
+        where.displayNameContains = keyword;
       }
-      if (props.userType) {
-        params.userType = props.userType;
-      }
-      const result = await getOrgUserList(props.orgId, params, filter, sort, { orgRoleId: props.orgRole?.id });
+      where.userType = props.userType;
+      const result = await getOrgUserList(props.orgId, {
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }, {
+        orgRoleId: props.orgRole?.id,
+      });
       if (result?.totalCount) {
-        table.data = result.edges.map(item => item.node);
+        table.data = result.edges?.map(item => item?.node) as User[] || [];
         table.total = result.totalCount;
       }
       setdataSource(table.data);
@@ -54,36 +58,38 @@ export default (props: {
     },
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        props.onClose();
       }
       setSaveDisabled(true);
     },
     onFinish = async () => {
-      let isTree = false,
-        result: boolean | null = null;
+      let isTree = false;
       setSaveLoading(true);
       for (let idx in selectedDatas) {
         const item = selectedDatas[idx];
         if (props.orgRole) {
-          result = await assignOrgRoleUser({
+          const result = await assignOrgRoleUser({
             orgRoleID: props.orgRole.id,
             userID: item.id,
           });
+          if (result) {
+            isTree = true;
+          }
         } else if (props.orgInfo) {
-          result = await allotOrgUser({
+          const result = await allotOrgUser({
             joinedAt: getDate(Date.now(), 'YYYY-MM-DDTHH:mm:ssZ') as string,
             displayName: item.displayName,
             orgID: props.orgInfo.id,
             userID: item.id,
           });
-        }
-        if (result) {
-          isTree = true;
+          if (result) {
+            isTree = true;
+          }
         }
       }
       if (isTree) {
         message.success(t('submit_success'));
-        props.onClose?.(true);
+        props.onClose(true);
         setSaveDisabled(true);
       }
       setSaveLoading(false);

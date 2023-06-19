@@ -1,6 +1,5 @@
-import { App } from '@/services/app';
-import { AppPolicy, getAppPolicyList } from '@/services/app/policy';
-import { AppRole, assignAppRolePolicy } from '@/services/app/role';
+import { getAppPolicyList } from '@/services/app/policy';
+import { assignAppRolePolicy } from '@/services/app/role';
 import { Col, Input, List, Row, Space, Tag, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
@@ -8,6 +7,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { useTranslation } from 'react-i18next';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { App, AppPolicy, AppRole } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
@@ -40,13 +40,10 @@ export default (props: {
       if (props.appInfo) {
         const result = await getAppPolicyList(
           props.appInfo.id,
-          params,
-          filter,
-          sort,
           { appRoleId: props.roleInfo?.id },
         );
         if (result?.length) {
-          table.data = result;
+          table.data = result as AppPolicy[];
           table.total = result.length;
         }
       }
@@ -63,7 +60,7 @@ export default (props: {
       if (props.roleInfo?.id) {
         setSaveLoading(true);
         const result = await assignAppRolePolicy(
-          props.roleInfo.appID,
+          props.roleInfo.appID || '',
           props.roleInfo.id,
           selectedDatas.map(item => item.id),
         );

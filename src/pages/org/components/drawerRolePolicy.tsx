@@ -2,13 +2,12 @@ import { Col, Input, List, Row, Space, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
-import { OrgPolicy, getOrgPolicyList } from '@/services/org/policy';
-import { OrgRole } from '@/services/org/role';
-import { Permission, createPermission } from '@/services/permission';
+import { getOrgPolicyList } from '@/services/org/policy';
+import { createPermission } from '@/services/permission';
 import { useTranslation } from 'react-i18next';
-import { User } from '@/services/user';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
@@ -35,16 +34,21 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as OrgPolicy[], success: true, total: 0 };
+      const table = { data: [] as OrgPolicy[], success: true, total: 0 },
+        where: OrgPolicyWhereInput = {};
       if (keyword) {
-        params.nameContains = keyword;
+        where.nameContains = keyword;
       }
-      const result = await getOrgPolicyList(props.orgId, params, filter, sort, {
+      const result = await getOrgPolicyList(props.orgId, {
+        current: params.current,
+        pageSize: params.pageSize,
+        where,
+      }, {
         roleId: props.orgRoleInfo?.id,
         userId: props.userInfo?.id,
       });
       if (result?.totalCount) {
-        table.data = result.edges.map(item => item.node);
+        table.data = result.edges?.map(item => item?.node) as OrgPolicy[];
         table.total = result.totalCount;
       }
       setdataSource(table.data);
@@ -58,34 +62,35 @@ export default (props: {
     },
     onFinish = async () => {
       setSaveLoading(true);
-      let isTree = false,
-        result: Permission | null = null;
+      let isTree = false;
       for (let idx in selectedDatas) {
         const item = selectedDatas[idx];
         if (props.orgRoleInfo) {
-          result = await createPermission({
-            principalKind: 'role',
+          const result = await createPermission({
+            principalKind: PermissionPrincipalKind.Role,
             orgID: props.orgId,
             orgPolicyID: item.id,
             roleID: props.orgRoleInfo.id,
           });
+          if (result?.id) {
+            isTree = true;
+          }
         } else if (props.userInfo) {
-          result = await createPermission({
-            principalKind: 'user',
+          const result = await createPermission({
+            principalKind: PermissionPrincipalKind.User,
             orgID: props.orgId,
             orgPolicyID: item.id,
             userID: props.userInfo.id,
           });
-        }
-
-        if (result?.id) {
-          isTree = true;
+          if (result?.id) {
+            isTree = true;
+          }
         }
       }
       if (isTree) {
         message.success(t('submit_success'));
         setSaveDisabled(true);
-        props.onClose?.(true);
+        props.onClose(true);
       }
       setSaveLoading(false);
       return false;

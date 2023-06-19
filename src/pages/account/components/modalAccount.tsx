@@ -1,16 +1,16 @@
 import { Modal } from 'antd';
 import { useState } from 'react';
-import { EnumUserStatus, User, UserType, getUserList } from '@/services/user';
+import { EnumUserStatus, getUserList } from '@/services/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { List, TableFilter, TableParams, TableSort } from '@/services/graphql';
+import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgRoleUserList, getOrgUserList } from '@/services/org/user';
-
+import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
 export default (props: {
   open: boolean;
   title: string;
-  userType?: UserType;
+  userType?: UserUserType;
   isMultiple?: boolean;
   tableTitle?: string;
   orgId?: string;
@@ -69,21 +69,56 @@ export default (props: {
 
   const
     getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as User[], success: true, total: 0 };
-      let result: List<User> | null;
-      params['userType'] = props.userType;
+      const table = { data: [] as User[], success: true, total: 0 },
+        where: UserWhereInput = {};
+      let orderBy: UserOrder | undefined = undefined;
+      where.userType = props.userType;
+      where.principalNameContains = params.principalNameContains;
+      where.displayNameContains = params.displayNameContains;
+      where.emailContains = params.emailContains;
+      where.mobileContains = params.mobileContains;
+      where.statusIn = filter.status as UserSimpleStatus[] | null;
+      if (sort.createdAt) {
+        orderBy = {
+          direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
+          field: UserOrderField.CreatedAt
+        }
+      }
       if (props.orgRoleId) {
-        result = await getOrgRoleUserList(props.orgRoleId, params, filter, sort);
+        const result = await getOrgRoleUserList(props.orgRoleId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
       } else if (props.orgId) {
-        result = await getOrgUserList(props.orgId, params, filter, sort);
+        const result = await getOrgUserList(props.orgId, {
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
       } else {
-        result = await getUserList(params, filter, sort);
+        const result = await getUserList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
       }
 
-      if (result) {
-        table.data = result.edges.map(item => item.node);
-        table.total = result.totalCount;
-      }
       setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;

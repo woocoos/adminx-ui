@@ -1,114 +1,7 @@
 import { gid } from '@/util';
-import Sha256 from 'crypto-js/sha256';
-import {
-  TableParams, graphqlApi, setClearInputField, TableFilter,
-  TableSort,
-  getGraphqlFilter,
-  graphqlPageApi,
-  List,
-} from '../graphql';
-import { AppAction, AppActionField } from '../app/action';
-import { AppMenu, AppMenuField } from '../app/menu';
-import { Org, OrgNodeField } from '../org';
-
-export type UserType = 'account' | 'member';
-export type UserCreationType = 'invitation' | 'register' | 'manual';
-
-type UserStatus = 'active' | 'inactive' | 'processing';
-
-export interface User {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  deletedAt: string;
-  principalName: string;
-  displayName: string;
-  email: string;
-  mobile: string;
-  userType: UserType;
-  creationType: UserCreationType;
-  registerIP: string;
-  status: UserStatus;
-  comments: string;
-  loginProfile?: UserLoginProfile;
-  passwords?: UserPassword[];
-  password?: UserPassword;
-  identities?: UserIdentity[];
-  isAssignOrgRole?: boolean;
-  isAllowRevokeRole?: boolean;
-}
-
-export type UserLoginProfileSetKind = 'keep' | 'customer' | 'auto';
-export interface UserLoginProfile {
-  id: string;
-  createdBy: string;
-  createdAt: string;
-  updatedBy: string;
-  updatedAt: string;
-  userID: string;
-  lastLoginIP: string;
-  /**
-   * 最后登陆时间
-   */
-  lastLoginAt: string;
-  /**
-   * 是否允许使用密码登陆控制台
-   */
-  canLogin: boolean;
-  /**
-   * 设置密码:keep-保持不变,customer-客户自行设置,auto-自动生成
-   */
-  setKind: UserLoginProfileSetKind;
-  /**
-   * 下次登陆时需要重置密码
-   */
-  passwordReset: boolean;
-  /**
-   * 是否开启设备认证
-   */
-  verifyDevice: boolean;
-  /**
-   * 是否开启多因素验证
-   */
-  mfaEnabled: boolean;
-
-  /**
-   * 多因素验证状态
-   */
-  mfaStatus: UserStatus;
-}
-
-export type Mfa = {
-  secret: string;
-  account: string;
-};
-
-interface UserPassword {
-  id: string;
-  createdBy: string;
-  createdAt: Date;
-  updatedBy: string;
-  updatedAt: Date;
-  userID: string;
-  scene: 'login';
-  status: UserStatus;
-}
-
-type UserIdentityKind = 'name' | 'email' | 'phone' | 'wechat' | 'qq';
-export interface UserIdentity {
-  id: string;
-  createdBy: string;
-  createdAt: Date;
-  updatedBy: string;
-  updatedAt: Date;
-  userID: string;
-  kind: UserIdentityKind;
-  code: string;
-  codeExtend: string;
-  status: UserStatus;
-}
+import { koClient } from '../graphql';
+import { gql } from '@/__generated__';
+import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserIdentity, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
@@ -130,22 +23,156 @@ export const EnumUserLoginProfileMfaStatus = {
   processing: { text: '处理中', status: 'warning' },
 };
 
-export const UserNodeField = `
-  id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-  email,mobile,userType,creationType,registerIP,status,comments`;
-
-const UserLoginProfileField = `
-    id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
-    canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
-  `,
-  UserIdentityField = `
-    id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
-  `,
-  MFANodeField = `
-    secret,account
-  `;
-
 export type UpdateUserInfoScene = 'create' | 'base' | 'loginProfile' | 'identity' | 'recycle';
+
+const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  list:users(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        email,mobile,userType,creationType,registerIP,status,comments
+      }
+    }
+  }
+}`)
+
+const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+      email,mobile,userType,creationType,registerIP,status,comments
+    }
+  }
+}`)
+
+const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+      email,mobile,userType,creationType,registerIP,status,comments,
+      loginProfile{
+        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
+        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
+      }
+    }
+  }
+}`)
+
+const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLoginProfileIdentities($gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+      email,mobile,userType,creationType,registerIP,status,comments,
+      loginProfile{
+        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
+        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
+      }
+      identities{
+        id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
+      }
+    }
+  }
+}`)
+
+const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+      email,mobile,userType,creationType,registerIP,status,comments,
+      identities{
+        id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
+      }
+    }
+  }
+}`)
+
+const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
+  action:createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
+}`)
+
+const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
+  action:createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }
+}`)
+
+const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
+  action:updateUser(userID:$userId,input:$input){ id,displayName }
+}`)
+
+const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){
+  action:updateLoginProfile(userID:$userId,input:$input){ id }
+}`)
+
+const mutationBindUserIdentity = gql(/* GraphQL */`mutation bindUserIdentity($input: CreateUserIdentityInput!){
+  action:bindUserIdentity(input:$input){ id }
+}`)
+
+const mutationDelUserIdentity = gql(/* GraphQL */`mutation deleteUserIdentity($identityId:ID!){
+  action:deleteUserIdentity(id:$identityId)
+}`)
+
+const mutationDelUser = gql(/* GraphQL */`mutation deleteUser($userId:ID!){
+  action:deleteUser(userID:$userId)
+}`)
+
+const mutationResetUserPwdEmail = gql(/* GraphQL */`mutation resetUserPasswordByEmail($userId:ID!){
+  action:resetUserPasswordByEmail(userId: $userId)
+}`)
+
+const mutationChangePwd = gql(/* GraphQL */`mutation changePassword($oldPwd:String!,$newPwd:String!){
+  action:changePassword(oldPwd:$oldPwd,newPwd:$newPwd)
+}`)
+
+const mutationEnableMfa = gql(/* GraphQL */`mutation enableMfa($userId:ID!){
+  action:enableMFA(userID:$userId){secret,account}
+}`)
+
+const mutationDisableMfa = gql(/* GraphQL */`mutation disableMfa($userId:ID!){
+  action:disableMFA(userID:$userId)
+}`)
+
+const mutationSendMfaEmail = gql(/* GraphQL */`mutation sendMfaEmail($userId:ID!){
+  action:sendMFAToUserByEmail(userID:$userId)
+}`)
+
+const queryCheckPermission = gql(/* GraphQL */`query  checkPermission($permission:String!){
+  action:checkPermission(permission: $permission)
+}`)
+
+const queryUserPermissionList = gql(/* GraphQL */`query userPermissionList($where: AppActionWhereInput){
+  list:userPermissions(where: $where){
+    id,appID,name,kind,method
+  }
+}`)
+
+const queryUserMenuList = gql(/* GraphQL */`query userMenuList($appCode:String!){
+  list:userMenus(appCode: $appCode){
+    id,parentID,kind,name,comments,displaySort,icon,route
+  }
+}`)
+
+const queryUserRootOrgList = gql(/* GraphQL */`query userRootOrgs{
+  list:userRootOrgs{
+    id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone
+  }
+}`)
+
+const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  list:orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        email,mobile,userType,creationType,registerIP,status,comments
+      }
+    }
+  }
+}`)
+
+const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
+  action:recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
+}`)
+
 
 /**
  * 获取用户信息
@@ -153,64 +180,94 @@ export type UpdateUserInfoScene = 'create' | 'base' | 'loginProfile' | 'identity
  * @param headers
  * @returns
  */
-export async function getUserList(params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query users($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:UserOrder,$where:UserWhereInput){
-        list:users(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${UserNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<User>;
-  } else {
-    return null;
+export async function getUserList(gather: {
+  current?: number
+  pageSize?: number
+  where?: UserWhereInput
+  orderBy?: UserOrder
+}) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserList, {
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.list.__typename === 'UserConnection') {
+    return result.data.list
   }
+  return null
 }
 
 /**
  * 获取用户信息
  * @param userId
- * @param headers
  * @returns
  */
-export async function getUserInfo(userId: string, scene?: UpdateUserInfoScene[], headers?: Record<string, any>) {
-  const result = await graphqlApi(
-    `query{
-      node(id:"${gid('user', userId)}"){
-        ... on User{
-          ${UserNodeField}
-          ${scene?.includes('loginProfile') ? `loginProfile{
-            ${UserLoginProfileField}
-          }` : ''}
-          ${scene?.includes('identity') ? `identities{
-            ${UserIdentityField}
-          }` : ''}
-        }
-      }
-    }`,
-    {},
-    headers,
-  );
+export async function getUserInfo(userId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserInfo, {
+      gid: gid('user', userId),
+    }, {
 
-  if (result?.data?.node) {
-    return result?.data?.node as User;
-  } else {
-    return null;
+    }).toPromise()
+
+  if (result.data?.node?.__typename === 'User') {
+    return result.data?.node
   }
+  return null
+}
+
+/**
+ * 获取用户信息
+ * @param userId
+ * @returns
+ */
+export async function getUserInfoLoginProfile(userId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserInfoLoginProfile, {
+      gid: gid('user', userId),
+    }).toPromise()
+
+  if (result.data?.node?.__typename === 'User') {
+    return result.data?.node
+  }
+  return null
+}
+
+/**
+ * 获取用户信息
+ * @param userId
+ * @returns
+ */
+export async function getUserInfoIdentities(userId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserInfoIdentities, {
+      gid: gid('user', userId),
+    }).toPromise()
+
+  if (result.data?.node?.__typename === 'User') {
+    return result.data?.node
+  }
+  return null
+}
+
+/**
+ * 获取用户信息
+ * @param userId
+ * @returns
+ */
+export async function getUserInfoLoginProfileIdentities(userId: string) {
+  const koc = koClient(),
+    result = await koc.client.query(queryUserInfoLoginProfileIdentities, {
+      gid: gid('user', userId),
+    }).toPromise()
+
+  if (result.data?.node?.__typename === 'User') {
+    return result.data?.node
+  }
+  return null
 }
 
 /**
@@ -219,46 +276,18 @@ export async function getUserInfo(userId: string, scene?: UpdateUserInfoScene[],
  * @param input
  * @returns
  */
-export async function createUserInfo(
-  rootOrgID: string,
-  input: User | Record<string, any>,
-  userType: UserType,
-  setKind: UserLoginProfileSetKind,
-) {
-  if (input['password']) {
-    const pwd = input['password'];
-    input.password = {
-      scene: 'login',
-      status: 'active',
-      password: pwd,
-    };
-  }
+export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
+      rootOrgID: rootOrgID,
+      input
+    }).toPromise()
 
-  if (setKind) {
-    input.loginProfile = {
-      setKind: setKind,
-      verifyDevice: false,
-    };
+  if (result.data?.action?.id) {
+    return result.data?.action
   }
-  if (!input.status) {
-    input.status = 'active';
-  }
-  const result = await graphqlApi(
-    `mutation createUser($input: CreateUserInput!){
-      action:${userType === 'account' ? 'createOrganizationAccount' : 'createOrganizationUser'}(
-        rootOrgID:"${rootOrgID}",input:$input
-      ){
-        ${UserNodeField}
-      }
-    }`,
-    { input },
-  );
-
-  if (result?.data?.action) {
-    return result?.data?.action as User;
-  } else {
-    return null;
-  }
+  return null
 }
 
 
@@ -268,23 +297,18 @@ export async function createUserInfo(
  * @param input
  * @returns
  */
-export async function updateUserInfo(userId: string, input: User) {
-  const result = await graphqlApi(
-    `mutation updateUser($input: UpdateUserInput!){
-      action:updateUser(userID:"${userId}",input:$input){
-        ${UserNodeField}
-      }
-    }`,
-    {
-      input: setClearInputField(input),
-    },
-  );
+export async function updateUserInfo(userId: string, input: UpdateUserInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateUser, {
+      userId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as User;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -293,23 +317,18 @@ export async function updateUserInfo(userId: string, input: User) {
  * @param input
  * @returns
  */
-export async function updateUserProfile(userId: string, input: User) {
-  const result = await graphqlApi(
-    `mutation updateLoginProfile($input: UpdateUserLoginProfileInput!){
-      action:updateLoginProfile(userID:"${userId}",input:$input){
-        ${UserLoginProfileField}
-      }
-    }`,
-    {
-      input: setClearInputField(input),
-    },
-  );
+export async function updateUserProfile(userId: string, input: UpdateUserLoginProfileInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationUpdateUserLoginProfile, {
+      userId,
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as UserLoginProfile;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -318,24 +337,17 @@ export async function updateUserProfile(userId: string, input: User) {
  * @param input
  * @returns
  */
-export async function bindUserIdentity(userId: string, input: UserIdentity) {
-  input.userID = userId;
-  const result = await graphqlApi(
-    `mutation bindUserIdentity($input: CreateUserIdentityInput!){
-      action:bindUserIdentity(input:$input){
-        ${UserIdentityField}
-      }
-    }`,
-    {
-      input: input,
-    },
-  );
+export async function bindUserIdentity(input: CreateUserIdentityInput) {
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationBindUserIdentity, {
+      input,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as UserIdentity;
-  } else {
-    return null;
+  if (result.data?.action?.id) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -344,17 +356,16 @@ export async function bindUserIdentity(userId: string, input: UserIdentity) {
  * @returns
  */
 export async function delUserIdentity(identityId: string) {
-  const result = await graphqlApi(
-    `mutation deleteUserIdentity{
-      action:deleteUserIdentity(id:"${identityId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelUserIdentity, {
+      identityId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -363,16 +374,16 @@ export async function delUserIdentity(identityId: string) {
  * @returns
  */
 export async function delUserInfo(userId: string) {
-  const result = await graphqlApi(
-    `mutation deleteUser{
-      action:deleteUser(userID: "${userId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDelUser, {
+      userId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -381,16 +392,16 @@ export async function delUserInfo(userId: string) {
  * @returns
  */
 export async function resetUserPasswordByEmail(userId: string) {
-  const result = await graphqlApi(
-    `mutation resetUserPasswordByEmail{
-      action:resetUserPasswordByEmail(userId: "${userId}")
-    }`);
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationResetUserPwdEmail, {
+      userId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -400,17 +411,17 @@ export async function resetUserPasswordByEmail(userId: string) {
  * @returns
  */
 export async function updatePassword(oldPwd: string, newPwd: string) {
-  const result = await graphqlApi(
-    `mutation changePassword{
-      action:changePassword(oldPwd:"${Sha256(oldPwd).toString()}",newPwd:"${Sha256(newPwd).toString()}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationChangePwd, {
+      oldPwd,
+      newPwd,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action
   }
+  return null
 }
 
 
@@ -420,19 +431,16 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
  * @returns
  */
 export async function enableMFA(userId: string) {
-  const result = await graphqlApi(
-    `mutation enableMFA{
-      action:enableMFA(userID:"${userId}"){
-        ${MFANodeField}
-      }
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationEnableMfa, {
+      userId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as Mfa;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -441,17 +449,16 @@ export async function enableMFA(userId: string) {
  * @returns
  */
 export async function disableMFA(userId: string) {
-  const result = await graphqlApi(
-    `mutation disableMFA{
-      action:disableMFA(userID:"${userId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationDisableMfa, {
+      userId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 /**
@@ -460,17 +467,16 @@ export async function disableMFA(userId: string) {
  * @returns
  */
 export async function sendMFAEmail(userId: string) {
-  const result = await graphqlApi(
-    `mutation sendMFAToUserByEmail{
-      action:sendMFAToUserByEmail(userID:"${userId}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationSendMfaEmail, {
+      userId,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 
@@ -480,17 +486,16 @@ export async function sendMFAEmail(userId: string) {
  * @returns
  */
 export async function checkPermission(permission: string) {
-  const result = await graphqlApi(
-    `query{
-      action:checkPermission(permission: "${permission}")
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryCheckPermission, {
+      permission,
+    }).toPromise()
 
-  if (result?.data?.action) {
-    return result?.data?.action as boolean;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
 
 
@@ -499,20 +504,17 @@ export async function checkPermission(permission: string) {
  * @param where
  * @returns
  */
-export async function userPermissions(where: Record<string, any>, headers?: Record<string, any>) {
-  const result = await graphqlApi(
-    `query userPermissions($where: AppActionWhereInput){
-      list:userPermissions(where: $where){
-        ${AppActionField}
-      }
-    }`, { where }, headers,
-  );
+export async function userPermissions(where: AppActionWhereInput) {
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryUserPermissionList, {
+      where
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result?.data?.list as AppAction[];
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result?.data?.list;
   }
+  return null
 }
 
 /**
@@ -521,19 +523,16 @@ export async function userPermissions(where: Record<string, any>, headers?: Reco
  * @returns
  */
 export async function userMenus(appCode: string) {
-  const result = await graphqlApi(
-    `query userMenus{
-      list:userMenus(appCode: "${appCode}"){
-        ${AppMenuField}
-      }
-    }`,
-  );
+  const koc = koClient(),
+    result = await koc.client.query(
+      queryUserMenuList, {
+      appCode,
+    }).toPromise()
 
-  if (result?.data?.list) {
-    return result?.data?.list as AppMenu[];
-  } else {
-    return null;
+  if (result.data?.list) {
+    return result?.data?.list;
   }
+  return null
 }
 
 /**
@@ -541,19 +540,12 @@ export async function userMenus(appCode: string) {
  * @returns
  */
 export async function userRootOrgs() {
-  const result = await graphqlApi(
-    `query userRootOrgs{
-      list:userRootOrgs{
-        ${OrgNodeField}
-      }
-    }`,
-  );
-
-  if (result?.data?.list) {
-    return result?.data?.list as Org[];
-  } else {
-    return null;
+  const koc = koClient(),
+    result = await koc.client.query(queryUserRootOrgList, {}).toPromise()
+  if (result.data?.list) {
+    return result?.data?.list;
   }
+  return null
 }
 
 
@@ -563,32 +555,24 @@ export async function userRootOrgs() {
  * @param headers
  * @returns
  */
-export async function getRecycleUserList(params: TableParams, filter: TableFilter, sort: TableSort) {
-  const { where, orderBy } = getGraphqlFilter(params, filter, sort),
-    result = await graphqlPageApi(
-      `query orgRecycleUsers($after: Cursor,$first: Int,$before: Cursor,$last: Int,$orderBy:UserOrder,$where:UserWhereInput){
-        list:orgRecycleUsers(after:$after,first:$first,before:$before,last:$last,orderBy: $orderBy,where: $where){
-          totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-          edges{
-            cursor,node{
-              ${UserNodeField}
-            }
-          }
-        }
-      }`,
-      {
-        first: params.pageSize,
-        where,
-        orderBy,
-      },
-      params.current,
-    );
-
-  if (result?.data?.list) {
-    return result.data.list as List<User>;
-  } else {
-    return null;
+export async function getRecycleUserList(gather: {
+  current?: number
+  pageSize?: number
+  where?: UserWhereInput
+  orderBy?: UserOrder
+}) {
+  const koc = koClient(),
+    result = await koc.client.query(queryOrgRecycleUserList, {
+      first: gather.pageSize,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, {
+      url: `${koc.url}?p=${gather.current || 1}`
+    }).toPromise()
+  if (result.data?.list) {
+    return result?.data?.list;
   }
+  return null
 }
 
 
@@ -599,39 +583,21 @@ export async function getRecycleUserList(params: TableParams, filter: TableFilte
  */
 export async function restoreRecycleUser(
   userId: string,
-  input: User | Record<string, any>,
+  userInput: UpdateUserInput,
   setKind: UserLoginProfileSetKind,
+  pwdInput?: CreateUserPasswordInput
 ) {
-  let pwdInput: Record<string, any> | undefined;
-  if (setKind === 'customer') {
-    pwdInput = {
-      scene: 'login',
-      password: input.password,
-      status: 'active',
-      userID: userId,
-    };
-    delete input.password;
-  }
-  const result = await graphqlApi(
-    `mutation recoverOrgUser($userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
-      action:recoverOrgUser(
-        userID:"${userId}",
-        pwdKind:${setKind},
-        userInput: $userInput,
-        pwdInput: $pwdInput
-        ){
-          ${UserNodeField}
-        }
-    }`,
-    {
-      userInput: setClearInputField(input),
+  const koc = koClient(),
+    result = await koc.client.mutation(
+      mutationRecOrgUser, {
+      userId,
+      setKind,
+      userInput,
       pwdInput,
-    },
-  );
+    }).toPromise()
 
-  if (result?.data?.action?.id) {
-    return result?.data?.action as User;
-  } else {
-    return null;
+  if (result.data?.action) {
+    return result?.data?.action;
   }
+  return null
 }
