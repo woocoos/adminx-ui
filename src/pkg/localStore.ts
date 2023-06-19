@@ -59,12 +59,10 @@ export const monitorKeyChange = (keys: { key: string; onChange: (value: any) => 
           const kk = key.key;
           if (typeof od[kk] === 'object') {
             if (JSON.stringify(od[kk]) !== JSON.stringify(nd[kk])) {
-              console.log(kk);
               key.onChange(nd[kk]);
             }
           } else {
             if (od[kk] !== nd[kk]) {
-              console.log(kk);
               key.onChange(nd[kk]);
             }
           }

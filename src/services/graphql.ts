@@ -84,35 +84,20 @@ export function koClient(headers?: Record<string, any>) {
             switch (error.response.status) {
               case 401:
                 store.dispatch.basis.logout();
-                if (!msg) {
-                  msg = i18n.t('401');
-                }
+                msg = i18n.t('401');
                 break;
               case 403:
-                if (!msg) {
-                  msg = i18n.t('403');
-                }
+                msg = i18n.t('403');
                 break;
               case 404:
-                if (!msg) {
-                  msg = i18n.t('404');
-                }
-                break;
-              case 500:
-                if (!msg) {
-                  msg = i18n.t('500');
-                }
+                msg = i18n.t('404');
                 break;
               default:
-                if (!msg) {
-                  msg = error.toString();
-                }
+                msg = error.toString();
             }
             if (msg) {
               message.error(msg);
             }
-
-            console.dir('onError', error);
           },
         }),
         cacheExchange,
