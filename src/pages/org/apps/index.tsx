@@ -24,7 +24,7 @@ export default () => {
 
   useEffect(() => {
     getInfo();
-  }, []);
+  }, [searchParams]);
 
   return (<PageContainer
     header={{

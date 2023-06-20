@@ -53,6 +53,7 @@ export async function getAppMenus(
     result = await koc.client.query(
       queryAppMenuList, {
       gid: gid('app', appId),
+      first: gather.pageSize,
       where: gather.where,
       orderBy: gather.orderBy || {
         direction: OrderDirection.Asc,

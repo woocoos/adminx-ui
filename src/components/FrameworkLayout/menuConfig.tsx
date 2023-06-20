@@ -101,6 +101,7 @@ export const userMenuList = async () => {
         menus.forEach(item => {
           if (item) {
             const data: MenuDataItem = {
+              key: item.id,
               id: item.id,
               name: item.name,
               icon: <i className={item.icon || ''} />,

@@ -80,6 +80,7 @@ export default () => {
         const result = await getAppRoleInfo(appRoleId);
         if (result?.id) {
           setAppRoleInfo(result as AppRole);
+          return result;
         }
       }
       return null;
