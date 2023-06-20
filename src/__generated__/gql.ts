@@ -85,14 +85,14 @@ const documents = {
     "mutation revokeOrgRoleUser($orgRoleId:ID!,$userId:ID!){\n  action:revokeRoleUser(roleID:$orgRoleId,userID:$userId)\n}": types.RevokeOrgRoleUserDocument,
     "mutation assignOrgAppRole($orgId:ID!,$appRoleId:ID!){\n  action:assignOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)\n}": types.AssignOrgAppRoleDocument,
     "mutation revokeOrgAppRole($orgId:ID!,$appRoleId:ID!){\n  action:revokeOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)\n}": types.RevokeOrgAppRoleDocument,
-    "query orgGroupListNum($where:OrgRoleWhereInput){\n  list:orgGroups(where: $where){ totalCount }\n}": types.OrgGroupListNumDocument,
-    "query userGroupListNum($userId:ID!,$where:OrgRoleWhereInput){\n  list:userGroups(userID:$userId,where: $where){ totalCount }\n}": types.UserGroupListNumDocument,
-    "query orgRoleListNum($where:OrgRoleWhereInput){\n  list:orgRoles(where: $where){ totalCount }\n}": types.OrgRoleListNumDocument,
+    "query orgGroupListNum($first:Int,$where:OrgRoleWhereInput){\n  list:orgGroups(first:$first,where: $where){ totalCount }\n}": types.OrgGroupListNumDocument,
+    "query userGroupListNum($userId:ID!,$first:Int,$where:OrgRoleWhereInput){\n  list:userGroups(userID:$userId,first:$first,where: $where){ totalCount }\n}": types.UserGroupListNumDocument,
+    "query orgRoleListNum($first:Int,$where:OrgRoleWhereInput){\n  list:orgRoles(first:$first,where: $where){ totalCount }\n}": types.OrgRoleListNumDocument,
     "query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n            email,mobile,userType,creationType,registerIP,status,comments\n          }\n        }\n      }\n    }\n  }\n}": types.OrgUserListDocument,
     "query orgUserListAndIsOrgRole($gid: GID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n            email,mobile,userType,creationType,registerIP,status,comments\n            isAssignOrgRole(orgRoleID: $orgRoleId)\n            isAllowRevokeRole(orgRoleID: $orgRoleId)\n          }\n        }\n      }\n    }\n  }\n}": types.OrgUserListAndIsOrgRoleDocument,
     "query orgRoleUserList($roleId: ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  list:orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}": types.OrgRoleUserListDocument,
     "query orgRoleUserListAndIsOrgRole($roleId: ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  list:orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n        isAssignOrgRole(orgRoleID: $orgRoleId)\n        isAllowRevokeRole(orgRoleID: $orgRoleId)\n      }\n    }\n  }\n}": types.OrgRoleUserListAndIsOrgRoleDocument,
-    "query orgUserNum($gid:GID!,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(where: $where){ totalCount }\n    }\n  }\n}": types.OrgUserNumDocument,
+    "query orgUserNum($gid:GID!,$first: Int,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(first:$first,where: $where){ totalCount }\n    }\n  }\n}": types.OrgUserNumDocument,
     "mutation allotOrgUser($input:CreateOrgUserInput!){\n  action:allotOrganizationUser(input:$input)\n}": types.AllotOrgUserDocument,
     "mutation removeOrgUser($orgId:ID!,$userId:ID!){\n  action:removeOrganizationUser(orgID: $orgId,userID: $userId)\n}": types.RemoveOrgUserDocument,
     "query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){\n  list:orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n        role{ id,orgID,kind,name,isAppRole }\n        orgPolicy{ id,orgID,appPolicyID,name }\n        user{ id,displayName }\n      }\n    }\n  }\n}": types.OrgPolicyReferencesDocument,
@@ -433,15 +433,15 @@ export function gql(source: "mutation revokeOrgAppRole($orgId:ID!,$appRoleId:ID!
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query orgGroupListNum($where:OrgRoleWhereInput){\n  list:orgGroups(where: $where){ totalCount }\n}"): (typeof documents)["query orgGroupListNum($where:OrgRoleWhereInput){\n  list:orgGroups(where: $where){ totalCount }\n}"];
+export function gql(source: "query orgGroupListNum($first:Int,$where:OrgRoleWhereInput){\n  list:orgGroups(first:$first,where: $where){ totalCount }\n}"): (typeof documents)["query orgGroupListNum($first:Int,$where:OrgRoleWhereInput){\n  list:orgGroups(first:$first,where: $where){ totalCount }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query userGroupListNum($userId:ID!,$where:OrgRoleWhereInput){\n  list:userGroups(userID:$userId,where: $where){ totalCount }\n}"): (typeof documents)["query userGroupListNum($userId:ID!,$where:OrgRoleWhereInput){\n  list:userGroups(userID:$userId,where: $where){ totalCount }\n}"];
+export function gql(source: "query userGroupListNum($userId:ID!,$first:Int,$where:OrgRoleWhereInput){\n  list:userGroups(userID:$userId,first:$first,where: $where){ totalCount }\n}"): (typeof documents)["query userGroupListNum($userId:ID!,$first:Int,$where:OrgRoleWhereInput){\n  list:userGroups(userID:$userId,first:$first,where: $where){ totalCount }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query orgRoleListNum($where:OrgRoleWhereInput){\n  list:orgRoles(where: $where){ totalCount }\n}"): (typeof documents)["query orgRoleListNum($where:OrgRoleWhereInput){\n  list:orgRoles(where: $where){ totalCount }\n}"];
+export function gql(source: "query orgRoleListNum($first:Int,$where:OrgRoleWhereInput){\n  list:orgRoles(first:$first,where: $where){ totalCount }\n}"): (typeof documents)["query orgRoleListNum($first:Int,$where:OrgRoleWhereInput){\n  list:orgRoles(first:$first,where: $where){ totalCount }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -461,7 +461,7 @@ export function gql(source: "query orgRoleUserListAndIsOrgRole($roleId: ID!,$org
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query orgUserNum($gid:GID!,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(where: $where){ totalCount }\n    }\n  }\n}"): (typeof documents)["query orgUserNum($gid:GID!,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(where: $where){ totalCount }\n    }\n  }\n}"];
+export function gql(source: "query orgUserNum($gid:GID!,$first: Int,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(first:$first,where: $where){ totalCount }\n    }\n  }\n}"): (typeof documents)["query orgUserNum($gid:GID!,$first: Int,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      list:users(first:$first,where: $where){ totalCount }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -66,11 +66,11 @@ const queryOrgRoleUserListAndIsOrgRole = gql(/* GraphQL */`query orgRoleUserList
   }
 }`);
 
-const queryOrgUserNum = gql(/* GraphQL */`query orgUserNum($gid:GID!,$where:UserWhereInput){
+const queryOrgUserNum = gql(/* GraphQL */`query orgUserNum($gid:GID!,$first: Int,$where:UserWhereInput){
   node(id:$gid){
     ... on Org{
       id,
-      list:users(where: $where){ totalCount }
+      list:users(first:$first,where: $where){ totalCount }
     }
   }
 }`);
@@ -222,6 +222,7 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
       queryOrgUserNum, {
       gid: gid('org', orgId),
       where,
+      first: 9999,
     }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {

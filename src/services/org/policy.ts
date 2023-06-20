@@ -269,6 +269,7 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
     result = await koc.client.query(
       queryOrgPolicyListNum, {
       gid: gid('org', orgId),
+      first: 9999,
       where,
     }).toPromise();
 

@@ -96,16 +96,16 @@ const mutationRevOrgAppRole = gql(/* GraphQL */`mutation revokeOrgAppRole($orgId
   action:revokeOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
 }`);
 
-const queryOrgGroupListNum = gql(/* GraphQL */`query orgGroupListNum($where:OrgRoleWhereInput){
-  list:orgGroups(where: $where){ totalCount }
+const queryOrgGroupListNum = gql(/* GraphQL */`query orgGroupListNum($first:Int,$where:OrgRoleWhereInput){
+  list:orgGroups(first:$first,where: $where){ totalCount }
 }`);
 
-const queryUserGroupListNum = gql(/* GraphQL */`query userGroupListNum($userId:ID!,$where:OrgRoleWhereInput){
-  list:userGroups(userID:$userId,where: $where){ totalCount }
+const queryUserGroupListNum = gql(/* GraphQL */`query userGroupListNum($userId:ID!,$first:Int,$where:OrgRoleWhereInput){
+  list:userGroups(userID:$userId,first:$first,where: $where){ totalCount }
 }`);
 
-const queryOrgRoleListNum = gql(/* GraphQL */`query orgRoleListNum($where:OrgRoleWhereInput){
-  list:orgRoles(where: $where){ totalCount }
+const queryOrgRoleListNum = gql(/* GraphQL */`query orgRoleListNum($first:Int,$where:OrgRoleWhereInput){
+  list:orgRoles(first:$first,where: $where){ totalCount }
 }`);
 
 
@@ -390,6 +390,7 @@ export async function getOrgGroupQty(where?: OrgRoleWhereInput) {
     result = await koc.client.query(
       queryOrgGroupListNum, {
       where,
+      first: 9999,
     }).toPromise();
 
   if (result.data?.list.__typename === 'OrgRoleConnection') {
@@ -411,6 +412,7 @@ export async function getUserJoinGroupQty(userId: string, where?: OrgRoleWhereIn
       queryUserGroupListNum, {
       where,
       userId,
+      first: 9999,
     }).toPromise();
 
   if (result.data?.list.__typename === 'OrgRoleConnection') {
@@ -429,6 +431,7 @@ export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
     result = await koc.client.query(
       queryOrgRoleListNum, {
       where,
+      first: 9999,
     }).toPromise();
 
   if (result.data?.list.__typename === 'OrgRoleConnection') {
