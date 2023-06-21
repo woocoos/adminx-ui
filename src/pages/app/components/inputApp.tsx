@@ -3,7 +3,7 @@ import ModalApp from './modalApp';
 import { useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { App } from '@/__generated__/graphql';
+import { App } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   value?: App;

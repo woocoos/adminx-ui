@@ -8,7 +8,7 @@ import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList 
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
-import { App, AppAction, AppActionWhereInput } from '@/__generated__/graphql';
+import { App, AppAction, AppActionWhereInput } from '@/__generated__/knockout/graphql';
 
 export type AppActionListRef = {
   getSelect: () => AppAction[];

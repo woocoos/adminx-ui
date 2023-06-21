@@ -8,7 +8,7 @@ import { assignOrgRoleUser } from '@/services/org/role';
 import { allotOrgUser, getOrgUserList } from '@/services/org/user';
 import { getDate } from '@/util';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { Org, OrgRole, User, UserUserType, UserWhereInput } from '@/__generated__/graphql';
+import { Org, OrgRole, User, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

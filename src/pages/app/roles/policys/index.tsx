@@ -8,7 +8,7 @@ import { getAppRoleInfo, getAppRoleInfoPolicieList, revokeAppRolePolicy } from '
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
-import { AppRole, AppPolicy, App } from '@/__generated__/graphql';
+import { AppRole, AppPolicy, App } from '@/__generated__/knockout/graphql';
 
 
 export default () => {

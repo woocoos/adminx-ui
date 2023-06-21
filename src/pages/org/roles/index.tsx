@@ -12,7 +12,7 @@ import DrawerRolePolicy from '../components/drawerRolePolicy';
 import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/knockout/graphql';
 
 
 export const PageOrgRoleList = (props: {

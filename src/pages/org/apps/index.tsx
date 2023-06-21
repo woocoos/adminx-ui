@@ -1,4 +1,4 @@
-import { Org } from '@/__generated__/graphql';
+import { Org } from '@/__generated__/knockout/graphql';
 import { PageAppList } from '@/pages/app/list';
 import { getOrgInfo } from '@/services/org';
 import { PageContainer, useToken } from '@ant-design/pro-components';

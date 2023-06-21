@@ -12,7 +12,7 @@ import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { App, AppKind, AppWhereInput } from '@/__generated__/graphql';
+import { App, AppKind, AppWhereInput } from '@/__generated__/knockout/graphql';
 
 export const PageAppList = (props: {
   title?: string;

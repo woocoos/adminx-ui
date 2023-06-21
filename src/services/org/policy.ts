@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__';
+import { gql } from '@/__generated__/knockout';
 import { gid } from '@/util';
 import { koClient } from '../graphql';
-import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/__generated__/graphql';
+import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/__generated__/knockout/graphql';
 
 const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){

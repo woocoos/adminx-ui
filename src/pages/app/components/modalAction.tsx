@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { AppAction, AppActionWhereInput } from '@/__generated__/graphql';
+import { AppAction, AppActionWhereInput } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

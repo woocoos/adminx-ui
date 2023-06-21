@@ -7,7 +7,7 @@ import { EnumPermissionPrincipalKind, delPermssion, getOrgPolicyReferenceList } 
 import { getOrgPolicyInfo } from '@/services/org/policy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/graphql';
+import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   isFromSystem?: boolean;

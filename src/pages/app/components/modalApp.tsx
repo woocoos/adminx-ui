@@ -6,7 +6,7 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgAppList } from '@/services/org/app';
 import defaultApp from '@/assets/images/default-app.png';
-import { App, AppKind, AppWhereInput } from '@/__generated__/graphql';
+import { App, AppKind, AppWhereInput } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

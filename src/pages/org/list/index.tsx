@@ -12,7 +12,7 @@ import { getAppOrgList } from '@/services/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { Org, OrgKind, OrgWhereInput } from '@/__generated__/graphql';
+import { Org, OrgKind, OrgWhereInput } from '@/__generated__/knockout/graphql';
 
 export const OrgList = (props: {
   title?: string;

@@ -12,7 +12,7 @@ import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/graphql';
+import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/knockout/graphql';
 import { getAppInfo } from '@/services/app';
 
 

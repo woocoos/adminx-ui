@@ -7,7 +7,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/Auth';
-import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/graphql';
+import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
 
 export default () => {
   const { token } = useToken(),

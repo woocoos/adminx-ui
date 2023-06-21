@@ -10,7 +10,7 @@ import { userPermissions } from './services/user';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';
-import { User } from './__generated__/graphql';
+import { User } from './__generated__/knockout/graphql';
 
 
 // App config, see https://v3.ice.work/docs/guide/basic/app

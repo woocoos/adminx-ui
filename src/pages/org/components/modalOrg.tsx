@@ -1,4 +1,4 @@
-import { Org, OrgKind, OrgWhereInput } from '@/__generated__/graphql';
+import { Org, OrgKind, OrgWhereInput } from '@/__generated__/knockout/graphql';
 import { getAppOrgList } from '@/services/app/org';
 import { TableParams } from '@/services/graphql';
 import { EnumOrgKind, getOrgList, getOrgPathList } from '@/services/org';

@@ -1,5 +1,5 @@
 import KeepAlive from '@/components/KeepAlive';
-import { UserUserType } from '@/__generated__/graphql';
+import { UserUserType } from '@/__generated__/knockout/graphql';
 import { UserList } from '@/pages/account/components/listAccount';
 
 

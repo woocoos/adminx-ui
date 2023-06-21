@@ -8,7 +8,7 @@ import { Link, useSearchParams } from '@ice/runtime';
 import { getAppResList } from '@/services/app/resource';
 import CreateRes from './components/createRes';
 import Auth from '@/components/Auth';
-import { App, AppRes, AppResWhereInput } from '@/__generated__/graphql';
+import { App, AppRes, AppResWhereInput } from '@/__generated__/knockout/graphql';
 
 
 export default () => {

@@ -7,7 +7,7 @@ import { createPermission } from '@/services/permission';
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/__generated__/graphql';
+import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

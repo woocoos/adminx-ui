@@ -1,4 +1,4 @@
-import { gql } from '@/__generated__';
+import { gql } from '@/__generated__/knockout';
 import i18n from '@/i18n';
 import store from '@/store';
 import { message } from 'antd';

@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__';
+import { gql } from '@/__generated__/knockout';
 import { gid } from '@/util';
 import { koClient } from '../graphql';
-import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/__generated__/graphql';
+import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/__generated__/knockout/graphql';
 
 
 const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){

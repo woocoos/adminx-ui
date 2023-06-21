@@ -10,7 +10,7 @@ import { getAppRoleInfo } from '@/services/app/role';
 import { assignOrgAppRole, revokeOrgAppRole } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { AppRole, Org, OrgWhereInput } from '@/__generated__/graphql';
+import { AppRole, Org, OrgWhereInput } from '@/__generated__/knockout/graphql';
 
 
 export default () => {

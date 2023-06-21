@@ -1,6 +1,6 @@
 import { gid } from '@/util';
-import { gql } from '@/__generated__';
-import { AppResOrder, AppResWhereInput, UpdateAppResInput } from '@/__generated__/graphql';
+import { gql } from '@/__generated__/knockout';
+import { AppResOrder, AppResWhereInput, UpdateAppResInput } from '@/__generated__/knockout/graphql';
 import { koClient } from '../graphql';
 
 const queryAppResList = gql(/* GraphQL */`query appResList($gid: GID!,$first: Int,$orderBy:AppResOrder,$where:AppResWhereInput){

@@ -7,7 +7,7 @@ import { delPermssion, getOrgPermissionList } from '@/services/permission';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/graphql';
+import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/knockout/graphql';
 
 
 export default (props: {

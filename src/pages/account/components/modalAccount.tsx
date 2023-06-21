@@ -5,7 +5,7 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgRoleUserList, getOrgUserList } from '@/services/org/user';
-import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/graphql';
+import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

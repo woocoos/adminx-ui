@@ -13,7 +13,7 @@ import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import KeepAlive from '@/components/KeepAlive';
-import { App, AppRole } from '@/__generated__/graphql';
+import { App, AppRole } from '@/__generated__/knockout/graphql';
 
 
 export default () => {

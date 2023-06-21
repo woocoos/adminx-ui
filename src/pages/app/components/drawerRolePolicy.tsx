@@ -7,7 +7,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppPolicy, AppRole } from '@/__generated__/graphql';
+import { App, AppPolicy, AppRole } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

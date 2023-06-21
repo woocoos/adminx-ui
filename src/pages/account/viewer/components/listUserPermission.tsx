@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import store from '@/store';
 import { getUserJoinGroupList } from '@/services/org/role';
 import Auth from '@/components/Auth';
-import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/__generated__/graphql';
+import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/__generated__/knockout/graphql';
 
 
 export default (props: {

@@ -1,7 +1,7 @@
 import { createModel, history } from 'ice';
 import { LoginRes } from '@/services/basis';
 import { setItem, removeItem } from '@/pkg/localStore';
-import { User } from '@/__generated__/graphql';
+import { User } from '@/__generated__/knockout/graphql';
 
 type BasisUserState = {
   id: string;

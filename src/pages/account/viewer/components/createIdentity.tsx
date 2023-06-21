@@ -1,4 +1,4 @@
-import { UserIdentity } from '@/__generated__/graphql';
+import { UserIdentity } from '@/__generated__/knockout/graphql';
 import Auth, { checkAuth } from '@/components/Auth';
 import { EnumUserIdentityKind, EnumUserStatus, bindUserIdentity, delUserIdentity, getUserInfoIdentities } from '@/services/user';
 import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-components';

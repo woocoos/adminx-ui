@@ -1,4 +1,4 @@
-import { App, AppKind } from '@/__generated__/graphql';
+import { App, AppKind } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/app';
 import { updateFormat } from '@/util';

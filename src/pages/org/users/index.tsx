@@ -11,7 +11,7 @@ import { TreeDataState } from '@/services/graphql';
 import KeepAlive from '@/components/KeepAlive';
 import styles from './index.module.css';
 import Auth from '@/components/Auth';
-import { Org, OrgKind } from '@/__generated__/graphql';
+import { Org, OrgKind } from '@/__generated__/knockout/graphql';
 import { Link } from '@ice/runtime';
 
 export const PageOrgUsers = (props: {

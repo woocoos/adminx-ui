@@ -10,7 +10,7 @@ import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppPolicyAssignedOrgList } from '@/services/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { AppPolicy, Org, OrgWhereInput } from '@/__generated__/graphql';
+import { AppPolicy, Org, OrgWhereInput } from '@/__generated__/knockout/graphql';
 
 
 export default () => {

@@ -1,4 +1,4 @@
-import { TreeAction } from '@/__generated__/graphql';
+import { TreeAction } from '@/__generated__/knockout/graphql';
 import { TreeDataState } from '@/services/graphql';
 import CryptoJS from 'crypto-js';
 import dayjs from 'dayjs';

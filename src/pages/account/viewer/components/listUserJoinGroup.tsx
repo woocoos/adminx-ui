@@ -8,7 +8,7 @@ import store from '@/store';
 import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/org/role';
 import DrawerRole from '@/pages/org/components/drawerRole';
 import Auth from '@/components/Auth';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/knockout/graphql';
 
 
 export default (props: {

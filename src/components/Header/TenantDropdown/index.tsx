@@ -4,7 +4,7 @@ import { checkLave } from '@/components/LeavePrompt';
 import store from '@/store';
 import { useEffect, useState } from 'react';
 import { userRootOrgs } from '@/services/user';
-import { Org } from '@/__generated__/graphql';
+import { Org } from '@/__generated__/knockout/graphql';
 
 export default () => {
   const { t } = useTranslation(),

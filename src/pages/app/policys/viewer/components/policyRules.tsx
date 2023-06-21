@@ -6,7 +6,7 @@ import ActionsTransfer from '@/components/ActionsTransfer';
 import Editor from '@monaco-editor/react';
 import { useTranslation } from 'react-i18next';
 import AppPolicyRes from '@/components/AppPolicyRes';
-import { App, AppAction, PolicyEffect, PolicyRule } from '@/__generated__/graphql';
+import { App, AppAction, PolicyEffect, PolicyRule } from '@/__generated__/knockout/graphql';
 
 const RuleItem = (props: {
   rule: PolicyRule;

@@ -1,4 +1,4 @@
-import { AppRole } from '@/__generated__/graphql';
+import { AppRole } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { createAppRole, getAppRoleInfo, updateAppRole } from '@/services/app/role';
 import { updateFormat } from '@/util';

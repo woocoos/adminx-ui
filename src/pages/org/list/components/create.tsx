@@ -1,4 +1,4 @@
-import { Org, OrgKind, User, UserUserType } from '@/__generated__/graphql';
+import { Org, OrgKind, User, UserUserType } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import InputAccount from '@/pages/account/components/inputAccount';
 import { createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';

@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__';
+import { gql } from '@/__generated__/knockout';
 import { gid } from '@/util';
 import { koClient } from '../graphql';
-import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/__generated__/graphql';
+import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/__generated__/knockout/graphql';
 
 export const EnumAppPolicyStatus = {
   active: { text: '活跃', status: 'success' },

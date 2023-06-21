@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { MfaPrepare, bindMfa, bindPrepareMfa } from '@/services/basis';
 import { getUserInfoLoginProfile } from '@/services/user';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { User } from '@/__generated__/graphql';
+import { User } from '@/__generated__/knockout/graphql';
 
 export default () => {
   const { t } = useTranslation(),

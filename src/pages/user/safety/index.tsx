@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import UnbindMFA from './components/unbindMFA';
 import styles from './index.module.css';
-import { User } from '@/__generated__/graphql';
+import { User } from '@/__generated__/knockout/graphql';
 
 export default () => {
   const { t } = useTranslation(),

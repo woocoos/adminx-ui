@@ -1,7 +1,7 @@
 import { gid } from '@/util';
 import { koClient } from '../graphql';
-import { gql } from '@/__generated__';
-import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/__generated__/graphql';
+import { gql } from '@/__generated__/knockout';
+import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/__generated__/knockout/graphql';
 
 export const EnumOrgStatus = {
   active: { text: '活跃', status: 'success' },

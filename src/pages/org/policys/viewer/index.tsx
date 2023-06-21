@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { Org, PolicyRule } from '@/__generated__/graphql';
+import { Org, PolicyRule } from '@/__generated__/knockout/graphql';
 
 type ProFormData = {
   name: string;

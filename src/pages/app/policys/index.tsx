@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
-import { App, AppPolicy } from '@/__generated__/graphql';
+import { App, AppPolicy } from '@/__generated__/knockout/graphql';
 
 
 const PageAppPolicys = (props: {

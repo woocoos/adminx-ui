@@ -6,7 +6,7 @@ import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/o
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/knockout/graphql';
 
 export default (props: {
   open: boolean;

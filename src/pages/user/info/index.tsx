@@ -5,7 +5,7 @@ import { getUserInfo, updateUserInfo } from '@/services/user';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { User } from '@/__generated__/graphql';
+import { User } from '@/__generated__/knockout/graphql';
 import { updateFormat } from '@/util';
 
 export default () => {

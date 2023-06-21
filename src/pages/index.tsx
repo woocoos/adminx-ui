@@ -11,7 +11,7 @@ import { getOrgGroupQty, getOrgRoleQty } from '@/services/org/role';
 import { getOrgPolicyQty } from '@/services/org/policy';
 import { getOrgAppList } from '@/services/org/app';
 import { Link } from '@ice/runtime';
-import { App, OrgRoleKind, User } from '@/__generated__/graphql';
+import { App, OrgRoleKind, User } from '@/__generated__/knockout/graphql';
 
 export default () => {
   const { token } = useToken(),

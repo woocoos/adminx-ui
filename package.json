@@ -11,6 +11,7 @@
     "stylelint": "stylelint \"src/**/*.{css,scss,less}\" --cache",
     "stylelint:fix": "pnpm run stylelint --fix",
     "gqlgen": "graphql-code-generator --config ./script/gqlgen.ts",
+    "gqlgen:schema-ast": "pnpm gqlgen --schema-ast",
     "gqlgen:watch": "pnpm gqlgen --watch"
   },
   "dependencies": {
@@ -38,6 +39,7 @@
     "@applint/spec": "^1.2.3",
     "@graphql-codegen/cli": "^4.0.1",
     "@graphql-codegen/client-preset": "^4.0.0",
+    "@graphql-codegen/schema-ast": "^4.0.0",
     "@graphql-tools/mock": "^8.7.20",
     "@graphql-tools/schema": "^10.0.0",
     "@ice/app": "^3.2.4",

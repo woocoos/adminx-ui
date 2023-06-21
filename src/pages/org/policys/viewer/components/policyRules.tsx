@@ -9,7 +9,7 @@ import InputApp from '@/pages/app/components/inputApp';
 import { useTranslation } from 'react-i18next';
 import AppPolicyRes from '@/components/AppPolicyRes';
 import { getOrgAppActionList } from '@/services/org/app';
-import { AppAction, PolicyEffect, PolicyRule, App } from '@/__generated__/graphql';
+import { AppAction, PolicyEffect, PolicyRule, App } from '@/__generated__/knockout/graphql';
 
 const RuleItem = (props: {
   orgId: string;

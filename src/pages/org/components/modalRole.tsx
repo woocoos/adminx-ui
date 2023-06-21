@@ -4,7 +4,7 @@ import { getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { TableParams } from '@/services/graphql';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/knockout/graphql';
 
 
 export default (props: {
