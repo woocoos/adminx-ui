@@ -1,13 +1,12 @@
-import { OrgRoleKind } from "@/__generated__/graphql";
-import KeepAlive from "@/components/KeepAlive";
-import { PageOrgRoleList } from "@/pages/org/roles"
-import { useSearchParams } from "@ice/runtime";
+import { OrgRoleKind } from '@/__generated__/graphql';
+import KeepAlive from '@/components/KeepAlive';
+import { PageOrgRoleList } from '@/pages/org/roles';
+import { useSearchParams } from '@ice/runtime';
 
 export default () => {
   const [searchParams] = useSearchParams();
 
-  return (<KeepAlive clearAlive>
+  return (<KeepAlive>
     <PageOrgRoleList kind={OrgRoleKind.Role} orgId={searchParams.get('id') || ''} isFromSystem />
-  </KeepAlive>
-  );
-}
+  </KeepAlive>);
+};

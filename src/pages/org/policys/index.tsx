@@ -11,8 +11,7 @@ import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
 import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/__generated__/graphql';
 
-
-export default (props: {
+export const PageOrgPolicys = (props: {
   isFromSystem?: boolean;
 }) => {
   const { token } = useToken(),
@@ -147,64 +146,67 @@ export default (props: {
   }, [searchParams]);
 
   return (
-    <KeepAlive clearAlive>
-      <PageContainer
-        header={{
-          title: t('policy'),
-          style: { background: token.colorBgContainer },
-          breadcrumb: {
-            items: props.isFromSystem ? [
-              { title: t('system_conf') },
-              { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
-              { title: t('policy') },
-            ] : [
-              { title: t('org_cooperation') },
-              { title: t('policy') },
-            ],
-          },
-          children: <Alert
-            showIcon
-            message={
-              <>
-                <div key="1">{t('app_manage_policy_alert_childre_1')}</div>
-                <div key="2">{t('system_strategy')}：{t('app_manage_policy_alert_childre_2')}</div>
-                <div key="3">{t('custom_policy')}：{t('app_manage_policy_alert_childre_3')}</div>
-              </>
-            }
-          />,
+    <PageContainer
+      header={{
+        title: t('policy'),
+        style: { background: token.colorBgContainer },
+        breadcrumb: {
+          items: props.isFromSystem ? [
+            { title: t('system_conf') },
+            { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+            { title: t('policy') },
+          ] : [
+            { title: t('org_cooperation') },
+            { title: t('policy') },
+          ],
+        },
+        children: <Alert
+          showIcon
+          message={
+            <>
+              <div key="1">{t('app_manage_policy_alert_childre_1')}</div>
+              <div key="2">{t('system_strategy')}：{t('app_manage_policy_alert_childre_2')}</div>
+              <div key="3">{t('custom_policy')}：{t('app_manage_policy_alert_childre_3')}</div>
+            </>
+          }
+        />,
 
+      }}
+    >
+      <ProTable
+        actionRef={proTableRef}
+        search={{
+          searchText: `${t('query')}`,
+          resetText: `${t('reset')}`,
+          labelWidth: 'auto',
         }}
-      >
-        <ProTable
-          actionRef={proTableRef}
-          search={{
-            searchText: `${t('query')}`,
-            resetText: `${t('reset')}`,
-            labelWidth: 'auto',
-          }}
-          rowKey={'id'}
-          toolbar={{
-            title: `${t('organization')}:${orgInfo?.name || '-'}`,
-            actions: [
-              <Auth authKey="createOrganizationPolicy">
-                <Button type="primary">
-                  <Link key="editor" to={`/org/policys/viewer?orgId=${orgInfo?.id}`} >
-                    {t('custom_policy')}
-                  </Link>
-                </Button>
-              </Auth>,
-            ],
-          }}
-          scroll={{ x: 'max-content' }}
-          columns={columns}
-          request={getRequest}
-          rowSelection={{
-            selectedRowKeys: selectedRowKeys,
-            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-            type: 'checkbox',
-          }}
-        />
-      </PageContainer>
-    </KeepAlive>
+        rowKey={'id'}
+        toolbar={{
+          title: `${t('organization')}:${orgInfo?.name || '-'}`,
+          actions: [
+            <Auth authKey="createOrganizationPolicy">
+              <Button type="primary">
+                <Link key="editor" to={`/org/policys/viewer?orgId=${orgInfo?.id}`} >
+                  {t('custom_policy')}
+                </Link>
+              </Button>
+            </Auth>,
+          ],
+        }}
+        scroll={{ x: 'max-content' }}
+        columns={columns}
+        request={getRequest}
+        rowSelection={{
+          selectedRowKeys: selectedRowKeys,
+          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+          type: 'checkbox',
+        }}
+      />
+    </PageContainer>
   );
 };
+
+
+export default () => (<KeepAlive clearAlive>
+  <PageOrgPolicys />
+</KeepAlive>);

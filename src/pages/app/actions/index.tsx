@@ -165,7 +165,7 @@ const AppActionList = (props: {
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: <Link to={'/system/app'}>{t('app_manage')}</Link>  },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
             { title: t('app_auth') },
           ],
         },

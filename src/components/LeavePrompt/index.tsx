@@ -1,4 +1,4 @@
-import { history } from 'ice';
+import { history, useLocation } from 'ice';
 import { ReactNode, useEffect } from 'react';
 import i18n from '../../i18n';
 
@@ -35,6 +35,8 @@ export const setLeavePromptWhen = (when: boolean) => {
  * TODO：浏览器的前进和回退无法拦截
  */
 export default () => {
+  const location = useLocation();
+
   const onBeforeunload = (event: BeforeUnloadEvent) => {
     event.preventDefault();
     if (pathName.when) {
@@ -44,6 +46,10 @@ export default () => {
       return i18n.t('leave_prompt_tip');
     }
   };
+
+  useEffect(() => {
+    setLeavePromptWhen(true);
+  }, [location.pathname]);
 
   useEffect(() => {
     window.addEventListener('beforeunload', onBeforeunload);

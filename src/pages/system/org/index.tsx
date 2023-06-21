@@ -1,8 +1,8 @@
-import KeepAlive from "@/components/KeepAlive"
-import { OrgList } from "@/pages/org/list"
+import KeepAlive from '@/components/KeepAlive';
+import { OrgList } from '@/pages/org/list';
 
 export default () => {
-  return <KeepAlive clearAlive>
+  return (<KeepAlive clearAlive>
     <OrgList />
-  </KeepAlive>
-}
+  </KeepAlive>);
+};

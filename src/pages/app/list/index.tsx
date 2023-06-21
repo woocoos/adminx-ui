@@ -15,9 +15,9 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/__generated__/graphql';
 
 export const PageAppList = (props: {
-  title?: string
-  orgId?: string
-  scene?: 'orgApp'
+  title?: string;
+  orgId?: string;
+  scene?: 'orgApp';
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
@@ -62,8 +62,6 @@ export const PageAppList = (props: {
       },
     ],
     [dataSource, setDataSource] = useState<App[]>([]),
-    // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
     [modal, setModal] = useState({
       open: false,
@@ -164,9 +162,6 @@ export const PageAppList = (props: {
           table.total = result.totalCount;
         }
       }
-
-
-      setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;
     },

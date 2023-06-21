@@ -1,3 +1,3 @@
-import PageOrgPolicyViewer from '@/pages/org/policys/viewer'
+import PageOrgPolicyViewer from '@/pages/org/policys/viewer';
 
-export default () => <PageOrgPolicyViewer isFromSystem />
+export default () => <PageOrgPolicyViewer isFromSystem />;

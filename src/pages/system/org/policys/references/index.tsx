@@ -1,3 +1,3 @@
-import PageOrgPolicyReferences from '@/pages/org/policys/references'
+import PageOrgPolicyReferences from '@/pages/org/policys/references';
 
-export default () => <PageOrgPolicyReferences isFromSystem />
+export default () => <PageOrgPolicyReferences isFromSystem />;

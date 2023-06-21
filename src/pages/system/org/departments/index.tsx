@@ -1,3 +1,3 @@
 import PageOrgDepartments from '@/pages/org/departments';
 
-export default () => <PageOrgDepartments isFromSystem />
+export default () => <PageOrgDepartments isFromSystem />;

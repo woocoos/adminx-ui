@@ -78,8 +78,6 @@ export const UserList = (props: {
       },
       { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
     ],
-    // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -245,7 +243,6 @@ export const UserList = (props: {
         }
       }
 
-      setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;
     },

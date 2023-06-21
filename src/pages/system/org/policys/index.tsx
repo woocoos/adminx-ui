@@ -1,3 +1,6 @@
-import PageOrgPolicys from '@/pages/org/policys'
+import KeepAlive from '@/components/KeepAlive';
+import { PageOrgPolicys } from '@/pages/org/policys';
 
-export default () => <PageOrgPolicys isFromSystem />
+export default () => (<KeepAlive>
+  <PageOrgPolicys isFromSystem />
+</KeepAlive>);

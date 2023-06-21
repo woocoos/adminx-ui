@@ -5,7 +5,7 @@ import { useSearchParams } from '@ice/runtime';
 export default () => {
   const [searchParams] = useSearchParams();
 
-  return <KeepAlive clearAlive>
+  return (<KeepAlive>
     <PageOrgUsers isFromSystem orgId={searchParams.get('id') || ''} />
-  </KeepAlive>
-}
+  </KeepAlive>);
+};

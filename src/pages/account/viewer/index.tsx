@@ -127,8 +127,9 @@ export default (props: {
             { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
             {
               title: <a onClick={() => {
-                history?.go(-1)
-              }}>{t('user_manage')}</a>
+                history?.go(-1);
+              }}
+              >{t('user_manage')}</a>,
             },
             { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
           ] : props.isFromOrg ? [

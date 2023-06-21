@@ -2,7 +2,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal, Alert, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { Link, useSearchParams } from '@ice/runtime';
+import { Link } from '@ice/runtime';
 import CreateOrgRole from './components/create';
 import { delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
 import store from '@/store';
@@ -16,7 +16,7 @@ import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql
 
 
 export const PageOrgRoleList = (props: {
-  isFromSystem?: boolean,
+  isFromSystem?: boolean;
   kind?: OrgRoleKind;
   orgId: string;
   title?: string;
