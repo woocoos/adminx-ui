@@ -2,14 +2,16 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import { EnumPermissionPrincipalKind, delPermssion, getOrgPolicyReferenceList } from '@/services/permission';
 import { getOrgPolicyInfo } from '@/services/org/policy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/graphql';
 
-export default () => {
+export default (props: {
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     // 表格相关
@@ -116,10 +118,14 @@ export default () => {
           title: t('reference_record'),
           style: { background: token.colorBgContainer },
           breadcrumb: {
-            items: [
+            items: props.isFromSystem ? [
               { title: t('system_conf') },
-              { title: t('org_manage') },
-              { title: t('policy') },
+              { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+              { title: <Link to={`/system/org/policys?id=${orgPolicyInfo?.orgID}`}>{t('policy')}</Link> },
+              { title: t('reference_record') },
+            ] : [
+              { title: t('org_cooperation') },
+              { title: <Link to={'/org/policys'}>{t('policy')}</Link> },
               { title: t('reference_record') },
             ],
           },

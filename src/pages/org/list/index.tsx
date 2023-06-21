@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/org';
@@ -14,19 +14,13 @@ import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Org, OrgKind, OrgWhereInput } from '@/__generated__/graphql';
 
-export type OrgListRef = {
-  getSelect: () => Org[];
-  reload: (resetPageIndex: boolean) => void;
-};
-
-const OrgList = (props: {
-  ref?: MutableRefObject<OrgListRef>;
+export const OrgList = (props: {
   title?: string;
-  isMultiple?: boolean;
   tenantId?: string;
   appId?: string;
   kind?: OrgKind;
-}, ref: MutableRefObject<OrgListRef>) => {
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [auth] = useAuth(),
@@ -51,11 +45,8 @@ const OrgList = (props: {
       },
       { title: t('description'), dataIndex: 'profile', width: 120, search: false },
     ],
-    [allList, setAllList] = useState<Org[]>([]),
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     [dataSource, setDataSource] = useState<Org[]>([]),
-    // 选中处理
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -103,10 +94,10 @@ const OrgList = (props: {
         const items: ItemType[] = [];
         if (kind == 'root') {
           items.push(
-            { key: 'policy', label: <Link to={`/org/policys?id=${record.id}`}>{t('policy')}</Link> },
-            { key: 'app', label: <Link to={`/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
-            { key: 'org', label: <Link to={`/org/departments?id=${record.id}`} >{t('department_manage')}</Link> },
-            { key: 'orgUser', label: <Link to={`/org/users?id=${record.id}`}>{t('user_manage')}</Link> },
+            { key: 'policy', label: <Link to={`/system/org/policys?id=${record.id}`}>{t('policy')}</Link> },
+            { key: 'app', label: <Link to={`/system/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
+            { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('department_manage')}</Link> },
+            { key: 'orgUser', label: <Link to={`/system/org/users?id=${record.id}`}>{t('user_manage')}</Link> },
           );
         } else {
           if (checkAuth('createOrganization', auth)) {
@@ -131,7 +122,7 @@ const OrgList = (props: {
           </> : <></>}
           {
             kind == 'root' ? <>
-              <Link key="userGroup" to={`/org/groups?id=${record.id}`}>
+              <Link key="userGroup" to={`/system/org/groups?id=${record.id}`}>
                 {t('user_group')}
               </Link>
               {items.length ? <Dropdown
@@ -178,7 +169,6 @@ const OrgList = (props: {
           table.data = data.edges?.map(item => item?.node) as Org[];
           table.total = data.totalCount;
         }
-        setAllList(table.data);
       } else {
         let list: Org[] = [];
         if (kind === 'org') {
@@ -201,9 +191,7 @@ const OrgList = (props: {
           table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
           setExpandedRowKeys(list.map(item => item.id));
         }
-        setAllList(list);
       }
-      setSelectedRowKeys([]);
       setDataSource(table.data);
       return table;
     },
@@ -249,17 +237,6 @@ const OrgList = (props: {
       setModal({ open: true, title: title, id: info.id, scene: action });
     };
 
-  useImperativeHandle(ref, () => {
-    return {
-      getSelect: () => {
-        return allList.filter(item => selectedRowKeys.includes(item.id));
-      },
-      reload: (resetPageIndex?: boolean) => {
-        proTableRef.current?.reload(resetPageIndex);
-      },
-    };
-  });
-
   return (
     <>
       <PageContainer
@@ -267,12 +244,13 @@ const OrgList = (props: {
           title: kind == 'org' ? t('department_manage') : t('org_manage'),
           style: { background: token.colorBgContainer },
           breadcrumb: {
-            items: kind == 'org' ? [
-              { title: t('org_cooperation') },
-              { title: t('department_manage') },
-            ] : [
+            items: props.isFromSystem ? [
               { title: t('system_conf') },
-              { title: t('org_manage') },
+              { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+              { title: kind == 'org' ? t('department_manage') : t('org_manage') },
+            ] : [
+              { title: t('org_cooperation') },
+              { title: kind == 'org' ? t('department_manage') : t('org_manage') },
             ],
           },
         }}
@@ -319,6 +297,3 @@ const OrgList = (props: {
     </>
   );
 };
-
-
-export default forwardRef(OrgList);

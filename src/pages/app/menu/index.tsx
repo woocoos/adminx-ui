@@ -7,7 +7,7 @@ import { TreeDataState } from '@/services/graphql';
 import { TreeEditorAction } from '@/util/type';
 import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/app/menu';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
@@ -301,7 +301,7 @@ export default () => {
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: t('app_manage') },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
             { title: t('menu_manage') },
           ],
         },

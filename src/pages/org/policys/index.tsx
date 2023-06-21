@@ -12,7 +12,9 @@ import KeepAlive from '@/components/KeepAlive';
 import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/__generated__/graphql';
 
 
-export default () => {
+export default (props: {
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [basisState] = store.useModel('basis'),
@@ -58,14 +60,14 @@ export default () => {
         width: 110,
         render: (text, record) => {
           return record.appPolicyID ? <Space>
-            <Link key="editor" to={`/org/policys/references?id=${record.id}`} >
+            <Link key="editor" to={`${props.isFromSystem ? '/system' : ''}/org/policys/references?id=${record.id}`} >
               {t('reference_record')}
             </Link>
           </Space> : <Space>
-            <Link key="editor" to={`/org/policys/viewer?id=${record.id}`} >
+            <Link key="editor" to={`${props.isFromSystem ? '/system' : ''}/org/policys/viewer?id=${record.id}`} >
               {t('view')}
             </Link>
-            <Link key="reference" to={`/org/policys/references?id=${record.id}`} >
+            <Link key="reference" to={`${props.isFromSystem ? '/system' : ''}/org/policys/references?id=${record.id}`} >
               {t('reference_record')}
             </Link>
             <Auth authKey="deleteOrganizationPolicy">
@@ -151,9 +153,9 @@ export default () => {
           title: t('policy'),
           style: { background: token.colorBgContainer },
           breadcrumb: {
-            items: searchParams.get('id') ? [
+            items: props.isFromSystem ? [
               { title: t('system_conf') },
-              { title: t('org_manage') },
+              { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
               { title: t('policy') },
             ] : [
               { title: t('org_cooperation') },

@@ -3,7 +3,7 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import { getAppPolicyInfo } from '@/services/app/policy';
 import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/org/policy';
 import ModalOrg from '@/pages/org/components/modalOrg';
@@ -123,8 +123,8 @@ export default () => {
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: t('app_manage') },
-            { title: t('policy') },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
+            { title: <Link to={`/app/policys?id=${appPolicyInfo?.appID}`}>{t('policy')}</Link> },
             { title: t('app_permission_policy_auth') },
           ],
         },

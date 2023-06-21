@@ -185,7 +185,7 @@ export default () => {
           breadcrumb: {
             items: [
               { title: t('system_conf') },
-              { title: t('app_manage') },
+              { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
               { title: t('app_role') },
             ],
           },

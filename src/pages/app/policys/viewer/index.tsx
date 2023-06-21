@@ -1,7 +1,7 @@
 import { createAppPolicy, getAppPolicyInfo, updateAppPolicy } from '@/services/app/policy';
 import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormSwitch, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import { useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
 import { getAppActionList } from '@/services/app/action';
@@ -149,13 +149,14 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: `${policyId ? t('policy') : t('create_policy')}`,
+        title: `${policyId ? t('policy_detail') : t('create_policy')}`,
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: t('app_manage') },
-            { title: t('policy') },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
+            { title: <Link to={`/app/policys?id=${appInfo?.id}`}>{t('policy')}</Link> },
+            { title: `${policyId ? t('policy_detail') : t('create_policy')}` },
           ],
         },
         extra: <></>,

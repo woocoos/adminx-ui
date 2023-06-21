@@ -1,28 +1,28 @@
 import { PageContainer, ProCard, useToken } from '@ant-design/pro-components';
 import { Tree, Input, Button, Row, Col, message } from 'antd';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
-import UserList, { UserListRef } from '@/pages/account/components/listAccount';
+import { UserList } from '@/pages/account/components/listAccount';
 import { formatTreeData, getTreeDropData } from '@/util';
 import { getOrgPathList, moveOrg } from '@/services/org';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from '@ice/runtime';
 import { TreeDataState } from '@/services/graphql';
 import KeepAlive from '@/components/KeepAlive';
 import styles from './index.module.css';
 import Auth from '@/components/Auth';
 import { Org, OrgKind } from '@/__generated__/graphql';
+import { Link } from '@ice/runtime';
 
-const PageOrgUsers = (props: {
+export const PageOrgUsers = (props: {
   orgId: string;
+  isFromSystem?: boolean;
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [basisState] = store.useModel('basis'),
     [treeDraggable, setTreeDraggable] = useState(false),
     [stretch, setStretch] = useState(false),
-    userListActionRef = useRef<UserListRef>(null),
     [loading, setLoading] = useState(false),
     [allOrgList, setAllOrgList] = useState<Org[]>([]),
     [treeData, setTreeData] = useState<TreeDataState<Org>[]>([]),
@@ -100,7 +100,11 @@ const PageOrgUsers = (props: {
         title: t('user_manage'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
-          items: [
+          items: props.isFromSystem ? [
+            { title: t('system_conf') },
+            { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+            { title: t('user_manage') },
+          ] : [
             { title: t('org_cooperation') },
             { title: t('user_manage') },
           ],
@@ -145,11 +149,11 @@ const PageOrgUsers = (props: {
           </div>
           <UserList
             x-if={selectedData}
-            ref={userListActionRef}
             title={proCardtitle()}
             scene="orgUser"
             orgInfo={selectedData}
             orgId={selectedData?.id}
+            isFromSystem={props.isFromSystem}
           />
         </Col>
       </Row>
@@ -160,12 +164,10 @@ const PageOrgUsers = (props: {
 
 
 export default () => {
-  const [basisState] = store.useModel('basis'),
-    [searchParams] = useSearchParams(),
-    orgId = searchParams.get('id') || basisState.tenantId;
+  const [basisState] = store.useModel('basis');
 
   return (<KeepAlive clearAlive>
-    <PageOrgUsers orgId={orgId} />
+    <PageOrgUsers orgId={basisState.tenantId} />
   </KeepAlive>
   );
 };

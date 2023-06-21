@@ -4,7 +4,7 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/app';
 import defaultApp from '@/assets/images/default-app.png';
 import AppCreate from './components/create';
-import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/org/app';
@@ -12,21 +12,13 @@ import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import KeepAlive from '@/components/KeepAlive';
 import { App, AppKind, AppWhereInput } from '@/__generated__/graphql';
 
-export type AppListRef = {
-  getSelect: () => App[];
-  reload: (resetPageIndex?: boolean) => void;
-};
-
-const PageAppList = (props: {
-  ref?: MutableRefObject<AppListRef>;
-  title?: string;
-  orgId?: string;
-  scene?: 'orgApp';
-  isMultiple?: boolean;
-}, ref: MutableRefObject<AppListRef>) => {
+export const PageAppList = (props: {
+  title?: string
+  orgId?: string
+  scene?: 'orgApp'
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [auth] = useAuth(),
@@ -223,17 +215,6 @@ const PageAppList = (props: {
       setModal({ open: false, title: '', id: '' });
     };
 
-  useImperativeHandle(ref, () => {
-    return {
-      getSelect: () => {
-        return dataSource.filter(item => selectedRowKeys.includes(item.id));
-      },
-      reload: (resetPageIndex?: boolean) => {
-        proTableRef.current?.reload(resetPageIndex);
-      },
-    };
-  });
-
   return (
     <>
       {
@@ -340,12 +321,4 @@ const PageAppList = (props: {
       }
     </>
   );
-};
-
-export const AppList = forwardRef(PageAppList);
-
-export default () => {
-  return (<KeepAlive clearAlive>
-    <AppList />
-  </KeepAlive>);
 };

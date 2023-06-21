@@ -6,7 +6,7 @@ import { getAppInfo } from '@/services/app';
 import CreateAppAction from './components/create';
 import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/app/action';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import { App, AppAction, AppActionWhereInput } from '@/__generated__/graphql';
 
@@ -18,7 +18,6 @@ export type AppActionListRef = {
 const AppActionList = (props: {
   appId?: string;
   title?: string;
-  isMultiple?: boolean;
   ref?: MutableRefObject<AppActionListRef>;
 }, ref: MutableRefObject<AppActionListRef>) => {
   const { token } = useToken(),
@@ -166,7 +165,7 @@ const AppActionList = (props: {
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: t('app_manage') },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link>  },
             { title: t('app_auth') },
           ],
         },

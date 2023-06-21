@@ -1,6 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Alert, message } from 'antd';
-import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import CreateOrgRole from './components/create';
@@ -14,19 +14,13 @@ import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/graphql';
 
-export type OrgRoleListRef = {
-  getSelect: () => OrgRole[];
-  reload: (resetPageIndex?: boolean) => void;
-};
 
-const PageOrgRoleList = (props: {
+export const PageOrgRoleList = (props: {
+  isFromSystem?: boolean,
   kind?: OrgRoleKind;
   orgId: string;
   title?: string;
-  isMultiple?: boolean;
-  ref?: MutableRefObject<OrgRoleListRef>;
-
-}, ref: MutableRefObject<OrgRoleListRef>) => {
+}) => {
   const { t } = useTranslation(),
     { token } = useToken(),
     // 表格相关
@@ -46,7 +40,6 @@ const PageOrgRoleList = (props: {
 
     ],
     [dataSource, setDataSource] = useState<OrgRole[]>([]),
-    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -84,7 +77,7 @@ const PageOrgRoleList = (props: {
       return (<Space>
         {
           record.isAppRole ? <>
-            <Link to={`/org/${record.kind}s/viewer?id=${record.id}`}>
+            <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/viewer?id=${record.id}`}>
               {t('view')}
             </Link>
             <Auth authKey="assignRoleUser">
@@ -97,7 +90,7 @@ const PageOrgRoleList = (props: {
             </Auth>
           </>
             : <>
-              <Link to={`/org/${record.kind}s/viewer?id=${record.id}`}>
+              <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/viewer?id=${record.id}`}>
                 {t('view')}
               </Link>
               <Auth authKey="assignRoleUser">
@@ -153,7 +146,6 @@ const PageOrgRoleList = (props: {
         table.total = result.totalCount;
       }
       setDataSource(table.data);
-      setSelectedRowKeys([]);
       return table;
     },
     onDel = (record: OrgRole) => {
@@ -182,35 +174,24 @@ const PageOrgRoleList = (props: {
       setModal({ open: false, title: '', id: '', scene: 'editor' });
     };
 
-  useImperativeHandle(ref, () => {
-    return {
-      getSelect: () => {
-        return dataSource.filter(item => selectedRowKeys.includes(item.id));
-      },
-      reload: (resetPageIndex?: boolean) => {
-        proTableRef.current?.reload(resetPageIndex);
-      },
-    };
-  });
-
   useEffect(() => {
     proTableRef.current?.reload(true);
   }, [props.orgId]);
 
   return (
     <>
-
       <PageContainer
         header={{
           title: kind == 'role' ? t('role') : t('user_group'),
           style: { background: token.colorBgContainer },
           breadcrumb: {
-            items: kind == 'role' ? [
-              { title: t('org_cooperation') },
-              { title: t('role') },
+            items: props.isFromSystem ? [
+              { title: t('system_conf') },
+              { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+              { title: kind == 'role' ? t('role') : t('user_group') },
             ] : [
               { title: t('org_cooperation') },
-              { title: t('user_group') },
+              { title: kind == 'role' ? t('role') : t('user_group') },
             ],
           },
           children: <Alert
@@ -303,14 +284,10 @@ const PageOrgRoleList = (props: {
   );
 };
 
-export const OrgRoleList = forwardRef(PageOrgRoleList);
-
 export default () => {
-  const [basisState] = store.useModel('basis'),
-    [searchParams] = useSearchParams(),
-    orgId = searchParams.get('id') || basisState.tenantId;
+  const [basisState] = store.useModel('basis');
 
   return (<KeepAlive clearAlive>
-    <OrgRoleList orgId={orgId} />
+    <PageOrgRoleList orgId={basisState.tenantId} />
   </KeepAlive>);
 };

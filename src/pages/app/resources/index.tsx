@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/app';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import { getAppResList } from '@/services/app/resource';
 import CreateRes from './components/createRes';
 import Auth from '@/components/Auth';
@@ -136,7 +136,7 @@ export default () => {
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: t('app_manage') },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
             { title: t('app_res') },
           ],
         },

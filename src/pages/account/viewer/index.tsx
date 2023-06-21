@@ -8,12 +8,15 @@ import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUs
 import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
-import { useSearchParams } from '@ice/runtime';
+import { Link, history, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserUserType } from '@/__generated__/graphql';
 
-export default () => {
+export default (props: {
+  isFromOrg?: boolean;
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
@@ -119,9 +122,22 @@ export default () => {
         title: info?.userType == 'account' ? t('account_detail') : t('member_detail'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
-          items: [
+          items: props.isFromSystem && props.isFromOrg ? [
             { title: t('system_conf') },
-            { title: info?.userType === 'account' ? t('account_manage') : t('member_manage') },
+            { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+            {
+              title: <a onClick={() => {
+                history?.go(-1)
+              }}>{t('user_manage')}</a>
+            },
+            { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
+          ] : props.isFromOrg ? [
+            { title: t('org_cooperation') },
+            { title: <Link to={'/org/users'}>{t('user_manage')}</Link> },
+            { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
+          ] : [
+            { title: t('system_conf') },
+            { title: <Link to={'/system/account'}>{info?.userType === 'account' ? t('account_manage') : t('member_manage')}</Link> },
             { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
           ],
         },

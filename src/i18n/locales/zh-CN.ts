@@ -217,6 +217,7 @@ export default {
     member_detail: '成员详情',
     role_detail: '角色详情',
     user_group_detail: '用户组详情',
+    policy_detail: '权限策略详情',
     // 必填
     required_app: '必需填写应用',
     required_operation: '必需填写操作',

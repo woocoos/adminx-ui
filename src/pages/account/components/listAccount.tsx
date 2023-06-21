@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal, message } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { EnumUserStatus, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/user';
@@ -17,23 +17,16 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import store from '@/store';
 import { OrderDirection, Org, OrgRole, OrgRoleKind, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/graphql';
 
-type UserListProps = {
+
+export const UserList = (props: {
   title?: string;
   orgId?: string;
   orgRole?: OrgRole;
   orgInfo?: Org;
   scene?: 'user' | 'orgUser' | 'roleUser';
   userType?: UserUserType;
-  isMultiple?: boolean;
-  ref?: MutableRefObject<UserListRef>;
-};
-
-export type UserListRef = {
-  getSelect: () => User[];
-  reload: (resetPageIndex?: boolean) => void;
-};
-
-const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [auth] = useAuth(),
@@ -164,7 +157,7 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
             {record.isAllowRevokeRole ? <a onClick={() => onRemoveRole(record)}>{t('remove')}</a> : ''}
           </Auth>
         </Space> : props.scene === 'orgUser' ? <Space>
-          <Link key="editor" to={`/account/viewer?id=${record.id}`}>
+          <Link key="editor" to={`${props.isFromSystem ? '/system' : ''}/org/users/viewer?id=${record.id}`}>
             {t('detail')}
           </Link>
           {
@@ -333,17 +326,6 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
         },
       });
     };
-
-  useImperativeHandle(ref, () => {
-    return {
-      getSelect: () => {
-        return dataSource.filter(item => selectedRowKeys.includes(item.id));
-      },
-      reload: (resetPageIndex?: boolean) => {
-        proTableRef.current?.reload(resetPageIndex);
-      },
-    };
-  });
 
   useEffect(() => {
     proTableRef.current?.reload(true);
@@ -520,6 +502,3 @@ const UserList = (props: UserListProps, ref: MutableRefObject<UserListRef>) => {
     </>
   );
 };
-
-
-export default forwardRef(UserList);

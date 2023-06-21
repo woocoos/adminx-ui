@@ -217,6 +217,7 @@ export default {
     member_detail: 'Member details',
     role_detail: 'Role details',
     user_group_detail: 'User group details',
+    policy_detail: 'policy details',
     // 必填提示
     required_app: 'Required application',
     required_operation: 'Required operation',

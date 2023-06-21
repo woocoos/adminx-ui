@@ -1,16 +1,18 @@
 import { getOrgRoleInfo } from '@/services/org/role';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Button } from 'antd';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import { useEffect, useState } from 'react';
-import UserList from '@/pages/account/components/listAccount';
+import { UserList } from '@/pages/account/components/listAccount';
 import CreateOrgRole from '../../roles/components/create';
 import ListRolePermission from '../../roles/components/listRolePermission';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { OrgRole } from '@/__generated__/graphql';
 
-export default () => {
+export default (props: {
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
@@ -55,8 +57,14 @@ export default () => {
         title: info?.kind === 'role' ? t('role_detail') : t('user_group_detail'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
-          items: [
+          items: props.isFromSystem ? [
+            { title: t('system_conf') },
+            { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+            { title: info?.kind == 'role' ? <Link to={`/system/org/roles?id=${info?.orgID}`}>{t('role')}</Link> : <Link to={`/system/org/groups?id=${info?.orgID}`}>{t('user_group')}</Link> },
+            { title: info?.kind === 'role' ? t('role_detail') : t('user_group_detail') },
+          ] : [
             { title: t('org_cooperation') },
+            { title: info?.kind == 'role' ? <Link to={'/org/roles'}>{t('role')}</Link> : <Link to={'/org/groups'}>{t('user_group')}</Link> },
             { title: info?.kind === 'role' ? t('role_detail') : t('user_group_detail') },
           ],
         },

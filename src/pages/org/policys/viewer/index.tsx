@@ -1,6 +1,6 @@
 import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
-import { useSearchParams } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 import { useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
 import { getOrgInfo } from '@/services/org';
@@ -16,7 +16,9 @@ type ProFormData = {
   comments: string;
 };
 
-export default () => {
+export default (props: {
+  isFromSystem?: boolean;
+}) => {
   const { token } = useToken(),
     [auth] = useAuth(),
     { t } = useTranslation(),
@@ -146,10 +148,15 @@ export default () => {
         title: `${policyId ? t('policy') : t('create_policy')}`,
         style: { background: token.colorBgContainer },
         breadcrumb: {
-          items: [
+          items: props.isFromSystem ? [
             { title: t('system_conf') },
-            { title: t('org_manage') },
-            { title: t('policy') },
+            { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+            { title: <Link to={`/system/org/policys?id=${orgInfo?.id}`}>{t('policy')}</Link> },
+            { title: t('policy_detail') },
+          ] : [
+            { title: t('org_cooperation') },
+            { title: <Link to={'/org/policys'}>{t('policy')}</Link> },
+            { title: t('policy_detail') },
           ],
         },
       }}
