@@ -1,6 +1,6 @@
 import { OrgRole, OrgRoleKind } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/org/role';
+import { createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/knockout/org/role';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';

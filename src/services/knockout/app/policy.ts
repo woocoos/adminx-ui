@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/knockout';
 import { gid } from '@/util';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/__generated__/knockout/graphql';
 
 export const EnumAppPolicyStatus = {

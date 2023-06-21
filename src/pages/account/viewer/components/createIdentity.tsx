@@ -1,6 +1,6 @@
 import { UserIdentity } from '@/__generated__/knockout/graphql';
 import Auth, { checkAuth } from '@/components/Auth';
-import { EnumUserIdentityKind, EnumUserStatus, bindUserIdentity, delUserIdentity, getUserInfoIdentities } from '@/services/user';
+import { EnumUserIdentityKind, EnumUserStatus, bindUserIdentity, delUserIdentity, getUserInfoIdentities } from '@/services/knockout/user';
 import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-components';
 import { Drawer, Popconfirm, message } from 'antd';
 import { useRef, useState } from 'react';

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link } from '@ice/runtime';
 import CreateOrgRole from './components/create';
-import { delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
+import { delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/knockout/org/role';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import DrawerUser from '../../account/components/drawerUser';

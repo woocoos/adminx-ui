@@ -1,5 +1,5 @@
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { getAppResInfo, updateAppRes } from '@/services/app/resource';
+import { getAppResInfo, updateAppRes } from '@/services/knockout/app/resource';
 import { DrawerForm, ProFormText } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

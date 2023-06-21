@@ -1,7 +1,7 @@
 import { Org, OrgKind, User, UserUserType } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import InputAccount from '@/pages/account/components/inputAccount';
-import { createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/org';
+import { createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/knockout/org';
 import store from '@/store';
 import { formatTreeData, updateFormat } from '@/util';
 import { TreeEditorAction } from '@/util/type';

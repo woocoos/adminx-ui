@@ -1,6 +1,6 @@
 import { Modal } from 'antd';
 import { useState } from 'react';
-import { getOrgGroupList, getOrgRoleList } from '@/services/org/role';
+import { getOrgGroupList, getOrgRoleList } from '@/services/knockout/org/role';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { TableParams } from '@/services/graphql';

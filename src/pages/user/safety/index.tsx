@@ -1,4 +1,4 @@
-import { getUserInfoLoginProfile } from '@/services/user';
+import { getUserInfoLoginProfile } from '@/services/knockout/user';
 import store from '@/store';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Link } from '@ice/runtime';

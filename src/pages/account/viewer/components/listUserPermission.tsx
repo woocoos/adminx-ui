@@ -3,11 +3,11 @@ import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/permission';
+import { delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/knockout/permission';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
-import { getUserJoinGroupList } from '@/services/org/role';
+import { getUserJoinGroupList } from '@/services/knockout/org/role';
 import Auth from '@/components/Auth';
 import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/__generated__/knockout/graphql';
 

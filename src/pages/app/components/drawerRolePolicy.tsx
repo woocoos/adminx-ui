@@ -1,5 +1,5 @@
-import { getAppPolicyList } from '@/services/app/policy';
-import { assignAppRolePolicy } from '@/services/app/role';
+import { getAppPolicyList } from '@/services/knockout/app/policy';
+import { assignAppRolePolicy } from '@/services/knockout/app/role';
 import { Col, Input, List, Row, Space, Tag, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';

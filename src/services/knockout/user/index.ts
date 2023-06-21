@@ -1,5 +1,5 @@
 import { gid } from '@/util';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 import { gql } from '@/__generated__/knockout';
 import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
 

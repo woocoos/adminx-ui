@@ -2,10 +2,10 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Space } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { getAppInfo } from '@/services/app';
+import { getAppInfo } from '@/services/knockout/app';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import { getAppResList } from '@/services/app/resource';
+import { getAppResList } from '@/services/knockout/app/resource';
 import CreateRes from './components/createRes';
 import Auth from '@/components/Auth';
 import { App, AppRes, AppResWhereInput } from '@/__generated__/knockout/graphql';

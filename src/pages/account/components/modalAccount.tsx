@@ -1,10 +1,10 @@
 import { Modal } from 'antd';
 import { useState } from 'react';
-import { EnumUserStatus, getUserList } from '@/services/user';
+import { EnumUserStatus, getUserList } from '@/services/knockout/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
-import { getOrgRoleUserList, getOrgUserList } from '@/services/org/user';
+import { getOrgRoleUserList, getOrgUserList } from '@/services/knockout/org/user';
 import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
 
 export default (props: {

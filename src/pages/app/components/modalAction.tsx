@@ -1,5 +1,5 @@
 import { Modal } from 'antd';
-import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/knockout/app/action';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useState } from 'react';

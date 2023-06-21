@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/knockout';
 import { gid } from '@/util';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 import { CreateAppRoleInput, UpdateAppRoleInput } from '@/__generated__/knockout/graphql';
 
 const queryAppRoleList = gql(/* GraphQL */`query appRoleList($gid:GID!){

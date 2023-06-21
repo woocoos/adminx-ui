@@ -28,15 +28,16 @@ const config: CodegenConfig = {
 if (process.env.GQLGEN_SCHEMA_KNOCKOUT) {
   const moduleName = 'knockout',
     srcOutputDir = `src/__generated__/${moduleName}/`,
-    graphqlFileOutput = `script/__generated__/${moduleName}.graphql`;
+    graphqlFileOutput = `script/__generated__/${moduleName}.graphql`,
+    documents = `src/services/${moduleName}/**/*.ts`;
 
   config.generates[srcOutputDir] = {
     preset: 'client',
     presetConfig: {
       gqlTagName: 'gql',
     },
-    schema: [graphqlFileOutput],
-    documents: 'src/services/**/*.ts',
+    schema: graphqlFileOutput,
+    documents,
   }
 
   if (process.env.GQLGEN_TOKEN && process.env.GQLGEN_TENANT_ID) {

@@ -1,5 +1,5 @@
 import { TableParams } from '@/services/graphql';
-import { getRecycleUserList } from '@/services/user';
+import { getRecycleUserList } from '@/services/knockout/user';
 import store from '@/store';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space, message } from 'antd';

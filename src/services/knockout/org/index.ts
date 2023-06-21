@@ -1,5 +1,5 @@
 import { gid } from '@/util';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 import { gql } from '@/__generated__/knockout';
 import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/__generated__/knockout/graphql';
 

@@ -1,6 +1,6 @@
 import { App, AppKind } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/app';
+import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/knockout/app';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';
 import { useState } from 'react';

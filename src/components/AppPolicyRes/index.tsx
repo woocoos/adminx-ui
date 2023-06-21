@@ -1,4 +1,4 @@
-import { getAppResList } from '@/services/app/resource';
+import { getAppResList } from '@/services/knockout/app/resource';
 import { Checkbox, Col, Popconfirm, Row, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

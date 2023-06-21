@@ -1,6 +1,6 @@
 import { Org } from '@/__generated__/knockout/graphql';
 import { PageAppList } from '@/pages/app/list';
-import { getOrgInfo } from '@/services/org';
+import { getOrgInfo } from '@/services/knockout/org';
 import { PageContainer, useToken } from '@ant-design/pro-components';
 import { Link, useSearchParams } from '@ice/runtime';
 import { useEffect, useState } from 'react';

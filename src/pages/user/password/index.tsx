@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { PageContainer, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
 import store from '@/store';
-import { updatePassword } from '@/services/user';
+import { updatePassword } from '@/services/knockout/user';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 

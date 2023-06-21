@@ -1,6 +1,6 @@
 import { AppAction, AppActionKind, AppActionMethod, UpdateAppActionInput } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { EnumAppActionKind, EnumAppActionMethod, createAppAction, getAppActionInfo, updateAppAction } from '@/services/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, createAppAction, getAppActionInfo, updateAppAction } from '@/services/knockout/app/action';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';

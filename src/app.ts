@@ -6,7 +6,7 @@ import { message } from 'antd';
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem } from '@/pkg/localStore';
-import { userPermissions } from './services/user';
+import { userPermissions } from './services/knockout/user';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';

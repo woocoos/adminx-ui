@@ -1,6 +1,6 @@
 import { gid } from '@/util';
 import { gql } from '@/__generated__/knockout';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 import { AssignRoleUserInput, CreateOrgRoleInput, OrgRoleOrder, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/__generated__/knockout/graphql';
 
 const queryOrgGroupList = gql(/* GraphQL */`query orgGroupList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){

@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from 'react';
 import { formatTreeData, getTreeDropData, updateFormat } from '@/util';
 import { TreeDataState } from '@/services/graphql';
 import { TreeEditorAction } from '@/util/type';
-import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/app/menu';
+import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/knockout/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/Auth';
@@ -13,7 +13,7 @@ import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/knockout/graphql';
-import { getAppInfo } from '@/services/app';
+import { getAppInfo } from '@/services/knockout/app';
 
 
 type TreeSelectedData = {

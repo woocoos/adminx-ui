@@ -1,7 +1,7 @@
 import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { getOrgInfo } from '@/services/org';
-import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/user';
+import { getOrgInfo } from '@/services/knockout/org';
+import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/knockout/user';
 import store from '@/store';
 import { DrawerForm, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
 import { Alert, Radio, message } from 'antd';

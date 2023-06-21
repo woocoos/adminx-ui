@@ -1,4 +1,4 @@
-import { getOrgRoleInfo } from '@/services/org/role';
+import { getOrgRoleInfo } from '@/services/knockout/org/role';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { Link, useSearchParams } from '@ice/runtime';

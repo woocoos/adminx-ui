@@ -5,7 +5,7 @@ import { Alert, QRCode, Result, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MfaPrepare, bindMfa, bindPrepareMfa } from '@/services/basis';
-import { getUserInfoLoginProfile } from '@/services/user';
+import { getUserInfoLoginProfile } from '@/services/knockout/user';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { User } from '@/__generated__/knockout/graphql';
 

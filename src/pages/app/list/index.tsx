@@ -1,13 +1,13 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/app';
+import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/knockout/app';
 import defaultApp from '@/assets/images/default-app.png';
 import AppCreate from './components/create';
 import { useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
-import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/org/app';
+import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/knockout/org/app';
 import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';

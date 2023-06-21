@@ -4,7 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Button, Divider, Modal, Space, message } from 'antd';
 import UserCreate from '../list/components/create';
 import UserCreateIdentity from './components/createIdentity';
-import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, sendMFAEmail } from '@/services/user';
+import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, sendMFAEmail } from '@/services/knockout/user';
 import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';

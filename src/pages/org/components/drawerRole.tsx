@@ -2,7 +2,7 @@ import { Alert, Col, Input, List, Row, Space, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
-import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/org/role';
+import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/knockout/org/role';
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';

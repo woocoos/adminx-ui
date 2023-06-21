@@ -1,6 +1,6 @@
 import { AppRole } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { createAppRole, getAppRoleInfo, updateAppRole } from '@/services/app/role';
+import { createAppRole, getAppRoleInfo, updateAppRole } from '@/services/knockout/app/role';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useState } from 'react';

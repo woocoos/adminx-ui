@@ -3,7 +3,7 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import defaultApp from '@/assets/images/default-app.png';
 import { useSearchParams } from '@ice/runtime';
 import { useEffect, useState } from 'react';
-import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/app';
+import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/knockout/app';
 import { Button, Divider } from 'antd';
 import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';

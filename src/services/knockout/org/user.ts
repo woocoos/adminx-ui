@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/knockout';
 import { gid } from '@/util';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/__generated__/knockout/graphql';
 
 

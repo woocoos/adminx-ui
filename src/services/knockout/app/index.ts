@@ -1,7 +1,7 @@
 import { gql } from '@/__generated__/knockout';
 import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/__generated__/knockout/graphql';
 import { gid } from '@/util';
-import { koClient } from '../graphql';
+import { koClient } from '../';
 
 export const EnumAppStatus = {
   active: { text: '活跃', status: 'success' },

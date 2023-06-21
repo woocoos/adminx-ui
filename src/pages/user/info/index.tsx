@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PageContainer, ProForm, ProFormText, ProFormTextArea, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
-import { getUserInfo, updateUserInfo } from '@/services/user';
+import { getUserInfo, updateUserInfo } from '@/services/knockout/user';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
