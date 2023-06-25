@@ -4,7 +4,7 @@ import { koClient } from '../';
 import { AssignRoleUserInput, CreateOrgRoleInput, OrgRoleOrder, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/__generated__/knockout/graphql';
 
 const queryOrgGroupList = gql(/* GraphQL */`query orgGroupList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-  list:orgGroups(first:$first,orderBy: $orderBy,where: $where){
+  orgGroups(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -15,7 +15,7 @@ const queryOrgGroupList = gql(/* GraphQL */`query orgGroupList($first: Int,$orde
 }`);
 
 const queryOrgGroupListAndIsGrant = gql(/* GraphQL */`query orgGroupListAndIsGrant($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-  list:orgGroups(first:$first,orderBy: $orderBy,where: $where){
+  orgGroups(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -27,7 +27,7 @@ const queryOrgGroupListAndIsGrant = gql(/* GraphQL */`query orgGroupListAndIsGra
 }`);
 
 const queryUserGroupList = gql(/* GraphQL */`query userGroupList($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-  list:userGroups(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+  userGroups(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -38,7 +38,7 @@ const queryUserGroupList = gql(/* GraphQL */`query userGroupList($userId: ID!,$f
 }`);
 
 const queryOrgRoleList = gql(/* GraphQL */`query orgRoleList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-  list:orgRoles(first:$first,orderBy: $orderBy,where: $where){
+  orgRoles(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -49,7 +49,7 @@ const queryOrgRoleList = gql(/* GraphQL */`query orgRoleList($first: Int,$orderB
 }`);
 
 const queryOrgRoleListAndIsGrant = gql(/* GraphQL */`query orgRoleListAndIsGrant($userId:ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-  list:orgRoles(first:$first,orderBy: $orderBy,where: $where){
+  orgRoles(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -69,43 +69,43 @@ const queryOrgRoleInfo = gql(/* GraphQL */`query orgRoleInfo($gid:GID!){
 }`);
 
 const mutationCreateOrgRole = gql(/* GraphQL */`mutation createOrgRole($input: CreateOrgRoleInput!){
-  action:createRole(input:$input){id}
+  createRole(input:$input){id}
 }`);
 
 const mutationUpdateOrgRole = gql(/* GraphQL */`mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){
-  action:updateRole(roleID:$orgRoleId,input:$input){id}
+  updateRole(roleID:$orgRoleId,input:$input){id}
 }`);
 
 const mutationDelOrgRole = gql(/* GraphQL */`mutation deleteOrgRole($orgRoleId:ID!){
-  action:deleteRole(roleID:$orgRoleId)
+  deleteRole(roleID:$orgRoleId)
 }`);
 
 const mutationAssignOrgRoleUser = gql(/* GraphQL */`mutation assignOrgRoleUser($input: AssignRoleUserInput!){
-  action:assignRoleUser(input:$input)
+  assignRoleUser(input:$input)
 }`);
 
 const mutationRevOrgRoleUser = gql(/* GraphQL */`mutation revokeOrgRoleUser($orgRoleId:ID!,$userId:ID!){
-  action:revokeRoleUser(roleID:$orgRoleId,userID:$userId)
+  revokeRoleUser(roleID:$orgRoleId,userID:$userId)
 }`);
 
 const mutationAssignOrgAppRole = gql(/* GraphQL */`mutation assignOrgAppRole($orgId:ID!,$appRoleId:ID!){
-  action:assignOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
+  assignOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
 }`);
 
 const mutationRevOrgAppRole = gql(/* GraphQL */`mutation revokeOrgAppRole($orgId:ID!,$appRoleId:ID!){
-  action:revokeOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
+  revokeOrganizationAppRole(orgID:$orgId,appRoleID:$appRoleId)
 }`);
 
 const queryOrgGroupListNum = gql(/* GraphQL */`query orgGroupListNum($first:Int,$where:OrgRoleWhereInput){
-  list:orgGroups(first:$first,where: $where){ totalCount }
+  orgGroups(first:$first,where: $where){ totalCount }
 }`);
 
 const queryUserGroupListNum = gql(/* GraphQL */`query userGroupListNum($userId:ID!,$first:Int,$where:OrgRoleWhereInput){
-  list:userGroups(userID:$userId,first:$first,where: $where){ totalCount }
+  userGroups(userID:$userId,first:$first,where: $where){ totalCount }
 }`);
 
 const queryOrgRoleListNum = gql(/* GraphQL */`query orgRoleListNum($first:Int,$where:OrgRoleWhereInput){
-  list:orgRoles(first:$first,where: $where){ totalCount }
+  orgRoles(first:$first,where: $where){ totalCount }
 }`);
 
 
@@ -143,8 +143,8 @@ export async function getOrgGroupList(
   }, {
     url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise();
-  if (result.data?.list) {
-    return result.data?.list;
+  if (result.data?.orgGroups) {
+    return result.data?.orgGroups;
   }
   return null;
 }
@@ -176,8 +176,8 @@ export async function getUserJoinGroupList(
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.userGroups) {
+    return result.data.userGroups;
   }
   return null;
 }
@@ -217,8 +217,8 @@ export async function getOrgRoleList(
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.orgRoles) {
+    return result.data.orgRoles;
   }
   return null;
 }
@@ -254,8 +254,8 @@ export async function createOrgRole(input: CreateOrgRoleInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.createRole?.id) {
+    return result.data.createRole;
   }
   return null;
 }
@@ -274,8 +274,8 @@ export async function updateOrgRole(orgRoleId: string, input: UpdateOrgRoleInput
       orgRoleId,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateRole?.id) {
+    return result.data.updateRole;
   }
   return null;
 }
@@ -293,8 +293,8 @@ export async function delOrgRole(orgRoleId: string) {
       orgRoleId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteRole) {
+    return result.data.deleteRole;
   }
   return null;
 }
@@ -312,8 +312,8 @@ export async function assignOrgRoleUser(input: AssignRoleUserInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.assignRoleUser) {
+    return result.data.assignRoleUser;
   }
   return null;
 }
@@ -332,8 +332,8 @@ export async function revokeOrgRoleUser(orgRoleId: string, userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.revokeRoleUser) {
+    return result.data.revokeRoleUser;
   }
   return null;
 }
@@ -353,8 +353,8 @@ export async function assignOrgAppRole(orgId: string, appRoleId: string) {
       appRoleId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.assignOrganizationAppRole) {
+    return result.data.assignOrganizationAppRole;
   }
   return null;
 }
@@ -373,8 +373,8 @@ export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
       appRoleId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.revokeOrganizationAppRole) {
+    return result.data.revokeOrganizationAppRole;
   }
   return null;
 }
@@ -393,8 +393,8 @@ export async function getOrgGroupQty(where?: OrgRoleWhereInput) {
       first: 9999,
     }).toPromise();
 
-  if (result.data?.list.__typename === 'OrgRoleConnection') {
-    return result.data.list.totalCount;
+  if (result.data?.orgGroups) {
+    return result.data.orgGroups.totalCount;
   }
   return 0;
 }
@@ -415,8 +415,8 @@ export async function getUserJoinGroupQty(userId: string, where?: OrgRoleWhereIn
       first: 9999,
     }).toPromise();
 
-  if (result.data?.list.__typename === 'OrgRoleConnection') {
-    return result.data.list.totalCount;
+  if (result.data?.userGroups) {
+    return result.data.userGroups.totalCount;
   }
   return 0;
 }
@@ -434,8 +434,8 @@ export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
       first: 9999,
     }).toPromise();
 
-  if (result.data?.list.__typename === 'OrgRoleConnection') {
-    return result.data.list.totalCount;
+  if (result.data?.orgRoles) {
+    return result.data.orgRoles.totalCount;
   }
   return 0;
 }

@@ -18,7 +18,7 @@ const queryAppPolicieList = gql(/* GraphQL */`query appPolicieList($gid:GID!){
   node(id:$gid){
     ... on App{
       id,
-      list:policies{
+      policies{
         id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
       }
     }
@@ -29,7 +29,7 @@ const queryAppPolicieListAndIsGrant = gql(/* GraphQL */`query appPolicieListAndI
   node(id:$gid){
     ... on App{
       id,
-      list:policies{
+      policies{
         id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
         isGrantAppRole(appRoleID: $appRoleId)
       }
@@ -48,15 +48,15 @@ const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
 }`);
 
 const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){
-  action:createAppPolicy(appID:$appId,input:$input){id}
+  createAppPolicy(appID:$appId,input:$input){id}
 }`);
 
 const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){
-  action:updateAppPolicy(policyID:$appPolicyId,input:$input){id}
+  updateAppPolicy(policyID:$appPolicyId,input:$input){id}
 }`);
 
 const mutationDelAppPolicy = gql(/* GraphQL */`mutation delAppPolicy($appPolicyId:ID!){
-  action:deleteAppPolicy(policyID: $appPolicyId)
+  deleteAppPolicy(policyID: $appPolicyId)
 }`);
 
 /**
@@ -81,7 +81,7 @@ export async function getAppPolicyList(
     }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list;
+    return result.data.node.policies;
   }
   return null;
 }
@@ -119,8 +119,8 @@ export async function createAppPolicy(appId: string, input: CreateAppPolicyInput
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.createAppPolicy?.id) {
+    return result.data.createAppPolicy;
   }
   return null;
 }
@@ -140,8 +140,8 @@ export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolic
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateAppPolicy?.id) {
+    return result.data.updateAppPolicy;
   }
   return null;
 }
@@ -158,8 +158,8 @@ export async function delAppPolicy(appPolicyId: string) {
       appPolicyId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteAppPolicy) {
+    return result.data.deleteAppPolicy;
   }
   return null;
 }

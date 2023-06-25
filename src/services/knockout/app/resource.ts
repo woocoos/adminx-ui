@@ -7,7 +7,7 @@ const queryAppResList = gql(/* GraphQL */`query appResList($gid: GID!,$first: In
   node(id:$gid){
     ... on App{
       id,
-      list:resources(first:$first,orderBy: $orderBy,where: $where){
+      resources(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -28,7 +28,7 @@ const queryAppResInfo = gql(/* GraphQL */`query appResInfo($gid:GID!){
 }`);
 
 const mutationUpdateAppRes = gql(/* GraphQL */`mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){
-  action:updateAppRes(appResID:$appResId,input:$input){id}
+  updateAppRes(appResID:$appResId,input:$input){id}
 }`);
 
 
@@ -56,7 +56,7 @@ export async function getAppResList(
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list;
+    return result.data.node.resources;
   }
   return null;
 }
@@ -95,8 +95,8 @@ export async function updateAppRes(appResId: string, input: UpdateAppResInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateAppRes?.id) {
+    return result.data.updateAppRes;
   }
   return null;
 }

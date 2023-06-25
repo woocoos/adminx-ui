@@ -26,7 +26,7 @@ export const EnumUserLoginProfileMfaStatus = {
 export type UpdateUserInfoScene = 'create' | 'base' | 'loginProfile' | 'identity' | 'recycle';
 
 const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
-  list:users(first:$first,orderBy: $orderBy,where: $where){
+  users(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -88,77 +88,77 @@ const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:
 }`);
 
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
-  action:createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
+  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
 }`);
 
 const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
-  action:createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }
+  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }
 }`);
 
 const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  action:updateUser(userID:$userId,input:$input){ id,displayName }
+  updateUser(userID:$userId,input:$input){ id,displayName }
 }`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){
-  action:updateLoginProfile(userID:$userId,input:$input){ id }
+  updateLoginProfile(userID:$userId,input:$input){ id }
 }`);
 
 const mutationBindUserIdentity = gql(/* GraphQL */`mutation bindUserIdentity($input: CreateUserIdentityInput!){
-  action:bindUserIdentity(input:$input){ id }
+  bindUserIdentity(input:$input){ id }
 }`);
 
 const mutationDelUserIdentity = gql(/* GraphQL */`mutation deleteUserIdentity($identityId:ID!){
-  action:deleteUserIdentity(id:$identityId)
+  deleteUserIdentity(id:$identityId)
 }`);
 
 const mutationDelUser = gql(/* GraphQL */`mutation deleteUser($userId:ID!){
-  action:deleteUser(userID:$userId)
+  deleteUser(userID:$userId)
 }`);
 
 const mutationResetUserPwdEmail = gql(/* GraphQL */`mutation resetUserPasswordByEmail($userId:ID!){
-  action:resetUserPasswordByEmail(userId: $userId)
+  resetUserPasswordByEmail(userId: $userId)
 }`);
 
 const mutationChangePwd = gql(/* GraphQL */`mutation changePassword($oldPwd:String!,$newPwd:String!){
-  action:changePassword(oldPwd:$oldPwd,newPwd:$newPwd)
+  changePassword(oldPwd:$oldPwd,newPwd:$newPwd)
 }`);
 
 const mutationEnableMfa = gql(/* GraphQL */`mutation enableMfa($userId:ID!){
-  action:enableMFA(userID:$userId){secret,account}
+  enableMFA(userID:$userId){secret,account}
 }`);
 
 const mutationDisableMfa = gql(/* GraphQL */`mutation disableMfa($userId:ID!){
-  action:disableMFA(userID:$userId)
+  disableMFA(userID:$userId)
 }`);
 
 const mutationSendMfaEmail = gql(/* GraphQL */`mutation sendMfaEmail($userId:ID!){
-  action:sendMFAToUserByEmail(userID:$userId)
+  sendMFAToUserByEmail(userID:$userId)
 }`);
 
 const queryCheckPermission = gql(/* GraphQL */`query  checkPermission($permission:String!){
-  action:checkPermission(permission: $permission)
+  checkPermission(permission: $permission)
 }`);
 
 const queryUserPermissionList = gql(/* GraphQL */`query userPermissionList($where: AppActionWhereInput){
-  list:userPermissions(where: $where){
+  userPermissions(where: $where){
     id,appID,name,kind,method
   }
 }`);
 
 const queryUserMenuList = gql(/* GraphQL */`query userMenuList($appCode:String!){
-  list:userMenus(appCode: $appCode){
+  userMenus(appCode: $appCode){
     id,parentID,kind,name,comments,displaySort,icon,route
   }
 }`);
 
 const queryUserRootOrgList = gql(/* GraphQL */`query userRootOrgs{
-  list:userRootOrgs{
+  userRootOrgs{
     id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone
   }
 }`);
 
 const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
-  list:orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){
+  orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -170,7 +170,7 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
 }`);
 
 const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
-  action:recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
+  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
 }`);
 
 
@@ -194,8 +194,8 @@ export async function getUserList(gather: {
     }, {
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
-  if (result.data?.list.__typename === 'UserConnection') {
-    return result.data.list;
+  if (result.data?.users) {
+    return result.data.users;
   }
   return null;
 }
@@ -284,8 +284,8 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data?.action;
+  if (result.data?.createOrganizationUser?.id) {
+    return result.data?.createOrganizationUser;
   }
   return null;
 }
@@ -305,8 +305,8 @@ export async function updateUserInfo(userId: string, input: UpdateUserInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result?.data?.action;
+  if (result.data?.updateUser?.id) {
+    return result?.data?.updateUser;
   }
   return null;
 }
@@ -325,8 +325,8 @@ export async function updateUserProfile(userId: string, input: UpdateUserLoginPr
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result?.data?.action;
+  if (result.data?.updateLoginProfile?.id) {
+    return result?.data?.updateLoginProfile;
   }
   return null;
 }
@@ -344,8 +344,8 @@ export async function bindUserIdentity(input: CreateUserIdentityInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result?.data?.action;
+  if (result.data?.bindUserIdentity?.id) {
+    return result?.data?.bindUserIdentity;
   }
   return null;
 }
@@ -362,8 +362,8 @@ export async function delUserIdentity(identityId: string) {
       identityId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.deleteUserIdentity) {
+    return result?.data?.deleteUserIdentity;
   }
   return null;
 }
@@ -380,8 +380,8 @@ export async function delUserInfo(userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.deleteUser) {
+    return result?.data?.deleteUser;
   }
   return null;
 }
@@ -398,8 +398,8 @@ export async function resetUserPasswordByEmail(userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.resetUserPasswordByEmail) {
+    return result?.data?.resetUserPasswordByEmail;
   }
   return null;
 }
@@ -418,8 +418,8 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
       newPwd,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.changePassword) {
+    return result?.data?.changePassword;
   }
   return null;
 }
@@ -437,8 +437,8 @@ export async function enableMFA(userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.enableMFA) {
+    return result?.data?.enableMFA;
   }
   return null;
 }
@@ -455,8 +455,8 @@ export async function disableMFA(userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.disableMFA) {
+    return result?.data?.disableMFA;
   }
   return null;
 }
@@ -473,8 +473,8 @@ export async function sendMFAEmail(userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.sendMFAToUserByEmail) {
+    return result?.data?.sendMFAToUserByEmail;
   }
   return null;
 }
@@ -492,8 +492,8 @@ export async function checkPermission(permission: string) {
       permission,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.checkPermission) {
+    return result?.data?.checkPermission;
   }
   return null;
 }
@@ -514,8 +514,8 @@ export async function userPermissions(where: AppActionWhereInput, headers?: Reco
       }
     ).toPromise();
 
-  if (result.data?.list) {
-    return result?.data?.list;
+  if (result.data?.userPermissions) {
+    return result?.data?.userPermissions;
   }
   return null;
 }
@@ -532,8 +532,8 @@ export async function userMenus(appCode: string) {
       appCode,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result?.data?.list;
+  if (result.data?.userMenus) {
+    return result?.data?.userMenus;
   }
   return null;
 }
@@ -545,8 +545,8 @@ export async function userMenus(appCode: string) {
 export async function userRootOrgs() {
   const koc = koClient(),
     result = await koc.client.query(queryUserRootOrgList, {}).toPromise();
-  if (result.data?.list) {
-    return result?.data?.list;
+  if (result.data?.userRootOrgs) {
+    return result?.data?.userRootOrgs;
   }
   return null;
 }
@@ -572,8 +572,8 @@ export async function getRecycleUserList(gather: {
     }, {
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
-  if (result.data?.list) {
-    return result?.data?.list;
+  if (result.data?.orgRecycleUsers) {
+    return result?.data?.orgRecycleUsers;
   }
   return null;
 }
@@ -599,8 +599,8 @@ export async function restoreRecycleUser(
       pwdInput,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.recoverOrgUser) {
+    return result?.data?.recoverOrgUser;
   }
   return null;
 }

@@ -21,19 +21,19 @@ const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: I
 }`);
 
 const mutationUpdateAppMenu = gql(/* GraphQL */`mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){
-  action:updateAppMenu(menuID:$menuId,input:$input){id}
+  updateAppMenu(menuID:$menuId,input:$input){id}
 }`);
 
 const mutationCreateAppMenu = gql(/* GraphQL */`mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){
-  action:createAppMenus(appID:$appId,input:$input){id}
+  createAppMenus(appID:$appId,input:$input){id}
 }`);
 
 const mutationDelAppMenu = gql(/* GraphQL */`mutation delAppMenu($menuId:ID!){
-  action:deleteAppMenu(menuID: $menuId)
+  deleteAppMenu(menuID: $menuId)
 }`);
 
 const mutationMoveAppMenu = gql(/* GraphQL */`mutation moveAppMenu($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
-  action:moveAppMenu(sourceID:$sourceId,targetID:$targetId,action:$action)
+  moveAppMenu(sourceID:$sourceId,targetID:$targetId,action:$action)
 }`);
 
 /**
@@ -84,8 +84,8 @@ export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateAppMenu?.id) {
+    return result.data.updateAppMenu;
   }
   return null;
 }
@@ -103,8 +103,8 @@ export async function createAppMenu(appId: string, input: CreateAppMenuInput | C
       input,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.createAppMenus) {
+    return result.data.createAppMenus;
   }
   return null;
 }
@@ -121,8 +121,8 @@ export async function delAppMenu(menuId: string) {
       menuId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteAppMenu) {
+    return result.data.deleteAppMenu;
   }
   return null;
 }
@@ -142,8 +142,8 @@ export async function moveAppMenu(sourceId: string, targetId: string, action: Tr
       action,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.moveAppMenu) {
+    return result.data.moveAppMenu;
   }
   return null;
 }

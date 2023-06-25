@@ -17,7 +17,7 @@ export const EnumAppKind = {
 
 
 const queryAppList = gql(/* GraphQL */`query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){
-  list:apps(first:$first,orderBy: $orderBy,where: $where){
+  apps(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -38,15 +38,15 @@ const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
 }`);
 
 const mutationUpdateApp = gql(/* GraphQL */`mutation updateApp($appId:ID!,$input: UpdateAppInput!){
-  action:updateApp(appID:$appId,input:$input){id}
+  updateApp(appID:$appId,input:$input){id}
 }`);
 
 const mutationCreateApp = gql(/* GraphQL */`mutation createApp($input: CreateAppInput!){
-  action:createApp(input:$input){ id }
+  createApp(input:$input){ id }
 }`);
 
 const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){
-  action:deleteApp(appID: $appId)
+  deleteApp(appID: $appId)
 }`);
 
 /**
@@ -74,8 +74,8 @@ export async function getAppList(
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.apps) {
+    return result.data.apps;
   }
   return null;
 }
@@ -112,8 +112,8 @@ export async function updateAppInfo(appId: string, input: UpdateAppInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateApp?.id) {
+    return result.data.updateApp;
   }
   return null;
 }
@@ -130,8 +130,8 @@ export async function createAppInfo(input: CreateAppInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.createApp?.id) {
+    return result.data.createApp;
   }
   return null;
 }
@@ -148,8 +148,8 @@ export async function delAppInfo(appId: string) {
       appId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteApp) {
+    return result.data.deleteApp;
   }
   return null;
 }

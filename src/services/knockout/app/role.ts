@@ -7,7 +7,7 @@ const queryAppRoleList = gql(/* GraphQL */`query appRoleList($gid:GID!){
   node(id:$gid){
     ... on App{
       id,
-      list:roles{
+      roles{
         id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
       }
     }
@@ -37,23 +37,23 @@ const queryAppRoleInfoPolicieList = gql(/* GraphQL */`query appRoleInfoPolicieLi
 }`);
 
 const mutationCreateAppRole = gql(/* GraphQL */`mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){
-  action:createAppRole(appID:$appId,input:$input){id}
+  createAppRole(appID:$appId,input:$input){id}
 }`);
 
 const mutationUpdateAppRole = gql(/* GraphQL */`mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){
-  action:updateAppRole(roleID:$appRoleId,input:$input){id}
+  updateAppRole(roleID:$appRoleId,input:$input){id}
 }`);
 
 const mutationDelAppRole = gql(/* GraphQL */`mutation delAppRole($appRoleId:ID!){
-  action:deleteAppRole(roleID: $appRoleId)
+  deleteAppRole(roleID: $appRoleId)
 }`);
 
 const mutationAssignAppRolePolicy = gql(/* GraphQL */`mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){
-  action:assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
+  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
 }`);
 
 const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){
-  action:revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
+  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
 }`);
 
 
@@ -70,7 +70,7 @@ export async function getAppRoleList(appId: string) {
     }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list;
+    return result.data.node.roles;
   }
   return null;
 }
@@ -126,8 +126,8 @@ export async function createAppRole(appId: string, input: CreateAppRoleInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.createAppRole?.id) {
+    return result.data.createAppRole;
   }
   return null;
 }
@@ -146,8 +146,8 @@ export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateAppRole?.id) {
+    return result.data.updateAppRole;
   }
   return null;
 }
@@ -164,8 +164,8 @@ export async function delAppRole(appRoleId: string) {
       appRoleId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteAppRole) {
+    return result.data.deleteAppRole;
   }
   return null;
 }
@@ -187,8 +187,8 @@ export async function assignAppRolePolicy(appId: string, appRoleId: string, appP
       policyIds: appPolicyIDs,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.assignAppRolePolicy) {
+    return result.data.assignAppRolePolicy;
   }
   return null;
 }
@@ -209,8 +209,8 @@ export async function revokeAppRolePolicy(appId: string, appRoleId: string, appP
       policyIds: appPolicyIDs,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.revokeAppRolePolicy) {
+    return result.data.revokeAppRolePolicy;
   }
   return null;
 }

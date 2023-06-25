@@ -20,7 +20,7 @@ const queryAppActionList = gql(/* GraphQL */`query appActionList($gid: GID!,$fir
   node(id:$gid){
     ... on App{
       id,
-      list:actions(first:$first,orderBy: $orderBy,where: $where){
+      actions(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -41,15 +41,15 @@ const queryAppActionInfo = gql(/* GraphQL */`query AppActionInfo($gid:GID!){
 }`);
 
 const mutationCreateAppAction = gql(/* GraphQL */`mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){
-  action:createAppActions(appID:$appId,input:$input){id}
+  createAppActions(appID:$appId,input:$input){id}
 }`);
 
 const mutationUpdateAppAction = gql(/* GraphQL */`mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){
-  action:updateAppAction(actionID:$appActionId,input:$input){id}
+  updateAppAction(actionID:$appActionId,input:$input){id}
 }`);
 
 const mutationDelAppAction = gql(/* GraphQL */`mutation delAppAction($appActionId:ID!){
-  action:deleteAppAction(actionID: $appActionId)
+  deleteAppAction(actionID: $appActionId)
 }`);
 
 /**
@@ -77,7 +77,7 @@ export async function getAppActionList(
     }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list;
+    return result.data.node.actions;
   }
   return null;
 }
@@ -115,8 +115,8 @@ export async function createAppAction(appId: string, input: CreateAppActionInput
       input,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.createAppActions) {
+    return result.data.createAppActions;
   }
   return null;
 }
@@ -143,8 +143,8 @@ export async function updateAppAction(appActionId: string, input: UpdateAppActio
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateAppAction?.id) {
+    return result.data.updateAppAction;
   }
   return null;
 }
@@ -161,8 +161,8 @@ export async function delAppAction(appActionId: string) {
       appActionId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteAppAction) {
+    return result.data.deleteAppAction;
   }
   return null;
 }

@@ -7,7 +7,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
   node(id:$gid){
     ... on App{
       id,
-      list:orgs(first:$first,orderBy: $orderBy,where: $where){
+      orgs(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -22,7 +22,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
 }`);
 
 const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToOrgList($appRoleId:ID!,$where: OrgWhereInput){
-  list:appRoleAssignedToOrgs(roleID:$appRoleId,where:$where){
+  appRoleAssignedToOrgs(roleID:$appRoleId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,
     owner { id,displayName }
@@ -30,7 +30,7 @@ const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToO
 }`);
 
 const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssignedToOrgList($appPolicyId:ID!,$where: OrgWhereInput){
-  list:appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
+  appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,
     owner { id,displayName }
@@ -38,7 +38,7 @@ const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssigne
 }`);
 
 const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPolicyAssignedToOrgListAndIsGrant($appPolicyId:ID!,$appPolicyIdToIsAllow:ID!,$where: OrgWhereInput){
-  list:appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
+  appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,
     owner { id,displayName }
@@ -74,7 +74,7 @@ export async function getAppOrgList(
     }).toPromise();
 
   if (result.data?.node?.__typename === 'App') {
-    return result.data.node.list;
+    return result.data.node.orgs;
   }
   return null;
 }
@@ -96,8 +96,8 @@ export async function getAppRoleAssignedOrgList(
       where,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.appRoleAssignedToOrgs) {
+    return result.data.appRoleAssignedToOrgs;
   }
   return null;
 }
@@ -126,8 +126,8 @@ export async function getAppPolicyAssignedOrgList(
       where,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.appPolicyAssignedToOrgs) {
+    return result.data.appPolicyAssignedToOrgs;
   }
   return null;
 }

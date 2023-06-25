@@ -14,7 +14,7 @@ export const EnumOrgStatus = {
   };
 
 const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
-  list:organizations(first:$first,orderBy: $orderBy,where: $where){
+  organizations(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -37,27 +37,27 @@ const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
 }`);
 
 const mutationCreateRootOrg = gql(/* GraphQL */`mutation createRootOrg($input: CreateOrgInput!){
-  action:createRoot(input:$input){id}
+  createRoot(input:$input){id}
 }`);
 
 const mutationUpdateOrg = gql(/* GraphQL */`mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){
-  action:updateOrganization(orgID:$orgId,input:$input){id}
+  updateOrganization(orgID:$orgId,input:$input){id}
 }`);
 
 const mutationCreateOrg = gql(/* GraphQL */`mutation createOrg($input: CreateOrgInput!){
-  action:createOrganization(input:$input){id}
+  createOrganization(input:$input){id}
 }`);
 
 const mutationEnableDirectory = gql(/* GraphQL */`mutation enableDirectory($input: EnableDirectoryInput!){
-  action:enableDirectory(input:$input){id}
+  enableDirectory(input:$input){id}
 }`);
 
 const mutationDelOrg = gql(/* GraphQL */`mutation delOrg($orgId:ID!){
-  action:deleteOrganization(orgID: $orgId)
+  deleteOrganization(orgID: $orgId)
 }`);
 
 const mutationMoveOrg = gql(/* GraphQL */`mutation moveOrg($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
-  action:moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)
+  moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)
 }`);
 
 /**
@@ -84,8 +84,8 @@ export async function getOrgList(gather: {
     }, {
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
-  if (result.data?.list.__typename === 'OrgConnection') {
-    return result.data.list;
+  if (result.data?.organizations) {
+    return result.data.organizations;
   }
   return null;
 }
@@ -143,8 +143,8 @@ export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
       orgId,
       input,
     }).toPromise();
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateOrganization?.id) {
+    return result.data.updateOrganization;
   }
   return null;
 }
@@ -161,8 +161,8 @@ export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
       kind === OrgKind.Root ? mutationCreateRootOrg : mutationCreateOrg, {
       input,
     }).toPromise();
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.createRoot?.id) {
+    return result.data.createRoot;
   }
   return null;
 }
@@ -177,8 +177,8 @@ export async function createRootOrgInfo(input: EnableDirectoryInput) {
     result = await koc.client.mutation(mutationEnableDirectory, {
       input,
     }).toPromise();
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.enableDirectory?.id) {
+    return result.data.enableDirectory;
   }
   return null;
 }
@@ -193,8 +193,8 @@ export async function delOrgInfo(orgId: string) {
     result = await koc.client.mutation(mutationDelOrg, {
       orgId,
     }).toPromise();
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteOrganization) {
+    return result.data.deleteOrganization;
   }
   return null;
 }
@@ -212,8 +212,8 @@ export async function moveOrg(sourceId: string, targetId: string, action: TreeAc
       targetId,
       action,
     }).toPromise();
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.moveOrganization) {
+    return result.data.moveOrganization;
   }
   return null;
 }

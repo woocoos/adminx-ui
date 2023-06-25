@@ -16,7 +16,7 @@ export const EnumPermissionStatus = {
 
 
 const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  list:orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){
+  orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -33,7 +33,7 @@ const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($or
 const queryOrgPrmissionList = gql(/* GraphQL */`query orgPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
   node(id:$gid){
     ... on Org{
-      list:permissions(first:$first,orderBy: $orderBy,where: $where){
+      permissions(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -52,7 +52,7 @@ const queryOrgPrmissionList = gql(/* GraphQL */`query orgPrmissionList($gid: GID
 const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
   node(id:$gid){
     ... on User{
-      list:permissions(first:$first,orderBy: $orderBy,where: $where){
+      permissions(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -69,7 +69,7 @@ const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: G
 }`);
 
 const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  list:userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+  userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -96,15 +96,15 @@ const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
 }`);
 
 const mutationCreatePermission = gql(/* GraphQL */`mutation createPermission($input: CreatePermissionInput!){
-  action:grant(input:$input){id}
+  grant(input:$input){id}
 }`);
 
 const mutationUpdatePermission = gql(/* GraphQL */`mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){
-  action:updatePermission(permissionID:$permissionId,input:$input){id}
+  updatePermission(permissionID:$permissionId,input:$input){id}
 }`);
 
 const mutationDelPermission = gql(/* GraphQL */`mutation revoke($permissionId:ID!,$orgId:ID!){
-  action:revoke(permissionID:$permissionId,orgID:$orgId)
+  revoke(permissionID:$permissionId,orgID:$orgId)
 }`);
 
 
@@ -130,8 +130,8 @@ export async function getOrgPolicyReferenceList(
     }, {
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
-  if (result.data?.list.__typename === 'PermissionConnection') {
-    return result.data.list;
+  if (result.data?.orgPolicyReferences) {
+    return result.data.orgPolicyReferences;
   }
   return null;
 }
@@ -160,7 +160,7 @@ export async function getOrgPermissionList(
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list;
+    return result.data.node.permissions;
   }
   return null;
 }
@@ -188,7 +188,7 @@ export async function getUserPermissionList(
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
   if (result.data?.node?.__typename === 'User') {
-    return result.data.node.list;
+    return result.data.node.permissions;
   }
   return null;
 }
@@ -219,8 +219,8 @@ export async function getUserExtendGroupPolicyList(
     }, {
       url: `${koc.url}?p=${gather.current || 1}`,
     }).toPromise();
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.userExtendGroupPolicies) {
+    return result.data.userExtendGroupPolicies;
   }
   return null;
 }
@@ -252,8 +252,8 @@ export async function createPermission(input: CreatePermissionInput) {
     result = await koc.client.mutation(mutationCreatePermission, {
       input,
     }).toPromise();
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.grant?.id) {
+    return result.data.grant;
   }
   return null;
 }
@@ -270,8 +270,8 @@ export async function updatePermission(permissionId: string, input: UpdatePermis
       input,
       permissionId,
     }).toPromise();
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updatePermission?.id) {
+    return result.data.updatePermission;
   }
   return null;
 }
@@ -289,8 +289,8 @@ export async function delPermssion(permissionId: string, orgId: string) {
       permissionId,
       orgId,
     }).toPromise();
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.revoke) {
+    return result.data.revoke;
   }
   return null;
 }

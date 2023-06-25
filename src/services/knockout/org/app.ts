@@ -7,7 +7,7 @@ const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: In
   node(id:$gid){
     ... on Org{
       id
-      list:apps(first:$first,orderBy: $orderBy,where: $where){
+      apps(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -21,15 +21,15 @@ const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: In
 }`);
 
 const mutationAssignOrgApp = gql(/* GraphQL */`mutation assignOrgApp($orgId:ID!,$appId:ID!){
-  action:assignOrganizationApp(orgID: $orgId,appID: $appId)
+  assignOrganizationApp(orgID: $orgId,appID: $appId)
 }`);
 
 const mutationRevOrgApp = gql(/* GraphQL */`mutation revokeOrgApp($orgId:ID!,$appId:ID!){
-  action:revokeOrganizationApp(orgID: $orgId,appID: $appId)
+  revokeOrganizationApp(orgID: $orgId,appID: $appId)
 }`);
 
 const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!){
-  list:orgAppActions(appCode: $appCode){
+  orgAppActions(appCode: $appCode){
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
   }
 }`);
@@ -62,7 +62,7 @@ export async function getOrgAppList(
     }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list;
+    return result.data.node.apps;
   }
   return null;
 }
@@ -82,8 +82,8 @@ export async function assignOrgApp(orgId: string, appId: string) {
       appId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.assignOrganizationApp) {
+    return result.data.assignOrganizationApp;
   }
   return null;
 }
@@ -102,8 +102,8 @@ export async function revokeOrgApp(orgId: string, appId: string) {
       appId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.revokeOrganizationApp) {
+    return result.data.revokeOrganizationApp;
   }
   return null;
 }
@@ -121,8 +121,8 @@ export async function getOrgAppActionList(appCode: string) {
       appCode,
     }).toPromise();
 
-  if (result.data?.list) {
-    return result.data.list;
+  if (result.data?.orgAppActions) {
+    return result.data.orgAppActions;
   }
   return [];
 }

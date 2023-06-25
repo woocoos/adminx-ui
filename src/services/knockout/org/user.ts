@@ -8,7 +8,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
   node(id:$gid){
     ... on Org{
       id,
-      list:users(first:$first,orderBy: $orderBy,where: $where){
+      users(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -25,7 +25,7 @@ const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrg
   node(id:$gid){
     ... on Org{
       id,
-      list:users(first:$first,orderBy: $orderBy,where: $where){
+      users(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -41,7 +41,7 @@ const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrg
 }`);
 
 const queryOrgRoleUserList = gql(/* GraphQL */`query orgRoleUserList($roleId: ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
-  list:orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){
+  orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -53,7 +53,7 @@ const queryOrgRoleUserList = gql(/* GraphQL */`query orgRoleUserList($roleId: ID
 }`);
 
 const queryOrgRoleUserListAndIsOrgRole = gql(/* GraphQL */`query orgRoleUserListAndIsOrgRole($roleId: ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
-  list:orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){
+  orgRoleUsers(roleID:$roleId,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -70,17 +70,17 @@ const queryOrgUserNum = gql(/* GraphQL */`query orgUserNum($gid:GID!,$first: Int
   node(id:$gid){
     ... on Org{
       id,
-      list:users(first:$first,where: $where){ totalCount }
+      users(first:$first,where: $where){ totalCount }
     }
   }
 }`);
 
 const mutationAllotOrgUser = gql(/* GraphQL */`mutation allotOrgUser($input:CreateOrgUserInput!){
-  action:allotOrganizationUser(input:$input)
+  allotOrganizationUser(input:$input)
 }`);
 
 const mutationRemoveOrgUser = gql(/* GraphQL */`mutation removeOrgUser($orgId:ID!,$userId:ID!){
-  action:removeOrganizationUser(orgID: $orgId,userID: $userId)
+  removeOrganizationUser(orgID: $orgId,userID: $userId)
 }`);
 
 /**
@@ -121,7 +121,7 @@ export async function getOrgUserList(
   }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list;
+    return result.data.node.users;
   }
   return null;
 }
@@ -166,8 +166,8 @@ export async function getOrgRoleUserList(
     url: `${koc.url}?p=${gather.current || 1}`,
   }).toPromise();
 
-  if (result.data?.list) {
-    return result.data?.list;
+  if (result.data?.orgRoleUsers) {
+    return result.data?.orgRoleUsers;
   }
   return null;
 }
@@ -184,8 +184,8 @@ export async function allotOrgUser(input: CreateOrgUserInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.allotOrganizationUser) {
+    return result?.data?.allotOrganizationUser;
   }
   return null;
 }
@@ -204,8 +204,8 @@ export async function removeOrgUser(orgId: string, userId: string) {
       userId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result?.data?.action;
+  if (result.data?.removeOrganizationUser) {
+    return result?.data?.removeOrganizationUser;
   }
   return null;
 }
@@ -226,7 +226,7 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
     }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result?.data?.node.list.totalCount;
+    return result?.data?.node.users.totalCount;
   }
   return 0;
 }

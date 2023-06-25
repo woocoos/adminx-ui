@@ -6,7 +6,7 @@ import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPol
 const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
     ... on Org{
-      list:policies(first:$first,orderBy: $orderBy,where: $where){
+      policies(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -20,7 +20,7 @@ const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$fir
 const queryOrgPolicyListNum = gql(/* GraphQL */`query orgPolicyListNum($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
     ... on Org{
-      list:policies(first:$first,orderBy: $orderBy,where: $where){ totalCount }
+      policies(first:$first,orderBy: $orderBy,where: $where){ totalCount }
     }
   }
 }`);
@@ -28,7 +28,7 @@ const queryOrgPolicyListNum = gql(/* GraphQL */`query orgPolicyListNum($gid: GID
 const queryOrgPolicyListAndIsGrantUser = gql(/* GraphQL */`query orgPolicyListAndIsGrantUser($gid: GID!,$userId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
     ... on Org{
-      list:policies(first:$first,orderBy: $orderBy,where: $where){
+      policies(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -44,7 +44,7 @@ const queryOrgPolicyListAndIsGrantUser = gql(/* GraphQL */`query orgPolicyListAn
 const queryOrgPolicyListAndIsGrantRole = gql(/* GraphQL */`query orgPolicyListAndIsGrantRole($gid: GID!,$roleId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
     ... on Org{
-      list:policies(first:$first,orderBy: $orderBy,where: $where){
+      policies(first:$first,orderBy: $orderBy,where: $where){
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
@@ -67,23 +67,23 @@ const queryOrgPolicyInfo = gql(/* GraphQL */`query orgPolicyInfo($gid:GID!){
 }`);
 
 const mutationCreateOrgPolicy = gql(/* GraphQL */`mutation createOrgPolicy($input: CreateOrgPolicyInput!){
-  action:createOrganizationPolicy(input:$input){id}
+  createOrganizationPolicy(input:$input){id}
 }`);
 
 const mutationUpdateOrgPolicy = gql(/* GraphQL */`mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){
-  action:updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}
+  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}
 }`);
 
 const mutationDelOrgPolicy = gql(/* GraphQL */`mutation deleteOrgPolicy($orgPolicyId:ID!){
-  action:deleteOrganizationPolicy(orgPolicyID:$orgPolicyId)
+  deleteOrganizationPolicy(orgPolicyID:$orgPolicyId)
 }`);
 
 const mutationAssignOrgAppPolicy = gql(/* GraphQL */`mutation assignOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){
-  action:assignOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
+  assignOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
 }`);
 
 const mutationRevOrgAppPolicy = gql(/* GraphQL */`mutation revokeOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){
-  action:revokeOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
+  revokeOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)
 }`);
 
 
@@ -135,7 +135,7 @@ export async function getOrgPolicyList(
   }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list;
+    return result.data.node.policies;
   }
   return null;
 }
@@ -172,8 +172,8 @@ export async function createOrgPolicy(input: CreateOrgPolicyInput) {
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.createOrganizationPolicy?.id) {
+    return result.data.createOrganizationPolicy;
   }
   return null;
 }
@@ -192,8 +192,8 @@ export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolic
       input,
     }).toPromise();
 
-  if (result.data?.action?.id) {
-    return result.data.action;
+  if (result.data?.updateOrganizationPolicy?.id) {
+    return result.data.updateOrganizationPolicy;
   }
   return null;
 }
@@ -210,8 +210,8 @@ export async function delOrgPolicy(orgPolicyId: string) {
       orgPolicyId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.deleteOrganizationPolicy) {
+    return result.data.deleteOrganizationPolicy;
   }
   return null;
 }
@@ -231,8 +231,8 @@ export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
       appPolicyId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.assignOrganizationAppPolicy) {
+    return result.data.assignOrganizationAppPolicy;
   }
   return null;
 }
@@ -251,8 +251,8 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
       appPolicyId,
     }).toPromise();
 
-  if (result.data?.action) {
-    return result.data.action;
+  if (result.data?.revokeOrganizationAppPolicy) {
+    return result.data.revokeOrganizationAppPolicy;
   }
   return null;
 }
@@ -274,7 +274,7 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
     }).toPromise();
 
   if (result.data?.node?.__typename === 'Org') {
-    return result.data.node.list.totalCount;
+    return result.data.node.policies.totalCount;
   }
   return 0;
 }
