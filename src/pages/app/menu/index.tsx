@@ -3,8 +3,7 @@ import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col }
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { formatTreeData, getTreeDropData, updateFormat } from '@/util';
-import { TreeDataState } from '@/services/graphql';
-import { TreeEditorAction } from '@/util/type';
+import { TreeDataState, TreeEditorAction } from '@/services/graphql';
 import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/knockout/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';

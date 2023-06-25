@@ -2,12 +2,11 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
+import { TableParams, TreeEditorAction } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/knockout/org';
 import OrgCreate from './components/create';
 import { formatTreeData } from '@/util';
-import { TreeEditorAction } from '@/util/type';
 import { getAppOrgList } from '@/services/knockout/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';

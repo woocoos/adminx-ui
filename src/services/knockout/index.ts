@@ -34,7 +34,7 @@ let client: Client
  * ko项目的client
  * @returns
  */
-export function koClient(headers?: Record<string, any>) {
+export function koClient() {
   const url = '/api/graphql/query';
 
   if (!client) {
@@ -44,14 +44,21 @@ export function koClient(headers?: Record<string, any>) {
       exchanges: [
         mapExchange({
           onOperation(operation) {
-            const basisState = store.getModelState('basis');
+            const basisState = store.getModelState('basis'), headers: Record<string, any> = {};
+            if (operation.context.fetchOptions?.['headers']?.['Authorization']) {
+              headers['Authorization'] = operation.context.fetchOptions?.['headers']?.['Authorization'];
+            } else if (basisState.token) {
+              headers['Authorization'] = `Bearer ${basisState.token}`;
+            }
+            if (operation.context.fetchOptions?.['headers']?.['X-Tenant-ID']) {
+              headers['X-Tenant-ID'] = operation.context.fetchOptions?.['headers']?.['X-Tenant-ID'];
+            } else if (basisState.tenantId) {
+              headers['X-Tenant-ID'] = basisState.tenantId;
+            }
+
             return makeOperation(operation.kind, operation, {
               fetchOptions: {
-                headers: {
-                  Authorization: basisState.token ? `Bearer ${basisState.token}` : '',
-                  'X-Tenant-ID': basisState.tenantId || '',
-                  ...headers,
-                },
+                headers,
               },
             });
           },

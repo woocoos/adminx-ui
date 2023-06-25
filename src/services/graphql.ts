@@ -19,3 +19,5 @@ export interface TableParams {
 export type TableFilter = Record<string, (string | number)[] | null>;
 
 export type TableSort = Record<string, SortOrder>;
+
+export type TreeEditorAction = 'editor' | 'peer' | 'child';

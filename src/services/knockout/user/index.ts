@@ -505,11 +505,14 @@ export async function checkPermission(permission: string) {
  * @returns
  */
 export async function userPermissions(where: AppActionWhereInput, headers?: Record<string, any>) {
-  const koc = koClient(headers),
+  const koc = koClient(),
     result = await koc.client.query(
-      queryUserPermissionList, {
-      where,
-    }).toPromise();
+      queryUserPermissionList,
+      { where },
+      {
+        fetchOptions: { headers }
+      }
+    ).toPromise();
 
   if (result.data?.list) {
     return result?.data?.list;

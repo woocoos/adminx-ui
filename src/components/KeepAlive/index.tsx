@@ -24,7 +24,6 @@ export default (props: {
     }
   }, [props.clearAlive]);
 
-  // 先关闭掉 等测试通过后开启
   return (<KeepAlive when autoFreeze={false} cacheKey={cacheKey} name={cacheKey} id={id}>
     {props.children}
   </KeepAlive>);
