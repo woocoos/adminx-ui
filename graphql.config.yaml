@@ -2,3 +2,10 @@ projects:
   knockout:
     schema: "script/__generated__/knockout.graphql"
     documents: 'src/services/knockout/**/*.ts'
+    extensions:
+      endpoints:
+        default:
+          url: ${GQLGEN_SCHEMA}
+          headers:
+            Authorization: bearer ${GQLGEN_TOKEN}
+            X-Tenant-ID: ${GQLGEN_TENANT_ID}
