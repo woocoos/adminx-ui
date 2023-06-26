@@ -1,2 +1,0 @@
-schema: "mock/allinone.graphql"
-documents: "**/*.{graphql,js,ts,jsx,tsx}"
