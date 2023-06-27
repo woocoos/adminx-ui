@@ -125,7 +125,7 @@ export default (props: {
       </div>
       <div x-else>
         <ProFormText name="logo" label="LOGO" >
-          <UploadFiles />
+          <UploadFiles accept=".png,.jpng,.jpeg,.jpg" />
         </ProFormText>
         <ProFormText
           name="name"
