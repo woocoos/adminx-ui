@@ -276,6 +276,7 @@ export default {
     department_manage: 'Department management',
     user_manage: 'User management',
 
+    'file_size_<_{{str}}': 'File must smaller than {{str}}',
     '{{num}}_operations': '{{num}} operations',
     '{{num}}_conditions': '{{num}} conditions',
     '{{num}}_resources': '{{num}} resources',

@@ -7,6 +7,7 @@ import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgAppList } from '@/services/knockout/org/app';
 import defaultApp from '@/assets/images/default-app.png';
 import { App, AppKind, AppWhereInput } from '@/__generated__/knockout/graphql';
+import { formatArrayFilesRaw } from '@/services/files';
 
 export default (props: {
   open: boolean;
@@ -73,12 +74,8 @@ export default (props: {
           where,
         });
         if (result?.totalCount) {
-          table.data = result.edges?.map(item => {
-            if (item?.node) {
-              item.node.logo = item?.node?.logo || defaultApp;
-            }
-            return item?.node;
-          }) as App[];
+          table.data = result.edges?.map(item => item?.node) as App[];
+          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
           table.total = result.totalCount;
         }
       } else {
@@ -88,12 +85,8 @@ export default (props: {
           where,
         });
         if (result?.totalCount) {
-          table.data = result.edges?.map(item => {
-            if (item?.node) {
-              item.node.logo = item?.node?.logo || defaultApp;
-            }
-            return item?.node;
-          }) as App[];
+          table.data = result.edges?.map(item => item?.node) as App[];
+          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
           table.total = result.totalCount;
         }
       }

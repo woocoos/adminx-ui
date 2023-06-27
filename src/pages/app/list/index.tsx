@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/__generated__/knockout/graphql';
+import { formatArrayFilesRaw } from '@/services/files';
 
 export const PageAppList = (props: {
   title?: string;
@@ -138,12 +139,8 @@ export const PageAppList = (props: {
           where,
         });
         if (result?.totalCount) {
-          table.data = result.edges?.map(item => {
-            if (item?.node) {
-              item.node.logo = item?.node?.logo || defaultApp;
-            }
-            return item?.node;
-          }) as App[];
+          table.data = result.edges?.map(item => item?.node) as App[];
+          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
           table.total = result.totalCount;
         }
       } else {
@@ -153,12 +150,8 @@ export const PageAppList = (props: {
           where,
         });
         if (result?.totalCount) {
-          table.data = result.edges?.map(item => {
-            if (item?.node) {
-              item.node.logo = item?.node?.logo || defaultApp;
-            }
-            return item?.node;
-          }) as App[];
+          table.data = result.edges?.map(item => item?.node) as App[];
+          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
           table.total = result.totalCount;
         }
       }

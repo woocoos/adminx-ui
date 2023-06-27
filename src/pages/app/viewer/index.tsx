@@ -9,6 +9,7 @@ import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import { App } from '@/__generated__/knockout/graphql';
+import { getFilesRaw } from '@/services/files';
 
 export default () => {
   const { token } = useToken(),
@@ -18,6 +19,7 @@ export default () => {
     [showEys, setShowEys] = useState(false),
     [loading, setLoading] = useState(false),
     [appInfo, setAppInfo] = useState<App>(),
+    [logoSrc, setLogoSrc] = useState<string>(),
     [modal, setModal] = useState<{
       open: boolean;
       title: string;
@@ -39,9 +41,18 @@ export default () => {
         setLoading(true);
         const result = await getAppInfo(id);
         if (result?.id) {
+          if (result.logo) {
+            await getLogoSrc(result.logo)
+          }
           setAppInfo(result as App);
           setLoading(false);
         }
+      }
+    },
+    getLogoSrc = async (fileId: string) => {
+      const result = await getFilesRaw(fileId)
+      if (result) {
+        setLogoSrc(result)
       }
     };
 
@@ -80,7 +91,7 @@ export default () => {
             valueType={{ type: 'image', width: 120 }}
             style={{ width: '140px' }}
           >
-            {appInfo?.logo || defaultApp}
+            {logoSrc || defaultApp}
           </ProDescriptions.Item>
           <ProDescriptions.Item label="" >
             <ProDescriptions column={2}>

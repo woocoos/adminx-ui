@@ -1,5 +1,6 @@
 import { App, AppKind } from '@/__generated__/knockout/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import UploadFiles from '@/components/UploadFiles';
 import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/knockout/app';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';
@@ -123,7 +124,9 @@ export default (props: {
         <ProFormDigit name="refreshTokenValidity" label={`refresh_token ${t('validity')}`} />
       </div>
       <div x-else>
-        <ProFormText name="logo" label="LOGO" />
+        <ProFormText name="logo" label="LOGO" >
+          <UploadFiles />
+        </ProFormText>
         <ProFormText
           name="name"
           label={t('name')}

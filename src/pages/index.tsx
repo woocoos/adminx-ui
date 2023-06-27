@@ -12,6 +12,7 @@ import { getOrgPolicyQty } from '@/services/knockout/org/policy';
 import { getOrgAppList } from '@/services/knockout/org/app';
 import { Link } from '@ice/runtime';
 import { App, OrgRoleKind, User } from '@/__generated__/knockout/graphql';
+import { formatArrayFilesRaw } from '@/services/files';
 
 export default () => {
   const { token } = useToken(),
@@ -37,11 +38,14 @@ export default () => {
         setRoleQty(await getOrgRoleQty({ kind: OrgRoleKind.Role }));
         setPolicyQty(await getOrgPolicyQty(basisState.tenantId, { appPolicyIDIsNil: true }));
 
-        const orgApps = await getOrgAppList(basisState.tenantId, {
+        const orgAppsRes = await getOrgAppList(basisState.tenantId, {
           pageSize: 999,
         });
-        if (orgApps) {
-          setMyApps(orgApps.edges?.map(item => item?.node) as App[]);
+        if (orgAppsRes) {
+          const orgApps = orgAppsRes.edges?.map(item => item?.node) as App[]
+          setMyApps(
+            await formatArrayFilesRaw(orgApps, 'logo', defaultApp)
+          );
         }
       }
     }
@@ -116,7 +120,7 @@ export default () => {
             colSpan={6}
             title={
               <Space>
-                <Avatar src={defaultApp} />
+                <Avatar src={item.logo} />
                 <span style={{ display: 'inline-block', lineHeight: '30px' }} >{item.name}</span>
               </Space>
             }

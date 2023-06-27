@@ -276,6 +276,7 @@ export default {
     department_manage: '部门管理',
     user_manage: '用户管理',
 
+    'file_size_<_{{str}}': '文件必须小于{{str}}',
     '{{num}}_operations': '{{num}}个操作',
     '{{num}}_conditions': '{{num}}个条件',
     '{{num}}_resources': '{{num}}个资源',

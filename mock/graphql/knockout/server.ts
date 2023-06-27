@@ -13,9 +13,6 @@ const mocks = {
   Time: () => casual.date('YYYY-MM-DDTHH:mm:ss.SSSZZ'),
   Cursor: () => casual._string(),
   GID: () => casual._string(),
-  App: () => ({
-    logo: null
-  }),
   Query: {},
   Mutation: {},
 }
