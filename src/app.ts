@@ -11,7 +11,16 @@ import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';
 import { User } from './__generated__/knockout/graphql';
+import { defineChildConfig } from '@ice/plugin-icestark/types';
 
+export const icestark = defineChildConfig(() => ({
+  mount: () => {
+    // 在微应用挂载前执行
+  },
+  unmount: () => {
+    // 在微应用卸载后执行
+  },
+}));
 
 // App config, see https://v3.ice.work/docs/guide/basic/app
 export default defineAppConfig(() => ({

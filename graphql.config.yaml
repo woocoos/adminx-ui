@@ -1,7 +1,9 @@
 projects:
   knockout:
     schema: "script/__generated__/knockout.graphql"
-    documents: 'src/services/knockout/**/*.ts'
+    documents:
+      - 'src/services/knockout/**/*.ts'
+      - 'script/__generated__/knockout.graphql'
     extensions:
       endpoints:
         default:

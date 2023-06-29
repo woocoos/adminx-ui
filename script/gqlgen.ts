@@ -20,6 +20,9 @@ const schemaAstConfig: CodegenConfig = {
     // knockout 项目
     'script/__generated__/knockout.graphql': {
       plugins: ['schema-ast'],
+      config: {
+        includeDirectives: true,
+      },
       schema: {
         [knockoutSchema]: {
           headers: {

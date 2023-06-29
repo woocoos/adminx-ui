@@ -165,9 +165,9 @@ export const initStoreData = (store: IMockStore) => {
   store.set('AppMenu', 9, { id: 9, name: '用户组', kind: 'menu', route: '/org/groups', parentID: 5, appID: 1, app: store.get('App', 1), })
   store.set('AppMenu', 10, { id: 10, name: '角色', kind: 'menu', route: '/org/roles', parentID: 5, appID: 1, app: store.get('App', 1), })
   store.set('AppMenu', 11, { id: 11, name: '系统设置', kind: 'dir', parentID: 0, appID: 1, app: store.get('App', 1), })
-  store.set('AppMenu', 12, { id: 12, name: '组织管理', kind: 'menu', route: '/system/org/list', parentID: 11, appID: 1, app: store.get('App', 1), })
-  store.set('AppMenu', 13, { id: 13, name: '账户管理', kind: 'menu', route: '/system/account/list', parentID: 11, appID: 1, app: store.get('App', 1), })
-  store.set('AppMenu', 14, { id: 14, name: '应用管理', kind: 'menu', route: '/system/app/list', parentID: 11, appID: 1, app: store.get('App', 1), })
+  store.set('AppMenu', 12, { id: 12, name: '组织管理', kind: 'menu', route: '/system/org', parentID: 11, appID: 1, app: store.get('App', 1), })
+  store.set('AppMenu', 13, { id: 13, name: '账户管理', kind: 'menu', route: '/system/account', parentID: 11, appID: 1, app: store.get('App', 1), })
+  store.set('AppMenu', 14, { id: 14, name: '应用管理', kind: 'menu', route: '/system/app', parentID: 11, appID: 1, app: store.get('App', 1), })
 
   // AppRole
   store.set('AppRole', 1, { id: 1, name: 'app1Role1', autoGrant: true, editable: true, appID: 1, app: store.get('App', 1) })

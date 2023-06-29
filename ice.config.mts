@@ -4,43 +4,24 @@ import store from '@ice/plugin-store';
 import auth from '@ice/plugin-auth';
 import antd from '@ice/plugin-antd';
 import jsxPlus from '@ice/plugin-jsx-plus';
+import icestark from '@ice/plugin-icestark';
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
 const minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
-const proxyConfig = (): any => {
-  const args = process.argv.slice(2);
-  const mock = !args.includes('--no-mock');
-  return !mock ? {
-    '/api/graphql': {
-      target: 'http://127.0.0.1:8080/',
-      changeOrigin: true,
-      pathRewrite: { '^/api': '' },
-    },
-    '/api/files': {
-      target: 'http://127.0.0.1:10071/',
-      changeOrigin: true,
-      pathRewrite: { '^/api': '' },
-    },
-    '/api': {
-      target: 'http://127.0.0.1:10070/',
-      changeOrigin: true,
-      pathRewrite: { '^/api': '' },
-    },
-  } : {}
-}
 export default defineConfig(() => ({
-  ssr: false,
   ssg: false,
+  ssr: false,
   minify,
-  postcss: {
-    plugins: []
-  },
+  codeSplitting: 'page',
+  devPublicPath: process.env.ICE_DEV_PUBLIC_PATH,
+  publicPath: process.env.ICE_BUILD_PUBLIC_PATH,
   routes: {
     ignoreFiles: [
       '**/components/**',   // 添加此配置忽略components被解析成路由组件
     ],
   },
   plugins: [
+    icestark({ type: 'child' }),
     request(),
     store(),
     auth(),
@@ -49,6 +30,22 @@ export default defineConfig(() => ({
       importStyle: false,
     }),
   ],
-  proxy: proxyConfig(),
-  compileDependencies: false,
+  proxy: process.argv.includes('--no-mock') ? {
+    '/api/graphql': {
+      target: process.env.ICE_PROXY_KNOCKOUT,
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api/files': {
+      target: process.env.ICE_PROXY_FILES,
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+    '/api': {
+      target: process.env.ICE_PROXY_LOGIN,
+      changeOrigin: true,
+      pathRewrite: { '^/api': '' },
+    },
+  } : {},
 }));
+
