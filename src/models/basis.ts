@@ -1,7 +1,7 @@
-import { createModel, history } from 'ice';
+import { createModel } from 'ice';
 import { LoginRes } from '@/services/basis';
 import { setItem, removeItem } from '@/pkg/localStore';
-import { User } from '@/__generated__/knockout/graphql';
+import { User } from '@/__generated__/adminx/graphql';
 
 type BasisUserState = {
   id: string;
@@ -94,7 +94,7 @@ export default createModel({
       this.updateUser(null);
 
       if (!location.pathname.split('/').includes('login')) {
-        history?.push(`/login?redirect=${encodeURIComponent(location.href)}`);
+        location.href = `/login?redirect=${encodeURIComponent(location.href)}`
       }
     },
     /**

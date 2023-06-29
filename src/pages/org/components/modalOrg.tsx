@@ -1,7 +1,7 @@
-import { Org, OrgKind, OrgWhereInput } from '@/__generated__/knockout/graphql';
-import { getAppOrgList } from '@/services/knockout/app/org';
+import { Org, OrgKind, OrgWhereInput } from '@/__generated__/adminx/graphql';
+import { getAppOrgList } from '@/services/adminx/app/org';
 import { TableParams } from '@/services/graphql';
-import { EnumOrgKind, getOrgList, getOrgPathList } from '@/services/knockout/org';
+import { EnumOrgKind, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import store from '@/store';
 import { formatTreeData } from '@/util';
 import { ProColumns, ProTable } from '@ant-design/pro-components';

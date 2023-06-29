@@ -1,7 +1,7 @@
 import { gid } from '@/util';
 import { koClient } from '../';
-import { gql } from '@/__generated__/knockout';
-import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
+import { gql } from '@/__generated__/adminx';
+import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
 
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },

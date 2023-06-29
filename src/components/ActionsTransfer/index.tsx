@@ -4,7 +4,7 @@ import { SwapOutlined, CloseOutlined } from '@ant-design/icons';
 import { ProCard } from '@ant-design/pro-components';
 import CardTree from './cardTree';
 import { useTranslation } from 'react-i18next';
-import { AppAction, AppActionMethod } from '@/__generated__/knockout/graphql';
+import { AppAction, AppActionMethod } from '@/__generated__/adminx/graphql';
 
 
 export default function (props: {

@@ -6,10 +6,10 @@ dotenv.config()
 dotenv.config({ path: `.env.${process.env.NODE_ENV}`, override: true })
 dotenv.config({ path: '.env.local', override: true })
 
-const knockoutSchema = process.env.GQLGEN_SCHEMA_KNOCKOUT
+const adminxSchema = process.env.GQLGEN_SCHEMA_ADMINX
 
-if (!knockoutSchema) {
-  throw Error('The env.GQLGEN_SCHEMA_KNOCKOUT is undefined')
+if (!adminxSchema) {
+  throw Error('The env.GQLGEN_SCHEMA_ADMINX is undefined')
 }
 
 /**
@@ -17,14 +17,14 @@ if (!knockoutSchema) {
  */
 const schemaAstConfig: CodegenConfig = {
   generates: {
-    // knockout 项目
-    'script/__generated__/knockout.graphql': {
+    // adminx 项目
+    'script/__generated__/adminx.graphql': {
       plugins: ['schema-ast'],
       config: {
         includeDirectives: true,
       },
       schema: {
-        [knockoutSchema]: {
+        [adminxSchema]: {
           headers: {
             "Authorization": `Bearer ${process.env.GQLGEN_TOKEN}`,
             "X-Tenant-ID": `${process.env.GQLGEN_TENANT_ID}`,
@@ -41,14 +41,14 @@ const schemaAstConfig: CodegenConfig = {
  */
 const config: CodegenConfig = {
   generates: {
-    // knockout 项目
-    "src/__generated__/knockout/": {
+    // adminx 项目
+    "src/__generated__/adminx/": {
       preset: 'client',
       presetConfig: {
         gqlTagName: 'gql',
       },
-      schema: "script/__generated__/knockout.graphql",
-      documents: "src/services/knockout/**/*.ts",
+      schema: "script/__generated__/adminx.graphql",
+      documents: "src/services/adminx/**/*.ts",
     }
   },
   ignoreNoDocuments: true,

@@ -4,10 +4,10 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
-import { EnumUserStatus, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/knockout/user';
+import { EnumUserStatus, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/adminx/user';
 import AccountCreate from '../list/components/create';
-import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from '@/services/knockout/org/user';
-import { revokeOrgRoleUser } from '@/services/knockout/org/role';
+import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from '@/services/adminx/org/user';
+import { revokeOrgRoleUser } from '@/services/adminx/org/role';
 import DrawerUser from '@/pages/account/components/drawerUser';
 import { useTranslation } from 'react-i18next';
 import DrawerRole from '@/pages/org/components/drawerRole';
@@ -15,7 +15,7 @@ import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import store from '@/store';
-import { OrderDirection, Org, OrgRole, OrgRoleKind, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
+import { OrderDirection, Org, OrgRole, OrgRoleKind, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
 
 
 export const UserList = (props: {

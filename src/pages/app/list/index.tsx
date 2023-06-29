@@ -1,18 +1,18 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/knockout/app';
+import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/adminx/app';
 import defaultApp from '@/assets/images/default-app.png';
 import AppCreate from './components/create';
 import { useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
-import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/knockout/org/app';
+import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/adminx/org/app';
 import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { App, AppKind, AppWhereInput } from '@/__generated__/knockout/graphql';
+import { App, AppKind, AppWhereInput } from '@/__generated__/adminx/graphql';
 import { formatArrayFilesRaw } from '@/services/files';
 
 export const PageAppList = (props: {

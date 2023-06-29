@@ -3,13 +3,13 @@ import { Divider, Radio, Tabs, Row, Col, Button, Popconfirm } from 'antd';
 import { CSSProperties, useEffect, useState } from 'react';
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import ActionsTransfer from '@/components/ActionsTransfer';
-import { getAppList } from '@/services/knockout/app';
+import { getAppList } from '@/services/adminx/app';
 import Editor from '@monaco-editor/react';
 import InputApp from '@/pages/app/components/inputApp';
 import { useTranslation } from 'react-i18next';
 import AppPolicyRes from '@/components/AppPolicyRes';
-import { getOrgAppActionList } from '@/services/knockout/org/app';
-import { AppAction, PolicyEffect, PolicyRule, App } from '@/__generated__/knockout/graphql';
+import { getOrgAppActionList } from '@/services/adminx/org/app';
+import { AppAction, PolicyEffect, PolicyRule, App } from '@/__generated__/adminx/graphql';
 
 const RuleItem = (props: {
   orgId: string;

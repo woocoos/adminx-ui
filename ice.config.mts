@@ -31,20 +31,20 @@ export default defineConfig(() => ({
     }),
   ],
   proxy: process.argv.includes('--no-mock') ? {
-    '/api/graphql': {
-      target: process.env.ICE_PROXY_KNOCKOUT,
+    '/api-adminx': {
+      target: process.env.ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { '^/api': '' },
+      pathRewrite: { '^/api-adminx': '' },
     },
-    '/api/files': {
+    '/api-files': {
       target: process.env.ICE_PROXY_FILES,
       changeOrigin: true,
-      pathRewrite: { '^/api': '' },
+      pathRewrite: { '^/api-files': '' },
     },
-    '/api': {
-      target: process.env.ICE_PROXY_LOGIN,
+    '/api-auth': {
+      target: process.env.ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { '^/api': '' },
+      pathRewrite: { '^/api-auth': '' },
     },
   } : {},
 }));

@@ -1,7 +1,7 @@
 import { gid } from '@/util';
-import { gql } from '@/__generated__/knockout';
+import { gql } from '@/__generated__/adminx';
 import { koClient } from '../';
-import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/__generated__/knockout/graphql';
+import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/__generated__/adminx/graphql';
 
 const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){
   node(id:$gid){

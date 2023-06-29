@@ -1,4 +1,4 @@
-import { User } from '@/__generated__/knockout/graphql';
+import { User } from '@/__generated__/adminx/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { unbindMfa } from '@/services/basis';
 import { ModalForm, ProFormText } from '@ant-design/pro-components';

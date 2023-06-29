@@ -1,5 +1,5 @@
-import { gql } from '@/__generated__/knockout';
-import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/__generated__/knockout/graphql';
+import { gql } from '@/__generated__/adminx';
+import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/__generated__/adminx/graphql';
 import { gid } from '@/util';
 import { koClient } from '../';
 

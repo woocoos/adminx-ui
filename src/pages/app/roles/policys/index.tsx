@@ -4,11 +4,11 @@ import { Button, Space, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { getAppRoleInfo, getAppRoleInfoPolicieList, revokeAppRolePolicy } from '@/services/knockout/app/role';
+import { getAppRoleInfo, getAppRoleInfoPolicieList, revokeAppRolePolicy } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
-import { AppRole, AppPolicy, App } from '@/__generated__/knockout/graphql';
+import { AppRole, AppPolicy, App } from '@/__generated__/adminx/graphql';
 
 
 export default () => {

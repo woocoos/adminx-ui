@@ -1,12 +1,12 @@
-import { EnumAppKind, EnumAppStatus, getAppList } from '@/services/knockout/app';
+import { EnumAppKind, EnumAppStatus, getAppList } from '@/services/adminx/app';
 import { Modal } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { TableFilter, TableParams, TableSort } from '@/services/graphql';
-import { getOrgAppList } from '@/services/knockout/org/app';
+import { getOrgAppList } from '@/services/adminx/org/app';
 import defaultApp from '@/assets/images/default-app.png';
-import { App, AppKind, AppWhereInput } from '@/__generated__/knockout/graphql';
+import { App, AppKind, AppWhereInput } from '@/__generated__/adminx/graphql';
 import { formatArrayFilesRaw } from '@/services/files';
 
 export default (props: {

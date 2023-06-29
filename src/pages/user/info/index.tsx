@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { PageContainer, ProForm, ProFormText, ProFormTextArea, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
-import { getUserInfo, updateUserInfo } from '@/services/knockout/user';
+import { getUserInfo, updateUserInfo } from '@/services/adminx/user';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { User } from '@/__generated__/knockout/graphql';
+import { User } from '@/__generated__/adminx/graphql';
 import { updateFormat } from '@/util';
 
 export default () => {

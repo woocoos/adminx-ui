@@ -1,5 +1,5 @@
-import { AppAction, AppActionMethod } from '@/__generated__/knockout/graphql';
-import { EnumAppActionMethod } from '@/services/knockout/app/action';
+import { AppAction, AppActionMethod } from '@/__generated__/adminx/graphql';
+import { EnumAppActionMethod } from '@/services/adminx/app/action';
 import { ProCard } from '@ant-design/pro-components';
 import { Checkbox } from 'antd';
 

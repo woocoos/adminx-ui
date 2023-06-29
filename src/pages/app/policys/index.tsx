@@ -2,13 +2,13 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { getAppInfo } from '@/services/knockout/app';
-import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/knockout/app/policy';
+import { getAppInfo } from '@/services/adminx/app';
+import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/adminx/app/policy';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
-import { App, AppPolicy } from '@/__generated__/knockout/graphql';
+import { App, AppPolicy } from '@/__generated__/adminx/graphql';
 
 
 const PageAppPolicys = (props: {

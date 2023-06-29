@@ -4,14 +4,14 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
 import { TableParams, TreeEditorAction } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
-import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/knockout/org';
+import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
 import { formatTreeData } from '@/util';
-import { getAppOrgList } from '@/services/knockout/app/org';
+import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { Org, OrgKind, OrgWhereInput } from '@/__generated__/knockout/graphql';
+import { Org, OrgKind, OrgWhereInput } from '@/__generated__/adminx/graphql';
 
 export const OrgList = (props: {
   title?: string;

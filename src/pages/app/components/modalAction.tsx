@@ -1,10 +1,10 @@
 import { Modal } from 'antd';
-import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/knockout/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/services/adminx/app/action';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { AppAction, AppActionWhereInput } from '@/__generated__/knockout/graphql';
+import { AppAction, AppActionWhereInput } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   open: boolean;

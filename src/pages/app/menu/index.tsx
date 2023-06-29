@@ -4,15 +4,15 @@ import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { formatTreeData, getTreeDropData, updateFormat } from '@/util';
 import { TreeDataState, TreeEditorAction } from '@/services/graphql';
-import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/knockout/app/menu';
+import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/knockout/graphql';
-import { getAppInfo } from '@/services/knockout/app';
+import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/adminx/graphql';
+import { getAppInfo } from '@/services/adminx/app';
 
 
 type TreeSelectedData = {

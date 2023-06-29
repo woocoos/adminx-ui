@@ -32,7 +32,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzIw
   };
 
 export default {
-  'POST /api/login/auth': (request: Request, response: Response) => {
+  'POST /api-auth/login/auth': (request: Request, response: Response) => {
     bodyParser.json()(request, response, async () => {
       const result: LoginResponse = {}
       const { username, password, captcha } = request.body;
@@ -55,7 +55,7 @@ export default {
     })
   },
   //
-  'POST /api/login/verify-factor': (request: Request, response: Response) => {
+  'POST /api-auth/login/verify-factor': (request: Request, response: Response) => {
     bodyParser.json()(request, response, async () => {
       const result: LoginResponse = {}
       const { deviceId, stateToken, otpToken } = request.body;
@@ -77,7 +77,7 @@ export default {
       response.send(result);
     })
   },
-  'POST /api/login/reset-password': (request: Request, response: Response) => {
+  'POST /api-auth/login/reset-password': (request: Request, response: Response) => {
     bodyParser.json()(request, response, async () => {
       const result: LoginResponse = {}
       const { stateToken, newPassword } = request.body;
@@ -99,13 +99,13 @@ export default {
     })
   },
 
-  'POST /api/logout': (request: Request, response: Response) => {
+  'POST /api-auth/logout': (request: Request, response: Response) => {
     response.send({
       success: true,
     });
   },
 
-  'GET /api/captcha': (request: Request, response: Response) => {
+  'GET /api-auth/captcha': (request: Request, response: Response) => {
     const captcha = svgCaptcha.create({
       fontSize: 48,
       width: 150,
@@ -120,7 +120,7 @@ export default {
       captchaImage: "data:image/svg+xml;utf8," + encodeURIComponent(captcha.data)
     });
   },
-  'POST /api/mfa/bind-prepare': (request: Request, response: Response) => {
+  'POST /api-auth/mfa/bind-prepare': (request: Request, response: Response) => {
     response.send({
       principalName: 'admin',
       secret: 'adminsecret',

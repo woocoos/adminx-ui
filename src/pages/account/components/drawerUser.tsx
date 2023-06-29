@@ -4,11 +4,11 @@ import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
-import { assignOrgRoleUser } from '@/services/knockout/org/role';
-import { allotOrgUser, getOrgUserList } from '@/services/knockout/org/user';
+import { assignOrgRoleUser } from '@/services/adminx/org/role';
+import { allotOrgUser, getOrgUserList } from '@/services/adminx/org/user';
 import { getDate } from '@/util';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { Org, OrgRole, User, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
+import { Org, OrgRole, User, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   open: boolean;

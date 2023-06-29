@@ -3,13 +3,13 @@ import { Button, Space, Modal, message, Alert, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { TableSort, TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { getOrgInfo } from '@/services/knockout/org';
-import { delOrgPolicy, getOrgPolicyList } from '@/services/knockout/org/policy';
+import { getOrgInfo } from '@/services/adminx/org';
+import { delOrgPolicy, getOrgPolicyList } from '@/services/adminx/org/policy';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
 import KeepAlive from '@/components/KeepAlive';
-import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/__generated__/knockout/graphql';
+import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/__generated__/adminx/graphql';
 
 export const PageOrgPolicys = (props: {
   isFromSystem?: boolean;

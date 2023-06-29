@@ -1,7 +1,7 @@
 import { gid } from '@/util';
 import { koClient } from '../';
-import { gql } from '@/__generated__/knockout';
-import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/__generated__/knockout/graphql';
+import { gql } from '@/__generated__/adminx';
+import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/__generated__/adminx/graphql';
 
 export const EnumPermissionPrincipalKind = {
   user: { text: '用户' },

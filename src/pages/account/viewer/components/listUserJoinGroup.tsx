@@ -5,10 +5,10 @@ import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
-import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/knockout/org/role';
+import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/adminx/org/role';
 import DrawerRole from '@/pages/org/components/drawerRole';
 import Auth from '@/components/Auth';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/knockout/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/adminx/graphql';
 
 
 export default (props: {

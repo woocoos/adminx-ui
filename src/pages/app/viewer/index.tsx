@@ -3,12 +3,12 @@ import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import defaultApp from '@/assets/images/default-app.png';
 import { useSearchParams } from '@ice/runtime';
 import { useEffect, useState } from 'react';
-import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/knockout/app';
+import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/adminx/app';
 import { Button, Divider } from 'antd';
 import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { App } from '@/__generated__/knockout/graphql';
+import { App } from '@/__generated__/adminx/graphql';
 import { getFilesRaw } from '@/services/files';
 
 export default () => {

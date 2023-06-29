@@ -2,12 +2,12 @@ import { Col, Input, List, Row, Space, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
-import { getOrgPolicyList } from '@/services/knockout/org/policy';
-import { createPermission } from '@/services/knockout/permission';
+import { getOrgPolicyList } from '@/services/adminx/org/policy';
+import { createPermission } from '@/services/adminx/permission';
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/__generated__/knockout/graphql';
+import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   open: boolean;

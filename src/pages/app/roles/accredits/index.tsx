@@ -5,12 +5,12 @@ import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import ModalOrg from '@/pages/org/components/modalOrg';
-import { getAppRoleAssignedOrgList } from '@/services/knockout/app/org';
-import { getAppRoleInfo } from '@/services/knockout/app/role';
-import { assignOrgAppRole, revokeOrgAppRole } from '@/services/knockout/org/role';
+import { getAppRoleAssignedOrgList } from '@/services/adminx/app/org';
+import { getAppRoleInfo } from '@/services/adminx/app/role';
+import { assignOrgAppRole, revokeOrgAppRole } from '@/services/adminx/org/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { AppRole, Org, OrgWhereInput } from '@/__generated__/knockout/graphql';
+import { AppRole, Org, OrgWhereInput } from '@/__generated__/adminx/graphql';
 
 
 export default () => {

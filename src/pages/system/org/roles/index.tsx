@@ -1,4 +1,4 @@
-import { OrgRoleKind } from '@/__generated__/knockout/graphql';
+import { OrgRoleKind } from '@/__generated__/adminx/graphql';
 import KeepAlive from '@/components/KeepAlive';
 import { PageOrgRoleList } from '@/pages/org/roles';
 import { useSearchParams } from '@ice/runtime';

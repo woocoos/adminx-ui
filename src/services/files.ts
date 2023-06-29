@@ -1,12 +1,13 @@
 import { request } from 'ice';
 
-
 type Files = {
   id: string;
   name: string;
   size: number;
   createdAt: string
 }
+
+const baseURL = '/api-files'
 
 /**
  * 上传
@@ -18,7 +19,7 @@ export async function updateFiles(data: {
   bucket: string;
   file: File;
 }) {
-  const result = await request.post('/files', data, {
+  const result = await request.post(`${baseURL}/files`, data, {
     headers: {
       "Content-Type": "multipart/form-data"
     }
@@ -36,7 +37,7 @@ export async function updateFiles(data: {
  * @returns
  */
 export async function getFiles(fileId: string) {
-  const result = await request.get(`/files/${fileId}`)
+  const result = await request.get(`${baseURL}/files/${fileId}`)
   if (result?.id) {
     return result as Files;
   }
@@ -49,7 +50,7 @@ export async function getFiles(fileId: string) {
  * @returns
  */
 export async function delFiles(fileId: string) {
-  const result = await request.delete(`/files/${fileId}`)
+  const result = await request.delete(`${baseURL}/files/${fileId}`)
   return result;
 }
 
@@ -61,7 +62,7 @@ export async function delFiles(fileId: string) {
  * @returns
  */
 export async function getFilesRaw(fileId: string) {
-  const result = await request.get(`/files/${fileId}/raw`, {
+  const result = await request.get(`${baseURL}/files/${fileId}/raw`, {
     responseType: "blob",
   })
   if (typeof result === 'object' && result.constructor.name === 'Blob') {

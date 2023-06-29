@@ -3,11 +3,11 @@ import { Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { EnumPermissionPrincipalKind, delPermssion, getOrgPolicyReferenceList } from '@/services/knockout/permission';
-import { getOrgPolicyInfo } from '@/services/knockout/org/policy';
+import { EnumPermissionPrincipalKind, delPermssion, getOrgPolicyReferenceList } from '@/services/adminx/permission';
+import { getOrgPolicyInfo } from '@/services/adminx/org/policy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/knockout/graphql';
+import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   isFromSystem?: boolean;

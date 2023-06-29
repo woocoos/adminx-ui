@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { checkLave } from '@/components/LeavePrompt';
 import store from '@/store';
 import { useEffect, useState } from 'react';
-import { userRootOrgs } from '@/services/knockout/user';
-import { Org } from '@/__generated__/knockout/graphql';
+import { userRootOrgs } from '@/services/adminx/user';
+import { Org } from '@/__generated__/adminx/graphql';
 
 export default () => {
   const { t } = useTranslation(),

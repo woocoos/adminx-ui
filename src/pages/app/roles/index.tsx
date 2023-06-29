@@ -4,16 +4,16 @@ import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { getAppInfo } from '@/services/knockout/app';
+import { getAppInfo } from '@/services/adminx/app';
 import CreateAppRole from './components/create';
-import { delAppRole, getAppRoleList } from '@/services/knockout/app/role';
+import { delAppRole, getAppRoleList } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import KeepAlive from '@/components/KeepAlive';
-import { App, AppRole } from '@/__generated__/knockout/graphql';
+import { App, AppRole } from '@/__generated__/adminx/graphql';
 
 
 export default () => {

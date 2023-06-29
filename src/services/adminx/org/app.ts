@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/knockout';
+import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
 import { koClient } from '../';
-import { AppOrder, AppWhereInput } from '@/__generated__/knockout/graphql';
+import { AppOrder, AppWhereInput } from '@/__generated__/adminx/graphql';
 
 const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
   node(id:$gid){

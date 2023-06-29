@@ -3,13 +3,13 @@ import { message } from 'antd';
 import { Link, useSearchParams } from '@ice/runtime';
 import { useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
-import { getOrgInfo } from '@/services/knockout/org';
-import { createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from '@/services/knockout/org/policy';
+import { getOrgInfo } from '@/services/adminx/org';
+import { createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from '@/services/adminx/org/policy';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { Org, PolicyRule } from '@/__generated__/knockout/graphql';
+import { Org, PolicyRule } from '@/__generated__/adminx/graphql';
 
 type ProFormData = {
   name: string;

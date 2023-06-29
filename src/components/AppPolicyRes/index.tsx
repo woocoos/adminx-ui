@@ -1,10 +1,10 @@
-import { getAppResList } from '@/services/knockout/app/resource';
+import { getAppResList } from '@/services/adminx/app/resource';
 import { Checkbox, Col, Popconfirm, Row, Space } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './index.module.css';
 import Create from './create';
-import { App } from '@/__generated__/knockout/graphql';
+import { App } from '@/__generated__/adminx/graphql';
 
 export type AppResItem = {
   title: string;

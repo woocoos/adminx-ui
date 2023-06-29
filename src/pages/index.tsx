@@ -1,4 +1,4 @@
-import { getUserInfo } from '@/services/knockout/user';
+import { getUserInfo } from '@/services/adminx/user';
 import store from '@/store';
 import { PageContainer, ProCard, useToken } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
@@ -6,12 +6,12 @@ import { useTranslation } from 'react-i18next';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import defaultApp from '@/assets/images/default-app.png';
 import { Avatar, Col, Empty, Row, Space, Statistic } from 'antd';
-import { getOrgUserQty } from '@/services/knockout/org/user';
-import { getOrgGroupQty, getOrgRoleQty } from '@/services/knockout/org/role';
-import { getOrgPolicyQty } from '@/services/knockout/org/policy';
-import { getOrgAppList } from '@/services/knockout/org/app';
+import { getOrgUserQty } from '@/services/adminx/org/user';
+import { getOrgGroupQty, getOrgRoleQty } from '@/services/adminx/org/role';
+import { getOrgPolicyQty } from '@/services/adminx/org/policy';
+import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
-import { App, OrgRoleKind, User } from '@/__generated__/knockout/graphql';
+import { App, OrgRoleKind, User } from '@/__generated__/adminx/graphql';
 import { formatArrayFilesRaw } from '@/services/files';
 
 export default () => {

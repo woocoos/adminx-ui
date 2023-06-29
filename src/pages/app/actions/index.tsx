@@ -2,13 +2,13 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Modal } from 'antd';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
-import { getAppInfo } from '@/services/knockout/app';
+import { getAppInfo } from '@/services/adminx/app';
 import CreateAppAction from './components/create';
-import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/knockout/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/adminx/app/action';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
-import { App, AppAction, AppActionWhereInput } from '@/__generated__/knockout/graphql';
+import { App, AppAction, AppActionWhereInput } from '@/__generated__/adminx/graphql';
 
 export type AppActionListRef = {
   getSelect: () => AppAction[];

@@ -4,13 +4,13 @@ import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
 import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
-import { getAppPolicyInfo } from '@/services/knockout/app/policy';
-import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/knockout/org/policy';
+import { getAppPolicyInfo } from '@/services/adminx/app/policy';
+import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/adminx/org/policy';
 import ModalOrg from '@/pages/org/components/modalOrg';
-import { getAppPolicyAssignedOrgList } from '@/services/knockout/app/org';
+import { getAppPolicyAssignedOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { AppPolicy, Org, OrgWhereInput } from '@/__generated__/knockout/graphql';
+import { AppPolicy, Org, OrgWhereInput } from '@/__generated__/adminx/graphql';
 
 
 export default () => {

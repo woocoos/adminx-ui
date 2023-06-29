@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/knockout';
+import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
 import { koClient } from '../';
-import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/__generated__/knockout/graphql';
+import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/__generated__/adminx/graphql';
 
 export const EnumAppActionKind = {
   restful: { text: 'restful' },

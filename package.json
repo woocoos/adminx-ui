@@ -1,7 +1,7 @@
 {
   "name": "adminx-ui",
   "version": "0.1.0",
-  "description": "knockout应用后台管理系统",
+  "description": "adminx应用后台管理系统",
   "scripts": {
     "dev": "ice start",
     "start": "ice start --no-mock",

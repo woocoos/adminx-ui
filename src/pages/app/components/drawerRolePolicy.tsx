@@ -1,5 +1,5 @@
-import { getAppPolicyList } from '@/services/knockout/app/policy';
-import { assignAppRolePolicy } from '@/services/knockout/app/role';
+import { getAppPolicyList } from '@/services/adminx/app/policy';
+import { assignAppRolePolicy } from '@/services/adminx/app/role';
 import { Col, Input, List, Row, Space, Tag, message } from 'antd';
 import { useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
@@ -7,7 +7,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { useTranslation } from 'react-i18next';
 import { TableParams } from '@/services/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppPolicy, AppRole } from '@/__generated__/knockout/graphql';
+import { App, AppPolicy, AppRole } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   open: boolean;

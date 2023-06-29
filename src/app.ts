@@ -6,11 +6,11 @@ import { message } from 'antd';
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem } from '@/pkg/localStore';
-import { userPermissions } from './services/knockout/user';
+import { userPermissions } from './services/adminx/user';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';
-import { User } from './__generated__/knockout/graphql';
+import { User } from './__generated__/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 
 export const icestark = defineChildConfig(() => ({
@@ -105,7 +105,6 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 export const requestConfig = defineRequestConfig(() => {
   return [
     {
-      baseURL: '/api',
       interceptors: {
         request: {
           onConfig(config: any) {

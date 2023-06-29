@@ -1,5 +1,5 @@
 import { TableParams } from '@/services/graphql';
-import { getRecycleUserList } from '@/services/knockout/user';
+import { getRecycleUserList } from '@/services/adminx/user';
 import store from '@/store';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space, message } from 'antd';
@@ -7,7 +7,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/Auth';
-import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/knockout/graphql';
+import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
 
 export default () => {
   const { token } = useToken(),

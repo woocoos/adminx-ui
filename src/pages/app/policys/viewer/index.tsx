@@ -1,16 +1,16 @@
-import { createAppPolicy, getAppPolicyInfo, updateAppPolicy } from '@/services/knockout/app/policy';
+import { createAppPolicy, getAppPolicyInfo, updateAppPolicy } from '@/services/adminx/app/policy';
 import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormSwitch, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
 import { Link, useSearchParams } from '@ice/runtime';
 import { useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
-import { getAppActionList } from '@/services/knockout/app/action';
-import { getAppInfo } from '@/services/knockout/app';
+import { getAppActionList } from '@/services/adminx/app/action';
+import { getAppInfo } from '@/services/adminx/app';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/__generated__/knockout/graphql';
+import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/__generated__/adminx/graphql';
 import { updateFormat } from '@/util';
 
 type ProFormData = {

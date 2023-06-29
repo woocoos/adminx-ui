@@ -1,7 +1,7 @@
 import store from '@/store';
 import { OrgList } from '../list';
 import { useSearchParams } from '@ice/runtime';
-import { OrgKind } from '@/__generated__/knockout/graphql';
+import { OrgKind } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   isFromSystem?: boolean;

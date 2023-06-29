@@ -1,4 +1,4 @@
-import { getOrgRoleInfo } from '@/services/knockout/org/role';
+import { getOrgRoleInfo } from '@/services/adminx/org/role';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { Link, useSearchParams } from '@ice/runtime';
@@ -8,7 +8,7 @@ import CreateOrgRole from '../../roles/components/create';
 import ListRolePermission from '../../roles/components/listRolePermission';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { OrgRole } from '@/__generated__/knockout/graphql';
+import { OrgRole } from '@/__generated__/adminx/graphql';
 
 export default (props: {
   isFromSystem?: boolean;

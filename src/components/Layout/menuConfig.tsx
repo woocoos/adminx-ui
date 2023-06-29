@@ -1,4 +1,4 @@
-import { userMenus } from '@/services/knockout/user';
+import { userMenus } from '@/services/adminx/user';
 import { formatTreeData } from '@/util';
 import {
   SettingOutlined,

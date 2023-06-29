@@ -2,7 +2,7 @@ import i18n from '@/i18n';
 import store from '@/store';
 import { message } from 'antd';
 import { Client, cacheExchange, fetchExchange, makeOperation, mapExchange } from 'urql';
-import { gql } from '@/__generated__/knockout';
+import { gql } from '@/__generated__/adminx';
 
 const queryGlobalId = gql(/* GraphQL */`query globalID($type:String!,$id:ID!){
   globalID(type:$type,id:$id)
@@ -28,6 +28,7 @@ export async function getGID(type: string, id: string | number) {
   return null;
 }
 
+const baseURL = '/api-adminx'
 let client: Client
 
 /**
@@ -35,7 +36,7 @@ let client: Client
  * @returns
  */
 export function koClient() {
-  const url = '/api/graphql/query';
+  const url = `${baseURL}/graphql/query`;
 
   if (!client) {
     client = new Client({

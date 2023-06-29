@@ -1,4 +1,4 @@
-import { getUserInfoLoginProfile } from '@/services/knockout/user';
+import { getUserInfoLoginProfile } from '@/services/adminx/user';
 import store from '@/store';
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import { Link } from '@ice/runtime';
@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import UnbindMFA from './components/unbindMFA';
 import styles from './index.module.css';
-import { User } from '@/__generated__/knockout/graphql';
+import { User } from '@/__generated__/adminx/graphql';
 
 export default () => {
   const { t } = useTranslation(),
