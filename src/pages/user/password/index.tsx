@@ -5,6 +5,7 @@ import store from '@/store';
 import { updatePassword } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { Link } from '@ice/runtime';
 
 type FormValues = { oldPwd: string; newPwd: string; reNewPwd: string };
 
@@ -47,7 +48,7 @@ export default () => {
         breadcrumb: {
           items: [
             { title: t('info_center') },
-            { title: t('security_setting') },
+            { title: <Link to="/user/safety">{t('security_setting')}</Link> },
             { title: t('change_pwd') },
           ],
         },

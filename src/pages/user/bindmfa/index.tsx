@@ -1,6 +1,6 @@
 import store from '@/store';
 import { PageContainer, ProCard, ProForm, ProFormText, useToken } from '@ant-design/pro-components';
-import { history } from '@ice/runtime';
+import { Link, history } from '@ice/runtime';
 import { Alert, QRCode, Result, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -88,7 +88,7 @@ export default () => {
       breadcrumb: {
         items: [
           { title: t('info_center') },
-          { title: t('security_setting') },
+          { title: <Link to="/user/safety">{t('security_setting')}</Link> },
           { title: t('bind_virtual_MFA') },
         ],
       },

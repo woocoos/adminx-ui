@@ -1,5 +1,6 @@
 import i18n from "@/i18n";
 import store from "@/store";
+import { ProConfigProvider } from "@ant-design/pro-components";
 import { Outlet } from "@ice/runtime"
 import { useEffect } from "react";
 import { AliveScope } from "react-activation"
@@ -11,7 +12,9 @@ export default () => {
     i18n.changeLanguage(basisState.locale);
   }, [basisState.locale]);
 
-  return <AliveScope>
-    <Outlet />
-  </AliveScope>
+  return <ProConfigProvider dark={basisState.darkMode} >
+    <AliveScope>
+      <Outlet />
+    </AliveScope>
+  </ProConfigProvider>
 }
