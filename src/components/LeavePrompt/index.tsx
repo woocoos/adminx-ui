@@ -37,25 +37,19 @@ export const setLeavePromptWhen = (when: boolean) => {
 export default () => {
   const location = useLocation();
 
-  const onBeforeunload = (event: BeforeUnloadEvent) => {
-    event.preventDefault();
-    if (pathName.when) {
-      return true;
-    } else {
-      event.returnValue = i18n.t('leave_prompt_tip');
-      return i18n.t('leave_prompt_tip');
-    }
-  };
-
   useEffect(() => {
     setLeavePromptWhen(true);
   }, [location.pathname]);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', onBeforeunload);
-    return () => {
-      window.removeEventListener('beforeunload', onBeforeunload);
-    };
+    window.addEventListener('beforeunload', (event) => {
+      if (pathName.when === true) {
+        return;
+      }
+      event.preventDefault();
+      event.returnValue = i18n.t('leave_prompt_tip');
+      return i18n.t('leave_prompt_tip');
+    });
   }, []);
 
   return <></>;
