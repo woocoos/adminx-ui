@@ -1,6 +1,6 @@
 import { gid } from '@/util';
 import { gql } from '@/__generated__/adminx';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest } from '../';
 import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/__generated__/adminx/graphql';
 
 const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){
@@ -49,8 +49,8 @@ export async function getAppMenus(
     where?: AppMenuWhereInput;
     orderBy?: AppMenuOrder;
   }) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await pagingRequest(
       queryAppMenuList, {
       gid: gid('app', appId),
       first: gather.pageSize,
@@ -59,9 +59,7 @@ export async function getAppMenus(
         direction: OrderDirection.Asc,
         field: AppMenuOrderField.DisplaySort,
       },
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+    }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node.menus;
@@ -77,12 +75,12 @@ export async function getAppMenus(
  * @returns
  */
 export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationUpdateAppMenu, {
       menuId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.updateAppMenu?.id) {
     return result.data.updateAppMenu;
@@ -96,12 +94,12 @@ export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
  * @returns
  */
 export async function createAppMenu(appId: string, input: CreateAppMenuInput | CreateAppMenuInput[]) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationCreateAppMenu, {
       appId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.createAppMenus) {
     return result.data.createAppMenus;
@@ -115,11 +113,11 @@ export async function createAppMenu(appId: string, input: CreateAppMenuInput | C
  * @returns
  */
 export async function delAppMenu(menuId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationDelAppMenu, {
       menuId,
-    }).toPromise();
+    });
 
   if (result.data?.deleteAppMenu) {
     return result.data.deleteAppMenu;
@@ -134,13 +132,13 @@ export async function delAppMenu(menuId: string) {
  * @returns
  */
 export async function moveAppMenu(sourceId: string, targetId: string, action: TreeAction) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationMoveAppMenu, {
       sourceId,
       targetId,
       action,
-    }).toPromise();
+    });
 
   if (result.data?.moveAppMenu) {
     return result.data.moveAppMenu;

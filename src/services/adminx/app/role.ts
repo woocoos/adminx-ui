@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, queryRequest } from '../';
 import { CreateAppRoleInput, UpdateAppRoleInput } from '@/__generated__/adminx/graphql';
 
 const queryAppRoleList = gql(/* GraphQL */`query appRoleList($gid:GID!){
@@ -63,11 +63,11 @@ const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePoli
  * @returns
  */
 export async function getAppRoleList(appId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppRoleList, {
       gid: gid('app', appId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node.roles;
@@ -82,11 +82,11 @@ export async function getAppRoleList(appId: string) {
  * @returns
  */
 export async function getAppRoleInfo(appRoleId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppRoleInfo, {
       gid: gid('app_role', appRoleId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'AppRole') {
     return result.data.node;
@@ -100,11 +100,11 @@ export async function getAppRoleInfo(appRoleId: string) {
  * @returns
  */
 export async function getAppRoleInfoPolicieList(appRoleId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppRoleInfoPolicieList, {
       gid: gid('app_role', appRoleId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'AppRole') {
     return result.data.node;
@@ -119,12 +119,12 @@ export async function getAppRoleInfoPolicieList(appRoleId: string) {
  * @returns
  */
 export async function createAppRole(appId: string, input: CreateAppRoleInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationCreateAppRole, {
       appId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.createAppRole?.id) {
     return result.data.createAppRole;
@@ -139,12 +139,12 @@ export async function createAppRole(appId: string, input: CreateAppRoleInput) {
  * @returns
  */
 export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationUpdateAppRole, {
       appRoleId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.updateAppRole?.id) {
     return result.data.updateAppRole;
@@ -158,11 +158,11 @@ export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput
  * @returns
  */
 export async function delAppRole(appRoleId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationDelAppRole, {
       appRoleId,
-    }).toPromise();
+    });
 
   if (result.data?.deleteAppRole) {
     return result.data.deleteAppRole;
@@ -179,13 +179,13 @@ export async function delAppRole(appRoleId: string) {
  * @returns
  */
 export async function assignAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs?: string | string[]) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationAssignAppRolePolicy, {
       appRoleId,
       appId,
       policyIds: appPolicyIDs,
-    }).toPromise();
+    });
 
   if (result.data?.assignAppRolePolicy) {
     return result.data.assignAppRolePolicy;
@@ -201,13 +201,13 @@ export async function assignAppRolePolicy(appId: string, appRoleId: string, appP
  * @returns
  */
 export async function revokeAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs: string[]) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationRevokeAppRolePolicy, {
       appRoleId,
       appId,
       policyIds: appPolicyIDs,
-    }).toPromise();
+    });
 
   if (result.data?.revokeAppRolePolicy) {
     return result.data.revokeAppRolePolicy;

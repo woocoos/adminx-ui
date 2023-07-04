@@ -1,7 +1,7 @@
 import { gid } from '@/util';
 import { gql } from '@/__generated__/adminx';
 import { OrgOrder, OrgWhereInput } from '@/__generated__/adminx/graphql';
-import { koClient } from '../';
+import { pagingRequest, queryRequest } from '../';
 
 const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
   node(id:$gid){
@@ -49,9 +49,7 @@ const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPol
 /**
  * 获取应用授权的组织列表
  * @param appId
- * @param params
- * @param filter
- * @param sort
+ * @param gather
  * @returns
  */
 export async function getAppOrgList(
@@ -62,16 +60,14 @@ export async function getAppOrgList(
     where?: OrgWhereInput;
     orderBy?: OrgOrder;
   }) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await pagingRequest(
       queryAppOrgList, {
       gid: gid('app', appId),
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy,
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+    }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node.orgs;
@@ -89,12 +85,12 @@ export async function getAppRoleAssignedOrgList(
   appRoleId: string,
   where?: OrgWhereInput,
 ) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppRoleAssignedToOrgList, {
       appRoleId,
       where,
-    }).toPromise();
+    });
 
   if (result.data?.appRoleAssignedToOrgs) {
     return result.data.appRoleAssignedToOrgs;
@@ -114,17 +110,17 @@ export async function getAppPolicyAssignedOrgList(
     appPolicyId?: string;
   },
 ) {
-  const koc = koClient(),
-    result = isGrant?.appPolicyId ? await koc.client.query(
+  const
+    result = isGrant?.appPolicyId ? await queryRequest(
       queryAppPolicyAssignedToOrgListAndIsGrant, {
       appPolicyId,
       appPolicyIdToIsAllow: isGrant.appPolicyId,
       where,
-    }).toPromise() : await koc.client.query(
+    }) : await queryRequest(
       queryAppPolicyAssignedToOrgList, {
       appPolicyId,
       where,
-    }).toPromise();
+    });
 
   if (result.data?.appPolicyAssignedToOrgs) {
     return result.data.appPolicyAssignedToOrgs;

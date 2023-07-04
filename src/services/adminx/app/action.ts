@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/__generated__/adminx/graphql';
 
 export const EnumAppActionKind = {
@@ -65,16 +65,14 @@ export async function getAppActionList(
     where?: AppActionWhereInput;
     orderBy?: AppActionOrder;
   }) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await pagingRequest(
       queryAppActionList, {
       gid: gid('app', appId),
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy,
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+    }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node.actions;
@@ -89,11 +87,11 @@ export async function getAppActionList(
  * @returns
  */
 export async function getAppActionInfo(appActionId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppActionInfo, {
       gid: gid('app_action', appActionId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'AppAction') {
     return result.data.node;
@@ -108,25 +106,17 @@ export async function getAppActionInfo(appActionId: string) {
  * @returns
  */
 export async function createAppAction(appId: string, input: CreateAppActionInput | CreateAppActionInput[]) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationCreateAppAction, {
       appId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.createAppActions) {
     return result.data.createAppActions;
   }
   return null;
-}
-
-/**
- * 创建
- * @param input
- * @returns
- */
-export async function createAppActions() {
 }
 
 /**
@@ -136,12 +126,12 @@ export async function createAppActions() {
  * @returns
  */
 export async function updateAppAction(appActionId: string, input: UpdateAppActionInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationUpdateAppAction, {
       appActionId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.updateAppAction?.id) {
     return result.data.updateAppAction;
@@ -155,11 +145,11 @@ export async function updateAppAction(appActionId: string, input: UpdateAppActio
  * @returns
  */
 export async function delAppAction(appActionId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationDelAppAction, {
       appActionId,
-    }).toPromise();
+    });
 
   if (result.data?.deleteAppAction) {
     return result.data.deleteAppAction;

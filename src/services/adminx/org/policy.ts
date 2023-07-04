@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/__generated__/adminx/graphql';
 
 const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
@@ -105,34 +105,28 @@ export async function getOrgPolicyList(
     userId?: string;
   },
 ) {
-  const koc = koClient();
-  const result = isGrant?.roleId ? await koc.client.query(
+  const result = isGrant?.roleId ? await pagingRequest(
     queryOrgPolicyListAndIsGrantRole, {
     gid: gid('org', orgId),
     roleId: isGrant.roleId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise() : isGrant?.userId ? await koc.client.query(
-    queryOrgPolicyListAndIsGrantUser, {
-    gid: gid('org', orgId),
-    userId: isGrant.userId,
-    first: gather.pageSize || 20,
-    where: gather.where,
-    orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise() : await koc.client.query(
-    queryOrgPolicyList, {
-    gid: gid('org', orgId),
-    first: gather.pageSize || 20,
-    where: gather.where,
-    orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise();
+  }, gather.current || 1) :
+    isGrant?.userId ? await pagingRequest(
+      queryOrgPolicyListAndIsGrantUser, {
+      gid: gid('org', orgId),
+      userId: isGrant.userId,
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, gather.current || 1) : await pagingRequest(
+      queryOrgPolicyList, {
+      gid: gid('org', orgId),
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy,
+    }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.policies;
@@ -147,11 +141,11 @@ export async function getOrgPolicyList(
  * @returns
  */
 export async function getOrgPolicyInfo(orgPolicyId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryOrgPolicyInfo, {
       gid: gid('org_policy', orgPolicyId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'OrgPolicy') {
     return result.data.node;
@@ -166,11 +160,11 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
  * @returns
  */
 export async function createOrgPolicy(input: CreateOrgPolicyInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationCreateOrgPolicy, {
       input,
-    }).toPromise();
+    });
 
   if (result.data?.createOrganizationPolicy?.id) {
     return result.data.createOrganizationPolicy;
@@ -185,12 +179,12 @@ export async function createOrgPolicy(input: CreateOrgPolicyInput) {
  * @returns
  */
 export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolicyInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationUpdateOrgPolicy, {
       orgPolicyId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.updateOrganizationPolicy?.id) {
     return result.data.updateOrganizationPolicy;
@@ -204,11 +198,11 @@ export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolic
  * @returns
  */
 export async function delOrgPolicy(orgPolicyId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationDelOrgPolicy, {
       orgPolicyId,
-    }).toPromise();
+    });
 
   if (result.data?.deleteOrganizationPolicy) {
     return result.data.deleteOrganizationPolicy;
@@ -224,12 +218,12 @@ export async function delOrgPolicy(orgPolicyId: string) {
  * @returns
  */
 export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationAssignOrgAppPolicy, {
       orgId,
       appPolicyId,
-    }).toPromise();
+    });
 
   if (result.data?.assignOrganizationAppPolicy) {
     return result.data.assignOrganizationAppPolicy;
@@ -244,12 +238,12 @@ export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
  * @returns
  */
 export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationRevOrgAppPolicy, {
       orgId,
       appPolicyId,
-    }).toPromise();
+    });
 
   if (result.data?.revokeOrganizationAppPolicy) {
     return result.data.revokeOrganizationAppPolicy;
@@ -265,13 +259,13 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
  * @returns
  */
 export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryOrgPolicyListNum, {
       gid: gid('org', orgId),
       first: 9999,
       where,
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.policies.totalCount;

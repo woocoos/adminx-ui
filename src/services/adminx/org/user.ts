@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/__generated__/adminx/graphql';
 
 
@@ -100,25 +100,20 @@ export async function getOrgUserList(
     orgRoleId?: string;
   },
 ) {
-  const koc = koClient();
-  const result = isGrant?.orgRoleId ? await koc.client.query(
+  const result = isGrant?.orgRoleId ? await pagingRequest(
     queryOrgUserListAndIsOrgRole, {
     orgRoleId: isGrant.orgRoleId,
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise() : await koc.client.query(
+  }, gather.current || 1) : await pagingRequest(
     queryOrgUserList, {
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise();
+  }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.users;
@@ -146,25 +141,20 @@ export async function getOrgRoleUserList(
     orgRoleId?: string;
   },
 ) {
-  const koc = koClient();
-  const result = isGrant?.orgRoleId ? await koc.client.query(
+  const result = isGrant?.orgRoleId ? await pagingRequest(
     queryOrgRoleUserListAndIsOrgRole, {
     roleId,
     orgRoleId: isGrant.orgRoleId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise() : await koc.client.query(
+  }, gather.current || 1) : await pagingRequest(
     queryOrgRoleUserList, {
     roleId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, {
-    url: `${koc.url}?p=${gather.current || 1}`,
-  }).toPromise();
+  }, gather.current || 1);
 
   if (result.data?.orgRoleUsers) {
     return result.data?.orgRoleUsers;
@@ -178,11 +168,11 @@ export async function getOrgRoleUserList(
  * @returns
  */
 export async function allotOrgUser(input: CreateOrgUserInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationAllotOrgUser, {
       input,
-    }).toPromise();
+    });
 
   if (result.data?.allotOrganizationUser) {
     return result?.data?.allotOrganizationUser;
@@ -197,12 +187,12 @@ export async function allotOrgUser(input: CreateOrgUserInput) {
  * @returns
  */
 export async function removeOrgUser(orgId: string, userId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationRemoveOrgUser, {
       orgId,
       userId,
-    }).toPromise();
+    });
 
   if (result.data?.removeOrganizationUser) {
     return result?.data?.removeOrganizationUser;
@@ -217,13 +207,13 @@ export async function removeOrgUser(orgId: string, userId: string) {
  * @returns
  */
 export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryOrgUserNum, {
       gid: gid('org', orgId),
       where,
       first: 9999,
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'Org') {
     return result?.data?.node.users.totalCount;

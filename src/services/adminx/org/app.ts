@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { AppOrder, AppWhereInput } from '@/__generated__/adminx/graphql';
 
 const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
@@ -50,16 +50,13 @@ export async function getOrgAppList(
     where?: AppWhereInput;
     orderBy?: AppOrder;
   }) {
-  const koc = koClient(),
-    result = await koc.client.query(
-      queryOrgAppList, {
-      gid: gid('org', orgId),
-      first: gather.pageSize || 20,
-      where: gather.where,
-      orderBy: gather.orderBy,
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+  const result = await pagingRequest(
+    queryOrgAppList, {
+    gid: gid('org', orgId),
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.apps;
@@ -75,12 +72,11 @@ export async function getOrgAppList(
  * @returns
  */
 export async function assignOrgApp(orgId: string, appId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationAssignOrgApp, {
-      orgId,
-      appId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationAssignOrgApp, {
+    orgId,
+    appId,
+  });
 
   if (result.data?.assignOrganizationApp) {
     return result.data.assignOrganizationApp;
@@ -95,12 +91,11 @@ export async function assignOrgApp(orgId: string, appId: string) {
  * @returns
  */
 export async function revokeOrgApp(orgId: string, appId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationRevOrgApp, {
-      orgId,
-      appId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationRevOrgApp, {
+    orgId,
+    appId,
+  });
 
   if (result.data?.revokeOrganizationApp) {
     return result.data.revokeOrganizationApp;
@@ -115,11 +110,10 @@ export async function revokeOrgApp(orgId: string, appId: string) {
  * @returns
  */
 export async function getOrgAppActionList(appCode: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
-      queryOrgAppActionList, {
-      appCode,
-    }).toPromise();
+  const result = await queryRequest(
+    queryOrgAppActionList, {
+    appCode,
+  });
 
   if (result.data?.orgAppActions) {
     return result.data.orgAppActions;

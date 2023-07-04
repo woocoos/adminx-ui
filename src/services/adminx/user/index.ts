@@ -1,5 +1,5 @@
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { gql } from '@/__generated__/adminx';
 import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
 
@@ -186,14 +186,11 @@ export async function getUserList(gather: {
   where?: UserWhereInput;
   orderBy?: UserOrder;
 }) {
-  const koc = koClient(),
-    result = await koc.client.query(queryUserList, {
-      first: gather.pageSize || 20,
-      where: gather.where,
-      orderBy: gather.orderBy,
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+  const result = await pagingRequest(queryUserList, {
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, gather.current || 1);
   if (result.data?.users) {
     return result.data.users;
   }
@@ -206,12 +203,9 @@ export async function getUserList(gather: {
  * @returns
  */
 export async function getUserInfo(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(queryUserInfo, {
-      gid: gid('user', userId),
-    }, {
-
-    }).toPromise();
+  const result = await queryRequest(queryUserInfo, {
+    gid: gid('user', userId),
+  });
 
   if (result.data?.node?.__typename === 'User') {
     return result.data?.node;
@@ -225,10 +219,9 @@ export async function getUserInfo(userId: string) {
  * @returns
  */
 export async function getUserInfoLoginProfile(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(queryUserInfoLoginProfile, {
-      gid: gid('user', userId),
-    }).toPromise();
+  const result = await queryRequest(queryUserInfoLoginProfile, {
+    gid: gid('user', userId),
+  })
 
   if (result.data?.node?.__typename === 'User') {
     return result.data?.node;
@@ -242,10 +235,9 @@ export async function getUserInfoLoginProfile(userId: string) {
  * @returns
  */
 export async function getUserInfoIdentities(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(queryUserInfoIdentities, {
-      gid: gid('user', userId),
-    }).toPromise();
+  const result = await queryRequest(queryUserInfoIdentities, {
+    gid: gid('user', userId),
+  });
 
   if (result.data?.node?.__typename === 'User') {
     return result.data?.node;
@@ -259,10 +251,9 @@ export async function getUserInfoIdentities(userId: string) {
  * @returns
  */
 export async function getUserInfoLoginProfileIdentities(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(queryUserInfoLoginProfileIdentities, {
-      gid: gid('user', userId),
-    }).toPromise();
+  const result = await queryRequest(queryUserInfoLoginProfileIdentities, {
+    gid: gid('user', userId),
+  });
 
   if (result.data?.node?.__typename === 'User') {
     return result.data?.node;
@@ -277,12 +268,11 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
  * @returns
  */
 export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
-      rootOrgID: rootOrgID,
-      input,
-    }).toPromise();
+  const result = await mutationRequest(
+    userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
+    rootOrgID: rootOrgID,
+    input,
+  });
 
   if (result.data?.createOrganizationUser?.id) {
     return result.data?.createOrganizationUser;
@@ -298,12 +288,11 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
  * @returns
  */
 export async function updateUserInfo(userId: string, input: UpdateUserInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationUpdateUser, {
-      userId,
-      input,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationUpdateUser, {
+    userId,
+    input,
+  });
 
   if (result.data?.updateUser?.id) {
     return result?.data?.updateUser;
@@ -318,12 +307,11 @@ export async function updateUserInfo(userId: string, input: UpdateUserInput) {
  * @returns
  */
 export async function updateUserProfile(userId: string, input: UpdateUserLoginProfileInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationUpdateUserLoginProfile, {
-      userId,
-      input,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationUpdateUserLoginProfile, {
+    userId,
+    input,
+  });
 
   if (result.data?.updateLoginProfile?.id) {
     return result?.data?.updateLoginProfile;
@@ -338,11 +326,10 @@ export async function updateUserProfile(userId: string, input: UpdateUserLoginPr
  * @returns
  */
 export async function bindUserIdentity(input: CreateUserIdentityInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationBindUserIdentity, {
-      input,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationBindUserIdentity, {
+    input,
+  });
 
   if (result.data?.bindUserIdentity?.id) {
     return result?.data?.bindUserIdentity;
@@ -356,11 +343,10 @@ export async function bindUserIdentity(input: CreateUserIdentityInput) {
  * @returns
  */
 export async function delUserIdentity(identityId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationDelUserIdentity, {
-      identityId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationDelUserIdentity, {
+    identityId,
+  });
 
   if (result.data?.deleteUserIdentity) {
     return result?.data?.deleteUserIdentity;
@@ -374,11 +360,10 @@ export async function delUserIdentity(identityId: string) {
  * @returns
  */
 export async function delUserInfo(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationDelUser, {
-      userId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationDelUser, {
+    userId,
+  });
 
   if (result.data?.deleteUser) {
     return result?.data?.deleteUser;
@@ -392,11 +377,10 @@ export async function delUserInfo(userId: string) {
  * @returns
  */
 export async function resetUserPasswordByEmail(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationResetUserPwdEmail, {
-      userId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationResetUserPwdEmail, {
+    userId,
+  });
 
   if (result.data?.resetUserPasswordByEmail) {
     return result?.data?.resetUserPasswordByEmail;
@@ -411,12 +395,11 @@ export async function resetUserPasswordByEmail(userId: string) {
  * @returns
  */
 export async function updatePassword(oldPwd: string, newPwd: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationChangePwd, {
-      oldPwd,
-      newPwd,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationChangePwd, {
+    oldPwd,
+    newPwd,
+  });
 
   if (result.data?.changePassword) {
     return result?.data?.changePassword;
@@ -431,11 +414,10 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
  * @returns
  */
 export async function enableMFA(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationEnableMfa, {
-      userId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationEnableMfa, {
+    userId,
+  });
 
   if (result.data?.enableMFA) {
     return result?.data?.enableMFA;
@@ -449,11 +431,10 @@ export async function enableMFA(userId: string) {
  * @returns
  */
 export async function disableMFA(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationDisableMfa, {
-      userId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationDisableMfa, {
+    userId,
+  });
 
   if (result.data?.disableMFA) {
     return result?.data?.disableMFA;
@@ -467,11 +448,10 @@ export async function disableMFA(userId: string) {
  * @returns
  */
 export async function sendMFAEmail(userId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationSendMfaEmail, {
-      userId,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationSendMfaEmail, {
+    userId,
+  });
 
   if (result.data?.sendMFAToUserByEmail) {
     return result?.data?.sendMFAToUserByEmail;
@@ -486,11 +466,10 @@ export async function sendMFAEmail(userId: string) {
  * @returns
  */
 export async function checkPermission(permission: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
-      queryCheckPermission, {
-      permission,
-    }).toPromise();
+  const result = await queryRequest(
+    queryCheckPermission, {
+    permission,
+  });
 
   if (result.data?.checkPermission) {
     return result?.data?.checkPermission;
@@ -505,14 +484,11 @@ export async function checkPermission(permission: string) {
  * @returns
  */
 export async function userPermissions(where: AppActionWhereInput, headers?: Record<string, any>) {
-  const koc = koClient(),
-    result = await koc.client.query(
-      queryUserPermissionList,
-      { where },
-      {
-        fetchOptions: { headers }
-      }
-    ).toPromise();
+  const result = await queryRequest(
+    queryUserPermissionList,
+    { where },
+    headers,
+  );
 
   if (result.data?.userPermissions) {
     return result?.data?.userPermissions;
@@ -526,11 +502,10 @@ export async function userPermissions(where: AppActionWhereInput, headers?: Reco
  * @returns
  */
 export async function userMenus(appCode: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
-      queryUserMenuList, {
-      appCode,
-    }).toPromise();
+  const result = await queryRequest(
+    queryUserMenuList, {
+    appCode,
+  });
 
   if (result.data?.userMenus) {
     return result?.data?.userMenus;
@@ -543,8 +518,7 @@ export async function userMenus(appCode: string) {
  * @returns
  */
 export async function userRootOrgs() {
-  const koc = koClient(),
-    result = await koc.client.query(queryUserRootOrgList, {}).toPromise();
+  const result = await queryRequest(queryUserRootOrgList, {});
   if (result.data?.userRootOrgs) {
     return result?.data?.userRootOrgs;
   }
@@ -564,14 +538,11 @@ export async function getRecycleUserList(gather: {
   where?: UserWhereInput;
   orderBy?: UserOrder;
 }) {
-  const koc = koClient(),
-    result = await koc.client.query(queryOrgRecycleUserList, {
-      first: gather.pageSize,
-      where: gather.where,
-      orderBy: gather.orderBy,
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+  const result = await pagingRequest(queryOrgRecycleUserList, {
+    first: gather.pageSize,
+    where: gather.where,
+    orderBy: gather.orderBy,
+  }, gather.current || 1);
   if (result.data?.orgRecycleUsers) {
     return result?.data?.orgRecycleUsers;
   }
@@ -590,14 +561,13 @@ export async function restoreRecycleUser(
   setKind: UserLoginProfileSetKind,
   pwdInput?: CreateUserPasswordInput,
 ) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
-      mutationRecOrgUser, {
-      userId,
-      setKind,
-      userInput,
-      pwdInput,
-    }).toPromise();
+  const result = await mutationRequest(
+    mutationRecOrgUser, {
+    userId,
+    setKind,
+    userInput,
+    pwdInput,
+  });
 
   if (result.data?.recoverOrgUser) {
     return result?.data?.recoverOrgUser;

@@ -1,6 +1,6 @@
 import { gql } from '@/__generated__/adminx';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, queryRequest } from '../';
 import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/__generated__/adminx/graphql';
 
 export const EnumAppPolicyStatus = {
@@ -70,15 +70,15 @@ export async function getAppPolicyList(
   isGrant?: {
     appRoleId?: string;
   }) {
-  const koc = koClient(),
-    result = isGrant?.appRoleId ? await koc.client.query(
+  const
+    result = isGrant?.appRoleId ? await queryRequest(
       queryAppPolicieListAndIsGrant, {
       gid: gid('app', appId),
       appRoleId: isGrant.appRoleId,
-    }).toPromise() : await koc.client.query(
+    }) : await queryRequest(
       queryAppPolicieList, {
       gid: gid('app', appId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node.policies;
@@ -93,11 +93,11 @@ export async function getAppPolicyList(
  * @returns
  */
 export async function getAppPolicyInfo(appPolicyId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppPolicyInfo, {
       gid: gid('app_policy', appPolicyId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'AppPolicy') {
     return result.data.node;
@@ -112,12 +112,12 @@ export async function getAppPolicyInfo(appPolicyId: string) {
  * @returns
  */
 export async function createAppPolicy(appId: string, input: CreateAppPolicyInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationCreateAppPolicy, {
       appId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.createAppPolicy?.id) {
     return result.data.createAppPolicy;
@@ -133,12 +133,12 @@ export async function createAppPolicy(appId: string, input: CreateAppPolicyInput
  * @returns
  */
 export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolicyInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationUpdateAppPolicy, {
       appPolicyId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.updateAppPolicy?.id) {
     return result.data.updateAppPolicy;
@@ -152,11 +152,11 @@ export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolic
  * @returns
  */
 export async function delAppPolicy(appPolicyId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationDelAppPolicy, {
       appPolicyId,
-    }).toPromise();
+    });
 
   if (result.data?.deleteAppPolicy) {
     return result.data.deleteAppPolicy;

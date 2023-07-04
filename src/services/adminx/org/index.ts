@@ -1,5 +1,5 @@
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { gql } from '@/__generated__/adminx';
 import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/__generated__/adminx/graphql';
 
@@ -73,17 +73,15 @@ export async function getOrgList(gather: {
   where?: OrgWhereInput;
   orderBy?: OrgOrder;
 }) {
-  const koc = koClient(),
-    result = await koc.client.query(queryOrgList, {
+  const
+    result = await pagingRequest(queryOrgList, {
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy || {
         direction: OrderDirection.Asc,
         field: OrgOrderField.DisplaySort,
       },
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+    }, gather.current || 1);
   if (result.data?.organizations) {
     return result.data.organizations;
   }
@@ -121,10 +119,10 @@ export async function getOrgPathList(orgId: string, kind: OrgKind) {
  * @returns
  */
 export async function getOrgInfo(orgId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(queryOrgInfo, {
+  const
+    result = await queryRequest(queryOrgInfo, {
       gid: gid('org', orgId),
-    }).toPromise();
+    });
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node;
   }
@@ -138,11 +136,11 @@ export async function getOrgInfo(orgId: string) {
  * @returns
  */
 export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(mutationUpdateOrg, {
+  const
+    result = await mutationRequest(mutationUpdateOrg, {
       orgId,
       input,
-    }).toPromise();
+    });
   if (result.data?.updateOrganization?.id) {
     return result.data.updateOrganization;
   }
@@ -156,11 +154,11 @@ export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
  * @returns
  */
 export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       kind === OrgKind.Root ? mutationCreateRootOrg : mutationCreateOrg, {
       input,
-    }).toPromise();
+    });
   if (result.data?.createRoot?.id) {
     return result.data.createRoot;
   }
@@ -173,10 +171,10 @@ export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
  * @returns
  */
 export async function createRootOrgInfo(input: EnableDirectoryInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(mutationEnableDirectory, {
+  const
+    result = await mutationRequest(mutationEnableDirectory, {
       input,
-    }).toPromise();
+    });
   if (result.data?.enableDirectory?.id) {
     return result.data.enableDirectory;
   }
@@ -189,10 +187,10 @@ export async function createRootOrgInfo(input: EnableDirectoryInput) {
  * @returns
  */
 export async function delOrgInfo(orgId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(mutationDelOrg, {
+  const
+    result = await mutationRequest(mutationDelOrg, {
       orgId,
-    }).toPromise();
+    });
   if (result.data?.deleteOrganization) {
     return result.data.deleteOrganization;
   }
@@ -206,12 +204,12 @@ export async function delOrgInfo(orgId: string) {
  * @returns
  */
 export async function moveOrg(sourceId: string, targetId: string, action: TreeAction) {
-  const koc = koClient(),
-    result = await koc.client.mutation(mutationMoveOrg, {
+  const
+    result = await mutationRequest(mutationMoveOrg, {
       sourceId,
       targetId,
       action,
-    }).toPromise();
+    });
   if (result.data?.moveOrganization) {
     return result.data.moveOrganization;
   }

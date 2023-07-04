@@ -1,7 +1,7 @@
 import { gql } from '@/__generated__/adminx';
 import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/__generated__/adminx/graphql';
 import { gid } from '@/util';
-import { koClient } from '../';
+import { mutationRequest, pagingRequest, queryRequest } from '../';
 
 export const EnumAppStatus = {
   active: { text: '活跃', status: 'success' },
@@ -64,15 +64,13 @@ export async function getAppList(
     orderBy?: AppOrder;
   },
 ) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await pagingRequest(
       queryAppList, {
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy,
-    }, {
-      url: `${koc.url}?p=${gather.current || 1}`,
-    }).toPromise();
+    }, gather.current || 1);
 
   if (result.data?.apps) {
     return result.data.apps;
@@ -86,11 +84,11 @@ export async function getAppList(
  * @returns
  */
 export async function getAppInfo(appId: string) {
-  const koc = koClient(),
-    result = await koc.client.query(
+  const
+    result = await queryRequest(
       queryAppInfo, {
       gid: gid('app', appId),
-    }).toPromise();
+    });
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node;
@@ -105,12 +103,12 @@ export async function getAppInfo(appId: string) {
  * @returns
  */
 export async function updateAppInfo(appId: string, input: UpdateAppInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationUpdateApp, {
       appId,
       input,
-    }).toPromise();
+    });
 
   if (result.data?.updateApp?.id) {
     return result.data.updateApp;
@@ -124,11 +122,11 @@ export async function updateAppInfo(appId: string, input: UpdateAppInput) {
  * @returns
  */
 export async function createAppInfo(input: CreateAppInput) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationCreateApp, {
       input,
-    }).toPromise();
+    });
 
   if (result.data?.createApp?.id) {
     return result.data.createApp;
@@ -142,11 +140,11 @@ export async function createAppInfo(input: CreateAppInput) {
  * @returns
  */
 export async function delAppInfo(appId: string) {
-  const koc = koClient(),
-    result = await koc.client.mutation(
+  const
+    result = await mutationRequest(
       mutationDelApp, {
       appId,
-    }).toPromise();
+    });
 
   if (result.data?.deleteApp) {
     return result.data.deleteApp;
