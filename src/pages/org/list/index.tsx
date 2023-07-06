@@ -176,7 +176,7 @@ export const OrgList = (props: {
             table.total = list.length;
           }
         } else {
-          where.kind = props.kind;
+          where.kind = kind;
           const result = await getOrgList({
             pageSize: 999,
             where,
@@ -243,11 +243,15 @@ export const OrgList = (props: {
           title: kind == 'org' ? t('department_manage') : t('org_manage'),
           style: { background: token.colorBgContainer },
           breadcrumb: {
-            items: props.isFromSystem ? [
-              { title: t('system_conf') },
-              { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
-              { title: kind == 'org' ? t('department_manage') : t('org_manage') },
-            ] : [
+            items: props.isFromSystem ? kind == 'org' ?
+              [
+                { title: t('system_conf') },
+                { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+                { title: t('department_manage') },
+              ] : [
+                { title: t('system_conf') },
+                { title: t('org_manage') },
+              ] : [
               { title: t('org_cooperation') },
               { title: kind == 'org' ? t('department_manage') : t('org_manage') },
             ],

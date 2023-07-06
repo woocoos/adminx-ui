@@ -114,7 +114,7 @@ export default (props: {
       onOpenChange={onOpenChange}
     >
       <Space direction="vertical">
-        <Alert showIcon message={t('after a user is added to a user group, the user has all the permissions of the group')} />
+        <Alert showIcon message={t('drawer_org_role_alert_msg')} />
         {
           props.userInfo ? <>
             <div>{t('user')}</div>

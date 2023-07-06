@@ -3,6 +3,6 @@ import { OrgList } from '@/pages/org/list';
 
 export default () => {
   return (<KeepAlive clearAlive>
-    <OrgList />
+    <OrgList isFromSystem />
   </KeepAlive>);
 };
