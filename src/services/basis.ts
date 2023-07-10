@@ -55,6 +55,7 @@ const baseURL = "/api-auth"
 export async function captcha(): Promise<CaptchaRes> {
   return await request.get(`${baseURL}/captcha`);
 }
+
 /**
  * 登录
  * @param data
@@ -66,6 +67,17 @@ export async function login(username: string, password: string, captcha: string,
     password,
     captcha,
     captchaId,
+  });
+}
+
+/**
+ * 刷新登录token
+ * @param data
+ * @returns
+ */
+export async function refreshToken(refreshToken: string): Promise<LoginRes> {
+  return await request.post(`${baseURL}/login/refresh-token`, {
+    refreshToken,
   });
 }
 

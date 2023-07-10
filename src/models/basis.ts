@@ -10,6 +10,7 @@ type BasisUserState = {
 
 type BasisModelState = {
   locale: LocalLanguage;
+  refreshToken: string;
   token: string;
   tenantId: string;
   darkMode: boolean;
@@ -23,6 +24,7 @@ export default createModel({
   state: {
     locale: 'zh-CN',
     token: '',
+    refreshToken: '',
     tenantId: '',
     user: null,
     darkMode: false,
@@ -40,6 +42,14 @@ export default createModel({
         removeItem('token');
       }
       prevState.token = payload;
+    },
+    updateRefreshToken(prevState: BasisModelState, payload: string) {
+      if (payload) {
+        setItem('refreshToken', payload);
+      } else {
+        removeItem('refreshToken');
+      }
+      prevState.refreshToken = payload;
     },
     updateTenantId(prevState: BasisModelState, payload: string) {
       if (payload) {
@@ -83,6 +93,7 @@ export default createModel({
             this.updateTenantId('');
           }
         }
+        this.updateRefreshToken(payload.refreshToken || '');
       }
     },
     /**
