@@ -7,7 +7,16 @@ import jsxPlus from '@ice/plugin-jsx-plus';
 import icestark from '@ice/plugin-icestark';
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
-const minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
+const minify = process.env.NODE_ENV === 'production' ? 'swc' : false,
+  port = process.env.PORT,
+  isNoMock = process.argv.includes('--no-mock'),
+  mockItems = process.env.ICE_MOCK_ITEMS?.split(',') as string[],
+  isMockItems = {
+    adminx: mockItems.includes('adminx') && !isNoMock,
+    files: mockItems.includes('files') && !isNoMock,
+    auth: mockItems.includes('auth') && !isNoMock,
+  };
+
 export default defineConfig(() => ({
   ssg: false,
   ssr: false,
@@ -30,22 +39,22 @@ export default defineConfig(() => ({
       importStyle: false,
     }),
   ],
-  proxy: process.argv.includes('--no-mock') ? {
+  proxy: {
     '/api-adminx': {
-      target: process.env.ICE_PROXY_ADMINX,
+      target: isMockItems.adminx ? `http://localhost:${port}` : process.env.ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { '^/api-adminx': '' },
+      pathRewrite: { '^/api-adminx': isMockItems.adminx ? '/mock-api-adminx' : '' },
     },
     '/api-files': {
-      target: process.env.ICE_PROXY_FILES,
+      target: isMockItems.files ? `http://localhost:${port}` : process.env.ICE_PROXY_FILES,
       changeOrigin: true,
-      pathRewrite: { '^/api-files': '' },
+      pathRewrite: { '^/api-files': isMockItems.files ? '/mock-api-files' : '' },
     },
     '/api-auth': {
-      target: process.env.ICE_PROXY_AUTH,
+      target: isMockItems.auth ? `http://localhost:${port}` : process.env.ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { '^/api-auth': '' },
+      pathRewrite: { '^/api-auth': isMockItems.auth ? '/mock-api-auth' : '' },
     },
-  } : {},
+  },
 }));
 
