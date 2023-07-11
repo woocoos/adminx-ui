@@ -1,7 +1,7 @@
 import { gid } from '@/util';
 import { mutationRequest, pagingRequest, queryRequest } from '../';
 import { gql } from '@/__generated__/adminx';
-import { AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
+import { AppActionKind, AppActionMethod, AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
 
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
@@ -483,10 +483,18 @@ export async function checkPermission(permission: string) {
  * @param where
  * @returns
  */
-export async function userPermissions(where: AppActionWhereInput, headers?: Record<string, any>) {
+export async function userPermissions(headers?: Record<string, any>) {
   const result = await queryRequest(
     queryUserPermissionList,
-    { where },
+    {
+      where: {
+        hasAppWith: [{ code: process.env.ICE_APP_CODE }],
+        or: [
+          { kind: AppActionKind.Function },
+          { kindNEQ: AppActionKind.Function, method: AppActionMethod.Write }
+        ],
+      }
+    },
     headers,
   );
 

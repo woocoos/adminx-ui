@@ -1,4 +1,6 @@
+import store from '@/store';
 import { request } from 'ice';
+import jwtDcode, { JwtPayload } from 'jwt-decode';
 
 interface OasErrors {
   code: number;
@@ -71,17 +73,32 @@ export async function login(username: string, password: string, captcha: string,
   });
 }
 
+
+let refreshTokenFn: NodeJS.Timeout;
+
 /**
  * 刷新登录token
  * @param data
  * @returns
  */
-export async function refreshToken(refreshToken: string): Promise<LoginRes> {
-  return await request.post(`${baseURL}/login/refresh-token`, {
-    refreshToken,
-  });
+export function refreshToken() {
+  clearTimeout(refreshTokenFn);
+  refreshTokenFn = setTimeout(async () => {
+    const basisState = store.getModelState('basis');
+    if (basisState.token && basisState.refreshToken) {
+      const jwt = jwtDcode<JwtPayload>(basisState.token);
+      if ((jwt.exp || 0) * 1000 - Date.now() < 30 * 60 * 1000) {
+        // 小于30分钟的时候需要刷新token
+        const tr = await request.post(`${baseURL}/login/refresh-token`, {
+          refreshToken: basisState.refreshToken,
+        });
+        if (tr.accessToken) {
+          store.dispatch.basis.updateToken(tr.accessToken);
+        }
+      }
+    }
+  }, 2000);
 }
-
 /**
  * 退出登录
  * @returns
