@@ -12,6 +12,7 @@ import { Link, history, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserUserType } from '@/__generated__/adminx/graphql';
+import { getFilesRaw } from '@/services/files';
 
 export default (props: {
   isFromOrg?: boolean;
@@ -22,6 +23,7 @@ export default (props: {
     [searchParams] = useSearchParams(),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
+    [avatar, setAvatar] = useState<string>(),
     [modal, setModal] = useState<{
       open: boolean;
       title: string;
@@ -47,9 +49,18 @@ export default (props: {
         setLoading(true);
         const info = await getUserInfoLoginProfileIdentities(id);
         if (info?.id) {
+          if (info.avatarFileID) {
+            await getAvatar(info.avatarFileID)
+          }
           setInfo(info as User);
           setLoading(false);
         }
+      }
+    },
+    getAvatar = async (fileId: string) => {
+      const result = await getFilesRaw(fileId, 'url')
+      if (typeof result === 'string') {
+        setAvatar(result)
       }
     },
     identityRender = () => {
@@ -164,7 +175,7 @@ export default (props: {
             valueType={{ type: 'image', width: 120 }}
             style={{ width: '140px' }}
           >
-            {defaultAvatar}
+            {avatar || defaultAvatar}
           </ProDescriptions.Item>
           <ProDescriptions.Item label="" >
             <ProDescriptions column={2}>

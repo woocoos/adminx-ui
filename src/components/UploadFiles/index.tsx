@@ -60,8 +60,8 @@ export default (props: {
     },
     getFile = async () => {
       if (props.value) {
-        const result = await getFilesRaw(props.value)
-        if (result) {
+        const result = await getFilesRaw(props.value, 'url')
+        if (typeof result === 'string') {
           setImgsrc(result)
         }
       }

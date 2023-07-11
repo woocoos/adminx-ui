@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
+import UploadFiles from '@/components/UploadFiles';
 
 type ProFormData = {
   principalName?: string;
@@ -222,6 +223,12 @@ export default (props: {
           ]}
         />
       </div>
+      <ProFormText
+        x-if={['base'].includes(props.scene)}
+        name="avatarFileID"
+      >
+        <UploadFiles accept='.jpg,.png' />
+      </ProFormText>
       <div x-if={['create', 'base', 'recycle'].includes(props.scene)}>
         <ProFormText
           name="displayName"

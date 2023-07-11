@@ -41,7 +41,7 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments
+      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
     }
   }
 }`);
@@ -50,7 +50,7 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,
+      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -63,7 +63,7 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,
+      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus

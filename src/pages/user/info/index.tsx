@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { User } from '@/__generated__/adminx/graphql';
 import { updateFormat } from '@/util';
+import UploadFiles from '@/components/UploadFiles';
 
 export default () => {
   const
@@ -78,6 +79,11 @@ export default () => {
           request={getRequest}
           onValuesChange={onValuesChange}
         >
+          <ProFormText
+            name="avatarFileID"
+          >
+            <UploadFiles accept='.jpg,.png' />
+          </ProFormText>
           <ProFormText
             width="lg"
             name="displayName"

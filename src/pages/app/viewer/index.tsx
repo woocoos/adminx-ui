@@ -50,8 +50,8 @@ export default () => {
       }
     },
     getLogoSrc = async (fileId: string) => {
-      const result = await getFilesRaw(fileId)
-      if (result) {
+      const result = await getFilesRaw(fileId, 'url')
+      if (typeof result === 'string') {
         setLogoSrc(result)
       }
     };

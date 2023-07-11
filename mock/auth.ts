@@ -26,6 +26,7 @@ const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzIw
   user = {
     id: 1,
     displayName: "admin",
+    avatarFileId: 'png',
     domains: [
       { name: "wooocoo", id: 1 }
     ]

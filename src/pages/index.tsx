@@ -12,13 +12,14 @@ import { getOrgPolicyQty } from '@/services/adminx/org/policy';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
 import { App, OrgRoleKind, User } from '@/__generated__/adminx/graphql';
-import { formatArrayFilesRaw } from '@/services/files';
+import { formatArrayFilesRaw, getFilesRaw } from '@/services/files';
 
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [basisState] = store.useModel('basis'),
     [info, setInfo] = useState<User>(),
+    [avatar, setAvatar] = useState<string>(),
     [loading, setLoading] = useState<boolean>(false),
     [userQty, setUserQty] = useState<number>(0),
     [userGroupQty, setUserGroupQty] = useState<number>(0),
@@ -26,31 +27,40 @@ export default () => {
     [policyQty, setPolicyQty] = useState<number>(0),
     [myApps, setMyApps] = useState<App[]>([]);
 
-  const getRequest = async () => {
-    setLoading(true);
-    if (basisState.user?.id) {
-      const result = await getUserInfo(basisState.user.id);
-      if (result?.id) {
-        setInfo(result as User);
+  const
+    getRequest = async () => {
+      setLoading(true);
+      if (basisState.user?.id) {
+        const result = await getUserInfo(basisState.user.id);
+        if (result?.id) {
+          setInfo(result as User);
+          if (result.avatarFileID) {
+            await getAvatar(result.avatarFileID)
+          }
+          setUserQty(await getOrgUserQty(basisState.tenantId));
+          setUserGroupQty(await getOrgGroupQty());
+          setRoleQty(await getOrgRoleQty({ kind: OrgRoleKind.Role }));
+          setPolicyQty(await getOrgPolicyQty(basisState.tenantId, { appPolicyIDIsNil: true }));
 
-        setUserQty(await getOrgUserQty(basisState.tenantId));
-        setUserGroupQty(await getOrgGroupQty());
-        setRoleQty(await getOrgRoleQty({ kind: OrgRoleKind.Role }));
-        setPolicyQty(await getOrgPolicyQty(basisState.tenantId, { appPolicyIDIsNil: true }));
-
-        const orgAppsRes = await getOrgAppList(basisState.tenantId, {
-          pageSize: 999,
-        });
-        if (orgAppsRes) {
-          const orgApps = orgAppsRes.edges?.map(item => item?.node) as App[]
-          setMyApps(
-            await formatArrayFilesRaw(orgApps, 'logo', defaultApp)
-          );
+          const orgAppsRes = await getOrgAppList(basisState.tenantId, {
+            pageSize: 999,
+          });
+          if (orgAppsRes) {
+            const orgApps = orgAppsRes.edges?.map(item => item?.node) as App[]
+            setMyApps(
+              await formatArrayFilesRaw(orgApps, 'logo', defaultApp)
+            );
+          }
         }
       }
-    }
-    setLoading(false);
-  };
+      setLoading(false);
+    },
+    getAvatar = async (fileId: string) => {
+      const result = await getFilesRaw(fileId, 'url');
+      if (typeof result === 'string') {
+        setAvatar(result);
+      }
+    };
 
   useEffect(() => {
     getRequest();
@@ -64,7 +74,7 @@ export default () => {
         style: { background: token.colorBgContainer },
         children: <Row gutter={20}>
           <Col>
-            <Avatar size={64} src={defaultAvatar} />
+            <Avatar size={64} src={avatar || defaultAvatar} />
           </Col>
           <Col flex="auto">
             <div style={{ fontWeight: 'bold', fontSize: '16px', lineHeight: '38px' }}>{info?.displayName}</div>

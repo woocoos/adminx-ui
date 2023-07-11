@@ -40,6 +40,7 @@ const schemaWithMocks = addMocksToSchema({
       apps: relayStylePaginationMock(store),
     },
     User: {
+      avatarFileID: () => 'png',
       permissions: relayStylePaginationMock(store),
     },
     Query: {

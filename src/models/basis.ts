@@ -6,6 +6,7 @@ import { User } from '@/__generated__/adminx/graphql';
 type BasisUserState = {
   id: string;
   displayName: string;
+  avatarFileId?: string;
 };
 
 type BasisModelState = {
@@ -81,10 +82,11 @@ export default createModel({
       if (payload.accessToken) {
         this.updateToken(payload.accessToken);
         if (payload.user) {
-          this.updateUser({
+          this.saveUser({
             id: payload.user.id,
             displayName: payload.user.displayName,
-          });
+            avatarFileID: payload.user?.avatarFileId || '',
+          } as User)
           if (payload.user.domains?.length) {
             if (!payload.user.domains.find(item => item.id == rootState.basis.tenantId)) {
               this.updateTenantId(payload.user.domains[0].id);
@@ -116,6 +118,7 @@ export default createModel({
       this.updateUser({
         id: user.id,
         displayName: user.displayName,
+        avatarFileId: user.avatarFileID || undefined,
       });
     },
     /**
