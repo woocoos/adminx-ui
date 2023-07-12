@@ -41,17 +41,17 @@ export default defineConfig(() => ({
   ],
   proxy: {
     '/api-adminx': {
-      target: isMockItems.adminx ? `http://localhost:${port}` : process.env.ICE_PROXY_ADMINX,
+      target: isMockItems.adminx ? `http://127.0.0.1:${port}` : process.env.ICE_PROXY_ADMINX,
       changeOrigin: true,
       pathRewrite: { '^/api-adminx': isMockItems.adminx ? '/mock-api-adminx' : '' },
     },
     '/api-files': {
-      target: isMockItems.files ? `http://localhost:${port}` : process.env.ICE_PROXY_FILES,
+      target: isMockItems.files ? `http://127.0.0.1:${port}` : process.env.ICE_PROXY_FILES,
       changeOrigin: true,
       pathRewrite: { '^/api-files': isMockItems.files ? '/mock-api-files' : '' },
     },
     '/api-auth': {
-      target: isMockItems.auth ? `http://localhost:${port}` : process.env.ICE_PROXY_AUTH,
+      target: isMockItems.auth ? `http://127.0.0.1:${port}` : process.env.ICE_PROXY_AUTH,
       changeOrigin: true,
       pathRewrite: { '^/api-auth': isMockItems.auth ? '/mock-api-auth' : '' },
     },
