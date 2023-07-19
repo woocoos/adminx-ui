@@ -34,7 +34,7 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [oldInfo, setOldInfo] = useState<Org>();
@@ -60,7 +60,7 @@ export default (props: {
           result.push(...(data.edges?.map(item => item?.node) as Org[] || []));
         }
       } else {
-        const data = await getOrgPathList(basisState.tenantId, props.kind);
+        const data = await getOrgPathList(userState.tenantId, props.kind);
         if (data.length) {
           result.push(...data);
         }

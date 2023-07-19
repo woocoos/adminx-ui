@@ -2,10 +2,11 @@ import React, { useCallback } from 'react';
 import { LogoutOutlined } from '@ant-design/icons';
 import { Dropdown, Avatar } from 'antd';
 import styles from './index.module.css';
-import { logout } from '@/services/basis';
+import { logout } from '@/services/auth';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { checkLave } from '@/components/LeavePrompt';
+import { goLogin } from '@/util';
 
 interface AvatarDropdownProps {
   name: string;
@@ -14,7 +15,7 @@ interface AvatarDropdownProps {
 
 const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
   const { t } = useTranslation(),
-    [, basisDispatcher] = store.useModel('basis');
+    [, userDispatcher] = store.useModel('user');
 
   const onMenuClick = useCallback((event) => {
     const { key } = event;
@@ -22,7 +23,8 @@ const AvatarDropdown: React.FC<AvatarDropdownProps> = ({ name, avatar }) => {
       checkLave(() => {
         // 即使退出接口异常前端也需要直接退出掉所以不需要同步处理
         logout();
-        basisDispatcher.logout();
+        userDispatcher.logout();
+        goLogin();
       });
     }
   }, []);

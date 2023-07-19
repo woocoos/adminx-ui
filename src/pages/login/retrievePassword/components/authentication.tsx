@@ -2,7 +2,7 @@ import { ProFormText, LoginForm } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { Link } from '@ice/runtime';
-import { CaptchaRes, ForgetPwdBeginRes, captcha, forgetPwdBegin } from '@/services/basis';
+import { CaptchaRes, ForgetPwdBeginRes, captcha, forgetPwdBegin } from '@/services/auth';
 
 export default (
   props: {

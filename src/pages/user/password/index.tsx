@@ -6,6 +6,7 @@ import { updatePassword } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { Link } from '@ice/runtime';
+import { goLogin } from '@/util';
 
 type FormValues = { oldPwd: string; newPwd: string; reNewPwd: string };
 
@@ -15,7 +16,7 @@ export default () => {
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
-    [, basisDispatcher] = store.useModel('basis');
+    [, userDispatcher] = store.useModel('user');
 
   setLeavePromptWhen(saveDisabled);
 
@@ -33,7 +34,8 @@ export default () => {
       const result = await updatePassword(values.oldPwd, values.newPwd);
       if (result === true) {
         message.success(t('submit_success'));
-        await basisDispatcher.logout();
+        await userDispatcher.logout();
+        goLogin();
         setSaveDisabled(true);
       }
       setSaveLoading(false);

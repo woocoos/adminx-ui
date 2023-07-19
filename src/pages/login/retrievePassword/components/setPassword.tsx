@@ -1,4 +1,4 @@
-import { forgetPwdReset } from '@/services/basis';
+import { forgetPwdReset } from '@/services/auth';
 import { LoginForm, ProFormInstance, ProFormText } from '@ant-design/pro-components';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

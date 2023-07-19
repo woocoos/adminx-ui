@@ -1,6 +1,6 @@
 import { User } from '@/__generated__/adminx/graphql';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { unbindMfa } from '@/services/basis';
+import { unbindMfa } from '@/services/auth';
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
 import { Alert } from 'antd';
 import { useState } from 'react';

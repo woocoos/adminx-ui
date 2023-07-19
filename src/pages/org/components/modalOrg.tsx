@@ -21,7 +21,7 @@ export default (props: {
   onClose: (selectData?: Org[]) => void;
 }) => {
   const { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
       { title: t('name'), dataIndex: 'name', width: 120 },
@@ -68,7 +68,7 @@ export default (props: {
       } else {
         let list: Org[] = [];
         if (props.kind === 'org') {
-          list = await getOrgPathList(props.orgId || basisState.tenantId, props.kind);
+          list = await getOrgPathList(props.orgId || userState.tenantId, props.kind);
           table.total = list.length;
         } else {
           where.kind = props.kind;

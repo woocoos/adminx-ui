@@ -4,10 +4,10 @@ import KeepAlive from '@/components/KeepAlive';
 import { OrgRoleKind } from '@/__generated__/adminx/graphql';
 
 export default () => {
-  const [basisState] = store.useModel('basis');
+  const [userState] = store.useModel('user');
 
   return (<KeepAlive clearAlive>
-    <PageOrgRoleList kind={OrgRoleKind.Group} orgId={basisState.tenantId} />
+    <PageOrgRoleList kind={OrgRoleKind.Group} orgId={userState.tenantId} />
   </KeepAlive>
   );
 };

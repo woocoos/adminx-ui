@@ -16,7 +16,7 @@ export default () => {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [userInfo, setUserInfo] = useState<User>(),
-    [basisState, basisDispatcher] = store.useModel('basis');
+    [userState, userDispatcher] = store.useModel('user');
 
   setLeavePromptWhen(saveDisabled);
 
@@ -24,8 +24,8 @@ export default () => {
     getRequest = async () => {
       setSaveLoading(false);
       setSaveDisabled(true);
-      if (basisState.user?.id) {
-        const result = await getUserInfo(basisState.user.id);
+      if (userState.user?.id) {
+        const result = await getUserInfo(userState.user.id);
         if (result?.id) {
           setUserInfo(result as User);
           return result;
@@ -37,12 +37,12 @@ export default () => {
       setSaveDisabled(false);
     },
     onFinish = async (values) => {
-      if (basisState.user?.id) {
+      if (userState.user?.id) {
         setSaveLoading(true);
-        const result = await updateUserInfo(basisState.user.id, updateFormat(values, userInfo || {}));
+        const result = await updateUserInfo(userState.user.id, updateFormat(values, userInfo || {}));
         if (result?.id) {
           message.success(t('submit_success'));
-          await basisDispatcher.saveUser(result as User);
+          await userDispatcher.saveUser(result as User);
           setSaveDisabled(true);
         }
         setSaveLoading(false);

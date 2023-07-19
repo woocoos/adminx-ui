@@ -18,7 +18,7 @@ export default (props: {
   principalKind: PermissionPrincipalKind;
 }) => {
   const { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<Permission>[] = [
@@ -131,7 +131,7 @@ export default (props: {
       const table = { data: [] as Permission[], success: true, total: 0 },
         where: PermissionWhereInput = {};
       where.principalKind = props.principalKind;
-      where.orgID = basisState.tenantId;
+      where.orgID = userState.tenantId;
       if (params.orgRoleId) {
         where.hasRoleWith = [{
           id: params.orgRoleId || undefined,
@@ -223,7 +223,7 @@ export default (props: {
         }}
       />
       {modal.open ? <DrawerRolePolicy
-        orgId={basisState.tenantId}
+        orgId={userState.tenantId}
         userInfo={props.userInfo}
         open={modal.open}
         title={`${t('add_permission')}`}

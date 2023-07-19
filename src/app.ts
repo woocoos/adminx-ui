@@ -5,13 +5,14 @@ import { defineRequestConfig } from '@ice/plugin-request/esm/types';
 import { message } from 'antd';
 import store from '@/store';
 import '@/assets/styles/index.css';
-import { getItem } from '@/pkg/localStore';
+import { getItem, removeItem } from '@/pkg/localStore';
 import { userPermissions } from './services/adminx/user';
-import { browserLanguage } from './util';
+import { browserLanguage, goLogin } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import i18n from './i18n';
 import { User } from './__generated__/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
+import { isInIcestark } from '@ice/stark-app';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -32,6 +33,14 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
+  if (!isInIcestark()) {
+    const sign = 'sign_cid=adminx'
+    if (document.cookie.indexOf(sign) === -1) {
+      removeItem('token')
+      removeItem('refreshToken')
+    }
+    document.cookie = sign
+  }
   let locale = getItem<string>('locale'),
     token = getItem<string>('token'),
     refreshToken = getItem<string>('refreshToken'),
@@ -56,12 +65,14 @@ export const dataLoader = defineDataLoader(async () => {
   }
 
   return {
-    basis: {
+    app: {
       locale,
-      token,
-      refreshToken,
       darkMode,
       compactMode,
+    },
+    user: {
+      token,
+      refreshToken,
       tenantId,
       user,
     },
@@ -70,13 +81,13 @@ export const dataLoader = defineDataLoader(async () => {
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const { basis } = appData,
+  const { user } = appData,
     initialAuth = {};
   // 判断路由权限
-  if (basis.token) {
+  if (user.token) {
     const ups = await userPermissions({
-      Authorization: `Bearer ${basis.token}`,
-      'X-Tenant-ID': basis.tenantId,
+      Authorization: `Bearer ${user.token}`,
+      'X-Tenant-ID': user.tenantId,
     });
     if (ups) {
       ups.forEach(item => {
@@ -86,7 +97,8 @@ export const authConfig = defineAuthConfig(async (appData) => {
       });
     }
   } else {
-    store.dispatch.basis.logout();
+    store.dispatch.user.logout();
+    goLogin();
   }
   return {
     initialAuth,
@@ -95,10 +107,11 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const { basis } = appData;
+  const { app, user } = appData;
   return {
     initialStates: {
-      basis,
+      app,
+      user,
     },
   };
 });
@@ -110,12 +123,12 @@ export const requestConfig = defineRequestConfig(() => {
       interceptors: {
         request: {
           onConfig(config: any) {
-            const basisState = store.getModelState('basis');
-            if (!config.headers['Authorization'] && basisState.token) {
-              config.headers['Authorization'] = `Bearer ${basisState.token}`;
+            const userState = store.getModelState('user');
+            if (!config.headers['Authorization'] && userState.token) {
+              config.headers['Authorization'] = `Bearer ${userState.token}`;
             }
-            if (!config.headers['X-Tenant-ID'] && basisState.tenantId) {
-              config.headers['X-Tenant-ID'] = basisState.tenantId;
+            if (!config.headers['X-Tenant-ID'] && userState.tenantId) {
+              config.headers['X-Tenant-ID'] = userState.tenantId;
             }
 
             return config;
@@ -139,7 +152,8 @@ export const requestConfig = defineRequestConfig(() => {
             }
             switch (errRes.status) {
               case 401:
-                store.dispatch.basis.logout();
+                store.dispatch.user.logout();
+                goLogin();
                 if (!msg) {
                   msg = i18n.t('401');
                 }

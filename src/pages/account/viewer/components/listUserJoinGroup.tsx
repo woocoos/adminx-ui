@@ -15,7 +15,7 @@ export default (props: {
   userInfo: User;
 }) => {
   const { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<OrgRole>[] = [
@@ -142,7 +142,7 @@ export default (props: {
       {modal.open ? <DrawerRole
         title={`${t('add_user_group')}`}
         open={modal.open}
-        orgId={basisState.tenantId}
+        orgId={userState.tenantId}
         kind={OrgRoleKind.Group}
         userInfo={props.userInfo}
         onClose={(isSuccess) => {

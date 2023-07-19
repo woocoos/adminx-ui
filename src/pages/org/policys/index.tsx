@@ -16,7 +16,7 @@ export const PageOrgPolicys = (props: {
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     [searchParams] = useSearchParams(),
     [orgInfo, setOrgInfo] = useState<Org>(),
     // 表格相关
@@ -85,7 +85,7 @@ export const PageOrgPolicys = (props: {
 
   const
     getOrg = async () => {
-      const orgId = searchParams.get('id') || basisState.tenantId;
+      const orgId = searchParams.get('id') || userState.tenantId;
       if (orgId) {
         const result = await getOrgInfo(orgId);
         if (result?.id) {

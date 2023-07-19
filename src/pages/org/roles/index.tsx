@@ -285,9 +285,9 @@ export const PageOrgRoleList = (props: {
 };
 
 export default () => {
-  const [basisState] = store.useModel('basis');
+  const [userState] = store.useModel('user');
 
   return (<KeepAlive clearAlive>
-    <PageOrgRoleList orgId={basisState.tenantId} />
+    <PageOrgRoleList orgId={userState.tenantId} />
   </KeepAlive>);
 };

@@ -1,4 +1,4 @@
-import { forgetPwdVerifyMfa } from '@/services/basis';
+import { forgetPwdVerifyMfa } from '@/services/auth';
 import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

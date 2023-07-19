@@ -3,7 +3,7 @@ import { ProFormText, LoginForm } from '@ant-design/pro-components';
 import logo from '@/assets/images/woocoo.png';
 import Sha256 from 'crypto-js/sha256';
 import { useTranslation } from 'react-i18next';
-import { CaptchaRes, LoginRes, captcha, login } from '@/services/basis';
+import { CaptchaRes, LoginRes, captcha, login } from '@/services/auth';
 import { useEffect, useState } from 'react';
 import { Link } from '@ice/runtime';
 

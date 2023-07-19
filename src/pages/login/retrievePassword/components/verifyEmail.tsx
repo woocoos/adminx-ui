@@ -1,4 +1,4 @@
-import { forgetPwdSendEmail, forgetPwdVerifyEmail } from '@/services/basis';
+import { forgetPwdSendEmail, forgetPwdVerifyEmail } from '@/services/auth';
 import { LoginForm, ProFormCaptcha } from '@ant-design/pro-components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

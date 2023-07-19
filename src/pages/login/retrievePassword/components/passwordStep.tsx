@@ -5,7 +5,7 @@ import VerifyEmail from './verifyEmail';
 import VerifyMfa from './verifyMfa';
 import SetPassword from './setPassword';
 import { Link } from '@ice/runtime';
-import { ForgetPwdBeginRes } from '@/services/basis';
+import { ForgetPwdBeginRes } from '@/services/auth';
 
 export default (props: {
   token: ForgetPwdBeginRes;

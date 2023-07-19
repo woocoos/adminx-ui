@@ -1,4 +1,4 @@
-import { ForgetPwdBeginRes } from '@/services/basis';
+import { ForgetPwdBeginRes } from '@/services/auth';
 import Authentication from './components/authentication';
 import PasswordStep from './components/passwordStep';
 import styles from '../index.module.css';

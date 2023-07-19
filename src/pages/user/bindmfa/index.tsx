@@ -4,7 +4,7 @@ import { Link, history } from '@ice/runtime';
 import { Alert, QRCode, Result, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MfaPrepare, bindMfa, bindPrepareMfa } from '@/services/basis';
+import { MfaPrepare, bindMfa, bindPrepareMfa } from '@/services/auth';
 import { getUserInfoLoginProfile } from '@/services/adminx/user';
 import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { User } from '@/__generated__/adminx/graphql';
@@ -16,7 +16,7 @@ export default () => {
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
     [mfaInfo, setMfaInfo] = useState<MfaPrepare>(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     [qrcodeValue, setQrcodeValue] = useState<string>(''),
     [qrcodeLoading, setQrcodeLoading] = useState(false),
     [surplus, setSurplus] = useState(0),
@@ -27,9 +27,9 @@ export default () => {
 
   const
     getRequest = async () => {
-      if (basisState.user?.id) {
+      if (userState.user?.id) {
         setLoading(true);
-        const result = await getUserInfoLoginProfile(basisState.user.id);
+        const result = await getUserInfoLoginProfile(userState.user.id);
         if (result?.id) {
           setInfo(result as User);
           if (!result.loginProfile?.mfaEnabled) {

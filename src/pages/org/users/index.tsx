@@ -20,7 +20,7 @@ export const PageOrgUsers = (props: {
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [appState] = store.useModel('app'),
     [treeDraggable, setTreeDraggable] = useState(false),
     [stretch, setStretch] = useState(false),
     [loading, setLoading] = useState(false),
@@ -144,7 +144,7 @@ export const PageOrgUsers = (props: {
           </div>
         </Col>
         <Col flex="auto">
-          <div x-if={allOrgList.length > 1} className={`stretch ${basisState.darkMode ? 'dark' : ''}`} onClick={() => { setStretch(!stretch); }}>
+          <div x-if={allOrgList.length > 1} className={`stretch ${appState.darkMode ? 'dark' : ''}`} onClick={() => { setStretch(!stretch); }}>
             {stretch ? <RightOutlined /> : <LeftOutlined />}
           </div>
           <UserList
@@ -164,10 +164,10 @@ export const PageOrgUsers = (props: {
 
 
 export default () => {
-  const [basisState] = store.useModel('basis');
+  const [userState] = store.useModel('user');
 
   return (<KeepAlive clearAlive>
-    <PageOrgUsers orgId={basisState.tenantId} />
+    <PageOrgUsers orgId={userState.tenantId} />
   </KeepAlive>
   );
 };

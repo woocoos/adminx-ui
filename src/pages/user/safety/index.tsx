@@ -14,7 +14,7 @@ export default () => {
     { token } = useToken(),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     [modal, setModal] = useState<{
       open: boolean;
     }>({
@@ -23,9 +23,9 @@ export default () => {
 
   const
     getRequest = async () => {
-      if (basisState.user?.id) {
+      if (userState.user?.id) {
         setLoading(true);
-        const result = await getUserInfoLoginProfile(basisState.user.id);
+        const result = await getUserInfoLoginProfile(userState.user.id);
         if (result?.id) {
           setInfo(result as User);
         }

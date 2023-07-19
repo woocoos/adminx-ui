@@ -1,6 +1,6 @@
 import { ProFormText, LoginForm } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { LoginRes, loginVerifyFactor } from '@/services/basis';
+import { LoginRes, loginVerifyFactor } from '@/services/auth';
 import { useState } from 'react';
 
 export default (

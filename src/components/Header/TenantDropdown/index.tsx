@@ -8,7 +8,7 @@ import { Org } from '@/__generated__/adminx/graphql';
 
 export default () => {
   const { t } = useTranslation(),
-    [basis, basisDispatcher] = store.useModel('basis'),
+    [userState, userDispatcher] = store.useModel('user'),
     [orgInfo, setOrgInfo] = useState<Org>(),
     [menu, setMenu] = useState<MenuProps>();
 
@@ -16,9 +16,9 @@ export default () => {
     getRequest = async () => {
       const result = await userRootOrgs();
       if (result) {
-        setOrgInfo(result.find(item => item?.id == basis.tenantId) as Org);
+        setOrgInfo(result.find(item => item?.id == userState.tenantId) as Org);
         setMenu({
-          items: result.filter(item => item?.id != basis.tenantId).map(item => {
+          items: result.filter(item => item?.id != userState.tenantId).map(item => {
             return {
               key: item?.id || '',
               label: item?.name || '',
@@ -35,7 +35,7 @@ export default () => {
           title: t('tenant_switch_reminder'),
           content: t('tenant_switch_context'),
           onOk: () => {
-            basisDispatcher.saveTenantId(key);
+            userDispatcher.saveTenantId(key);
             location.reload();
           },
         });
@@ -50,7 +50,7 @@ export default () => {
       document.body.innerHTML = `<div style="width:370px;margin:40px auto 0 auto;">${tipStr}</div>`;
       window.close();
     }
-  }, [basis.tenantId]);
+  }, [userState.tenantId]);
 
   useEffect(() => {
     getRequest();

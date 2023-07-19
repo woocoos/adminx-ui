@@ -30,7 +30,7 @@ export const UserList = (props: {
   const { token } = useToken(),
     { t } = useTranslation(),
     [auth] = useAuth(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     [dataSource, setDataSource] = useState<User[]>([]),
@@ -438,7 +438,7 @@ export const UserList = (props: {
       {modal.scene === 'create' ? <AccountCreate
         open={modal.open}
         title={modal.title}
-        orgId={basisState.tenantId}
+        orgId={userState.tenantId}
         userType={props.userType || UserUserType.Member}
         scene="create"
         onClose={(isSuccess) => {
@@ -454,7 +454,7 @@ export const UserList = (props: {
         modal.scene === 'add' && props.orgId && modal.open ? <DrawerUser
           open={modal.open}
           title={modal.title}
-          orgId={basisState.tenantId}
+          orgId={userState.tenantId}
           orgRole={props.orgRole}
           orgInfo={props.orgInfo}
           userType={props.userType}

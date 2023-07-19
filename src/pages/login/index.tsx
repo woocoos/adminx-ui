@@ -2,7 +2,7 @@ import styles from './index.module.css';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import Login from './components/login';
-import { LoginRes } from '@/services/basis';
+import { LoginRes } from '@/services/auth';
 import { useState } from 'react';
 import MfaVerify from './components/mfaVerify';
 import { Result, message } from 'antd';
@@ -11,14 +11,14 @@ import ResetPassword from './components/resetPassword';
 export default () => {
   const { t } = useTranslation(),
     [res, setRes] = useState<LoginRes>(),
-    [, basisDispatcher] = store.useModel('basis');
+    [, userDispatcher] = store.useModel('user');
 
   document.title = t('login');
 
   async function loginSuccess(result: LoginRes) {
     setRes(result);
     if (result?.accessToken) {
-      await basisDispatcher.login(result);
+      await userDispatcher.loginAfter(result);
       message.success(t('login_success'));
       const urlParams = (new URL(window.location.href)).searchParams;
       location.replace(urlParams.get('redirect') || '/');

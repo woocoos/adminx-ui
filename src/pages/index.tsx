@@ -17,7 +17,7 @@ import { formatArrayFilesRaw, getFilesRaw } from '@/services/files';
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     [info, setInfo] = useState<User>(),
     [avatar, setAvatar] = useState<string>(),
     [loading, setLoading] = useState<boolean>(false),
@@ -30,19 +30,19 @@ export default () => {
   const
     getRequest = async () => {
       setLoading(true);
-      if (basisState.user?.id) {
-        const result = await getUserInfo(basisState.user.id);
+      if (userState.user?.id) {
+        const result = await getUserInfo(userState.user.id);
         if (result?.id) {
           setInfo(result as User);
           if (result.avatarFileID) {
             await getAvatar(result.avatarFileID)
           }
-          setUserQty(await getOrgUserQty(basisState.tenantId));
+          setUserQty(await getOrgUserQty(userState.tenantId));
           setUserGroupQty(await getOrgGroupQty());
           setRoleQty(await getOrgRoleQty({ kind: OrgRoleKind.Role }));
-          setPolicyQty(await getOrgPolicyQty(basisState.tenantId, { appPolicyIDIsNil: true }));
+          setPolicyQty(await getOrgPolicyQty(userState.tenantId, { appPolicyIDIsNil: true }));
 
-          const orgAppsRes = await getOrgAppList(basisState.tenantId, {
+          const orgAppsRes = await getOrgAppList(userState.tenantId, {
             pageSize: 999,
           });
           if (orgAppsRes) {

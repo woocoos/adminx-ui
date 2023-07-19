@@ -6,10 +6,10 @@ import { OrgKind } from '@/__generated__/adminx/graphql';
 export default (props: {
   isFromSystem?: boolean;
 }) => {
-  const [basisState] = store.useModel('basis'),
+  const [userState] = store.useModel('user'),
     [searchParams] = useSearchParams();
 
   return (
-    <OrgList kind={OrgKind.Org} tenantId={searchParams.get('id') || basisState.tenantId} isFromSystem={props.isFromSystem} />
+    <OrgList kind={OrgKind.Org} tenantId={searchParams.get('id') || userState.tenantId} isFromSystem={props.isFromSystem} />
   );
 };

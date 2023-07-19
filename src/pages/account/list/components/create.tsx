@@ -38,14 +38,14 @@ export default (props: {
     [initValues, setInitValues] = useState<User | UserLoginProfile | null>(null),
     [domain, setDomain] = useState<string>(''),
     [setKind, setSetKind] = useState<UserLoginProfileSetKind>(UserLoginProfileSetKind.Auto),
-    [basisState] = store.useModel('basis');
+    [userState] = store.useModel('user');
 
   setLeavePromptWhen(saveDisabled);
 
   const
     getBase = async () => {
-      if (basisState.tenantId) {
-        const result = await getOrgInfo(basisState.tenantId);
+      if (userState.tenantId) {
+        const result = await getOrgInfo(userState.tenantId);
         if (result?.id) {
           setDomain(result.domain || '');
         }
@@ -132,7 +132,7 @@ export default (props: {
               password: Sha256(values.password || '').toString(),
             };
           }
-          const result = await createUserInfo(props?.orgId || basisState.tenantId, {
+          const result = await createUserInfo(props?.orgId || userState.tenantId, {
             mobile: values.mobile,
             email: values.email,
             principalName: values.principalName || '',

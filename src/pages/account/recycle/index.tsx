@@ -12,7 +12,7 @@ import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/a
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
-    [basisState] = store.useModel('basis'),
+    [userState] = store.useModel('user'),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<User>[] = [
@@ -123,7 +123,7 @@ export default () => {
     <CreateAccount
       open={modal.open}
       title={modal.title}
-      orgId={basisState.tenantId}
+      orgId={userState.tenantId}
       recycleInfo={modal.data}
       scene="recycle"
       userType={UserUserType.Member}

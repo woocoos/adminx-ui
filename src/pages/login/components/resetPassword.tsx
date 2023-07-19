@@ -1,6 +1,6 @@
 import { ProFormText, LoginForm, ProFormInstance } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { LoginRes, loginResetPassword } from '@/services/basis';
+import { LoginRes, loginResetPassword } from '@/services/auth';
 import { useRef, useState } from 'react';
 import Sha256 from 'crypto-js/sha256';
 
