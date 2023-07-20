@@ -19,6 +19,7 @@ import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import enUS from 'antd/locale/en_US';
 import { Locale } from 'antd/es/locale';
+import { NodeExpandOutlined } from '@ant-design/icons';
 
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
@@ -114,7 +115,13 @@ export default () => {
             />,
             <DarkMode />,
           ]}
-          menuItemRender={(item, defaultDom) => (item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom)}
+          menuItemRender={(item, defaultDom) => (item.path ? <>
+            <Link to={item.path}>{defaultDom}</Link>
+            <NodeExpandOutlined className={styles.menuIconPopup} onClick={() => {
+              window.open(item.path)
+            }} />
+          </>
+            : defaultDom)}
         >
           <AliveScope>
             <Outlet />
