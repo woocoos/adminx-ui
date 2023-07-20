@@ -105,17 +105,15 @@ export default () => {
             pathname: location.pathname,
           }}
           layout="mix"
-          rightContentRender={() => (
-            <>
-              <I18nDropdown />
-              <TenantDropdown />
-              <AvatarDropdown
-                avatar={avatar || defaultAvatar}
-                name={userState.user?.displayName || ''}
-              />
-              <DarkMode />
-            </>
-          )}
+          actionsRender={() => [
+            <I18nDropdown />,
+            <TenantDropdown />,
+            <AvatarDropdown
+              avatar={avatar || defaultAvatar}
+              name={userState.user?.displayName || ''}
+            />,
+            <DarkMode />,
+          ]}
           menuItemRender={(item, defaultDom) => (item.path ? <Link to={item.path}>{defaultDom}</Link> : defaultDom)}
         >
           <AliveScope>

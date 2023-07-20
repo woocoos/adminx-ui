@@ -5,6 +5,7 @@ import store from '@/store';
 import { useEffect, useState } from 'react';
 import { userRootOrgs } from '@/services/adminx/user';
 import { Org } from '@/__generated__/adminx/graphql';
+import styles from './index.module.css';
 
 export default () => {
   const { t } = useTranslation(),
@@ -57,8 +58,8 @@ export default () => {
   }, []);
 
   return orgInfo ? <Dropdown menu={menu} disabled={menu?.items?.length === 0}>
-    <span style={{ margin: '0 12px' }}>
-      {orgInfo.name}
+    <span className={styles.action}>
+      <span>{orgInfo.name}</span>
     </span>
   </Dropdown> : <></>;
 };

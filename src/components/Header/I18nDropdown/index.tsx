@@ -42,7 +42,7 @@ const I18nDropdown: React.FC = () => {
 
   return (
     <Dropdown menu={menu}>
-      <span className={`${styles.action} ${styles.account}`}>
+      <span className={styles.action}>
         <span>{locale}</span>
       </span>
     </Dropdown>
