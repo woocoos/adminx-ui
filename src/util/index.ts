@@ -31,7 +31,7 @@ export const parseGid = (gid: string) => {
  */
 export const goLogin = () => {
   if (!location.pathname.split('/').includes('login')) {
-    location.href = `/login?redirect=${encodeURIComponent(location.href)}`
+    location.href = `${process.env.ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
   }
 }
 
