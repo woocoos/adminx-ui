@@ -2,7 +2,7 @@ pipeline{
     agent any
     environment {
         DOCKER_BUILDKIT = "1"
-        DOCKER_HOST= "nexus.hycapital.hk:192.168.0.14"
+        NEXUS_HOST= "nexus.hycapital.hk:192.168.0.14"
         REGISTRY_SERVER = "registry.hycapital.hk"
         ADMINX_IMAGE_NAME = "woocoos/adminx-ui"
         VERSION = "v0.0.1"
@@ -17,7 +17,6 @@ pipeline{
                     } catch(exception) {
                         echo 'there is no tag in repo'
                     }
-
                 }
             }
         }
@@ -31,7 +30,7 @@ pipeline{
                         } else {
                             tagName = "${VERSION}.${env.GitCommitID}"
                         }
-                        def image = docker.build("${ADMINX_IMAGE_NAME}:${tagName}")
+                        def image = docker.build("${ADMINX_IMAGE_NAME}:${tagName}","--add-host ${NEXUS_HOST} -f Dockerfile .")
                         image.push()
                     }
                     if (tagName) {
