@@ -7,11 +7,11 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 
 WORKDIR /build/adminx-ui
 
-RUN npm install -g pnpm && pnpm -v
+RUN npm install -g pnpm && pnpm -v && pnpm config get registry && pnpm config set registry http://nexus.hycapital.hk/repository/npm-group/
 
 ADD package.json .
 ADD pnpm-lock.yaml .
-RUN pnpm install --registry=http://nexus.hycapital.hk/repository/npm-group/
+RUN pnpm install
 
 COPY . .
 RUN cat .env
