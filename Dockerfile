@@ -11,13 +11,13 @@ RUN npm install -g pnpm && pnpm -v
 
 ADD package.json .
 ADD pnpm-lock.yaml .
-RUN pnpm install
+RUN pnpm install --registry=http://nexus.hycapital.hk/repository/npm-group/
 
 COPY . .
 RUN cat .env
 RUN pnpm run build
 
-FROM nginx:1.25.1-alpine
+FROM nginx:1.24.0-alpine-slim
 
 COPY --from=builder /usr/share/zoneinfo/UTC /usr/share/zoneinfo/UTC
 COPY --from=builder /usr/share/zoneinfo/Asia/Hong_Kong /usr/share/zoneinfo/Asia/Hong_Kong
