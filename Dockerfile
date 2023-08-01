@@ -11,7 +11,7 @@ RUN npm install -g pnpm && pnpm -v
 
 ADD package.json .
 ADD pnpm-lock.yaml .
-RUN pnpm install --registry=http://nexus.hycapital.hk/repository/npm-group/
+RUN pnpm install
 
 COPY . .
 RUN cat .env

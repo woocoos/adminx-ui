@@ -17,6 +17,7 @@ pipeline{
                     } catch(exception) {
                         echo 'there is no tag in repo'
                     }
+
                 }
             }
         }
@@ -30,8 +31,7 @@ pipeline{
                         } else {
                             tagName = "${VERSION}.${env.GitCommitID}"
                         }
-
-                        def image = docker.build("${ADMINX_IMAGE_NAME}:${tagName}","--add-host ${DOCKER_HOST} .")
+                        def image = docker.build("${ADMINX_IMAGE_NAME}:${tagName}")
                         image.push()
                     }
                     if (tagName) {
