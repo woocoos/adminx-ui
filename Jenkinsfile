@@ -31,7 +31,7 @@ pipeline{
                             tagName = "${VERSION}.${env.GitCommitID}"
                         }
 
-                        def image = docker.build("${ADMINX_IMAGE_NAME}:${tagName}","--add-host ${DOCKER_HOST} -f Dockerfile .")
+                        def image = docker.build("${ADMINX_IMAGE_NAME}:${tagName}","--add-host nexus.hycapital.hk:192.168.0.14 -f Dockerfile .")
                         image.push()
                     }
                     if (tagName) {
