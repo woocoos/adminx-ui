@@ -83,7 +83,7 @@ export default () => {
   }, []);
 
 
-  return ['/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
+  return ['/login/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
     : <ProConfigProvider dark={appState.darkMode} >
       <ConfigProvider locale={locale}>
         <LeavePrompt />
