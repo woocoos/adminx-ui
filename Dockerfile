@@ -14,8 +14,7 @@ ADD pnpm-lock.yaml .
 RUN pnpm install
 
 COPY . .
-RUN cat .env
-RUN pnpm run build
+RUN cat .env && pnpm run build && rm -rf node_modules && rm -rf src
 
 FROM nginx:1.24.0-alpine-slim
 
