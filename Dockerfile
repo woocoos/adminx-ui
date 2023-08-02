@@ -24,8 +24,9 @@ ENV TZ Asia/Hong_Kong
 
 WORKDIR /app
 
-COPY --from=builder /build /usr/share/nginx/html
+COPY --from=builder /build/adminx-ui/build /usr/share/nginx/html
+RUN chmod -R 777 /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
