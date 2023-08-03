@@ -14,7 +14,7 @@ ADD pnpm-lock.yaml .
 RUN pnpm install
 
 COPY . .
-RUN cat .env && pnpm run build && rm -rf node_modules && rm -rf src
+RUN cat .env && pnpm run build
 
 FROM nginx:1.24.0-alpine-slim
 
@@ -24,9 +24,7 @@ ENV TZ Asia/Hong_Kong
 
 WORKDIR /app
 
-COPY --from=builder /build/adminx-ui/build /usr/share/nginx/html
-RUN chown -R nginx:nginx /usr/share/nginx/html
-RUN chmod -R 755 /usr/share/nginx/html
+COPY --from=builder /build/adminx-ui/build ./adminx-ui
 
 EXPOSE 8080
 
