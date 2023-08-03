@@ -4,6 +4,7 @@ pipeline{
         DOCKER_BUILDKIT = "1"
         ADMINX_IMAGE_NAME = "woocoos/adminx-ui"
         VERSION = "v0.0.1"
+        GitTag = ""
     }
     stages{
         stage("build") {
@@ -12,17 +13,17 @@ pipeline{
                     env.GitCommitID = sh (script: 'git rev-parse --short HEAD', returnStdout: true).trim()
                     try{
                         env.GitTag = sh (script: "git describe --tags ${env.GitCommitID}", returnStdout: true).trim()
-                        // 根据分支覆盖.env
-                        def tagName = env.GitTag
-                        if (tagName.startsWith("uat-")){
-                          // uat
-                        } else {
-                          // dev
-                          sh "echo 'ICE_APP_CODE=resource' > .env"
-                          sh "echo 'ICE_LOGIN_URL=/login' >> .env"
-                        }
                     } catch(exception) {
                         echo 'there is no tag in repo'
+                    }
+                    // 根据分支覆盖.env
+                    def tagName = env.GitTag
+                    if (tagName.startsWith("uat-")){
+                      // uat
+                    } else {
+                      // dev
+                      sh "echo 'ICE_APP_CODE=resource' > .env"
+                      sh "echo 'ICE_LOGIN_URL=/login' >> .env"
                     }
                 }
             }
