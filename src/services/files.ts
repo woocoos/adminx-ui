@@ -37,6 +37,9 @@ export async function updateFiles(data: {
  * @returns
  */
 export async function getFiles(fileId: string) {
+  if (fileId == '0') {
+    return null;
+  }
   const result = await request.get(`${baseURL}/files/${fileId}`)
   if (result?.id) {
     return result as Files;
@@ -50,6 +53,9 @@ export async function getFiles(fileId: string) {
  * @returns
  */
 export async function delFiles(fileId: string) {
+  if (fileId == '0') {
+    return null;
+  }
   const result = await request.delete(`${baseURL}/files/${fileId}`)
   return result;
 }
@@ -63,6 +69,9 @@ export async function delFiles(fileId: string) {
  * @returns
  */
 export async function getFilesRaw(fileId: string, type?: 'url') {
+  if (fileId == '0') {
+    return null;
+  }
   const result = await request.get(`${baseURL}/files/${fileId}/raw`, {
     responseType: "blob",
   })
