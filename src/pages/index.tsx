@@ -48,7 +48,7 @@ export default () => {
           if (orgAppsRes) {
             const orgApps = orgAppsRes.edges?.map(item => item?.node) as App[]
             setMyApps(
-              await formatArrayFilesRaw(orgApps, 'logo', defaultApp)
+              await formatArrayFilesRaw(orgApps, 'logo')
             );
           }
         }
@@ -130,7 +130,7 @@ export default () => {
             colSpan={6}
             title={
               <Space>
-                <Avatar src={item.logo} />
+                <Avatar src={item.logo || defaultApp} />
                 <span style={{ display: 'inline-block', lineHeight: '30px' }} >{item.name}</span>
               </Space>
             }
