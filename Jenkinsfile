@@ -4,7 +4,6 @@ pipeline{
         DOCKER_BUILDKIT = "1"
         ADMINX_IMAGE_NAME = "woocoos/adminx-ui"
         VERSION = "v0.0.1"
-        GitTag = ""
     }
     stages{
         stage("build") {
@@ -18,6 +17,9 @@ pipeline{
                     }
                     // 根据分支覆盖.env
                     def tagName = env.GitTag
+                    if (!tagName){
+                      tagName = ""
+                    }
                     if (tagName.startsWith("uat-")){
                       // uat
                     } else {
