@@ -106,6 +106,7 @@ const schemaWithMocks = addMocksToSchema({
       ],
       userRootOrgs: () => [
         store.get('Org', 1),
+        store.get('Org', 10),
       ],
       orgRecycleUsers: relayStylePaginationMock(store),
       globalID: (_, { type, id }) => btoa(`${type}:${id}`),

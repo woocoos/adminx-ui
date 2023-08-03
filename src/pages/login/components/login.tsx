@@ -48,8 +48,8 @@ export default (
       logo={<img alt="logo" src={logo} />}
       subTitle={t('manage_system')}
       initialValues={{
-        username: 'admin',
-        password: '123456',
+        // username: 'admin',
+        // password: '123456',
       }}
       submitter={{
         searchConfig: {

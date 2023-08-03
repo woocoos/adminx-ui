@@ -78,6 +78,7 @@ export const initStoreData = (store: IMockStore) => {
     ])
   })
   store.set('Org', 4, { id: 4, name: 'org2-1', code: 'org2-1', domain: '', parentID: 2, kind: 'org' })
+  store.set('Org', 10, { id: 10, name: 'org10', code: 'org10', domain: '', parentID: 0, kind: 'root' })
 
   // OrgRole
   store.set('OrgRole', 1, { id: 1, name: 'org1group1', kind: 'group', orgID: 1 })
