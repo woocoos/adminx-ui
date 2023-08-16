@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { gql } from '@/__generated__/adminx';
-import { AppActionKind, AppActionMethod, AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { gql } from '@/generated/adminx';
+import { AppActionKind, AppActionMethod, AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
@@ -186,7 +186,7 @@ export async function getUserList(gather: {
   where?: UserWhereInput;
   orderBy?: UserOrder;
 }) {
-  const result = await pagingRequest(queryUserList, {
+  const result = await paging(queryUserList, {
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
@@ -203,7 +203,7 @@ export async function getUserList(gather: {
  * @returns
  */
 export async function getUserInfo(userId: string) {
-  const result = await queryRequest(queryUserInfo, {
+  const result = await query(queryUserInfo, {
     gid: gid('user', userId),
   });
 
@@ -219,7 +219,7 @@ export async function getUserInfo(userId: string) {
  * @returns
  */
 export async function getUserInfoLoginProfile(userId: string) {
-  const result = await queryRequest(queryUserInfoLoginProfile, {
+  const result = await query(queryUserInfoLoginProfile, {
     gid: gid('user', userId),
   })
 
@@ -235,7 +235,7 @@ export async function getUserInfoLoginProfile(userId: string) {
  * @returns
  */
 export async function getUserInfoIdentities(userId: string) {
-  const result = await queryRequest(queryUserInfoIdentities, {
+  const result = await query(queryUserInfoIdentities, {
     gid: gid('user', userId),
   });
 
@@ -251,7 +251,7 @@ export async function getUserInfoIdentities(userId: string) {
  * @returns
  */
 export async function getUserInfoLoginProfileIdentities(userId: string) {
-  const result = await queryRequest(queryUserInfoLoginProfileIdentities, {
+  const result = await query(queryUserInfoLoginProfileIdentities, {
     gid: gid('user', userId),
   });
 
@@ -268,7 +268,7 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
  * @returns
  */
 export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
-  const result = await mutationRequest(
+  const result = await mutation(
     userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
     rootOrgID: rootOrgID,
     input,
@@ -288,7 +288,7 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
  * @returns
  */
 export async function updateUserInfo(userId: string, input: UpdateUserInput) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationUpdateUser, {
     userId,
     input,
@@ -307,7 +307,7 @@ export async function updateUserInfo(userId: string, input: UpdateUserInput) {
  * @returns
  */
 export async function updateUserProfile(userId: string, input: UpdateUserLoginProfileInput) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationUpdateUserLoginProfile, {
     userId,
     input,
@@ -326,7 +326,7 @@ export async function updateUserProfile(userId: string, input: UpdateUserLoginPr
  * @returns
  */
 export async function bindUserIdentity(input: CreateUserIdentityInput) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationBindUserIdentity, {
     input,
   });
@@ -343,7 +343,7 @@ export async function bindUserIdentity(input: CreateUserIdentityInput) {
  * @returns
  */
 export async function delUserIdentity(identityId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationDelUserIdentity, {
     identityId,
   });
@@ -360,7 +360,7 @@ export async function delUserIdentity(identityId: string) {
  * @returns
  */
 export async function delUserInfo(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationDelUser, {
     userId,
   });
@@ -377,7 +377,7 @@ export async function delUserInfo(userId: string) {
  * @returns
  */
 export async function resetUserPasswordByEmail(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationResetUserPwdEmail, {
     userId,
   });
@@ -395,7 +395,7 @@ export async function resetUserPasswordByEmail(userId: string) {
  * @returns
  */
 export async function updatePassword(oldPwd: string, newPwd: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationChangePwd, {
     oldPwd,
     newPwd,
@@ -414,7 +414,7 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
  * @returns
  */
 export async function enableMFA(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationEnableMfa, {
     userId,
   });
@@ -431,7 +431,7 @@ export async function enableMFA(userId: string) {
  * @returns
  */
 export async function disableMFA(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationDisableMfa, {
     userId,
   });
@@ -448,7 +448,7 @@ export async function disableMFA(userId: string) {
  * @returns
  */
 export async function sendMFAEmail(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationSendMfaEmail, {
     userId,
   });
@@ -466,7 +466,7 @@ export async function sendMFAEmail(userId: string) {
  * @returns
  */
 export async function checkPermission(permission: string) {
-  const result = await queryRequest(
+  const result = await query(
     queryCheckPermission, {
     permission,
   });
@@ -484,7 +484,7 @@ export async function checkPermission(permission: string) {
  * @returns
  */
 export async function userPermissions(headers?: Record<string, any>) {
-  const result = await queryRequest(
+  const result = await query(
     queryUserPermissionList,
     {
       where: {
@@ -510,7 +510,7 @@ export async function userPermissions(headers?: Record<string, any>) {
  * @returns
  */
 export async function userMenus(appCode: string) {
-  const result = await queryRequest(
+  const result = await query(
     queryUserMenuList, {
     appCode,
   });
@@ -526,7 +526,7 @@ export async function userMenus(appCode: string) {
  * @returns
  */
 export async function userRootOrgs() {
-  const result = await queryRequest(queryUserRootOrgList, {});
+  const result = await query(queryUserRootOrgList, {});
   if (result.data?.userRootOrgs) {
     return result?.data?.userRootOrgs;
   }
@@ -546,7 +546,7 @@ export async function getRecycleUserList(gather: {
   where?: UserWhereInput;
   orderBy?: UserOrder;
 }) {
-  const result = await pagingRequest(queryOrgRecycleUserList, {
+  const result = await paging(queryOrgRecycleUserList, {
     first: gather.pageSize,
     where: gather.where,
     orderBy: gather.orderBy,
@@ -569,7 +569,7 @@ export async function restoreRecycleUser(
   setKind: UserLoginProfileSetKind,
   pwdInput?: CreateUserPasswordInput,
 ) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationRecOrgUser, {
     userId,
     setKind,

@@ -1,11 +1,10 @@
-import { User } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { User } from '@/generated/adminx/graphql';
 import { unbindMfa } from '@/services/auth';
 import { ModalForm, ProFormText } from '@ant-design/pro-components';
 import { Alert } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
+import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
   open: boolean;
@@ -13,10 +12,13 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const onFinish = async (values) => {
     setSaveLoading(true);

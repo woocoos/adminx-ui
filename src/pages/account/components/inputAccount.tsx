@@ -3,7 +3,7 @@ import ModalAccount from './modalAccount';
 import { useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { User, UserUserType } from '@/__generated__/adminx/graphql';
+import { User, UserUserType } from '@/generated/adminx/graphql';
 
 export default (props: {
   value?: User;

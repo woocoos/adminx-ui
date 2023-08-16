@@ -2,14 +2,13 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/adminx/permission';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
 import { getUserJoinGroupList } from '@/services/adminx/org/role';
 import Auth from '@/components/Auth';
-import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/__generated__/adminx/graphql';
+import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/generated/adminx/graphql';
 
 
 export default (props: {
@@ -127,42 +126,6 @@ export default (props: {
         setAllUserGroup([]);
       }
     },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as Permission[], success: true, total: 0 },
-        where: PermissionWhereInput = {};
-      where.principalKind = props.principalKind;
-      where.orgID = userState.tenantId;
-      if (params.orgRoleId) {
-        where.hasRoleWith = [{
-          id: params.orgRoleId || undefined,
-        }];
-      }
-      if (params.name || params.comments || params.type) {
-        where.hasOrgPolicyWith = [{
-          nameContains: params.name || null,
-          commentsContains: params.comments || null,
-          appPolicyIDNotNil: params.type === 'sys' ? true : undefined,
-          appPolicyIDIsNil: params.type === 'cust' ? true : undefined,
-        }];
-      }
-
-      const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, {
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      }) : await getUserPermissionList(props.userInfo.id, {
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as Permission[] || [];
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: Permission) => {
       Modal.confirm({
         title: t('disauthorization'),
@@ -215,7 +178,42 @@ export default (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as Permission[], success: true, total: 0 },
+            where: PermissionWhereInput = {};
+          where.principalKind = props.principalKind;
+          where.orgID = userState.tenantId;
+          if (params.orgRoleId) {
+            where.hasRoleWith = [{
+              id: params.orgRoleId || undefined,
+            }];
+          }
+          if (params.name || params.comments || params.type) {
+            where.hasOrgPolicyWith = [{
+              nameContains: params.name || null,
+              commentsContains: params.comments || null,
+              appPolicyIDNotNil: params.type === 'sys' ? true : undefined,
+              appPolicyIDIsNil: params.type === 'cust' ? true : undefined,
+            }];
+          }
+
+          const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          }) : await getUserPermissionList(props.userInfo.id, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as Permission[] || [];
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

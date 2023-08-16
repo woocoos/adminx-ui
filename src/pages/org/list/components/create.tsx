@@ -1,13 +1,12 @@
-import { Org, OrgKind, User, UserUserType } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { Org, OrgKind, User, UserUserType } from '@/generated/adminx/graphql';
 import InputAccount from '@/pages/account/components/inputAccount';
-import { TreeEditorAction } from '@/services/graphql';
 import { createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/adminx/org';
 import store from '@/store';
-import { formatTreeData, updateFormat } from '@/util';
+import { TreeEditorAction, formatTreeData, updateFormat } from '@/util';
 import { DrawerForm, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type SelectTreeData = {
   value: string;
@@ -37,9 +36,12 @@ export default (props: {
     [userState] = store.useModel('user'),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [oldInfo, setOldInfo] = useState<Org>();
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     parentRequest = async () => {

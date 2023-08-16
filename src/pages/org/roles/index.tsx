@@ -1,7 +1,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Alert, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { Link } from '@ice/runtime';
 import CreateOrgRole from './components/create';
 import { delOrgRole, getOrgGroupList, getOrgRoleList } from '@/services/adminx/org/role';
@@ -11,8 +10,8 @@ import DrawerUser from '../../account/components/drawerUser';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
 import Auth from '@/components/Auth';
-import KeepAlive from '@/components/KeepAlive';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/adminx/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 export const PageOrgRoleList = (props: {
@@ -126,28 +125,6 @@ export const PageOrgRoleList = (props: {
 
 
   const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 },
-        where: OrgRoleWhereInput = {};
-      where.kind = kind;
-      where.orgID = props.orgId;
-      where.nameContains = params.nameContains;
-      const result = kind === OrgRoleKind.Role ? await getOrgRoleList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      }) : await getOrgGroupList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as OrgRole[];
-        table.total = result.totalCount;
-      }
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: OrgRole) => {
       Modal.confirm({
         title: t('delete'),
@@ -231,7 +208,28 @@ export const PageOrgRoleList = (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
-          request={getRequest}
+          request={async (params) => {
+            const table = { data: [] as OrgRole[], success: true, total: 0 },
+              where: OrgRoleWhereInput = {};
+            where.kind = kind;
+            where.orgID = props.orgId;
+            where.nameContains = params.nameContains;
+            const result = kind === OrgRoleKind.Role ? await getOrgRoleList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            }) : await getOrgGroupList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as OrgRole[];
+              table.total = result.totalCount;
+            }
+            setDataSource(table.data);
+            return table;
+          }}
         />
         <CreateOrgRole
           x-if={modal.scene === 'editor'}

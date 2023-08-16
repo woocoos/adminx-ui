@@ -2,7 +2,6 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppRoleAssignedOrgList } from '@/services/adminx/app/org';
@@ -10,7 +9,7 @@ import { getAppRoleInfo } from '@/services/adminx/app/role';
 import { assignOrgAppRole, revokeOrgAppRole } from '@/services/adminx/org/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { AppRole, Org, OrgWhereInput } from '@/__generated__/adminx/graphql';
+import { AppRole, Org, OrgWhereInput } from '@/generated/adminx/graphql';
 
 
 export default () => {
@@ -85,21 +84,6 @@ export default () => {
       }
       return null;
     },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as Org[], success: true, total: 0 },
-        where: OrgWhereInput = {},
-        info = await getInfo();
-      where.nameContains = params.nameContains;
-      if (info) {
-        const result = await getAppRoleAssignedOrgList(info.id, where);
-        if (result) {
-          table.data = result as Org[];
-          table.total = result.length;
-        }
-      }
-      setSelectedRowKeys([]);
-      return table;
-    },
     onDel = (record: Org) => {
       if (appRoleInfo) {
         Modal.confirm({
@@ -162,7 +146,21 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as Org[], success: true, total: 0 },
+            where: OrgWhereInput = {},
+            info = await getInfo();
+          where.nameContains = params.nameContains;
+          if (info) {
+            const result = await getAppRoleAssignedOrgList(info.id, where);
+            if (result) {
+              table.data = result as Org[];
+              table.total = result.length;
+            }
+          }
+          setSelectedRowKeys([]);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

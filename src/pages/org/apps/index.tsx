@@ -1,4 +1,4 @@
-import { Org } from '@/__generated__/adminx/graphql';
+import { Org } from '@/generated/adminx/graphql';
 import { PageAppList } from '@/pages/app/list';
 import { getOrgInfo } from '@/services/adminx/org';
 import { PageContainer, useToken } from '@ant-design/pro-components';

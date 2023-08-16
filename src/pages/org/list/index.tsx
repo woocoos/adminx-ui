@@ -2,16 +2,15 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
-import { TableParams, TreeEditorAction } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
-import { formatTreeData } from '@/util';
+import { TreeEditorAction, formatTreeData } from '@/util';
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { Org, OrgKind, OrgWhereInput } from '@/__generated__/adminx/graphql';
+import { Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
 
 export const OrgList = (props: {
   title?: string;
@@ -151,49 +150,6 @@ export const OrgList = (props: {
 
 
   const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as Org[], success: true, total: 0 },
-        where: OrgWhereInput = {};
-      setExpandedRowKeys([]);
-      if (props.appId) {
-        where.nameContains = params.name;
-        where.codeContains = params.code;
-        where.kind = params.kind;
-        const data = await getAppOrgList(props.appId, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (data?.totalCount) {
-          table.data = data.edges?.map(item => item?.node) as Org[];
-          table.total = data.totalCount;
-        }
-      } else {
-        let list: Org[] = [];
-        if (kind === 'org') {
-          if (props.tenantId) {
-            list = await getOrgPathList(props.tenantId, kind);
-            table.total = list.length;
-          }
-        } else {
-          where.kind = kind;
-          const result = await getOrgList({
-            pageSize: 999,
-            where,
-          });
-          if (result?.totalCount) {
-            list = result.edges?.map(item => item?.node) as Org[] || [];
-            table.total = result.totalCount;
-          }
-        }
-        if (list.length) {
-          table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
-          setExpandedRowKeys(list.map(item => item.id));
-        }
-      }
-      setDataSource(table.data);
-      return table;
-    },
     onDelOrg = (record: Org) => {
       Modal.confirm({
         title: t('delete'),
@@ -285,7 +241,49 @@ export const OrgList = (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
-          request={getRequest}
+          request={async (params) => {
+            const table = { data: [] as Org[], success: true, total: 0 },
+              where: OrgWhereInput = {};
+            setExpandedRowKeys([]);
+            if (props.appId) {
+              where.nameContains = params.name;
+              where.codeContains = params.code;
+              where.kind = params.kind;
+              const data = await getAppOrgList(props.appId, {
+                current: params.current,
+                pageSize: params.pageSize,
+                where,
+              });
+              if (data?.totalCount) {
+                table.data = data.edges?.map(item => item?.node) as Org[];
+                table.total = data.totalCount;
+              }
+            } else {
+              let list: Org[] = [];
+              if (kind === 'org') {
+                if (props.tenantId) {
+                  list = await getOrgPathList(props.tenantId, kind);
+                  table.total = list.length;
+                }
+              } else {
+                where.kind = kind;
+                const result = await getOrgList({
+                  pageSize: 999,
+                  where,
+                });
+                if (result?.totalCount) {
+                  list = result.edges?.map(item => item?.node) as Org[] || [];
+                  table.total = result.totalCount;
+                }
+              }
+              if (list.length) {
+                table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
+                setExpandedRowKeys(list.map(item => item.id));
+              }
+            }
+            setDataSource(table.data);
+            return table;
+          }}
           pagination={false}
         />
         <OrgCreate

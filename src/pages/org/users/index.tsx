@@ -3,16 +3,15 @@ import { Tree, Input, Button, Row, Col, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { UserList } from '@/pages/account/components/listAccount';
-import { formatTreeData, getTreeDropData } from '@/util';
+import { TreeDataState, formatTreeData, getTreeDropData } from '@/util';
 import { getOrgPathList, moveOrg } from '@/services/adminx/org';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
-import { TreeDataState } from '@/services/graphql';
-import KeepAlive from '@/components/KeepAlive';
 import styles from './index.module.css';
 import Auth from '@/components/Auth';
-import { Org, OrgKind } from '@/__generated__/adminx/graphql';
+import { Org, OrgKind } from '@/generated/adminx/graphql';
 import { Link } from '@ice/runtime';
+import { KeepAlive } from '@knockout-js/layout';
 
 export const PageOrgUsers = (props: {
   orgId: string;

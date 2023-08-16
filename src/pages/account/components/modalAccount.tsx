@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { EnumUserStatus, getUserList } from '@/services/adminx/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgRoleUserList, getOrgUserList } from '@/services/adminx/org/user';
-import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
+import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 
 export default (props: {
   open: boolean;
@@ -68,61 +67,6 @@ export default (props: {
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as User[], success: true, total: 0 },
-        where: UserWhereInput = {};
-      let orderBy: UserOrder | undefined;
-      where.userType = props.userType;
-      where.principalNameContains = params.principalNameContains;
-      where.displayNameContains = params.displayNameContains;
-      where.emailContains = params.emailContains;
-      where.mobileContains = params.mobileContains;
-      where.statusIn = filter.status as UserSimpleStatus[] | null;
-      if (sort.createdAt) {
-        orderBy = {
-          direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
-          field: UserOrderField.CreatedAt,
-        };
-      }
-      if (props.orgRoleId) {
-        const result = await getOrgRoleUserList(props.orgRoleId, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where: where,
-          orderBy: orderBy,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as User[] || [];
-          table.total = result.totalCount;
-        }
-      } else if (props.orgId) {
-        const result = await getOrgUserList(props.orgId, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where: where,
-          orderBy: orderBy,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as User[] || [];
-          table.total = result.totalCount;
-        }
-      } else {
-        const result = await getUserList({
-          current: params.current,
-          pageSize: params.pageSize,
-          where: where,
-          orderBy: orderBy,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as User[] || [];
-          table.total = result.totalCount;
-        }
-      }
-
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     handleOk = () => {
       props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
     },
@@ -150,7 +94,61 @@ export default (props: {
         scroll={{ x: 'max-content', y: 300 }}
         columns={columns}
         options={false}
-        request={getRequest}
+        request={async (params, sort, filter) => {
+          const table = { data: [] as User[], success: true, total: 0 },
+            where: UserWhereInput = {};
+          let orderBy: UserOrder | undefined;
+          where.userType = props.userType;
+          where.principalNameContains = params.principalNameContains;
+          where.displayNameContains = params.displayNameContains;
+          where.emailContains = params.emailContains;
+          where.mobileContains = params.mobileContains;
+          where.statusIn = filter.status as UserSimpleStatus[] | null;
+          if (sort.createdAt) {
+            orderBy = {
+              direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
+              field: UserOrderField.CreatedAt,
+            };
+          }
+          if (props.orgRoleId) {
+            const result = await getOrgRoleUserList(props.orgRoleId, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where: where,
+              orderBy: orderBy,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as User[] || [];
+              table.total = result.totalCount;
+            }
+          } else if (props.orgId) {
+            const result = await getOrgUserList(props.orgId, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where: where,
+              orderBy: orderBy,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as User[] || [];
+              table.total = result.totalCount;
+            }
+          } else {
+            const result = await getUserList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where: where,
+              orderBy: orderBy,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as User[] || [];
+              table.total = result.totalCount;
+            }
+          }
+
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         pagination={{ showSizeChanger: true }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,

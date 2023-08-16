@@ -5,6 +5,7 @@ import auth from '@ice/plugin-auth';
 import antd from '@ice/plugin-antd';
 import jsxPlus from '@ice/plugin-jsx-plus';
 import icestark from '@ice/plugin-icestark';
+import urqlPlugin from '@knockout-js/ice-urql';
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
 const minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
@@ -23,6 +24,7 @@ export default defineConfig(() => ({
   },
   plugins: [
     icestark({ type: 'child' }),
+    urqlPlugin(),
     request(),
     store(),
     auth(),

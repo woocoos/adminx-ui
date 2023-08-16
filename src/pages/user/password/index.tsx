@@ -1,12 +1,12 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PageContainer, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
 import store from '@/store';
 import { updatePassword } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { Link } from '@ice/runtime';
 import { goLogin } from '@/util';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type FormValues = { oldPwd: string; newPwd: string; reNewPwd: string };
 
@@ -16,9 +16,12 @@ export default () => {
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [, userDispatcher] = store.useModel('user');
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     getRequest = async () => {

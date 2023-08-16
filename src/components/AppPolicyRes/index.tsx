@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import style from './index.module.css';
 import Create from './create';
-import { App } from '@/__generated__/adminx/graphql';
+import { App } from '@/generated/adminx/graphql';
 
 export type AppResItem = {
   title: string;

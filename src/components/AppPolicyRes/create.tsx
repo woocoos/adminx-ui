@@ -2,7 +2,7 @@ import { ProForm, ProFormInstance, ProFormText } from '@ant-design/pro-component
 import { Checkbox, Col, Modal, Row } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { setLeavePromptWhen } from '../LeavePrompt';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
   open: boolean;
@@ -19,9 +19,12 @@ export default (props: {
     [model, setModel] = useState<{
       [key: string]: string;
     }>({}),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [newArn, setNewArn] = useState<string>('');
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     getRequest = async () => {

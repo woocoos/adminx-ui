@@ -1,10 +1,10 @@
-import { AppRole } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { AppRole } from '@/generated/adminx/graphql';
 import { createAppRole, getAppRoleInfo, updateAppRole } from '@/services/adminx/app/role';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormRadio, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   name: string;
@@ -22,10 +22,13 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [appRoleInfo, setAppRoleInfo] = useState<AppRole>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {

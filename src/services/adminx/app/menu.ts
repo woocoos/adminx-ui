@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { gql } from '@/__generated__/adminx';
-import { mutationRequest, pagingRequest } from '../';
-import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){
   node(id:$gid){
@@ -50,7 +50,7 @@ export async function getAppMenus(
     orderBy?: AppMenuOrder;
   }) {
   const
-    result = await pagingRequest(
+    result = await paging(
       queryAppMenuList, {
       gid: gid('app', appId),
       first: gather.pageSize,
@@ -76,7 +76,7 @@ export async function getAppMenus(
  */
 export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateAppMenu, {
       menuId,
       input,
@@ -95,7 +95,7 @@ export async function updateAppMenu(menuId: string, input: UpdateAppMenuInput) {
  */
 export async function createAppMenu(appId: string, input: CreateAppMenuInput | CreateAppMenuInput[]) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateAppMenu, {
       appId,
       input,
@@ -114,7 +114,7 @@ export async function createAppMenu(appId: string, input: CreateAppMenuInput | C
  */
 export async function delAppMenu(menuId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelAppMenu, {
       menuId,
     });
@@ -133,7 +133,7 @@ export async function delAppMenu(menuId: string) {
  */
 export async function moveAppMenu(sourceId: string, targetId: string, action: TreeAction) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationMoveAppMenu, {
       sourceId,
       targetId,

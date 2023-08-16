@@ -11,7 +11,7 @@ import { getOrgGroupQty, getOrgRoleQty } from '@/services/adminx/org/role';
 import { getOrgPolicyQty } from '@/services/adminx/org/policy';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
-import { App, OrgRoleKind, User } from '@/__generated__/adminx/graphql';
+import { App, OrgRoleKind, User } from '@/generated/adminx/graphql';
 import { formatArrayFilesRaw, getFilesRaw } from '@/services/files';
 
 export default () => {

@@ -2,7 +2,6 @@ import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-
 import { Button, Space, Dropdown, Modal, Alert } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppInfo } from '@/services/adminx/app';
 import CreateAppRole from './components/create';
@@ -12,8 +11,8 @@ import DrawerRolePolicy from '../components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
-import KeepAlive from '@/components/KeepAlive';
-import { App, AppRole } from '@/__generated__/adminx/graphql';
+import { App, AppRole } from '@/generated/adminx/graphql';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 export default () => {
@@ -130,26 +129,6 @@ export default () => {
       }
       return null;
     },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppRole[], success: true, total: 0 },
-        info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
-      if (info) {
-        const result = await getAppRoleList(info.id);
-        if (result) {
-          table.data = result.filter(item => {
-            let isTrue = true;
-            if (params.name) {
-              isTrue = item.name.indexOf(params.name) > -1;
-            }
-            return isTrue;
-          });
-          table.total = table.data.length;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: AppRole) => {
       Modal.confirm({
         title: t('delete'),
@@ -227,7 +206,26 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
-          request={getRequest}
+          request={async (params) => {
+            const table = { data: [] as AppRole[], success: true, total: 0 },
+              info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
+            if (info) {
+              const result = await getAppRoleList(info.id);
+              if (result) {
+                table.data = result.filter(item => {
+                  let isTrue = true;
+                  if (params.name) {
+                    isTrue = item.name.indexOf(params.name) > -1;
+                  }
+                  return isTrue;
+                });
+                table.total = table.data.length;
+              }
+            }
+            setSelectedRowKeys([]);
+            setDataSource(table.data);
+            return table;
+          }}
           rowSelection={{
             selectedRowKeys: selectedRowKeys,
             onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

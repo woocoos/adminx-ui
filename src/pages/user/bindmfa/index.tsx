@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MfaPrepare, bindMfa, bindPrepareMfa } from '@/services/auth';
 import { getUserInfoLoginProfile } from '@/services/adminx/user';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { User } from '@/__generated__/adminx/graphql';
+import { User } from '@/generated/adminx/graphql';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 export default () => {
   const { t } = useTranslation(),
@@ -20,10 +20,13 @@ export default () => {
     [qrcodeValue, setQrcodeValue] = useState<string>(''),
     [qrcodeLoading, setQrcodeLoading] = useState(false),
     [surplus, setSurplus] = useState(0),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     getRequest = async () => {

@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/__generated__/adminx/graphql';
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
+import { gql } from '@/generated/adminx';
+import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumAppStatus = {
   active: { text: '活跃', status: 'success' },
@@ -65,7 +65,7 @@ export async function getAppList(
   },
 ) {
   const
-    result = await pagingRequest(
+    result = await paging(
       queryAppList, {
       first: gather.pageSize || 20,
       where: gather.where,
@@ -85,7 +85,7 @@ export async function getAppList(
  */
 export async function getAppInfo(appId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppInfo, {
       gid: gid('app', appId),
     });
@@ -104,7 +104,7 @@ export async function getAppInfo(appId: string) {
  */
 export async function updateAppInfo(appId: string, input: UpdateAppInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateApp, {
       appId,
       input,
@@ -123,7 +123,7 @@ export async function updateAppInfo(appId: string, input: UpdateAppInput) {
  */
 export async function createAppInfo(input: CreateAppInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateApp, {
       input,
     });
@@ -141,7 +141,7 @@ export async function createAppInfo(input: CreateAppInput) {
  */
 export async function delAppInfo(appId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelApp, {
       appId,
     });

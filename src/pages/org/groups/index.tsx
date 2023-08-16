@@ -1,7 +1,7 @@
 import { PageOrgRoleList } from '../roles';
 import store from '@/store';
-import KeepAlive from '@/components/KeepAlive';
-import { OrgRoleKind } from '@/__generated__/adminx/graphql';
+import { OrgRoleKind } from '@/generated/adminx/graphql';
+import { KeepAlive } from '@knockout-js/layout';
 
 export default () => {
   const [userState] = store.useModel('user');

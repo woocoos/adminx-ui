@@ -2,16 +2,16 @@ import { createAppPolicy, getAppPolicyInfo, updateAppPolicy } from '@/services/a
 import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormSwitch, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
 import { Link, useSearchParams } from '@ice/runtime';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
 import { getAppActionList } from '@/services/adminx/app/action';
 import { getAppInfo } from '@/services/adminx/app';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/__generated__/adminx/graphql';
+import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   name: string;
@@ -31,9 +31,12 @@ export default () => {
     [appPolicyInfo, setAppPolicyInfo] = useState<AppPolicy>(),
     [rules, setRules] = useState<PolicyRule[]>([]),
     [appActions, setAppActions] = useState<AppAction[]>([]),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     policyId = searchParams.get('id');
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     isReadonly = () => {

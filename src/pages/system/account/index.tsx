@@ -1,6 +1,6 @@
-import KeepAlive from '@/components/KeepAlive';
-import { UserUserType } from '@/__generated__/adminx/graphql';
+import { UserUserType } from '@/generated/adminx/graphql';
 import { UserList } from '@/pages/account/components/listAccount';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 export default () => (<KeepAlive clearAlive>

@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { gql } from '@/__generated__/adminx';
-import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumPermissionPrincipalKind = {
   user: { text: '用户' },
@@ -121,7 +121,7 @@ export async function getOrgPolicyReferenceList(
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
   }) {
-  const result = await pagingRequest(queryOrgPolicyReferences, {
+  const result = await paging(queryOrgPolicyReferences, {
     orgPolicyId,
     first: gather.pageSize || 20,
     where: gather.where,
@@ -147,7 +147,7 @@ export async function getOrgPermissionList(
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
   }) {
-  const result = await pagingRequest(queryOrgPrmissionList, {
+  const result = await paging(queryOrgPrmissionList, {
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
@@ -172,7 +172,7 @@ export async function getUserPermissionList(
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
   }) {
-  const result = await pagingRequest(queryUserPrmissionList, {
+  const result = await paging(queryUserPrmissionList, {
     gid: gid('user', userId),
     first: gather.pageSize || 20,
     where: gather.where,
@@ -202,7 +202,7 @@ export async function getUserExtendGroupPolicyList(
     orderBy?: PermissionOrder;
   },
 ) {
-  const result = await pagingRequest(queryUserExtendGroupPolicieList, {
+  const result = await paging(queryUserExtendGroupPolicieList, {
     userId: userId,
     first: gather.pageSize || 20,
     where: gather.where,
@@ -222,7 +222,7 @@ export async function getUserExtendGroupPolicyList(
  * @returns
  */
 export async function getPermissionInfo(permissionId: string) {
-  const result = await queryRequest(queryPermissionInfo, {
+  const result = await query(queryPermissionInfo, {
     gid: gid('permission', permissionId),
   });
   if (result.data?.node?.__typename === 'Permission') {
@@ -237,7 +237,7 @@ export async function getPermissionInfo(permissionId: string) {
  * @returns
  */
 export async function createPermission(input: CreatePermissionInput) {
-  const result = await mutationRequest(mutationCreatePermission, {
+  const result = await mutation(mutationCreatePermission, {
     input,
   });
   if (result.data?.grant?.id) {
@@ -253,7 +253,7 @@ export async function createPermission(input: CreatePermissionInput) {
  * @returns
  */
 export async function updatePermission(permissionId: string, input: UpdatePermissionInput) {
-  const result = await mutationRequest(mutationUpdatePermission, {
+  const result = await mutation(mutationUpdatePermission, {
     input,
     permissionId,
   });
@@ -271,7 +271,7 @@ export async function updatePermission(permissionId: string, input: UpdatePermis
  * @returns
  */
 export async function delPermssion(permissionId: string, orgId: string) {
-  const result = await mutationRequest(mutationDelPermission, {
+  const result = await mutation(mutationDelPermission, {
     permissionId,
     orgId,
   });

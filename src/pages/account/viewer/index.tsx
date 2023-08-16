@@ -11,7 +11,7 @@ import ListUserJoinGroup from './components/listUserJoinGroup';
 import { Link, history, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/Auth';
 import style from './index.module.css';
-import { PermissionPrincipalKind, User, UserUserType } from '@/__generated__/adminx/graphql';
+import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
 import { getFilesRaw } from '@/services/files';
 
 export default (props: {

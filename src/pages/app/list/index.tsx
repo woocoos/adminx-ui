@@ -5,14 +5,13 @@ import { EnumAppKind, EnumAppStatus, delAppInfo, getAppList } from '@/services/a
 import defaultApp from '@/assets/images/default-app.png';
 import AppCreate from './components/create';
 import { useRef, useState } from 'react';
-import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useAuth } from 'ice';
 import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/adminx/org/app';
 import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/Auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { App, AppKind, AppWhereInput } from '@/__generated__/adminx/graphql';
+import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
 import { formatArrayFilesRaw } from '@/services/files';
 
 export const PageAppList = (props: {
@@ -126,38 +125,6 @@ export const PageAppList = (props: {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as App[], success: true, total: 0 },
-        where: AppWhereInput = {};
-      where.nameContains = params.nameContains;
-      where.codeContains = params.codeContains;
-      where.kindIn = filter.kind as AppKind[];
-      if (props.orgId) {
-        const result = await getOrgAppList(props.orgId, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as App[];
-          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
-          table.total = result.totalCount;
-        }
-      } else {
-        const result = await getAppList({
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as App[];
-          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
-          table.total = result.totalCount;
-        }
-      }
-      setDataSource(table.data);
-      return table;
-    },
     onDelApp = (record: App) => {
       Modal.confirm({
         title: t('delete'),
@@ -233,7 +200,38 @@ export const PageAppList = (props: {
               }}
               scroll={{ x: 'max-content', y: 300 }}
               columns={columns}
-              request={getRequest}
+              request={async (params, sort, filter) => {
+                const table = { data: [] as App[], success: true, total: 0 },
+                  where: AppWhereInput = {};
+                where.nameContains = params.nameContains;
+                where.codeContains = params.codeContains;
+                where.kindIn = filter.kind as AppKind[];
+                if (props.orgId) {
+                  const result = await getOrgAppList(props.orgId, {
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  });
+                  if (result?.totalCount) {
+                    table.data = result.edges?.map(item => item?.node) as App[];
+                    table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+                    table.total = result.totalCount;
+                  }
+                } else {
+                  const result = await getAppList({
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  });
+                  if (result?.totalCount) {
+                    table.data = result.edges?.map(item => item?.node) as App[];
+                    table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+                    table.total = result.totalCount;
+                  }
+                }
+                setDataSource(table.data);
+                return table;
+              }}
               pagination={{ showSizeChanger: true }}
               rowSelection={false}
             />
@@ -294,7 +292,38 @@ export const PageAppList = (props: {
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}
-              request={getRequest}
+              request={async (params, sort, filter) => {
+                const table = { data: [] as App[], success: true, total: 0 },
+                  where: AppWhereInput = {};
+                where.nameContains = params.nameContains;
+                where.codeContains = params.codeContains;
+                where.kindIn = filter.kind as AppKind[];
+                if (props.orgId) {
+                  const result = await getOrgAppList(props.orgId, {
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  });
+                  if (result?.totalCount) {
+                    table.data = result.edges?.map(item => item?.node) as App[];
+                    table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+                    table.total = result.totalCount;
+                  }
+                } else {
+                  const result = await getAppList({
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  });
+                  if (result?.totalCount) {
+                    table.data = result.edges?.map(item => item?.node) as App[];
+                    table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+                    table.total = result.totalCount;
+                  }
+                }
+                setDataSource(table.data);
+                return table;
+              }}
               pagination={{ showSizeChanger: true }}
             />
 

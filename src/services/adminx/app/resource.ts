@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { gql } from '@/__generated__/adminx';
-import { AppResOrder, AppResWhereInput, UpdateAppResInput } from '@/__generated__/adminx/graphql';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
+import { gql } from '@/generated/adminx';
+import { AppResOrder, AppResWhereInput, UpdateAppResInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 const queryAppResList = gql(/* GraphQL */`query appResList($gid: GID!,$first: Int,$orderBy:AppResOrder,$where:AppResWhereInput){
   node(id:$gid){
@@ -46,7 +46,7 @@ export async function getAppResList(
     orderBy?: AppResOrder;
   }) {
   const
-    result = await pagingRequest(
+    result = await paging(
       queryAppResList, {
       gid: gid('app', appId),
       first: gather.pageSize || 20,
@@ -68,7 +68,7 @@ export async function getAppResList(
  */
 export async function getAppResInfo(appResId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppResInfo, {
       gid: gid('app_res', appResId),
     });
@@ -88,7 +88,7 @@ export async function getAppResInfo(appResId: string) {
  */
 export async function updateAppRes(appResId: string, input: UpdateAppResInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateAppRes, {
       appResId,
       input,

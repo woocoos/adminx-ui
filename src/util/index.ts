@@ -1,30 +1,21 @@
-import { TreeAction } from '@/__generated__/adminx/graphql';
-import { TreeDataState } from '@/services/graphql';
-import CryptoJS from 'crypto-js';
+import { TreeAction } from '@/generated/adminx/graphql';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { ReactNode } from 'react';
+
+export type TreeEditorAction = 'editor' | 'peer' | 'child';
+
+export type TreeDataState<T> = {
+  key: string;
+  title: string | ReactNode;
+  children?: TreeDataState<T>[];
+  parentId: string | number;
+  node?: T;
+};
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-/**
- * 设置gid
- * @param type
- * @param id
- * @returns
- */
-export const gid = (type: string, id: string | number) => {
-  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(`${type}:${id}`));
-};
-
-/**
- * 解析gid
- * @param gid
- * @returns
- */
-export const parseGid = (gid: string) => {
-  return CryptoJS.enc.Base64.parse(gid).toString(CryptoJS.enc.Utf8);
-};
 
 /**
  * 前往登录

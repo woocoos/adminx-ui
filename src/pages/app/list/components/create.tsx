@@ -1,11 +1,11 @@
-import { App, AppKind } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { App, AppKind } from '@/generated/adminx/graphql';
 import UploadFiles from '@/components/UploadFiles';
 import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/adminx/app';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   redirectURI?: string;
@@ -28,10 +28,13 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [appInfo, setAppInfo] = useState<App>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {

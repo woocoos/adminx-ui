@@ -1,4 +1,3 @@
-import { TableParams } from '@/services/graphql';
 import { getRecycleUserList } from '@/services/adminx/user';
 import store from '@/store';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
@@ -7,7 +6,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/Auth';
-import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
+import { User, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 
 export default () => {
   const { token } = useToken(),
@@ -69,28 +68,6 @@ export default () => {
       title: '',
     });
 
-  const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as User[], success: true, total: 0 },
-        where: UserWhereInput = {};
-      let orderBy: UserOrder | undefined;
-      where.displayNameContains = params.displayNameContains;
-      where.emailContains = params.emailContains;
-      where.mobileContains = params.mobileContains;
-      const result = await getRecycleUserList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where: where,
-        orderBy: orderBy,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as User[] || [];
-        table.total = result.totalCount;
-      }
-      setDataSource(table.data);
-      return table;
-    };
-
   return (<PageContainer
     header={{
       title: t('recycle_bin'),
@@ -117,7 +94,26 @@ export default () => {
       }}
       scroll={{ x: 'max-content' }}
       columns={columns}
-      request={getRequest}
+      request={async (params) => {
+        const table = { data: [] as User[], success: true, total: 0 },
+          where: UserWhereInput = {};
+        let orderBy: UserOrder | undefined;
+        where.displayNameContains = params.displayNameContains;
+        where.emailContains = params.emailContains;
+        where.mobileContains = params.mobileContains;
+        const result = await getRecycleUserList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
+        setDataSource(table.data);
+        return table;
+      }}
       pagination={{ showSizeChanger: true }}
     />
     <CreateAccount

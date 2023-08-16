@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { mutationRequest, queryRequest } from '../';
-import { CreateAppRoleInput, UpdateAppRoleInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { CreateAppRoleInput, UpdateAppRoleInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 const queryAppRoleList = gql(/* GraphQL */`query appRoleList($gid:GID!){
   node(id:$gid){
@@ -64,7 +64,7 @@ const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePoli
  */
 export async function getAppRoleList(appId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppRoleList, {
       gid: gid('app', appId),
     });
@@ -83,7 +83,7 @@ export async function getAppRoleList(appId: string) {
  */
 export async function getAppRoleInfo(appRoleId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppRoleInfo, {
       gid: gid('app_role', appRoleId),
     });
@@ -101,7 +101,7 @@ export async function getAppRoleInfo(appRoleId: string) {
  */
 export async function getAppRoleInfoPolicieList(appRoleId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppRoleInfoPolicieList, {
       gid: gid('app_role', appRoleId),
     });
@@ -120,7 +120,7 @@ export async function getAppRoleInfoPolicieList(appRoleId: string) {
  */
 export async function createAppRole(appId: string, input: CreateAppRoleInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateAppRole, {
       appId,
       input,
@@ -140,7 +140,7 @@ export async function createAppRole(appId: string, input: CreateAppRoleInput) {
  */
 export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateAppRole, {
       appRoleId,
       input,
@@ -159,7 +159,7 @@ export async function updateAppRole(appRoleId: string, input: UpdateAppRoleInput
  */
 export async function delAppRole(appRoleId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelAppRole, {
       appRoleId,
     });
@@ -180,7 +180,7 @@ export async function delAppRole(appRoleId: string) {
  */
 export async function assignAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs?: string | string[]) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationAssignAppRolePolicy, {
       appRoleId,
       appId,
@@ -202,7 +202,7 @@ export async function assignAppRolePolicy(appId: string, appRoleId: string, appP
  */
 export async function revokeAppRolePolicy(appId: string, appRoleId: string, appPolicyIDs: string[]) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationRevokeAppRolePolicy, {
       appRoleId,
       appId,

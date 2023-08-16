@@ -1,4 +1,4 @@
-import { AppAction, AppActionMethod } from '@/__generated__/adminx/graphql';
+import { AppAction, AppActionMethod } from '@/generated/adminx/graphql';
 import { EnumAppActionMethod } from '@/services/adminx/app/action';
 import { ProCard } from '@ant-design/pro-components';
 import { Checkbox } from 'antd';

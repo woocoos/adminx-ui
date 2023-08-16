@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { AppOrder, AppWhereInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { AppOrder, AppWhereInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
   node(id:$gid){
@@ -50,7 +50,7 @@ export async function getOrgAppList(
     where?: AppWhereInput;
     orderBy?: AppOrder;
   }) {
-  const result = await pagingRequest(
+  const result = await paging(
     queryOrgAppList, {
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
@@ -72,7 +72,7 @@ export async function getOrgAppList(
  * @returns
  */
 export async function assignOrgApp(orgId: string, appId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationAssignOrgApp, {
     orgId,
     appId,
@@ -91,7 +91,7 @@ export async function assignOrgApp(orgId: string, appId: string) {
  * @returns
  */
 export async function revokeOrgApp(orgId: string, appId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationRevOrgApp, {
     orgId,
     appId,
@@ -110,7 +110,7 @@ export async function revokeOrgApp(orgId: string, appId: string) {
  * @returns
  */
 export async function getOrgAppActionList(appCode: string) {
-  const result = await queryRequest(
+  const result = await query(
     queryOrgAppActionList, {
     appCode,
   });

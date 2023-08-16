@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageContainer, ProForm, ProFormText, ProFormTextArea, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
 import { getUserInfo, updateUserInfo } from '@/services/adminx/user';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { User } from '@/__generated__/adminx/graphql';
+import { User } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
 import UploadFiles from '@/components/UploadFiles';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 export default () => {
   const
@@ -15,10 +15,13 @@ export default () => {
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [userInfo, setUserInfo] = useState<User>(),
     [userState, userDispatcher] = store.useModel('user');
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     getRequest = async () => {

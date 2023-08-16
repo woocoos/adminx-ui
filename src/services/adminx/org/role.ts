@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { gql } from '@/__generated__/adminx';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { AssignRoleUserInput, CreateOrgRoleInput, OrgRoleOrder, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { AssignRoleUserInput, CreateOrgRoleInput, OrgRoleOrder, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 const queryOrgGroupList = gql(/* GraphQL */`query orgGroupList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
   orgGroups(first:$first,orderBy: $orderBy,where: $where){
@@ -126,13 +126,13 @@ export async function getOrgGroupList(
   isGrant?: {
     userId?: string;
   }) {
-  const result = isGrant?.userId ? await pagingRequest(
+  const result = isGrant?.userId ? await paging(
     queryOrgGroupListAndIsGrant, {
     userId: isGrant.userId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, gather.current || 1) : await pagingRequest(
+  }, gather.current || 1) : await paging(
     queryOrgGroupList, {
     first: gather.pageSize || 20,
     where: gather.where,
@@ -161,7 +161,7 @@ export async function getUserJoinGroupList(
     orderBy?: OrgRoleOrder;
   }) {
   const
-    result = await pagingRequest(
+    result = await paging(
       queryUserGroupList, {
       userId: userId,
       first: gather.pageSize || 20,
@@ -193,13 +193,13 @@ export async function getOrgRoleList(
     userId?: string;
   }) {
   const
-    result = isGrant?.userId ? await pagingRequest(
+    result = isGrant?.userId ? await paging(
       queryOrgRoleListAndIsGrant, {
       userId: isGrant.userId,
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy,
-    }, gather.current || 1) : await pagingRequest(
+    }, gather.current || 1) : await paging(
       queryOrgRoleList, {
       first: gather.pageSize || 20,
       where: gather.where,
@@ -220,7 +220,7 @@ export async function getOrgRoleList(
  */
 export async function getOrgRoleInfo(orgRoleId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryOrgRoleInfo, {
       gid: gid('org_role', orgRoleId),
     });
@@ -238,7 +238,7 @@ export async function getOrgRoleInfo(orgRoleId: string) {
  */
 export async function createOrgRole(input: CreateOrgRoleInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateOrgRole, {
       input,
     });
@@ -257,7 +257,7 @@ export async function createOrgRole(input: CreateOrgRoleInput) {
  */
 export async function updateOrgRole(orgRoleId: string, input: UpdateOrgRoleInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateOrgRole, {
       input,
       orgRoleId,
@@ -277,7 +277,7 @@ export async function updateOrgRole(orgRoleId: string, input: UpdateOrgRoleInput
  */
 export async function delOrgRole(orgRoleId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelOrgRole, {
       orgRoleId,
     });
@@ -296,7 +296,7 @@ export async function delOrgRole(orgRoleId: string) {
  */
 export async function assignOrgRoleUser(input: AssignRoleUserInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationAssignOrgRoleUser, {
       input,
     });
@@ -315,7 +315,7 @@ export async function assignOrgRoleUser(input: AssignRoleUserInput) {
  */
 export async function revokeOrgRoleUser(orgRoleId: string, userId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationRevOrgRoleUser, {
       orgRoleId,
       userId,
@@ -336,7 +336,7 @@ export async function revokeOrgRoleUser(orgRoleId: string, userId: string) {
  */
 export async function assignOrgAppRole(orgId: string, appRoleId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationAssignOrgAppRole, {
       orgId,
       appRoleId,
@@ -356,7 +356,7 @@ export async function assignOrgAppRole(orgId: string, appRoleId: string) {
  */
 export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationRevOrgAppRole, {
       orgId,
       appRoleId,
@@ -376,7 +376,7 @@ export async function revokeOrgAppRole(orgId: string, appRoleId: string) {
  */
 export async function getOrgGroupQty(where?: OrgRoleWhereInput) {
   const
-    result = await queryRequest(
+    result = await query(
       queryOrgGroupListNum, {
       where,
       first: 9999,
@@ -397,7 +397,7 @@ export async function getOrgGroupQty(where?: OrgRoleWhereInput) {
  */
 export async function getUserJoinGroupQty(userId: string, where?: OrgRoleWhereInput) {
   const
-    result = await queryRequest(
+    result = await query(
       queryUserGroupListNum, {
       where,
       userId,
@@ -417,7 +417,7 @@ export async function getUserJoinGroupQty(userId: string, where?: OrgRoleWhereIn
  */
 export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
   const
-    result = await queryRequest(
+    result = await query(
       queryOrgRoleListNum, {
       where,
       first: 9999,

@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
   node(id:$gid){
@@ -105,7 +105,7 @@ export async function getOrgPolicyList(
     userId?: string;
   },
 ) {
-  const result = isGrant?.roleId ? await pagingRequest(
+  const result = isGrant?.roleId ? await paging(
     queryOrgPolicyListAndIsGrantRole, {
     gid: gid('org', orgId),
     roleId: isGrant.roleId,
@@ -113,14 +113,14 @@ export async function getOrgPolicyList(
     where: gather.where,
     orderBy: gather.orderBy,
   }, gather.current || 1) :
-    isGrant?.userId ? await pagingRequest(
+    isGrant?.userId ? await paging(
       queryOrgPolicyListAndIsGrantUser, {
       gid: gid('org', orgId),
       userId: isGrant.userId,
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy,
-    }, gather.current || 1) : await pagingRequest(
+    }, gather.current || 1) : await paging(
       queryOrgPolicyList, {
       gid: gid('org', orgId),
       first: gather.pageSize || 20,
@@ -142,7 +142,7 @@ export async function getOrgPolicyList(
  */
 export async function getOrgPolicyInfo(orgPolicyId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryOrgPolicyInfo, {
       gid: gid('org_policy', orgPolicyId),
     });
@@ -161,7 +161,7 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
  */
 export async function createOrgPolicy(input: CreateOrgPolicyInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateOrgPolicy, {
       input,
     });
@@ -180,7 +180,7 @@ export async function createOrgPolicy(input: CreateOrgPolicyInput) {
  */
 export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolicyInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateOrgPolicy, {
       orgPolicyId,
       input,
@@ -199,7 +199,7 @@ export async function updateOrgPolicy(orgPolicyId: string, input: UpdateOrgPolic
  */
 export async function delOrgPolicy(orgPolicyId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelOrgPolicy, {
       orgPolicyId,
     });
@@ -219,7 +219,7 @@ export async function delOrgPolicy(orgPolicyId: string) {
  */
 export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationAssignOrgAppPolicy, {
       orgId,
       appPolicyId,
@@ -239,7 +239,7 @@ export async function assignOrgAppPolicy(orgId: string, appPolicyId: string) {
  */
 export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationRevOrgAppPolicy, {
       orgId,
       appPolicyId,
@@ -260,7 +260,7 @@ export async function revokeOrgAppPolicy(orgId: string, appPolicyId: string) {
  */
 export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput) {
   const
-    result = await queryRequest(
+    result = await query(
       queryOrgPolicyListNum, {
       gid: gid('org', orgId),
       first: 9999,

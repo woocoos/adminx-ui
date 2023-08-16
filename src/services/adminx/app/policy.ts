@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { mutationRequest, queryRequest } from '../';
-import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 export const EnumAppPolicyStatus = {
   active: { text: '活跃', status: 'success' },
@@ -71,11 +71,11 @@ export async function getAppPolicyList(
     appRoleId?: string;
   }) {
   const
-    result = isGrant?.appRoleId ? await queryRequest(
+    result = isGrant?.appRoleId ? await query(
       queryAppPolicieListAndIsGrant, {
       gid: gid('app', appId),
       appRoleId: isGrant.appRoleId,
-    }) : await queryRequest(
+    }) : await query(
       queryAppPolicieList, {
       gid: gid('app', appId),
     });
@@ -94,7 +94,7 @@ export async function getAppPolicyList(
  */
 export async function getAppPolicyInfo(appPolicyId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppPolicyInfo, {
       gid: gid('app_policy', appPolicyId),
     });
@@ -113,7 +113,7 @@ export async function getAppPolicyInfo(appPolicyId: string) {
  */
 export async function createAppPolicy(appId: string, input: CreateAppPolicyInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateAppPolicy, {
       appId,
       input,
@@ -134,7 +134,7 @@ export async function createAppPolicy(appId: string, input: CreateAppPolicyInput
  */
 export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolicyInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateAppPolicy, {
       appPolicyId,
       input,
@@ -153,7 +153,7 @@ export async function updateAppPolicy(appPolicyId: string, input: UpdateAppPolic
  */
 export async function delAppPolicy(appPolicyId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelAppPolicy, {
       appPolicyId,
     });

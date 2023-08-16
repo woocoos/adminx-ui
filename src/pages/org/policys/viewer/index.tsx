@@ -1,15 +1,15 @@
 import { PageContainer, ProCard, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { message } from 'antd';
 import { Link, useSearchParams } from '@ice/runtime';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import PolicyRules from './components/policyRules';
 import { getOrgInfo } from '@/services/adminx/org';
 import { createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from '@/services/adminx/org/policy';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/Auth';
 import { useAuth } from 'ice';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { Org, PolicyRule } from '@/__generated__/adminx/graphql';
+import { Org, PolicyRule } from '@/generated/adminx/graphql';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   name: string;
@@ -28,9 +28,13 @@ export default (props: {
     [saveDisabled, setSaveDisabled] = useState(true),
     [orgInfo, setOrgInfo] = useState<Org>(),
     [rules, setRules] = useState<PolicyRule[]>([]),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     policyId = searchParams.get('id');
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
+
 
   const
     isReadonly = () => {

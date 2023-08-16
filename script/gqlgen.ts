@@ -18,7 +18,7 @@ if (!adminxSchema) {
 const schemaAstConfig: CodegenConfig = {
   generates: {
     // adminx 项目
-    'script/__generated__/adminx.graphql': {
+    'script/generated/adminx.graphql': {
       plugins: ['schema-ast'],
       config: {
         includeDirectives: true,
@@ -42,12 +42,12 @@ const schemaAstConfig: CodegenConfig = {
 const config: CodegenConfig = {
   generates: {
     // adminx 项目
-    "src/__generated__/adminx/": {
+    "src/generated/adminx/": {
       preset: 'client',
       presetConfig: {
         gqlTagName: 'gql',
       },
-      schema: "script/__generated__/adminx.graphql",
+      schema: "script/generated/adminx.graphql",
       documents: "src/services/adminx/**/*.ts",
     }
   },

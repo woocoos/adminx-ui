@@ -2,12 +2,11 @@
 import { ActionType, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { delPermssion, getOrgPermissionList } from '@/services/adminx/permission';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/adminx/graphql';
+import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/generated/adminx/graphql';
 
 
 export default (props: {
@@ -90,36 +89,6 @@ export default (props: {
   }
 
   const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as Permission[], success: true, total: 0 },
-        where: PermissionWhereInput = {};
-      if (props.orgRoleInfo.orgID) {
-        where.principalKind = PermissionPrincipalKind.Role;
-        where.roleID = props.orgRoleInfo.id;
-        if (params.name || params.comments || params.type) {
-          where.hasOrgPolicyWith = [{
-            nameContains: params.name || null,
-            commentsContains: params.comments || null,
-            appPolicyIDNotNil: params.type === 'sys' ? true : undefined,
-            appPolicyIDIsNil: params.type === 'cust' ? true : undefined,
-          }];
-        }
-
-        const result = await getOrgPermissionList(props.orgRoleInfo.orgID, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as Permission[] || [];
-          table.total = result.totalCount;
-        }
-      }
-
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: Permission) => {
       Modal.confirm({
         title: t('disauthorization'),
@@ -168,7 +137,36 @@ export default (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as Permission[], success: true, total: 0 },
+            where: PermissionWhereInput = {};
+          if (props.orgRoleInfo.orgID) {
+            where.principalKind = PermissionPrincipalKind.Role;
+            where.roleID = props.orgRoleInfo.id;
+            if (params.name || params.comments || params.type) {
+              where.hasOrgPolicyWith = [{
+                nameContains: params.name || null,
+                commentsContains: params.comments || null,
+                appPolicyIDNotNil: params.type === 'sys' ? true : undefined,
+                appPolicyIDIsNil: params.type === 'cust' ? true : undefined,
+              }];
+            }
+
+            const result = await getOrgPermissionList(props.orgRoleInfo.orgID, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as Permission[] || [];
+              table.total = result.totalCount;
+            }
+          }
+
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

@@ -8,7 +8,7 @@ import { Button, Divider } from 'antd';
 import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/Auth';
-import { App } from '@/__generated__/adminx/graphql';
+import { App } from '@/generated/adminx/graphql';
 import { getFilesRaw } from '@/services/files';
 
 export default () => {
