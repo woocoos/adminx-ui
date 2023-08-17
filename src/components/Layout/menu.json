@@ -1,0 +1,65 @@
+[
+  {
+    "name": "工作台",
+    "path": "/",
+    "icon": "icon-shouye1"
+  },
+  {
+    "name": "个人中心",
+    "icon": "icon-icon_zhanghu1",
+    "children": [
+      {
+        "name": "基本信息",
+        "path": "/user/info"
+      },
+      {
+        "name": "安全设置",
+        "path": "/user/safety"
+      }
+    ]
+  },
+  {
+    "name": "组织协作",
+    "icon": "icon-icon_zuzhi2",
+    "children": [
+      {
+        "name": "部门管理",
+        "path": "/org/departments"
+      },
+      {
+        "name": "用户管理",
+        "path": "/org/users"
+      },
+      {
+        "name": "权限策略",
+        "path": "/org/policys"
+      },
+      {
+        "name": "用户组",
+        "path": "/org/groups"
+      },
+      {
+        "name": "角色",
+        "path": "/org/roles"
+      }
+    ]
+  },
+  {
+    "name": "系统配置",
+    "icon": "icon-shezhi",
+    "children": [
+      {
+        "name": "组织管理",
+        "path": "/system/org"
+      },
+      {
+        "name": "账户管理",
+        "path": "/system/account"
+      },
+      {
+        "name": "应用管理",
+        "path": "/system/app"
+      }
+    ]
+  }
+]
