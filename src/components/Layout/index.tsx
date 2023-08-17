@@ -72,6 +72,7 @@ export default () => {
     : <Layout
       appCode={process.env.ICE_APP_CODE as string}
       pathname={location.pathname}
+      IconFont={IconFont}
       onClickMenuItem={(item, isOpen) => {
         if (isOpen) {
           window.open(item.path ?? '');
