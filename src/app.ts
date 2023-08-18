@@ -12,6 +12,7 @@ import { User } from './generated/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
 import { userPermissions } from '@knockout-js/api';
+import { parseSpm } from './services/auth';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -40,13 +41,14 @@ export const dataLoader = defineDataLoader(async () => {
     }
     document.cookie = sign
   }
+  const spmData = await parseSpm()
   let locale = getItem<string>('locale'),
-    token = getItem<string>('token'),
-    refreshToken = getItem<string>('refreshToken'),
+    token = spmData.tenantId ?? getItem<string>('token'),
+    refreshToken = spmData.refreshToken ?? getItem<string>('refreshToken'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
-    tenantId = getItem<string>('tenantId'),
-    user = getItem<User>('user');
+    tenantId = spmData.tenantId ?? getItem<string>('tenantId'),
+    user = spmData.user ?? getItem<User>('user');
 
   if (token) {
     // 增加jwt判断token过期的处理

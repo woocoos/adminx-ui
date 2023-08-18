@@ -9,7 +9,7 @@ import { MenuDataItem, useToken } from '@ant-design/pro-components';
 import { monitorKeyChange } from '@/pkg/localStore';
 import { getFilesRaw } from '@/services/files';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
-import { logout } from '@/services/auth';
+import { logout, urlSpm } from '@/services/auth';
 import { goLogin } from '@/util';
 import { createFromIconfontCN } from '@ant-design/icons';
 
@@ -73,11 +73,11 @@ export default () => {
       appCode={process.env.ICE_APP_CODE as string}
       pathname={location.pathname}
       IconFont={IconFont}
-      onClickMenuItem={(item, isOpen) => {
+      onClickMenuItem={async (item, isOpen) => {
         if (isOpen) {
-          window.open(item.path ?? '');
+          window.open(await urlSpm(item.path ?? ''));
         } else {
-          history?.push(item.path ?? '');
+          history?.push(await urlSpm(item.path ?? ''));
         }
       }}
       tenantProps={{

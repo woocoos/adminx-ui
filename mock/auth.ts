@@ -10,6 +10,7 @@ interface LoginResponse {
   user?: {
     id: string | number
     displayName: string
+    avatarFileId: string
     domains: {
       name: string
       id: string | number
@@ -128,6 +129,30 @@ export default {
       qrCodeUri: 'https://gw.alipayobjects.com/zos/rmsportal/KDpgvguMpGfqaHPjicRK.svg',
       stateToken: 'stateToken',
       stateTokenTTL: 1000
+    });
+  },
+  'POST /mock-api-auth/spm/create': (request: Request, response: Response) => {
+    response.send("spmstring");
+  },
+  'POST /mock-api-auth/spm/auth': (request: Request, response: Response) => {
+    bodyParser.json()(request, response, async () => {
+      const { spm } = request.body;
+      const result: LoginResponse = {};
+      if (spm === 'spmstring') {
+        result.accessToken = token
+        result.stateToken = token
+        result.expiresIn = 3600
+        result.refreshToken = refreshToken
+        result.user = user
+      } else {
+        result.errors = [
+          {
+            "code": 401,
+            "message": "password not match"
+          }
+        ]
+      }
+      response.send(result)
     });
   },
 }
