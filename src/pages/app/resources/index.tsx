@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppResList } from '@/services/adminx/app/resource';
 import CreateRes from './components/createRes';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { App, AppRes, AppResWhereInput } from '@/generated/adminx/graphql';
 
 

@@ -6,7 +6,7 @@ import PolicyRules from './components/policyRules';
 import { getOrgInfo } from '@/services/adminx/org';
 import { createOrgPolicy, getOrgPolicyInfo, updateOrgPolicy } from '@/services/adminx/org/policy';
 import { useTranslation } from 'react-i18next';
-import { checkAuth } from '@/components/Auth';
+import { checkAuth } from '@/components/auth';
 import { useAuth } from 'ice';
 import { Org, PolicyRule } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import DrawerUser from '../../account/components/drawerUser';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 

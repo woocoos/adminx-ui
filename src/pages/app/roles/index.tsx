@@ -8,7 +8,7 @@ import CreateAppRole from './components/create';
 import { delAppRole, getAppRoleList } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
-import Auth, { checkAuth } from '@/components/Auth';
+import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { App, AppRole } from '@/generated/adminx/graphql';

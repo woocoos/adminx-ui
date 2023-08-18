@@ -6,7 +6,7 @@ import { getOrgInfo } from '@/services/adminx/org';
 import { delOrgPolicy, getOrgPolicyList } from '@/services/adminx/org/policy';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 

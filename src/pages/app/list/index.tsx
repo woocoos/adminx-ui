@@ -9,7 +9,7 @@ import { Link, useAuth } from 'ice';
 import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/adminx/org/app';
 import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
-import Auth, { checkAuth } from '@/components/Auth';
+import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
 import { formatArrayFilesRaw } from '@/services/files';

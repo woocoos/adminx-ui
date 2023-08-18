@@ -7,7 +7,7 @@ import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/adminx/app';
 import { Button, Divider } from 'antd';
 import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { App } from '@/generated/adminx/graphql';
 import { getFilesRaw } from '@/services/files';
 

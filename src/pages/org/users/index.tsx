@@ -8,7 +8,7 @@ import { getOrgPathList, moveOrg } from '@/services/adminx/org';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import styles from './index.module.css';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { Org, OrgKind } from '@/generated/adminx/graphql';
 import { Link } from '@ice/runtime';
 import { KeepAlive } from '@knockout-js/layout';

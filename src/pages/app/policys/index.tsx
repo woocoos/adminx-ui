@@ -5,7 +5,7 @@ import { getAppInfo } from '@/services/adminx/app';
 import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/adminx/app/policy';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { App, AppPolicy } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 

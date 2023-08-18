@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
 import { Link, history, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
 import { getFilesRaw } from '@/services/files';

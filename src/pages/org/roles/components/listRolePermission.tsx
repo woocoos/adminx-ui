@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { delPermssion, getOrgPermissionList } from '@/services/adminx/permission';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/generated/adminx/graphql';
 
 

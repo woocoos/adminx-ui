@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import store from '@/store';
 import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/adminx/org/role';
 import DrawerRole from '@/pages/org/components/drawerRole';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
 
 

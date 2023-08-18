@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppRoleInfo, getAppRoleInfoPolicieList, revokeAppRolePolicy } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
 import { AppRole, AppPolicy, App } from '@/generated/adminx/graphql';
 

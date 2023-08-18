@@ -8,7 +8,7 @@ import OrgCreate from './components/create';
 import { TreeEditorAction, formatTreeData } from '@/util';
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
-import Auth, { checkAuth } from '@/components/Auth';
+import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
 

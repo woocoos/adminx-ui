@@ -5,7 +5,7 @@ import { Space, message } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { User, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 
 export default () => {

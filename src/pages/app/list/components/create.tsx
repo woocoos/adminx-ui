@@ -1,5 +1,5 @@
 import { App, AppKind } from '@/generated/adminx/graphql';
-import UploadFiles from '@/components/UploadFiles';
+import UploadFiles from '@/components/uploadFiles';
 import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/adminx/app';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';

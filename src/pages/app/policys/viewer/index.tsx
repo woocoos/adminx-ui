@@ -7,7 +7,7 @@ import PolicyRules from './components/policyRules';
 import { getAppActionList } from '@/services/adminx/app/action';
 import { getAppInfo } from '@/services/adminx/app';
 import { useTranslation } from 'react-i18next';
-import { checkAuth } from '@/components/Auth';
+import { checkAuth } from '@/components/auth';
 import { useAuth } from 'ice';
 import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';

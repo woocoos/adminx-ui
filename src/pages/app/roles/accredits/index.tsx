@@ -8,7 +8,7 @@ import { getAppRoleAssignedOrgList } from '@/services/adminx/app/org';
 import { getAppRoleInfo } from '@/services/adminx/app/role';
 import { assignOrgAppRole, revokeOrgAppRole } from '@/services/adminx/org/role';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { AppRole, Org, OrgWhereInput } from '@/generated/adminx/graphql';
 
 

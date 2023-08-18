@@ -6,7 +6,7 @@ import CreateAppAction from './components/create';
 import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/adminx/app/action';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { App, AppAction, AppActionWhereInput } from '@/generated/adminx/graphql';
 
 export type AppActionListRef = {

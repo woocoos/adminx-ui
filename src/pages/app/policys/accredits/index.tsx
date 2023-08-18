@@ -8,7 +8,7 @@ import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/adminx/org/po
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppPolicyAssignedOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import { AppPolicy, Org, OrgWhereInput } from '@/generated/adminx/graphql';
 
 

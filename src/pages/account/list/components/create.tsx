@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
-import UploadFiles from '@/components/UploadFiles';
+import UploadFiles from '@/components/uploadFiles';
 import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
