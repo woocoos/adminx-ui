@@ -85,7 +85,7 @@ export default () => {
           <ProFormText
             name="avatarFileID"
           >
-            <UploadFiles accept='.jpg,.png' />
+            <UploadFiles accept='.jpg,.png' directory="images" />
           </ProFormText>
           <ProFormText
             width="lg"

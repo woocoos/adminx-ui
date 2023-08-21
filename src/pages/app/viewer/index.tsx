@@ -41,15 +41,15 @@ export default () => {
         setLoading(true);
         const result = await getAppInfo(id);
         if (result?.id) {
-          if (result.logo) {
-            await getLogoSrc(result.logo)
+          if (result.logoFileID) {
+            await getLogoSrc(result.logoFileID)
           }
           setAppInfo(result as App);
           setLoading(false);
         }
       }
     },
-    getLogoSrc = async (fileId: string) => {
+    getLogoSrc = async (fileId: string | number) => {
       const result = await getFilesRaw(fileId, 'url')
       if (typeof result === 'string') {
         setLogoSrc(result)

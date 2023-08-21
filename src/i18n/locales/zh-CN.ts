@@ -186,6 +186,8 @@ export default {
     retrieve_pwd: '找回密码',
     app_code_mismatch: '应用编码不匹配',
     leave_prompt_tip: '您还有内容未保存，是否离开',
+    file_source: '文件来源',
+    file_source_kind: '来源类型',
 
     // 创建
     create_user: '创建用户',
@@ -197,12 +199,14 @@ export default {
     create_role: '创建角色',
     create_org: '创建组织',
     create_user_group: '创建用户组',
+    create_file_source: '创建文件来源',
     // 修改
     'amend_{{field}}': '修改{{field}}',
     amend_basic_info: '修改基本信息',
     amend_login_credentials: '修改登录凭证',
     amend_login_settings: '修改登陆设置',
     amend_app_config: '修改应用配置',
+    amend_file_source: '修改文件来源',
     // 列表
     account_list: '账户列表',
     member_list: '成员列表',
@@ -212,6 +216,7 @@ export default {
     policy_list: '权限策略列表',
     app_list: '应用列表',
     auth_org_list: '授权组织列表',
+    file_source_list: '文件来源列表',
     // 详情
     account_detail: '账户详情',
     member_detail: '成员详情',
@@ -252,6 +257,8 @@ export default {
     click_search_account: '点击搜索账户',
     click_search_member: '点击搜索成员',
     click_search_app: '点击搜索应用',
+    please_enter_file_source_kind: '请选择来源类型',
+    please_enter_file_source_bucket: '请输入bucket',
     // 添加
     add: '添加',
     add_resources: '添加资源',

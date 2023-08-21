@@ -70,7 +70,7 @@ export default () => {
 
   return ['/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
     : <Layout
-      appCode={process.env.ICE_APP_CODE as string}
+      appCode={process.env.ICE_APP_CODE ?? ''}
       pathname={location.pathname}
       IconFont={IconFont}
       onClickMenuItem={async (item, isOpen) => {

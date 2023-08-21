@@ -18,8 +18,8 @@ const documents = {
     "mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){id}\n}": types.CreateAppActionDocument,
     "mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){id}\n}": types.UpdateAppActionDocument,
     "mutation delAppAction($appActionId:ID!){\n  deleteAppAction(actionID: $appActionId)\n}": types.DelAppActionDocument,
-    "query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logo,comments,status,createdAt\n      }\n    }\n  }\n}": types.AppListDocument,
-    "query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logo,comments,status,createdAt\n    }\n  }\n}": types.AppInfoDocument,
+    "query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logoFileID,comments,status,createdAt\n      }\n    }\n  }\n}": types.AppListDocument,
+    "query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logoFileID,comments,status,createdAt\n    }\n  }\n}": types.AppInfoDocument,
     "mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){id}\n}": types.UpdateAppDocument,
     "mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){ id }\n}": types.CreateAppDocument,
     "mutation delApp($appId:ID!){\n  deleteApp(appID: $appId)\n}": types.DelAppDocument,
@@ -49,8 +49,12 @@ const documents = {
     "mutation delAppRole($appRoleId:ID!){\n  deleteAppRole(roleID: $appRoleId)\n}": types.DelAppRoleDocument,
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
-    "query globalID($type:String!,$id:ID!){\n  globalID(type:$type,id:$id)\n}": types.GlobalIdDocument,
-    "query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}": types.OrgAppListDocument,
+    "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}": types.FileSourceListDocument,
+    "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}": types.FileSourceInfoDocument,
+    "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}": types.CreateFileSourceDocument,
+    "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}": types.UpdateFileSourceDocument,
+    "mutation deleteFileSource($fsId:ID!){\n  deleteFileSource(fsID: $fsId)\n}": types.DeleteFileSourceDocument,
+    "query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logoFileID,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}": types.OrgAppListDocument,
     "mutation assignOrgApp($orgId:ID!,$appId:ID!){\n  assignOrganizationApp(orgID: $orgId,appID: $appId)\n}": types.AssignOrgAppDocument,
     "mutation revokeOrgApp($orgId:ID!,$appId:ID!){\n  revokeOrganizationApp(orgID: $orgId,appID: $appId)\n}": types.RevokeOrgAppDocument,
     "query orgAppActionList($appCode:String!){\n  orgAppActions(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}": types.OrgAppActionListDocument,
@@ -165,11 +169,11 @@ export function gql(source: "mutation delAppAction($appActionId:ID!){\n  deleteA
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logo,comments,status,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logo,comments,status,createdAt\n      }\n    }\n  }\n}"];
+export function gql(source: "query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logoFileID,comments,status,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logoFileID,comments,status,createdAt\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logo,comments,status,createdAt\n    }\n  }\n}"): (typeof documents)["query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logo,comments,status,createdAt\n    }\n  }\n}"];
+export function gql(source: "query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logoFileID,comments,status,createdAt\n    }\n  }\n}"): (typeof documents)["query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logoFileID,comments,status,createdAt\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -289,11 +293,27 @@ export function gql(source: "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query globalID($type:String!,$id:ID!){\n  globalID(type:$type,id:$id)\n}"): (typeof documents)["query globalID($type:String!,$id:ID!){\n  globalID(type:$type,id:$id)\n}"];
+export function gql(source: "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}"): (typeof documents)["query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}"];
+export function gql(source: "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}"): (typeof documents)["query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}"): (typeof documents)["mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}"): (typeof documents)["mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteFileSource($fsId:ID!){\n  deleteFileSource(fsID: $fsId)\n}"): (typeof documents)["mutation deleteFileSource($fsId:ID!){\n  deleteFileSource(fsID: $fsId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logoFileID,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logoFileID,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

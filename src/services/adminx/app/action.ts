@@ -7,6 +7,7 @@ export const EnumAppActionKind = {
   restful: { text: 'restful' },
   graphql: { text: 'graphql' },
   rpc: { text: 'rpc' },
+  route: { text: 'route' },
   function: { text: 'function' },
 };
 

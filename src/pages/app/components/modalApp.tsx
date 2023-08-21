@@ -19,7 +19,7 @@ export default (props: {
   const { t } = useTranslation(),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true
-      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
+      { title: 'LOGO', dataIndex: 'logoFileID', width: 90, align: 'center', valueType: 'image', search: false },
       {
         title: t('name'),
         dataIndex: 'name',
@@ -97,7 +97,7 @@ export default (props: {
             });
             if (result?.totalCount) {
               table.data = result.edges?.map(item => item?.node) as App[];
-              table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+              table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
               table.total = result.totalCount;
             }
           } else {
@@ -108,7 +108,7 @@ export default (props: {
             });
             if (result?.totalCount) {
               table.data = result.edges?.map(item => item?.node) as App[];
-              table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
+              table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
               table.total = result.totalCount;
             }
           }

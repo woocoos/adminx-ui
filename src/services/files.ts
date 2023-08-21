@@ -68,7 +68,7 @@ export async function delFiles(fileId: string) {
  * @param type
  * @returns
  */
-export async function getFilesRaw(fileId: string, type?: 'url') {
+export async function getFilesRaw(fileId: string | number, type?: 'url') {
   if (fileId == '0') {
     return null;
   }

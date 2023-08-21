@@ -22,7 +22,7 @@ const queryAppList = gql(/* GraphQL */`query appList($first: Int,$orderBy:AppOrd
     edges{
       cursor,node{
         id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
-        refreshTokenValidity,logo,comments,status,createdAt
+        refreshTokenValidity,logoFileID,comments,status,createdAt
       }
     }
   }
@@ -32,7 +32,7 @@ const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
   node(id:$gid){
     ... on App{
       id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
-      refreshTokenValidity,logo,comments,status,createdAt
+      refreshTokenValidity,logoFileID,comments,status,createdAt
     }
   }
 }`);

@@ -7,7 +7,7 @@ import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList 
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
-import { App, AppAction, AppActionWhereInput } from '@/generated/adminx/graphql';
+import { App, AppAction, AppActionKind, AppActionWhereInput } from '@/generated/adminx/graphql';
 
 export type AppActionListRef = {
   getSelect: () => AppAction[];
@@ -63,7 +63,7 @@ const AppActionList = (props: {
       search: false,
       width: 80,
       render: (text, record) => {
-        return (<Space>
+        return record.kind !== AppActionKind.Route ? (<Space>
           <Auth authKey={'updateAppAction'}>
             <a
               key="editor"
@@ -81,7 +81,7 @@ const AppActionList = (props: {
               {t('delete')}
             </a>
           </Auth>
-        </Space>);
+        </Space>) : <></>;
       },
     },
   );
@@ -160,16 +160,6 @@ const AppActionList = (props: {
         toolbar={{
           title: `${t('app')}:${appInfo?.name || '-'}`,
           actions: [
-            <Button
-              key="import"
-              onClick={
-                () => {
-                  alert('还未实现');
-                }
-              }
-            >
-              {t('sync_permission')}
-            </Button >,
             <Auth authKey="createAppActions">
               <Button
                 key="created"

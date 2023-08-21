@@ -12,7 +12,7 @@ type ProFormData = {
   scopes?: string;
   tokenValidity?: number;
   refreshTokenValidity?: number;
-  logo?: string;
+  logoFileID?: number;
   name?: string;
   code?: string;
   kind?: AppKind;
@@ -68,7 +68,7 @@ export default (props: {
           scopes: values.scopes,
           tokenValidity: values.tokenValidity,
           refreshTokenValidity: values.refreshTokenValidity,
-          logo: values.logo,
+          logoFileID: values.logoFileID,
           comments: values.comments,
         }, appInfo || {}))
         : await createAppInfo({
@@ -79,7 +79,7 @@ export default (props: {
           scopes: values.scopes,
           tokenValidity: values.tokenValidity,
           refreshTokenValidity: values.refreshTokenValidity,
-          logo: values.logo,
+          logoFileID: values.logoFileID,
           comments: values.comments,
         });
       if (result?.id) {
@@ -127,8 +127,8 @@ export default (props: {
         <ProFormDigit name="refreshTokenValidity" label={`refresh_token ${t('validity')}`} />
       </div>
       <div x-else>
-        <ProFormText name="logo" label="LOGO" >
-          <UploadFiles accept=".png,.jpng,.jpeg,.jpg" />
+        <ProFormText name="logoFileID" label="LOGO" >
+          <UploadFiles accept=".png,.jpng,.jpeg,.jpg" directory="images" />
         </ProFormText>
         <ProFormText
           name="name"

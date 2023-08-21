@@ -186,6 +186,8 @@ export default {
     retrieve_pwd: 'Retrieve password',
     app_code_mismatch: 'The application encoding does not match',
     leave_prompt_tip: 'You still have content not saved, please leave',
+    file_source: 'file source',
+    file_source_kind: 'source type',
 
     // 创建
     create_user: 'Create a user',
@@ -197,12 +199,14 @@ export default {
     create_role: 'Create a role',
     create_org: 'Create organization',
     create_user_group: 'Creating a User Group',
+    create_file_source: 'Creating a File source',
     // 修改
     'amend_{{field}}': 'Modifying {{field}}',
     amend_basic_info: 'Modifying Basic Information',
     amend_login_credentials: 'Modify login credentials',
     amend_login_settings: 'Modify login Settings',
     amend_app_config: 'Modifying Application Configuration',
+    amend_file_source: 'Modifying File Source',
     // 列表
     account_list: 'Account list',
     member_list: 'Member list',
@@ -212,6 +216,7 @@ export default {
     policy_list: 'Permission policy list',
     app_list: 'Application list',
     auth_org_list: 'List of authorized organizations',
+    file_source_list: 'File source list',
     // 详情
     account_detail: 'Account details',
     member_detail: 'Member details',
@@ -252,6 +257,8 @@ export default {
     click_search_account: 'Click Search Account',
     click_search_member: 'Click to search members',
     click_search_app: 'Click search app',
+    please_enter_file_source_kind: 'Please select source type',
+    please_enter_file_source_bucket: 'Please enter bucket',
     // 添加
     add: 'Append',
     add_resources: 'Add resource',

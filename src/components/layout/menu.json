@@ -59,6 +59,10 @@
       {
         "name": "应用管理",
         "path": "/system/app"
+      },
+      {
+        "name": "文件来源",
+        "path": "/system/file/source"
       }
     ]
   }

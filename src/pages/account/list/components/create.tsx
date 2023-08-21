@@ -230,7 +230,7 @@ export default (props: {
         x-if={['base'].includes(props.scene)}
         name="avatarFileID"
       >
-        <UploadFiles accept='.jpg,.png' />
+        <UploadFiles accept='.jpg,.png' directory="images" />
       </ProFormText>
       <div x-if={['create', 'base', 'recycle'].includes(props.scene)}>
         <ProFormText

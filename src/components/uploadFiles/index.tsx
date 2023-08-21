@@ -1,4 +1,5 @@
 import { getFilesRaw, updateFiles } from "@/services/files";
+import store from "@/store";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { Upload, message } from "antd"
 import { RcFile } from "antd/es/upload";
@@ -7,13 +8,24 @@ import { useTranslation } from "react-i18next";
 
 
 export default (props: {
+  bucket?: string;
+  appCode?: string;
+  tid?: string;
+  /**
+   * 目录格式  xxx/ss
+   */
   directory?: string;
+  /**
+   * 强制使用目录当前缀
+   */
+  forceDirectory?: boolean;
   value?: string;
   maxSize?: number;
   accept?: string;
   onChange?: (value: string) => void;
 }) => {
   const { t } = useTranslation(),
+    [userState] = store.useModel('user'),
     [loading, setLoading] = useState(false),
     [imgsrc, setImgsrc] = useState<string>();
 
@@ -30,7 +42,73 @@ export default (props: {
         return (fileSize / (1024 * 1024 * 1024)).toFixed(2) + 'GB';
       }
     },
-    beforeUpload = (file: RcFile) => {
+    // 随机数
+    randomId = (len: number) => {
+      let str = '';
+      for (; str.length < len; str += Math.random().toString(36).substring(2));
+      return str.substring(0, len);
+    },
+    updateFile = async (file: RcFile) => {
+      const suffix = file.name.split('.').pop(),
+        bucket = props.bucket ?? 'local',
+        tid = props.tid ?? userState.tenantId,
+        appCode = props.appCode ?? process.env.ICE_APP_CODE,
+        keys: string[] = [];
+
+      if (props.forceDirectory && props.directory) {
+        keys.push(props.directory)
+      } else {
+        if (appCode) {
+          keys.push(appCode)
+        }
+        if (tid) {
+          keys.push(tid)
+        }
+        if (props.directory) {
+          keys.push(props.directory)
+        }
+      }
+
+      keys.push(`${randomId(16)}.${suffix}`)
+
+      setLoading(true)
+      if (bucket === 'local') {
+        try {
+          const result = await updateFiles({
+            key: `/${keys.join('/')}`,
+            bucket,
+            file,
+          })
+          if (result) {
+            props.onChange?.(result)
+          }
+        } catch (error) {
+
+        }
+      }
+      setLoading(false)
+    }
+
+  useEffect(() => {
+    if (props.value) {
+      const bucket = props.bucket ?? 'local';
+      if (bucket === 'local') {
+        getFilesRaw(props.value, 'url').then(result => {
+          if (typeof result === 'string') {
+            setImgsrc(result)
+          }
+        })
+      }
+    } else {
+      setImgsrc(undefined)
+    }
+  }, [props.value])
+
+  return <Upload
+    accept={props.accept}
+    listType="picture-card"
+    showUploadList={false}
+    beforeUpload={(file) => {
       let isTrue = true;
       const maxSize = props.maxSize || 1024 * 5000
 
@@ -42,40 +120,7 @@ export default (props: {
         updateFile(file)
       }
       return false
-    },
-    updateFile = async (file: RcFile) => {
-      const suffix = file.name.split('.').pop(),
-        directory = props.directory || 'temp',
-        key = `${directory}/${Math.floor(Math.floor(Math.random() * 100000) + Date.now()).toString(16)}.${suffix}`
-      setLoading(true)
-      const result = await updateFiles({
-        key,
-        bucket: "adminx-ui",
-        file: file,
-      })
-      if (result) {
-        props.onChange?.(result)
-      }
-      setLoading(false)
-    },
-    getFile = async () => {
-      if (props.value) {
-        const result = await getFilesRaw(props.value, 'url')
-        if (typeof result === 'string') {
-          setImgsrc(result)
-        }
-      }
-    }
-
-  useEffect(() => {
-    getFile()
-  }, [props.value])
-
-  return <Upload
-    accept={props.accept}
-    listType="picture-card"
-    showUploadList={false}
-    beforeUpload={beforeUpload}
+    }}
   >
     {
       imgsrc ? <img

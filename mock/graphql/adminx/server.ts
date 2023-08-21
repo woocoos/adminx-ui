@@ -27,7 +27,7 @@ const schemaWithMocks = addMocksToSchema({
   preserveResolvers,
   resolvers: {
     App: {
-      logo: () => 'png',
+      logoFileID: () => 'png',
       menus: relayStylePaginationMock(store),
       actions: relayStylePaginationMock(store),
       resources: relayStylePaginationMock(store),
