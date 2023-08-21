@@ -105,7 +105,15 @@ export function refreshToken() {
  * @returns
  */
 export async function logout() {
-  return await request.post(`${baseURL}/logout`);
+  const userState = store.getModelState('user');
+  if (userState.token) {
+    request.post(`${baseURL}/logout`);
+  }
+  const userDispatcher = store.getModelDispatchers('user')
+  userDispatcher.logout();
+  if (!location.pathname.split('/').includes('login')) {
+    location.href = `${process.env.ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
+  }
 }
 
 /**

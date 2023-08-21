@@ -10,7 +10,6 @@ import { monitorKeyChange } from '@/pkg/localStore';
 import { getFilesRaw } from '@/services/files';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { logout, urlSpm } from '@/services/auth';
-import { goLogin } from '@/util';
 import { createFromIconfontCN } from '@ant-design/icons';
 
 const IconFont = createFromIconfontCN({
@@ -97,8 +96,6 @@ export default () => {
         onLogoutClick: () => {
           if (checkLeave()) {
             logout();
-            userDispatcher.logout();
-            goLogin();
           }
         },
       }}

@@ -6,13 +6,13 @@ import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/type
 import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem, removeItem } from '@/pkg/localStore';
-import { browserLanguage, goLogin } from './util';
+import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { User } from './generated/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
 import { userPermissions } from '@knockout-js/api';
-import { parseSpm } from './services/auth';
+import { logout, parseSpm } from './services/auth';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -124,8 +124,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
       });
     }
   } else {
-    store.dispatch.user.logout();
-    goLogin();
+    logout();
   }
   return {
     initialAuth,
