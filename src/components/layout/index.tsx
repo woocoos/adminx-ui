@@ -12,8 +12,8 @@ import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { logout, urlSpm } from '@/services/auth';
 import { createFromIconfontCN } from '@ant-design/icons';
 
-const NODE_ENV = process.env.NODE_ENV ?? '',
-  ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource',
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  NODE_ENV = process.env.NODE_ENV ?? '',
   IconFont = createFromIconfontCN({
     scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
   })

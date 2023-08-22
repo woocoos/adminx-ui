@@ -51,7 +51,7 @@ export type ForgetPwdBeginRes = {
 };
 
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
-  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login';
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login'
 
 /**
  * 获取验证码

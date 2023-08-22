@@ -14,12 +14,10 @@ import { isInIcestark } from '@ice/stark-app';
 import { userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 
-const ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '/api-adminx',
-  ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? `${ICE_API_ADMINX_PREFIX}/graphql/query`,
-  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
-  ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource',
-  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login',
-  ICE_SIGN_CID = process.env.ICE_SIGN_CID ?? `sign_cid=${ICE_APP_CODE}`;
+const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
+  ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
 
 export const icestark = defineChildConfig(() => ({
   mount: () => {
@@ -41,11 +39,12 @@ export default defineAppConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   if (!isInIcestark()) {
-    if (document.cookie.indexOf(ICE_SIGN_CID) === -1) {
+    const signCid = `sign_cid=${ICE_APP_CODE}`
+    if (document.cookie.indexOf(signCid) === -1) {
       removeItem('token')
       removeItem('refreshToken')
     }
-    document.cookie = ICE_SIGN_CID
+    document.cookie = signCid
   }
   const spmData = await parseSpm()
   let locale = getItem<string>('locale'),
@@ -104,8 +103,8 @@ export const urqlConfig = defineUrqlConfig([
             store.dispatch.user.updateToken(newToken)
           }
         },
-        login: ICE_LOGIN_URL,
-        refreshApi: `${ICE_API_AUTH_PREFIX}/login/refresh-token`
+        login: ICE_LOGIN_URL ?? '/login',
+        refreshApi: `${ICE_API_AUTH_PREFIX ?? '/api-auth'}/login/refresh-token`
       }
     }
   },
@@ -148,8 +147,9 @@ export const storeConfig = defineStoreConfig(async (appData) => {
   };
 });
 
+// const
 // 请求配置
-export const requestConfig = defineRequestConfig(() => {
+export const requestConfig = defineRequestConfig(async () => {
   return [
     {
       interceptors: requestInterceptor({
@@ -164,6 +164,6 @@ export const requestConfig = defineRequestConfig(() => {
         login: ICE_LOGIN_URL,
       })
     },
-  ];
+  ]
 });
 

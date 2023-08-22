@@ -1,6 +1,4 @@
-const ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource'
-
-const module = ICE_APP_CODE;
+const module = 'resource';
 
 /**
  * 获取持久化数据

@@ -4,7 +4,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 dotenv.config({ path: '.env.local', override: true })
 
-const GQLGEN_SCHEMA_ADMINX = process.env.GQLGEN_SCHEMA_ADMINX ?? "http://127.0.0.1:8080/graphql/query",
+const GQLGEN_SCHEMA_ADMINX = process.env.GQLGEN_SCHEMA_ADMINX ?? "",
   ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
   ICE_DEV_TID = process.env.ICE_DEV_TID ?? ''
 

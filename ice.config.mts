@@ -7,15 +7,15 @@ import jsxPlus from '@ice/plugin-jsx-plus';
 import icestark from '@ice/plugin-icestark';
 import urqlPlugin from '@knockout-js/ice-urql';
 
-const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '/',
-  ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '/',
+const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
+  ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
-  ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? 'http://127.0.0.1:8080/',
-  ICE_PROXY_FILES = process.env.ICE_PROXY_FILES ?? 'http://127.0.0.1:10071/',
-  ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? 'http://127.0.0.1:10070/',
-  ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '/api-adminx',
-  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
-  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '/api-files',
+  ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
+  ICE_PROXY_FILES = process.env.ICE_PROXY_FILES ?? '',
+  ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
+  ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '',
   minify = NODE_ENV === 'production' ? 'swc' : false;
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
@@ -50,12 +50,12 @@ export default defineConfig(() => ({
       pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}`]: '' },
     },
     [ICE_API_AUTH_PREFIX]: {
-      target: ICE_PROXY_FILES,
+      target: ICE_PROXY_AUTH,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
     },
     [ICE_API_FILES_PREFIX]: {
-      target: ICE_PROXY_AUTH,
+      target: ICE_PROXY_FILES,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_FILES_PREFIX}`]: '' },
     },

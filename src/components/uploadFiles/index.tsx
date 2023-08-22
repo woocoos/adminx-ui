@@ -6,7 +6,7 @@ import { RcFile } from "antd/es/upload";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-const ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource'
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
 
 export default (props: {
   bucket?: string;
