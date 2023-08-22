@@ -1,6 +1,6 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { AppActionKind, AppActionMethod, AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 export const EnumUserIdentityKind = {
@@ -476,63 +476,6 @@ export async function checkPermission(permission: string) {
   }
   return null;
 }
-
-
-/**
- * 获取用户的权限
- * @param where
- * @returns
- */
-export async function userPermissions(headers?: Record<string, any>) {
-  const result = await query(
-    queryUserPermissionList,
-    {
-      where: {
-        hasAppWith: [{ code: process.env.ICE_APP_CODE }],
-        or: [
-          { kind: AppActionKind.Function },
-          { kindNEQ: AppActionKind.Function, method: AppActionMethod.Write }
-        ],
-      }
-    },
-    headers,
-  );
-
-  if (result.data?.userPermissions) {
-    return result?.data?.userPermissions;
-  }
-  return null;
-}
-
-/**
- * 获取用户授权的菜单
- * @param appCode
- * @returns
- */
-export async function userMenus(appCode: string) {
-  const result = await query(
-    queryUserMenuList, {
-    appCode,
-  });
-
-  if (result.data?.userMenus) {
-    return result?.data?.userMenus;
-  }
-  return null;
-}
-
-/**
- * 获取用户root组织
- * @returns
- */
-export async function userRootOrgs() {
-  const result = await query(queryUserRootOrgList, {});
-  if (result.data?.userRootOrgs) {
-    return result?.data?.userRootOrgs;
-  }
-  return null;
-}
-
 
 /**
  * 获取回收站用户

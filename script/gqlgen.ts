@@ -1,16 +1,12 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
 import * as process from "process";
-
 const dotenv = require('dotenv')
 dotenv.config()
-dotenv.config({ path: `.env.${process.env.NODE_ENV}`, override: true })
 dotenv.config({ path: '.env.local', override: true })
 
-const adminxSchema = process.env.GQLGEN_SCHEMA_ADMINX
-
-if (!adminxSchema) {
-  throw Error('The env.GQLGEN_SCHEMA_ADMINX is undefined')
-}
+const GQLGEN_SCHEMA_ADMINX = process.env.GQLGEN_SCHEMA_ADMINX ?? "http://127.0.0.1:8080/graphql/query",
+  ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
+  ICE_DEV_TID = process.env.ICE_DEV_TID ?? ''
 
 /**
  * 生成.graphql的配置
@@ -24,10 +20,10 @@ const schemaAstConfig: CodegenConfig = {
         includeDirectives: true,
       },
       schema: {
-        [adminxSchema]: {
+        [GQLGEN_SCHEMA_ADMINX]: {
           headers: {
-            "Authorization": `Bearer ${process.env.GQLGEN_TOKEN}`,
-            "X-Tenant-ID": `${process.env.GQLGEN_TENANT_ID}`,
+            "Authorization": `Bearer ${ICE_DEV_TOKEN}`,
+            "X-Tenant-ID": `${ICE_DEV_TID}`,
           }
         },
       }

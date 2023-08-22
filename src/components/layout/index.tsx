@@ -12,9 +12,11 @@ import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { logout, urlSpm } from '@/services/auth';
 import { createFromIconfontCN } from '@ant-design/icons';
 
-const IconFont = createFromIconfontCN({
-  scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
-})
+const NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource',
+  IconFont = createFromIconfontCN({
+    scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
+  })
 
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
@@ -69,7 +71,7 @@ export default () => {
 
   return ['/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
     : <Layout
-      appCode={process.env.ICE_APP_CODE ?? ''}
+      appCode={ICE_APP_CODE}
       pathname={location.pathname}
       IconFont={IconFont}
       onClickMenuItem={async (item, isOpen) => {
@@ -111,7 +113,7 @@ export default () => {
             colorMenuBackground: appState.darkMode ? 'linear-gradient(#141414, #000000 28%)' : token.colorBgContainer,
           },
         },
-        [process.env.ICE_CORE_MODE === 'development' ? 'menu' : '']: {
+        [NODE_ENV === 'development' ? 'menu' : '']: {
           request: () => {
             const list: MenuDataItem[] = [];
             menuList.forEach(item => {

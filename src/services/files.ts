@@ -7,7 +7,7 @@ type Files = {
   createdAt: string
 }
 
-const baseURL = '/api-files'
+const ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '/api-files'
 
 /**
  * 上传
@@ -19,7 +19,7 @@ export async function updateFiles(data: {
   bucket: string;
   file: File;
 }) {
-  const result = await request.post(`${baseURL}/files`, data, {
+  const result = await request.post(`${ICE_API_FILES_PREFIX}/files`, data, {
     headers: {
       "Content-Type": "multipart/form-data"
     }
@@ -40,7 +40,7 @@ export async function getFiles(fileId: string) {
   if (fileId == '0') {
     return null;
   }
-  const result = await request.get(`${baseURL}/files/${fileId}`)
+  const result = await request.get(`${ICE_API_FILES_PREFIX}/files/${fileId}`)
   if (result?.id) {
     return result as Files;
   }
@@ -56,7 +56,7 @@ export async function delFiles(fileId: string) {
   if (fileId == '0') {
     return null;
   }
-  const result = await request.delete(`${baseURL}/files/${fileId}`)
+  const result = await request.delete(`${ICE_API_FILES_PREFIX}/files/${fileId}`)
   return result;
 }
 
@@ -72,7 +72,7 @@ export async function getFilesRaw(fileId: string | number, type?: 'url') {
   if (fileId == '0') {
     return null;
   }
-  const result = await request.get(`${baseURL}/files/${fileId}/raw`, {
+  const result = await request.get(`${ICE_API_FILES_PREFIX}/files/${fileId}/raw`, {
     responseType: "blob",
   })
   if (typeof result === 'object' && result.constructor.name === 'Blob') {

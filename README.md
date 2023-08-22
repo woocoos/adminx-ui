@@ -43,3 +43,75 @@ pnpm gqlgen:watch
 - JetBrains IDE:
   - 安装插件`PostCSS` 
   - `Settings` -> `Languages & Frameworks` -> `Stylesheets` -> `Dialects` -> project css dialect -> `PostCSS`
+
+
+## env 
+```
+/**
+ * 应用appCode
+ */
+process.env.ICE_APP_CODE ?? 'resource'
+
+/**
+ * cookie的sign_cid
+ */
+process.env.ICE_SIGN_CID ?? `sign_cid=${ICE_APP_CODE}`
+
+/**
+ * 登陆地址
+ */
+process.env.ICE_LOGIN_URL ?? '/login'
+
+/**
+ * api前缀
+ */
+process.env.ICE_API_ADMINX_PREFIX ?? '/api-adminx'
+process.env.ICE_API_AUTH_PREFIX ?? '/api-auth'
+process.env.ICE_API_FILES_PREFIX ?? '/api-files'
+
+/**
+ * gql api完整地址
+ */
+process.env.ICE_API_ADMINX ?? `${ICE_API_ADMINX_PREFIX}/graphql/query`
+
+/**
+ * 微前端开发适合测试使用
+ * 可配置值：http://localhost:xxx/
+ */
+process.env.ICE_DEV_PUBLIC_PATH ?? '/'
+
+/**
+ * 微前端打包时候使用配置与具体部署位置有关
+ */
+process.env.ICE_BUILD_PUBLIC_PATH ?? '/'
+
+
+/**
+ * 打包：production
+ * 开发：development
+ */
+process.env.NODE_ENV
+
+/**
+ * token
+ */
+process.env.ICE_DEV_TOKEN ?? ''
+
+/**
+ * tenant_id
+ */
+process.env.ICE_DEV_TID ?? '' 
+
+/**
+ * ice proxy target
+ */
+process.env.ICE_PROXY_ADMINX ?? 'http://127.0.0.1:8080/'
+process.env.ICE_PROXY_FILES ?? 'http://127.0.0.1:10071/'
+process.env.ICE_PROXY_AUTH ?? 'http://127.0.0.1:10070/'
+
+/**
+ * adminx项目schema地址
+ * gqlgen专用
+ */
+process.env.GQLGEN_SCHEMA_ADMINX ?? "http://127.0.0.1:8080/graphql/query"
+```

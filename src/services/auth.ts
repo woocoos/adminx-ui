@@ -50,14 +50,15 @@ export type ForgetPwdBeginRes = {
   errors?: OasErrors[];
 };
 
-const baseURL = "/api-auth"
+const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login';
 
 /**
  * 获取验证码
  * @returns
  */
 export async function captcha(): Promise<CaptchaRes> {
-  return await request.get(`${baseURL}/captcha`);
+  return await request.get(`${ICE_API_AUTH_PREFIX}/captcha`);
 }
 
 /**
@@ -66,7 +67,7 @@ export async function captcha(): Promise<CaptchaRes> {
  * @returns
  */
 export async function login(username: string, password: string, captcha: string, captchaId: string): Promise<LoginRes> {
-  return await request.post(`${baseURL}/login/auth`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/login/auth`, {
     username,
     password,
     captcha,
@@ -90,7 +91,7 @@ export function refreshToken() {
       const jwt = jwtDcode<JwtPayload>(userState.token);
       if ((jwt.exp || 0) * 1000 - Date.now() < 30 * 60 * 1000) {
         // 小于30分钟的时候需要刷新token
-        const tr = await request.post(`${baseURL}/login/refresh-token`, {
+        const tr = await request.post(`${ICE_API_AUTH_PREFIX}/login/refresh-token`, {
           refreshToken: userState.refreshToken,
         });
         if (tr.accessToken) {
@@ -107,12 +108,12 @@ export function refreshToken() {
 export async function logout() {
   const userState = store.getModelState('user');
   if (userState.token) {
-    request.post(`${baseURL}/logout`);
+    request.post(`${ICE_API_AUTH_PREFIX}/logout`);
   }
   const userDispatcher = store.getModelDispatchers('user')
   userDispatcher.logout();
   if (!location.pathname.split('/').includes('login')) {
-    location.href = `${process.env.ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
+    location.href = `${ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
   }
 }
 
@@ -123,7 +124,7 @@ export async function logout() {
  * @returns
  */
 export async function loginResetPassword(stateToken: string, newPassword: string): Promise<LoginRes> {
-  return await request.post(`${baseURL}/login/reset-password`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/login/reset-password`, {
     stateToken,
     newPassword,
   });
@@ -137,7 +138,7 @@ export async function loginResetPassword(stateToken: string, newPassword: string
  * @returns
  */
 export async function loginVerifyFactor(deviceId: string, stateToken: string, otpToken: string): Promise<LoginRes> {
-  return await request.post(`${baseURL}/login/verify-factor`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/login/verify-factor`, {
     deviceId,
     stateToken,
     otpToken,
@@ -149,7 +150,7 @@ export async function loginVerifyFactor(deviceId: string, stateToken: string, ot
  * @returns
  */
 export async function bindPrepareMfa(): Promise<MfaPrepare> {
-  return await request.post(`${baseURL}/mfa/bind-prepare`);
+  return await request.post(`${ICE_API_AUTH_PREFIX}/mfa/bind-prepare`);
 }
 
 /**
@@ -159,7 +160,7 @@ export async function bindPrepareMfa(): Promise<MfaPrepare> {
  * @returns
  */
 export async function bindMfa(stateToken: string, otpToken: string): Promise<boolean> {
-  return await request.post(`${baseURL}/mfa/bind`, { stateToken, otpToken });
+  return await request.post(`${ICE_API_AUTH_PREFIX}/mfa/bind`, { stateToken, otpToken });
 }
 
 /**
@@ -168,7 +169,7 @@ export async function bindMfa(stateToken: string, otpToken: string): Promise<boo
  * @returns
  */
 export async function unbindMfa(otpToken: string): Promise<boolean> {
-  return await request.post(`${baseURL}/mfa/unbind`, { otpToken });
+  return await request.post(`${ICE_API_AUTH_PREFIX}/mfa/unbind`, { otpToken });
 }
 
 /**
@@ -179,7 +180,7 @@ export async function unbindMfa(otpToken: string): Promise<boolean> {
  * @returns
  */
 export async function forgetPwdBegin(username: string, captcha: string, captchaId: string): Promise<ForgetPwdBeginRes> {
-  return await request.post(`${baseURL}/forget-pwd/begin`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/begin`, {
     username,
     captcha,
     captchaId,
@@ -199,7 +200,7 @@ export async function forgetPwdVerifyEmail(
   captcha: string,
   captchaId: string,
 ): Promise<ForgetPwdBeginRes> {
-  return await request.post(`${baseURL}/forget-pwd/verify-email`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/verify-email`, {
     stateToken,
     captcha,
     captchaId,
@@ -212,7 +213,7 @@ export async function forgetPwdVerifyEmail(
  * @returns
  */
 export async function forgetPwdSendEmail(stateToken: string): Promise<string> {
-  return await request.post(`${baseURL}/forget-pwd/send-email`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/send-email`, {
     stateToken,
   });
 }
@@ -224,7 +225,7 @@ export async function forgetPwdSendEmail(stateToken: string): Promise<string> {
  * @returns
  */
 export async function forgetPwdVerifyMfa(stateToken: string, otpToken: string): Promise<ForgetPwdBeginRes> {
-  return await request.post(`${baseURL}/forget-pwd/verify-mfa`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/verify-mfa`, {
     stateToken,
     otpToken,
   });
@@ -237,7 +238,7 @@ export async function forgetPwdVerifyMfa(stateToken: string, otpToken: string): 
  * @returns
  */
 export async function forgetPwdReset(stateToken: string, newPassword: string): Promise<boolean> {
-  return await request.post(`${baseURL}/forget-pwd/reset`, {
+  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/reset`, {
     stateToken,
     newPassword,
   });
@@ -251,7 +252,7 @@ export async function urlSpm(url: string, tenantId?: string) {
   try {
     const u = new URL(url);
     if (u.origin != location.origin) {
-      const result = await request.post(`${baseURL}/spm/create`), userState = store.getModelState("user");
+      const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
       if (typeof result === 'string') {
         u.searchParams.set('spm', result)
         if (tenantId || userState.tenantId) {
@@ -283,7 +284,7 @@ export async function parseSpm() {
     // 存放在cookie中避免重复读取
     const ck = `spm=${spm}`;
     if (document.cookie.indexOf(ck) === -1) {
-      const result: LoginRes = await request.post(`${baseURL}/spm/auth`, {
+      const result: LoginRes = await request.post(`${ICE_API_AUTH_PREFIX}/spm/auth`, {
         spm,
       });
       if (result?.accessToken) {

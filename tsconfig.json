@@ -21,6 +21,6 @@
       "ice": [".ice"]
     }
   },
-  "include": ["src", ".ice"],
+  "include": ["src", ".ice", "src/config.ts"],
   "exclude": ["build"]
 }

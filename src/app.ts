@@ -14,6 +14,13 @@ import { isInIcestark } from '@ice/stark-app';
 import { userPermissions } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 
+const ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '/api-adminx',
+  ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? `${ICE_API_ADMINX_PREFIX}/graphql/query`,
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
+  ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource',
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login',
+  ICE_SIGN_CID = process.env.ICE_SIGN_CID ?? `sign_cid=${ICE_APP_CODE}`;
+
 export const icestark = defineChildConfig(() => ({
   mount: () => {
     // 在微应用挂载前执行
@@ -34,12 +41,11 @@ export default defineAppConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   if (!isInIcestark()) {
-    const sign = 'sign_cid=adminx'
-    if (document.cookie.indexOf(sign) === -1) {
+    if (document.cookie.indexOf(ICE_SIGN_CID) === -1) {
       removeItem('token')
       removeItem('refreshToken')
     }
-    document.cookie = sign
+    document.cookie = ICE_SIGN_CID
   }
   const spmData = await parseSpm()
   let locale = getItem<string>('locale'),
@@ -84,7 +90,7 @@ export const dataLoader = defineDataLoader(async () => {
 export const urqlConfig = defineUrqlConfig([
   {
     instanceName: 'default',
-    url: '/api-adminx/graphql/query',
+    url: ICE_API_ADMINX,
     exchangeOpt: {
       authOpts: {
         store: {
@@ -98,8 +104,8 @@ export const urqlConfig = defineUrqlConfig([
             store.dispatch.user.updateToken(newToken)
           }
         },
-        login: process.env.ICE_LOGIN_URL,
-        refreshApi: "/api-auth/login/refresh-token"
+        login: ICE_LOGIN_URL,
+        refreshApi: `${ICE_API_AUTH_PREFIX}/login/refresh-token`
       }
     }
   },
@@ -112,7 +118,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     initialAuth = {};
   // 判断路由权限
   if (user.token) {
-    const ups = await userPermissions(process.env.ICE_APP_CODE as string, {
+    const ups = await userPermissions(ICE_APP_CODE, {
       Authorization: `Bearer ${user.token}`,
       'X-Tenant-ID': user.tenantId,
     });
@@ -155,7 +161,7 @@ export const requestConfig = defineRequestConfig(() => {
             }
           },
         },
-        login: process.env.ICE_LOGIN_URL,
+        login: ICE_LOGIN_URL,
       })
     },
   ];

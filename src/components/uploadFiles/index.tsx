@@ -6,6 +6,7 @@ import { RcFile } from "antd/es/upload";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? 'resource'
 
 export default (props: {
   bucket?: string;
@@ -52,7 +53,7 @@ export default (props: {
       const suffix = file.name.split('.').pop(),
         bucket = props.bucket ?? 'local',
         tid = props.tid ?? userState.tenantId,
-        appCode = props.appCode ?? process.env.ICE_APP_CODE,
+        appCode = props.appCode ?? ICE_APP_CODE,
         keys: string[] = [];
 
       if (props.forceDirectory && props.directory) {
