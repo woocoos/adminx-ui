@@ -27,6 +27,7 @@ export default defineConfig(() => ({
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
   compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/] : true,
+  hash: true,
   routes: {
     ignoreFiles: [
       '**/components/**',   // 添加此配置忽略components被解析成路由组件
