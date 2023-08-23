@@ -129,7 +129,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
       });
     }
   } else {
-    logout();
+    await logout();
   }
   return {
     initialAuth,
@@ -147,23 +147,18 @@ export const storeConfig = defineStoreConfig(async (appData) => {
   };
 });
 
-// const
 // 请求配置
-export const requestConfig = defineRequestConfig(async () => {
-  return [
-    {
-      interceptors: requestInterceptor({
-        store: {
-          getState: () => {
-            const { token, tenantId } = store.getModelState('user')
-            return {
-              token, tenantId
-            }
-          },
-        },
-        login: ICE_LOGIN_URL,
-      })
+export const requestConfig = defineRequestConfig({
+  interceptors: requestInterceptor({
+    store: {
+      getState: () => {
+        const { token, tenantId } = store.getModelState('user');
+        return {
+          token, tenantId
+        }
+      },
     },
-  ]
+    login: ICE_LOGIN_URL,
+  })
 });
 
