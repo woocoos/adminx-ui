@@ -87,6 +87,8 @@ export default {
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
+    confirm_disable: 'confirm disable',
+    confirm_enable: 'confirm enable',
     confirm_delete: 'confirm delete',
     confirm_remove: 'confirm remove',
     confirm_new_pwd: 'confirm new password',
@@ -188,6 +190,7 @@ export default {
     leave_prompt_tip: 'You still have content not saved, please leave',
     file_source: 'file source',
     file_source_kind: 'source type',
+    last_auth_at: 'last use time',
 
     // 创建
     create_user: 'Create a user',

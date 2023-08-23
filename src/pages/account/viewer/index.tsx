@@ -13,6 +13,7 @@ import Auth from '@/components/auth';
 import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
 import { getFilesRaw } from '@/services/files';
+import AccessKey from './components/accessKey';
 
 export default (props: {
   isFromOrg?: boolean;
@@ -310,6 +311,8 @@ export default (props: {
                     </ProDescriptions.Item>
                   </> : <></>}
                 </ProDescriptions>
+                <Divider />
+                <AccessKey userId={info.id} />
               </>
               ,
             }, {

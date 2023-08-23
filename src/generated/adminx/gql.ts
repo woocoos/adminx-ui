@@ -112,6 +112,7 @@ const documents = {
     "query userInfoLoginProfile($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID\n      loginProfile{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n      }\n    }\n  }\n}": types.UserInfoLoginProfileDocument,
     "query userInfoLoginProfileIdentities($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID\n      loginProfile{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n      }\n      identities{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n      }\n    }\n  }\n}": types.UserInfoLoginProfileIdentitiesDocument,
     "query userInfoIdentities($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,\n      identities{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n      }\n    }\n  }\n}": types.UserInfoIdentitiesDocument,
+    "query userAccessKeyList($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,\n      oauthClients{\n        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n      }\n    }\n  }\n}": types.UserAccessKeyListDocument,
     "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}": types.CreateUserDocument,
     "mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }\n}": types.CreateAccountDocument,
     "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName }\n}": types.UpdateUserDocument,
@@ -125,11 +126,12 @@ const documents = {
     "mutation disableMfa($userId:ID!){\n  disableMFA(userID:$userId)\n}": types.DisableMfaDocument,
     "mutation sendMfaEmail($userId:ID!){\n  sendMFAToUserByEmail(userID:$userId)\n}": types.SendMfaEmailDocument,
     "query  checkPermission($permission:String!){\n  checkPermission(permission: $permission)\n}": types.CheckPermissionDocument,
-    "query userPermissionList($where: AppActionWhereInput){\n  userPermissions(where: $where){\n    id,appID,name,kind,method\n  }\n}": types.UserPermissionListDocument,
-    "query userMenuList($appCode:String!){\n  userMenus(appCode: $appCode){\n    id,parentID,kind,name,comments,displaySort,icon,route\n  }\n}": types.UserMenuListDocument,
-    "query userRootOrgs{\n  userRootOrgs{\n    id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone\n  }\n}": types.UserRootOrgsDocument,
     "query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}": types.OrgRecycleUsersDocument,
     "mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }\n}": types.RecoverOrgUserDocument,
+    "mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){ id }\n}": types.CreateOauthClientDocument,
+    "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){ id }\n}": types.EnableOauthClientDocument,
+    "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){ id }\n}": types.DisableOauthClientDocument,
+    "mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}": types.DelOauthClientDocument,
 };
 
 /**
@@ -545,6 +547,10 @@ export function gql(source: "query userInfoIdentities($gid:GID!){\n  node(id:$gi
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "query userAccessKeyList($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,\n      oauthClients{\n        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query userAccessKeyList($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,\n      oauthClients{\n        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}"): (typeof documents)["mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -597,23 +603,27 @@ export function gql(source: "query  checkPermission($permission:String!){\n  che
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query userPermissionList($where: AppActionWhereInput){\n  userPermissions(where: $where){\n    id,appID,name,kind,method\n  }\n}"): (typeof documents)["query userPermissionList($where: AppActionWhereInput){\n  userPermissions(where: $where){\n    id,appID,name,kind,method\n  }\n}"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "query userMenuList($appCode:String!){\n  userMenus(appCode: $appCode){\n    id,parentID,kind,name,comments,displaySort,icon,route\n  }\n}"): (typeof documents)["query userMenuList($appCode:String!){\n  userMenus(appCode: $appCode){\n    id,parentID,kind,name,comments,displaySort,icon,route\n  }\n}"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
-export function gql(source: "query userRootOrgs{\n  userRootOrgs{\n    id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone\n  }\n}"): (typeof documents)["query userRootOrgs{\n  userRootOrgs{\n    id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone\n  }\n}"];
-/**
- * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
- */
 export function gql(source: "query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}"): (typeof documents)["query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }\n}"): (typeof documents)["mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){ id }\n}"): (typeof documents)["mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){ id }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){ id }\n}"): (typeof documents)["mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){ id }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){ id }\n}"): (typeof documents)["mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){ id }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}"): (typeof documents)["mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

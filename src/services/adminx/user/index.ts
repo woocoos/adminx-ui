@@ -1,6 +1,6 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 export const EnumUserIdentityKind = {
@@ -22,6 +22,13 @@ export const EnumUserLoginProfileMfaStatus = {
   inactive: { text: '失活', status: 'default' },
   processing: { text: '处理中', status: 'warning' },
 };
+
+export const EnumUserAccessKeyStatus = {
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
+};
+
 
 export type UpdateUserInfoScene = 'create' | 'base' | 'loginProfile' | 'identity' | 'recycle';
 
@@ -87,6 +94,18 @@ const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:
   }
 }`);
 
+
+const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,
+      oauthClients{
+        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+      }
+    }
+  }
+}`);
+
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
   createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
 }`);
@@ -139,24 +158,6 @@ const queryCheckPermission = gql(/* GraphQL */`query  checkPermission($permissio
   checkPermission(permission: $permission)
 }`);
 
-const queryUserPermissionList = gql(/* GraphQL */`query userPermissionList($where: AppActionWhereInput){
-  userPermissions(where: $where){
-    id,appID,name,kind,method
-  }
-}`);
-
-const queryUserMenuList = gql(/* GraphQL */`query userMenuList($appCode:String!){
-  userMenus(appCode: $appCode){
-    id,parentID,kind,name,comments,displaySort,icon,route
-  }
-}`);
-
-const queryUserRootOrgList = gql(/* GraphQL */`query userRootOrgs{
-  userRootOrgs{
-    id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone
-  }
-}`);
-
 const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
@@ -171,6 +172,22 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
 
 const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
   recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
+}`);
+
+const mutationCreateOauthClient = gql(/* GraphQL */`mutation createOauthClient($input: CreateOauthClientInput!){
+  createOauthClient( input: $input ){ id }
+}`);
+
+const mutationEnableOauthClient = gql(/* GraphQL */`mutation enableOauthClient($id: ID!){
+  enableOauthClient( id: $id ){ id }
+}`);
+
+const mutationDisableOauthClient = gql(/* GraphQL */`mutation disableOauthClient($id: ID!){
+  disableOauthClient( id: $id ){ id }
+}`);
+
+const mutationDelOauthClient = gql(/* GraphQL */`mutation delOauthClient($id: ID!){
+  deleteOauthClient( id: $id )
 }`);
 
 
@@ -524,4 +541,81 @@ export async function restoreRecycleUser(
     return result?.data?.recoverOrgUser;
   }
   return null;
+}
+
+/**
+ * 获取用户accesskey
+ * @param userId
+ * @returns
+ */
+export async function getAccessKeyList(userId: string) {
+  const result = await query(queryUserAccessKeyList, {
+    gid: gid('user', userId),
+  });
+
+  if (result.data?.node?.__typename == "User") {
+    return result.data.node.oauthClients
+  }
+  return null
+}
+
+/**
+ * 创建 accessKey
+ * @param input
+ * @returns
+ */
+export async function createAccessKey(input: CreateOauthClientInput) {
+  const result = await mutation(mutationCreateOauthClient, {
+    input,
+  });
+  if (result.data?.createOauthClient.id) {
+    return result.data.createOauthClient
+  }
+  return null;
+}
+
+/**
+ * 启用 accessKey
+ * @param accessKeyId
+ * @returns
+ */
+export async function enableAccessKey(accessKeyId: string) {
+  const result = await mutation(mutationEnableOauthClient, {
+    id: accessKeyId,
+  })
+  if (result.data?.enableOauthClient.id) {
+    return result.data.enableOauthClient
+  }
+  return null
+}
+
+/**
+ * 禁用 accessKey
+ * @param accessKeyId
+ * @returns
+ */
+export async function disableAccessKey(accessKeyId: string) {
+  const result = await mutation(mutationDisableOauthClient, {
+    id: accessKeyId,
+
+  })
+  if (result.data?.disableOauthClient.id) {
+    return result.data.disableOauthClient
+  }
+  return null
+}
+
+/**
+ * 移除accessKey
+ * @param accessKeyId
+ * @returns
+ */
+export async function delAccessKey(accessKeyId: string) {
+  const result = await mutation(mutationDelOauthClient, {
+    id: accessKeyId,
+  })
+  if (result.data?.deleteOauthClient) {
+    return result.data.deleteOauthClient
+  }
+  return null
 }

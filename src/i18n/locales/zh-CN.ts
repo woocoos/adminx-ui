@@ -87,6 +87,8 @@ export default {
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
+    confirm_disable: '确定是否禁用',
+    confirm_enable: '确定是否启用',
     confirm_delete: '确认是否删除',
     confirm_remove: '确认是否移除',
     confirm_new_pwd: '确认新密码',
@@ -188,6 +190,7 @@ export default {
     leave_prompt_tip: '您还有内容未保存，是否离开',
     file_source: '文件来源',
     file_source_kind: '来源类型',
+    last_auth_at: '最后使用时间',
 
     // 创建
     create_user: '创建用户',
