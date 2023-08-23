@@ -101,6 +101,7 @@ export function refreshToken() {
     }
   }, 2000);
 }
+
 /**
  * 退出登录
  * @returns
@@ -112,8 +113,15 @@ export async function logout() {
   }
   const userDispatcher = store.getModelDispatchers('user')
   userDispatcher.logout();
-  if (!location.pathname.split('/').includes('login')) {
-    location.href = `${ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
+  if (ICE_LOGIN_URL.toLowerCase().startsWith("http")) {
+    const url = new URL(ICE_LOGIN_URL);
+    if (location.pathname !== url.pathname || location.host != url.host) {
+      location.href = `${ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
+    }
+  } else {
+    if (location.pathname !== ICE_LOGIN_URL) {
+      location.href = `${ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
+    }
   }
 }
 
