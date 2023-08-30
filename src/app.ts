@@ -5,7 +5,7 @@ import { defineRequestConfig } from '@ice/plugin-request/esm/types';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
 import store from '@/store';
 import '@/assets/styles/index.css';
-import { getItem, removeItem } from '@/pkg/localStore';
+import { getItem, removeItem, setItem } from '@/pkg/localStore';
 import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { User } from './generated/adminx/graphql';
@@ -20,11 +20,23 @@ const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
 
 export const icestark = defineChildConfig(() => ({
-  mount: () => {
+  mount: (data) => {
     // 在微应用挂载前执行
+    if (data?.customProps) {
+      setItem('locale', data.customProps.app.locale);
+      setItem('darkMode', data.customProps.app.darkMode);
+      setItem('compactMode', data.customProps.app.compactMode);
+      setItem('token', data.customProps.user.token);
+      setItem('refreshToken', data.customProps.user.refreshToken);
+      setItem('tenantId', data.customProps.user.tenantId);
+      setItem('user', data.customProps.user.user);
+    }
   },
   unmount: () => {
     // 在微应用卸载后执行
+    removeItem('token');
+    removeItem('refreshToken');
+    removeItem('tenantId');
   },
 }));
 
