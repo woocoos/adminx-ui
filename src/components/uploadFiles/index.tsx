@@ -76,7 +76,7 @@ export default (props: {
       if (bucket === 'local') {
         try {
           const result = await updateFiles({
-            key: `/${keys.join('/')}`,
+            key: `/${keys.join('/')}`.replace('//', '/'),
             bucket,
             file,
           })
