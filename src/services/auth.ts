@@ -66,7 +66,7 @@ export async function captcha(): Promise<CaptchaRes> {
  * @param data
  * @returns
  */
-export async function login(username: string, password: string, captcha: string, captchaId: string): Promise<LoginRes> {
+export async function login(username: string, password: string, captcha?: string, captchaId?: string): Promise<LoginRes> {
   return await request.post(`${ICE_API_AUTH_PREFIX}/login/auth`, {
     username,
     password,
