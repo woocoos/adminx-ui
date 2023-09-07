@@ -72,10 +72,12 @@ export default () => {
       pathname={location.pathname}
       IconFont={IconFont}
       onClickMenuItem={async (item, isOpen) => {
-        if (isOpen) {
-          window.open(await urlSpm(item.path ?? ''));
-        } else {
-          history?.push(await urlSpm(item.path ?? ''));
+        if (checkLeave()) {
+          if (isOpen) {
+            window.open(await urlSpm(item.path ?? ''));
+          } else {
+            history?.push(await urlSpm(item.path ?? ''));
+          }
         }
       }}
       tenantProps={{
