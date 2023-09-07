@@ -108,6 +108,12 @@ export default {
     });
   },
 
+  'POST /mock-api-auth/login/refresh-token': (request: Request, response: Response) => {
+    response.send({
+      accessToken: token,
+    });
+  },
+
   'GET /mock-api-auth/captcha': (request: Request, response: Response) => {
     const captcha = svgCaptcha.create({
       fontSize: 48,
