@@ -27,20 +27,17 @@ export default () => {
     [avatar, setAvatar] = useState<string>();
 
   useEffect(() => {
+    i18n.changeLanguage(appState.locale);
+  }, [appState.locale]);
+
+  useEffect(() => {
     if (userState.user?.avatarFileId) {
-      getFilesRaw(userState.user?.avatarFileId, 'url').then(result => {
+      getFilesRaw(userState.user.avatarFileId, 'url').then(result => {
         if (typeof result === 'string') {
           setAvatar(result);
         }
       })
     }
-  }, [userState.user]);
-
-  useEffect(() => {
-    i18n.changeLanguage(appState.locale);
-  }, [appState.locale]);
-
-  useEffect(() => {
     monitorKeyChange([
       {
         key: 'tenantId',

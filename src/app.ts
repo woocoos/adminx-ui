@@ -115,6 +115,7 @@ export const urqlConfig = defineUrqlConfig([
             store.dispatch.user.updateToken(newToken)
           }
         },
+        beforeRefreshTime: 5 * 60 * 1000,
         login: ICE_LOGIN_URL ?? '/login',
         refreshApi: `${ICE_API_AUTH_PREFIX ?? '/api-auth'}/login/refresh-token`
       }

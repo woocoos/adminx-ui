@@ -115,7 +115,7 @@ const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgI
 }`);
 
 const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  updateUser(userID:$userId,input:$input){ id,displayName }
+  updateUser(userID:$userId,input:$input){ id,displayName,avatarFileID }
 }`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){

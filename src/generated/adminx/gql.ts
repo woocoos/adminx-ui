@@ -115,7 +115,7 @@ const documents = {
     "query userAccessKeyList($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,\n      oauthClients{\n        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n      }\n    }\n  }\n}": types.UserAccessKeyListDocument,
     "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}": types.CreateUserDocument,
     "mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }\n}": types.CreateAccountDocument,
-    "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName }\n}": types.UpdateUserDocument,
+    "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName,avatarFileID }\n}": types.UpdateUserDocument,
     "mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){ id }\n}": types.UpdateUserLoginProfileDocument,
     "mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){ id }\n}": types.BindUserIdentityDocument,
     "mutation deleteUserIdentity($identityId:ID!){\n  deleteUserIdentity(id:$identityId)\n}": types.DeleteUserIdentityDocument,
@@ -559,7 +559,7 @@ export function gql(source: "mutation createAccount($rootOrgID:ID!,$input: Creat
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName }\n}"): (typeof documents)["mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName }\n}"];
+export function gql(source: "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName,avatarFileID }\n}"): (typeof documents)["mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName,avatarFileID }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
