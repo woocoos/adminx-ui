@@ -69,6 +69,7 @@ const schemaWithMocks = addMocksToSchema({
       appPolicyAssignedToOrgs: () => [
         store.get('Org', 1),
       ],
+      orgUserPreference: () => store.get('OrgUserPreference', 1),
       orgPolicyReferences: relayStylePaginationMock(store),
       appResources: relayStylePaginationMock(store),
       orgAppResources: relayStylePaginationMock(store),
@@ -120,6 +121,14 @@ const schemaWithMocks = addMocksToSchema({
       updateUser: (_, { userID, input }) => {
         store.set('User', userID, input)
         return store.get('User', userID)
+      },
+      saveOrgUserPreference: (_, { input }) => {
+        if (input.menuFavorite) {
+          store.set("OrgUserPreference", 1, 'menuFavorite', input.menuFavorite)
+        } else if (input.menuRecent) {
+          store.set("OrgUserPreference", 1, 'menuRecent', input.menuRecent)
+        }
+        return { id: 1 };
       }
     }
   }
