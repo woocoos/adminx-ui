@@ -3626,6 +3626,8 @@ type Query {
     """Filtering options for Orgs returned from the connection."""
     where: OrgWhereInput
   ): OrgConnection!
+  """用户授权的应用列表"""
+  userApps: [App!]!
   """用户继承用户组的权限策略"""
   userExtendGroupPolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, userID: ID!, where: PermissionWhereInput): PermissionConnection!
   """用户加入的用户组"""
