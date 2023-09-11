@@ -129,20 +129,22 @@ export const authConfig = defineAuthConfig(async (appData) => {
   const { user } = appData,
     initialAuth = {};
   // 判断路由权限
-  if (user.token) {
-    const ups = await userPermissions(ICE_APP_CODE, {
-      Authorization: `Bearer ${user.token}`,
-      'X-Tenant-ID': user.tenantId,
-    });
-    if (ups) {
-      ups.forEach(item => {
-        if (item) {
-          initialAuth[item.name] = true;
-        }
+  if (!['/login', '/login/retrievePassword'].includes(location.pathname)) {
+    if (user.token) {
+      const ups = await userPermissions(ICE_APP_CODE, {
+        Authorization: `Bearer ${user.token}`,
+        'X-Tenant-ID': user.tenantId,
       });
+      if (ups) {
+        ups.forEach(item => {
+          if (item) {
+            initialAuth[item.name] = true;
+          }
+        });
+      }
+    } else {
+      await logout();
     }
-  } else {
-    await logout();
   }
   return {
     initialAuth,
