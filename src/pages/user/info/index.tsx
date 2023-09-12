@@ -6,8 +6,7 @@ import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { User } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
-import UploadFiles from '@/components/uploadFiles';
-import { useLeavePrompt } from '@knockout-js/layout';
+import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
 
 export default () => {
   const
@@ -85,7 +84,7 @@ export default () => {
           <ProFormText
             name="avatarFileID"
           >
-            <UploadFiles accept='.jpg,.png' directory="images" />
+            <UploadAvatar accept='.jpg,.png' directory="images" />
           </ProFormText>
           <ProFormText
             width="lg"

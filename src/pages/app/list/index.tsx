@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { formatArrayFilesRaw } from '@/services/files';
+import { files } from '@knockout-js/api';
 
 export const PageAppList = (props: {
   title?: string;
@@ -212,9 +212,20 @@ export const PageAppList = (props: {
                     pageSize: params.pageSize,
                     where,
                   });
-                  if (result?.totalCount) {
-                    table.data = result.edges?.map(item => item?.node) as App[];
-                    table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
+                  if (result?.totalCount && result.edges) {
+                    for (const item of result.edges) {
+                      if (item?.node) {
+                        let logoFileID: string = defaultApp;
+                        if (item.node?.logoFileID) {
+                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          if (typeof logo === 'string') {
+                            logoFileID = logo;
+                          }
+                        }
+                        item.node.logoFileID = logoFileID as any;
+                        table.data.push(item.node as App);
+                      }
+                    }
                     table.total = result.totalCount;
                   }
                 } else {
@@ -223,9 +234,20 @@ export const PageAppList = (props: {
                     pageSize: params.pageSize,
                     where,
                   });
-                  if (result?.totalCount) {
-                    table.data = result.edges?.map(item => item?.node) as App[];
-                    table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
+                  if (result?.totalCount && result.edges) {
+                    for (const item of result.edges) {
+                      if (item?.node) {
+                        let logoFileID: string = defaultApp;
+                        if (item.node?.logoFileID) {
+                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          if (typeof logo === 'string') {
+                            logoFileID = logo;
+                          }
+                        }
+                        item.node.logoFileID = logoFileID as any;
+                        table.data.push(item.node as App);
+                      }
+                    }
                     table.total = result.totalCount;
                   }
                 }
@@ -304,9 +326,20 @@ export const PageAppList = (props: {
                     pageSize: params.pageSize,
                     where,
                   });
-                  if (result?.totalCount) {
-                    table.data = result.edges?.map(item => item?.node) as App[];
-                    table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
+                  if (result?.totalCount && result.edges) {
+                    for (const item of result.edges) {
+                      if (item?.node) {
+                        let logoFileID: string = defaultApp;
+                        if (item.node?.logoFileID) {
+                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          if (typeof logo === 'string') {
+                            logoFileID = logo;
+                          }
+                        }
+                        item.node.logoFileID = logoFileID as any;
+                        table.data.push(item.node as App);
+                      }
+                    }
                     table.total = result.totalCount;
                   }
                 } else {
@@ -315,9 +348,20 @@ export const PageAppList = (props: {
                     pageSize: params.pageSize,
                     where,
                   });
-                  if (result?.totalCount) {
-                    table.data = result.edges?.map(item => item?.node) as App[];
-                    table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
+                  if (result?.totalCount && result.edges) {
+                    for (const item of result.edges) {
+                      if (item?.node) {
+                        let logoFileID: string = defaultApp;
+                        if (item.node?.logoFileID) {
+                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          if (typeof logo === 'string') {
+                            logoFileID = logo;
+                          }
+                        }
+                        item.node.logoFileID = logoFileID as any;
+                        table.data.push(item.node as App);
+                      }
+                    }
                     table.total = result.totalCount;
                   }
                 }

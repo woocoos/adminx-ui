@@ -12,7 +12,7 @@ import { getOrgPolicyQty } from '@/services/adminx/org/policy';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
 import { App, OrgRoleKind, User } from '@/generated/adminx/graphql';
-import { formatArrayFilesRaw, getFilesRaw } from '@/services/files';
+import { files } from '@knockout-js/api';
 
 export default () => {
   const { token } = useToken(),
@@ -45,18 +45,29 @@ export default () => {
           const orgAppsRes = await getOrgAppList(userState.tenantId, {
             pageSize: 999,
           });
-          if (orgAppsRes) {
-            const orgApps = orgAppsRes.edges?.map(item => item?.node) as App[]
-            setMyApps(
-              await formatArrayFilesRaw(orgApps, 'logoFileID')
-            );
+          if (orgAppsRes?.edges) {
+            const orgApps: App[] = [];
+            for (const item of orgAppsRes.edges) {
+              if (item?.node) {
+                let logoFileID: string = defaultApp;
+                if (item.node?.logoFileID) {
+                  const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                  if (typeof logo === 'string') {
+                    logoFileID = logo;
+                  }
+                }
+                item.node.logoFileID = logoFileID as any;
+                orgApps.push(item.node as App);
+              }
+            }
+            setMyApps(orgApps);
           }
         }
       }
       setLoading(false);
     },
     getAvatar = async (fileId: string) => {
-      const result = await getFilesRaw(fileId, 'url');
+      const result = await files.getFilesRaw(fileId, 'url');
       if (typeof result === 'string') {
         setAvatar(result);
       }

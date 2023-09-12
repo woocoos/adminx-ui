@@ -8,8 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
-import UploadFiles from '@/components/uploadFiles';
-import { useLeavePrompt } from '@knockout-js/layout';
+import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   principalName?: string;
@@ -230,7 +229,7 @@ export default (props: {
         x-if={['base'].includes(props.scene)}
         name="avatarFileID"
       >
-        <UploadFiles accept='.jpg,.png' directory="images" />
+        <UploadAvatar accept='.jpg,.png' directory="images" />
       </ProFormText>
       <div x-if={['create', 'base', 'recycle'].includes(props.scene)}>
         <ProFormText

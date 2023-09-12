@@ -9,7 +9,7 @@ import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { App } from '@/generated/adminx/graphql';
-import { getFilesRaw } from '@/services/files';
+import { files } from '@knockout-js/api';
 
 export default () => {
   const { token } = useToken(),
@@ -50,7 +50,7 @@ export default () => {
       }
     },
     getLogoSrc = async (fileId: string | number) => {
-      const result = await getFilesRaw(fileId, 'url')
+      const result = await files.getFilesRaw(fileId, 'url')
       if (typeof result === 'string') {
         setLogoSrc(result)
       }

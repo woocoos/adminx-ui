@@ -7,10 +7,10 @@ import { Outlet, useLocation } from '@ice/runtime';
 import i18n from '@/i18n';
 import { MenuDataItem, useToken } from '@ant-design/pro-components';
 import { monitorKeyChange } from '@/pkg/localStore';
-import { getFilesRaw } from '@/services/files';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { logout, urlSpm } from '@/services/auth';
 import { createFromIconfontCN } from '@ant-design/icons';
+import { files } from '@knockout-js/api';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
@@ -32,7 +32,7 @@ export default () => {
 
   useEffect(() => {
     if (userState.user?.avatarFileId) {
-      getFilesRaw(userState.user.avatarFileId, 'url').then(result => {
+      files.getFilesRaw(userState.user.avatarFileId, 'url').then(result => {
         if (typeof result === 'string') {
           setAvatar(result);
         }

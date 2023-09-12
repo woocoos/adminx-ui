@@ -11,13 +11,16 @@ import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { User } from './generated/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
-import { userPermissions } from '@knockout-js/api';
+import { userPermissions, files } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
-  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
+
+files.setFilesApi(ICE_API_FILES_PREFIX);
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {

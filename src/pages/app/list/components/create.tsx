@@ -1,11 +1,10 @@
 import { App, AppKind } from '@/generated/adminx/graphql';
-import UploadFiles from '@/components/uploadFiles';
 import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/adminx/app';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLeavePrompt } from '@knockout-js/layout';
+import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   redirectURI?: string;
@@ -128,7 +127,7 @@ export default (props: {
       </div>
       <div x-else>
         <ProFormText name="logoFileID" label="LOGO" >
-          <UploadFiles accept=".png,.jpng,.jpeg,.jpg" directory="images" />
+          <UploadAvatar accept=".png,.jpeg,.jpg" directory="images" />
         </ProFormText>
         <ProFormText
           name="name"

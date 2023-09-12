@@ -6,7 +6,7 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import defaultApp from '@/assets/images/default-app.png';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { formatArrayFilesRaw } from '@/services/files';
+import { files } from '@knockout-js/api';
 
 export default (props: {
   open: boolean;
@@ -95,9 +95,20 @@ export default (props: {
               pageSize: params.pageSize,
               where,
             });
-            if (result?.totalCount) {
-              table.data = result.edges?.map(item => item?.node) as App[];
-              table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
+            if (result?.totalCount && result.edges) {
+              for (const item of result.edges) {
+                if (item?.node) {
+                  let logoFileID: string = defaultApp;
+                  if (item.node?.logoFileID) {
+                    const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                    if (typeof logo === 'string') {
+                      logoFileID = logo;
+                    }
+                  }
+                  item.node.logoFileID = logoFileID as any;
+                  table.data.push(item.node as App);
+                }
+              }
               table.total = result.totalCount;
             }
           } else {
@@ -106,9 +117,20 @@ export default (props: {
               pageSize: params.pageSize,
               where,
             });
-            if (result?.totalCount) {
-              table.data = result.edges?.map(item => item?.node) as App[];
-              table.data = await formatArrayFilesRaw(table.data, "logoFileID", defaultApp)
+            if (result?.totalCount && result.edges) {
+              for (const item of result.edges) {
+                if (item?.node) {
+                  let logoFileID: string = defaultApp;
+                  if (item.node?.logoFileID) {
+                    const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                    if (typeof logo === 'string') {
+                      logoFileID = logo;
+                    }
+                  }
+                  item.node.logoFileID = logoFileID as any;
+                  table.data.push(item.node as App);
+                }
+              }
               table.total = result.totalCount;
             }
           }
