@@ -15,7 +15,7 @@
     "gqlgen:watch": "pnpm gqlgen --watch"
   },
   "dependencies": {
-    "@ant-design/icons": "^5.1.4",
+    "@ant-design/icons": "^5.2.5",
     "@ant-design/pro-components": "^2.6.2",
     "@knockout-js/api": "0.1.0",
     "@knockout-js/ice-urql": "0.1.0",
