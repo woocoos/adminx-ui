@@ -11,7 +11,7 @@ import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { User } from './generated/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
-import { userPermissions, files } from '@knockout-js/api';
+import { userPermissions, setFilesApi } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -20,7 +20,6 @@ const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
 
-files.setFilesApi(ICE_API_FILES_PREFIX);
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
@@ -53,6 +52,7 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
+  setFilesApi(ICE_API_FILES_PREFIX);
   if (!isInIcestark()) {
     const signCid = `sign_cid=${ICE_APP_CODE}`
     if (document.cookie.indexOf(signCid) === -1) {
@@ -60,15 +60,15 @@ export const dataLoader = defineDataLoader(async () => {
       removeItem('refreshToken')
     }
     document.cookie = signCid
+    await parseSpm()
   }
-  const spmData = await parseSpm()
   let locale = getItem<string>('locale'),
-    token = spmData.tenantId ?? getItem<string>('token'),
-    refreshToken = spmData.refreshToken ?? getItem<string>('refreshToken'),
+    token = getItem<string>('token'),
+    refreshToken = getItem<string>('refreshToken'),
     darkMode = getItem<string>('darkMode'),
     compactMode = getItem<string>('compactMode'),
-    tenantId = spmData.tenantId ?? getItem<string>('tenantId'),
-    user = spmData.user ?? getItem<User>('user');
+    tenantId = getItem<string>('tenantId'),
+    user = getItem<User>('user');
 
   if (token) {
     // 增加jwt判断token过期的处理
@@ -111,7 +111,9 @@ export const urqlConfig = defineUrqlConfig([
           getState: () => {
             const { token, tenantId, refreshToken } = store.getModelState('user')
             return {
-              token, tenantId, refreshToken
+              token: token ?? getItem<string>('token'),
+              tenantId: tenantId ?? getItem<string>('tenantId'),
+              refreshToken: refreshToken ?? getItem<string>('refreshToken'),
             }
           },
           setStateToken: (newToken) => {
@@ -172,7 +174,8 @@ export const requestConfig = defineRequestConfig({
       getState: () => {
         const { token, tenantId } = store.getModelState('user');
         return {
-          token, tenantId
+          token: token ?? getItem<string>('token'),
+          tenantId: tenantId ?? getItem<string>('tenantId'),
         }
       },
     },

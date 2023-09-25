@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { files } from '@knockout-js/api';
+import { getFilesRaw } from '@knockout-js/api';
 
 export const PageAppList = (props: {
   title?: string;
@@ -217,7 +217,7 @@ export const PageAppList = (props: {
                       if (item?.node) {
                         let logoFileID: string = defaultApp;
                         if (item.node?.logoFileID) {
-                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
                           if (typeof logo === 'string') {
                             logoFileID = logo;
                           }
@@ -239,7 +239,7 @@ export const PageAppList = (props: {
                       if (item?.node) {
                         let logoFileID: string = defaultApp;
                         if (item.node?.logoFileID) {
-                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
                           if (typeof logo === 'string') {
                             logoFileID = logo;
                           }
@@ -331,7 +331,7 @@ export const PageAppList = (props: {
                       if (item?.node) {
                         let logoFileID: string = defaultApp;
                         if (item.node?.logoFileID) {
-                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
                           if (typeof logo === 'string') {
                             logoFileID = logo;
                           }
@@ -353,7 +353,7 @@ export const PageAppList = (props: {
                       if (item?.node) {
                         let logoFileID: string = defaultApp;
                         if (item.node?.logoFileID) {
-                          const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
                           if (typeof logo === 'string') {
                             logoFileID = logo;
                           }

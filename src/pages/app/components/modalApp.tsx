@@ -6,7 +6,7 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import defaultApp from '@/assets/images/default-app.png';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { files } from '@knockout-js/api';
+import { getFilesRaw } from '@knockout-js/api';
 
 export default (props: {
   open: boolean;
@@ -100,7 +100,7 @@ export default (props: {
                 if (item?.node) {
                   let logoFileID: string = defaultApp;
                   if (item.node?.logoFileID) {
-                    const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                    const logo = await getFilesRaw(item.node.logoFileID, 'url');
                     if (typeof logo === 'string') {
                       logoFileID = logo;
                     }
@@ -122,7 +122,7 @@ export default (props: {
                 if (item?.node) {
                   let logoFileID: string = defaultApp;
                   if (item.node?.logoFileID) {
-                    const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                    const logo = await getFilesRaw(item.node.logoFileID, 'url');
                     if (typeof logo === 'string') {
                       logoFileID = logo;
                     }

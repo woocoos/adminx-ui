@@ -12,7 +12,7 @@ import { getOrgPolicyQty } from '@/services/adminx/org/policy';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
 import { App, OrgRoleKind, User } from '@/generated/adminx/graphql';
-import { files } from '@knockout-js/api';
+import { getFilesRaw } from '@knockout-js/api';
 
 export default () => {
   const { token } = useToken(),
@@ -51,7 +51,7 @@ export default () => {
               if (item?.node) {
                 let logoFileID: string = defaultApp;
                 if (item.node?.logoFileID) {
-                  const logo = await files.getFilesRaw(item.node.logoFileID, 'url');
+                  const logo = await getFilesRaw(item.node.logoFileID, 'url');
                   if (typeof logo === 'string') {
                     logoFileID = logo;
                   }
@@ -67,7 +67,7 @@ export default () => {
       setLoading(false);
     },
     getAvatar = async (fileId: string) => {
-      const result = await files.getFilesRaw(fileId, 'url');
+      const result = await getFilesRaw(fileId, 'url');
       if (typeof result === 'string') {
         setAvatar(result);
       }

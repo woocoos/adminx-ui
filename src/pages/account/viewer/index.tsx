@@ -13,7 +13,7 @@ import Auth from '@/components/auth';
 import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
 import AccessKey from './components/accessKey';
-import { files } from '@knockout-js/api';
+import { getFilesRaw } from '@knockout-js/api';
 
 export default (props: {
   isFromOrg?: boolean;
@@ -59,7 +59,7 @@ export default (props: {
       }
     },
     getAvatar = async (fileId: string) => {
-      const result = await files.getFilesRaw(fileId, 'url')
+      const result = await getFilesRaw(fileId, 'url')
       if (typeof result === 'string') {
         setAvatar(result)
       }

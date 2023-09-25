@@ -1,5 +1,6 @@
+import { User } from '@/generated/adminx/graphql';
+import { setItem } from '@/pkg/localStore';
 import store from '@/store';
-import { User } from '@knockout-js/api';
 import { request } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 
@@ -308,6 +309,10 @@ export async function parseSpm() {
             avatarFileID: result.user.avatarFileId,
           } as User
         }
+        setItem('token', parseData.token);
+        setItem('refreshToken', parseData.refreshToken);
+        setItem('tenantId', parseData.tenantId);
+        setItem('user', parseData.user);
       }
       document.cookie = ck
     }
