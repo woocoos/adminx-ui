@@ -49,10 +49,11 @@ export default {
       } else {
         result.errors = [
           {
-            "code": 401,
+            "code": 400,
             "message": "password not match"
           }
         ]
+        response.status(400);
       }
       response.send(result);
     })

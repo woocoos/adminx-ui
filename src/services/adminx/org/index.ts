@@ -4,9 +4,10 @@ import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumOrgStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 },
   EnumOrgKind = {
     root: { text: '组织' },

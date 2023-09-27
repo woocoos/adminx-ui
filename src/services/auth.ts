@@ -67,13 +67,18 @@ export async function captcha(): Promise<CaptchaRes> {
  * @param data
  * @returns
  */
-export async function login(username: string, password: string, captcha?: string, captchaId?: string): Promise<LoginRes> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/login/auth`, {
-    username,
-    password,
-    captcha,
-    captchaId,
-  });
+export async function login(username: string, password: string, captcha?: string, captchaId?: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/login/auth`, {
+      username,
+      password,
+      captcha,
+      captchaId,
+    });
+    return result as LoginRes;
+  } catch (error) {
+    return null;
+  }
 }
 
 
@@ -132,11 +137,16 @@ export async function logout() {
  * @param newPassword
  * @returns
  */
-export async function loginResetPassword(stateToken: string, newPassword: string): Promise<LoginRes> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/login/reset-password`, {
-    stateToken,
-    newPassword,
-  });
+export async function loginResetPassword(stateToken: string, newPassword: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/login/reset-password`, {
+      stateToken,
+      newPassword,
+    });
+    return result as LoginRes;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -146,20 +156,30 @@ export async function loginResetPassword(stateToken: string, newPassword: string
  * @param otpToken
  * @returns
  */
-export async function loginVerifyFactor(deviceId: string, stateToken: string, otpToken: string): Promise<LoginRes> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/login/verify-factor`, {
-    deviceId,
-    stateToken,
-    otpToken,
-  });
+export async function loginVerifyFactor(deviceId: string, stateToken: string, otpToken: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/login/verify-factor`, {
+      deviceId,
+      stateToken,
+      otpToken,
+    });
+    return result as LoginRes;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
  * 绑定mfa前需要的数据
  * @returns
  */
-export async function bindPrepareMfa(): Promise<MfaPrepare> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/mfa/bind-prepare`);
+export async function bindPrepareMfa() {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/mfa/bind-prepare`);
+    return result as MfaPrepare;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -168,8 +188,13 @@ export async function bindPrepareMfa(): Promise<MfaPrepare> {
  * @param otpToken
  * @returns
  */
-export async function bindMfa(stateToken: string, otpToken: string): Promise<boolean> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/mfa/bind`, { stateToken, otpToken });
+export async function bindMfa(stateToken: string, otpToken: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/mfa/bind`, { stateToken, otpToken });
+    return result as boolean;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -177,8 +202,13 @@ export async function bindMfa(stateToken: string, otpToken: string): Promise<boo
  * @param otpToken
  * @returns
  */
-export async function unbindMfa(otpToken: string): Promise<boolean> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/mfa/unbind`, { otpToken });
+export async function unbindMfa(otpToken: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/mfa/unbind`, { otpToken });
+    return result as boolean;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -188,12 +218,17 @@ export async function unbindMfa(otpToken: string): Promise<boolean> {
  * @param captchaId
  * @returns
  */
-export async function forgetPwdBegin(username: string, captcha: string, captchaId: string): Promise<ForgetPwdBeginRes> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/begin`, {
-    username,
-    captcha,
-    captchaId,
-  });
+export async function forgetPwdBegin(username: string, captcha: string, captchaId: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/begin`, {
+      username,
+      captcha,
+      captchaId,
+    });
+    return result as ForgetPwdBeginRes;
+  } catch (error) {
+    return null;
+  }
 }
 
 
@@ -208,12 +243,17 @@ export async function forgetPwdVerifyEmail(
   stateToken: string,
   captcha: string,
   captchaId: string,
-): Promise<ForgetPwdBeginRes> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/verify-email`, {
-    stateToken,
-    captcha,
-    captchaId,
-  });
+) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/verify-email`, {
+      stateToken,
+      captcha,
+      captchaId,
+    });
+    return result as ForgetPwdBeginRes;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -221,10 +261,15 @@ export async function forgetPwdVerifyEmail(
  * @param stateToken
  * @returns
  */
-export async function forgetPwdSendEmail(stateToken: string): Promise<string> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/send-email`, {
-    stateToken,
-  });
+export async function forgetPwdSendEmail(stateToken: string) {
+  try {
+    const result = await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/send-email`, {
+      stateToken,
+    });
+    return result as string;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -233,11 +278,15 @@ export async function forgetPwdSendEmail(stateToken: string): Promise<string> {
  * @param otpToken
  * @returns
  */
-export async function forgetPwdVerifyMfa(stateToken: string, otpToken: string): Promise<ForgetPwdBeginRes> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/verify-mfa`, {
-    stateToken,
-    otpToken,
-  });
+export async function forgetPwdVerifyMfa(stateToken: string, otpToken: string) {
+  try {
+    return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/verify-mfa`, {
+      stateToken,
+      otpToken,
+    }) as ForgetPwdBeginRes;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -246,11 +295,15 @@ export async function forgetPwdVerifyMfa(stateToken: string, otpToken: string): 
  * @param newPassword
  * @returns
  */
-export async function forgetPwdReset(stateToken: string, newPassword: string): Promise<boolean> {
-  return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/reset`, {
-    stateToken,
-    newPassword,
-  });
+export async function forgetPwdReset(stateToken: string, newPassword: string) {
+  try {
+    return await request.post(`${ICE_API_AUTH_PREFIX}/forget-pwd/reset`, {
+      stateToken,
+      newPassword,
+    }) as boolean;
+  } catch (error) {
+    return null;
+  }
 }
 
 /**
@@ -261,12 +314,15 @@ export async function urlSpm(url: string, tenantId?: string) {
   if (url.toLowerCase().startsWith("http")) {
     const u = new URL(url);
     if (u.origin != location.origin) {
-      const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
-      if (typeof result === 'string') {
-        u.searchParams.set('spm', result)
-        if (tenantId || userState.tenantId) {
-          u.searchParams.set('tid', tenantId || userState.tenantId)
+      try {
+        const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
+        if (typeof result === 'string') {
+          u.searchParams.set('spm', result)
+          if (tenantId || userState.tenantId) {
+            u.searchParams.set('tid', tenantId || userState.tenantId)
+          }
         }
+      } catch (error) {
       }
       return u.href
     }
@@ -290,31 +346,35 @@ export async function parseSpm() {
   parseData.tenantId = u.searchParams.get('tid') ?? undefined;
 
   if (spm) {
-    // 存放在cookie中避免重复读取
-    const ck = `spm=${spm}`;
-    if (document.cookie.indexOf(ck) === -1) {
-      const result: LoginRes = await request.post(`${ICE_API_AUTH_PREFIX}/spm/auth`, {
-        spm,
-      });
-      if (result?.accessToken) {
-        parseData.token = result.accessToken;
-        parseData.refreshToken = result.refreshToken;
-        if (!parseData.tenantId) {
-          parseData.tenantId = result.user?.domains?.[0]?.id
+    try {
+      // 存放在cookie中避免重复读取
+      const ck = `spm=${spm}`;
+      if (document.cookie.indexOf(ck) === -1) {
+        const result: LoginRes = await request.post(`${ICE_API_AUTH_PREFIX}/spm/auth`, {
+          spm,
+        });
+        if (result?.accessToken) {
+          parseData.token = result.accessToken;
+          parseData.refreshToken = result.refreshToken;
+          if (!parseData.tenantId) {
+            parseData.tenantId = result.user?.domains?.[0]?.id
+          }
+          if (result.user) {
+            parseData.user = {
+              id: result.user.id,
+              displayName: result.user.displayName,
+              avatarFileID: result.user.avatarFileId,
+            } as User
+          }
+          setItem('token', parseData.token);
+          setItem('refreshToken', parseData.refreshToken);
+          setItem('tenantId', parseData.tenantId);
+          setItem('user', parseData.user);
         }
-        if (result.user) {
-          parseData.user = {
-            id: result.user.id,
-            displayName: result.user.displayName,
-            avatarFileID: result.user.avatarFileId,
-          } as User
-        }
-        setItem('token', parseData.token);
-        setItem('refreshToken', parseData.refreshToken);
-        setItem('tenantId', parseData.tenantId);
-        setItem('user', parseData.user);
+
+        document.cookie = ck
       }
-      document.cookie = ck
+    } catch (error) {
     }
   }
   return parseData

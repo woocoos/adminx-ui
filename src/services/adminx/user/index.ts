@@ -12,20 +12,23 @@ export const EnumUserIdentityKind = {
 };
 
 export const EnumUserStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 };
 
 export const EnumUserLoginProfileMfaStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 };
 
 export const EnumUserAccessKeyStatus = {
   active: { text: 'active', status: 'success' },
   inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
   processing: { text: 'processing', status: 'warning' },
 };
 

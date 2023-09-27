@@ -4,9 +4,10 @@ import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/generated/adminx/g
 import { gid } from '@knockout-js/api';
 
 export const EnumAppPolicyStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 };
 
 export const EnumPolicyRuleEffect = {
