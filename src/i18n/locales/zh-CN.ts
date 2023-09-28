@@ -191,6 +191,12 @@ export default {
     file_source: '文件来源',
     file_source_kind: '来源类型',
     last_auth_at: '最后使用时间',
+    app_dict: '数据字典',
+    create_app_dict: '创建数据字典',
+    edit_app_dict: '编辑数据字典',
+    app_dict_item: '数据字典明细',
+    create_app_dict_item: '创建数据字典明细',
+    edit_app_dict_item: '编辑数据字典明细',
 
     // 创建
     create_user: '创建用户',
@@ -260,6 +266,7 @@ export default {
     click_search_account: '点击搜索账户',
     click_search_member: '点击搜索成员',
     click_search_app: '点击搜索应用',
+    click_search_org: '点击搜索组织',
     please_enter_file_source_kind: '请选择来源类型',
     please_enter_file_source_bucket: '请输入bucket',
     // 添加

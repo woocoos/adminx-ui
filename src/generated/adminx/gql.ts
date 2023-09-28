@@ -49,6 +49,17 @@ const documents = {
     "mutation delAppRole($appRoleId:ID!){\n  deleteAppRole(roleID: $appRoleId)\n}": types.DelAppRoleDocument,
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
+    "query appDictList($first: Int,$orderBy:AppDictOrder,$where:AppDictWhereInput){\n  appDicts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n        app{id,name}\n      }\n    }\n  }\n}": types.AppDictListDocument,
+    "query appDictInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       app{id,name}\n     }\n   }\n }": types.AppDictInfoDocument,
+    "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{\n          id,name\n        }\n       }\n     }\n   }\n }": types.AppDictItemListDocument,
+    "query appDictItemInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDictItem{\n      id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n      org{ id,name }\n     }\n   }\n }": types.AppDictItemInfoDocument,
+    "mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){id}\n}": types.UpdateAppDictDocument,
+    "mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){ id }\n}": types.CreateAppDictDocument,
+    "mutation deleteAppDict($dictId:ID!){\n  deleteAppDict(dictID: $dictId)\n}": types.DeleteAppDictDocument,
+    "mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){id}\n}": types.UpdateAppDictItemDocument,
+    "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}": types.CreateAppDictItemDocument,
+    "mutation deleteAppDictItem($itemId:ID!){\n  deleteAppDictItem(itemID: $itemId)\n}": types.DeleteAppDictItemDocument,
+    "mutation moveAppDictItem($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppDictItem(sourceID: $sourceId,targetID:$targetId,action:$action)\n}": types.MoveAppDictItemDocument,
     "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}": types.FileSourceListDocument,
     "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}": types.FileSourceInfoDocument,
     "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}": types.CreateFileSourceDocument,
@@ -292,6 +303,50 @@ export function gql(source: "mutation assignAppRolePolicy($appId:ID!,$appRoleId:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"): (typeof documents)["mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query appDictList($first: Int,$orderBy:AppDictOrder,$where:AppDictWhereInput){\n  appDicts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n        app{id,name}\n      }\n    }\n  }\n}"): (typeof documents)["query appDictList($first: Int,$orderBy:AppDictOrder,$where:AppDictWhereInput){\n  appDicts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n        app{id,name}\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query appDictInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       app{id,name}\n     }\n   }\n }"): (typeof documents)["query appDictInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       app{id,name}\n     }\n   }\n }"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{\n          id,name\n        }\n       }\n     }\n   }\n }"): (typeof documents)["query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{\n          id,name\n        }\n       }\n     }\n   }\n }"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query appDictItemInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDictItem{\n      id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n      org{ id,name }\n     }\n   }\n }"): (typeof documents)["query appDictItemInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDictItem{\n      id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n      org{ id,name }\n     }\n   }\n }"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){id}\n}"): (typeof documents)["mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){ id }\n}"): (typeof documents)["mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){ id }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteAppDict($dictId:ID!){\n  deleteAppDict(dictID: $dictId)\n}"): (typeof documents)["mutation deleteAppDict($dictId:ID!){\n  deleteAppDict(dictID: $dictId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){id}\n}"): (typeof documents)["mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}"): (typeof documents)["mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteAppDictItem($itemId:ID!){\n  deleteAppDictItem(itemID: $itemId)\n}"): (typeof documents)["mutation deleteAppDictItem($itemId:ID!){\n  deleteAppDictItem(itemID: $itemId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation moveAppDictItem($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppDictItem(sourceID: $sourceId,targetID:$targetId,action:$action)\n}"): (typeof documents)["mutation moveAppDictItem($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppDictItem(sourceID: $sourceId,targetID:$targetId,action:$action)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

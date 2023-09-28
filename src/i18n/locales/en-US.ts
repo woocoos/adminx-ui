@@ -191,6 +191,12 @@ export default {
     file_source: 'file source',
     file_source_kind: 'source type',
     last_auth_at: 'last use time',
+    app_dict: 'Data dictionary',
+    create_app_dict: 'Create a data dictionary',
+    edit_app_dict: 'Edit data dictionary',
+    app_dict_item: 'Data dictionary detail',
+    create_app_dict_item: 'Create data dictionary details',
+    edit_app_dict_item: 'Edit data dictionary details',
 
     // 创建
     create_user: 'Create a user',
@@ -260,6 +266,7 @@ export default {
     click_search_account: 'Click Search Account',
     click_search_member: 'Click to search members',
     click_search_app: 'Click search app',
+    click_search_org: 'Click search organization',
     please_enter_file_source_kind: 'Please select source type',
     please_enter_file_source_bucket: 'Please enter bucket',
     // 添加

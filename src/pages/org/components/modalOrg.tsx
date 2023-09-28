@@ -15,8 +15,8 @@ export default (props: {
   title: string;
   orgId?: string;
   appId?: string;
-  tableTitle?: string;
   kind?: OrgKind;
+  tableTitle?: string;
   onClose: (selectData?: Org[]) => void;
 }) => {
   const { t } = useTranslation(),

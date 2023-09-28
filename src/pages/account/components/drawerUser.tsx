@@ -28,7 +28,7 @@ export default (props: {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [keyword, setKeyword] = useState<string>(),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [selectedDatas, setSelectedDatas] = useState<User[]>([]),
     [dataSource, setdataSource] = useState<User[]>([]);
 
@@ -39,9 +39,13 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     onFinish = async () => {
       let isTree = false;

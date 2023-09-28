@@ -1,23 +1,27 @@
-import { getAppResInfo, updateAppRes } from '@/services/adminx/app/resource';
-import { DrawerForm, ProFormText } from '@ant-design/pro-components';
+import { App, AppDict } from '@/generated/adminx/graphql';
+import InputApp from '@/pages/app/components/inputApp';
+import { createAppDictInfo, getAppDictInfo, updateAppDictInfo } from '@/services/adminx/dict';
+import { updateFormat } from '@/util';
+import { DrawerForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { useLeavePrompt } from '@knockout-js/layout';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
+  app?: App;
   name: string;
-  typeName?: string;
-  arnPattern?: string;
+  code: string;
+  comments?: string;
 };
 
 export default (props: {
-  open: boolean;
+  open?: boolean;
   title?: string;
-  id?: string;
-  appId: string;
-  onClose: (isSuccess?: boolean) => void;
+  id?: string | null;
+  onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [info, setInfo] = useState<AppDict>(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -41,9 +45,10 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       if (props.id) {
-        const info = await getAppResInfo(props.id);
-        if (info?.id) {
-          return info;
+        const result = await getAppDictInfo(props.id);
+        if (result?.id) {
+          setInfo(result as AppDict);
+          return result;
         }
       }
       return {};
@@ -53,10 +58,18 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      const info = props.id ? await updateAppRes(props.id, {
-        name: values.name,
-      }) : null;
-      if (info?.id) {
+      const result = props.id
+        ? await updateAppDictInfo(props.id, updateFormat({
+          code: values.code,
+          name: values.name,
+          comments: values.comments,
+        }, info || {}))
+        : await createAppDictInfo(values.app?.id ?? '', {
+          code: values.code,
+          name: values.name,
+          comments: values.comments,
+        });
+      if (result?.id) {
         setSaveDisabled(true);
         props.onClose?.(true);
       }
@@ -89,6 +102,16 @@ export default (props: {
       onOpenChange={onOpenChange}
     >
       <ProFormText
+        name="app"
+        label={t('app')}
+        disabled={!!props.id}
+        rules={[
+          { required: true, message: `${t('please_enter_app')}` },
+        ]}
+      >
+        <InputApp />
+      </ProFormText>
+      <ProFormText
         name="name"
         label={t('name')}
         rules={[
@@ -96,20 +119,17 @@ export default (props: {
         ]}
       />
       <ProFormText
-        name="typeName"
-        label={t('type_name')}
+        name="code"
+        label={t('code')}
         disabled={!!props.id}
         rules={[
-          { required: true, message: `${t('please_enter_type_name')}` },
+          { required: true, message: `${t('please_enter_code')}` },
         ]}
       />
-      <ProFormText
-        name="arnPattern"
-        label={t('expression')}
-        disabled={!!props.id}
-        rules={[
-          { required: true, message: `${t('please_enter_expression')}` },
-        ]}
+      <ProFormTextArea
+        name="comments"
+        label={t('description')}
+        placeholder={`${t('please_enter_description')}`}
       />
     </DrawerForm>
   );

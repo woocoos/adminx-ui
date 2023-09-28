@@ -350,8 +350,9 @@ type AppDictItem implements Node {
   id: ID!
   """名称"""
   name: String!
+  org: Org
   """组织ID,空为全局字典"""
-  orgID: Int
+  orgID: ID
   """状态"""
   status: AppDictItemSimpleStatus
   updatedAt: Time
@@ -428,6 +429,9 @@ input AppDictItemWhereInput {
   """dict edge predicates"""
   hasDict: Boolean
   hasDictWith: [AppDictWhereInput!]
+  """org edge predicates"""
+  hasOrg: Boolean
+  hasOrgWith: [OrgWhereInput!]
   """id field predicates"""
   id: ID
   idGT: ID
@@ -454,15 +458,11 @@ input AppDictItemWhereInput {
   not: AppDictItemWhereInput
   or: [AppDictItemWhereInput!]
   """org_id field predicates"""
-  orgID: Int
-  orgIDGT: Int
-  orgIDGTE: Int
-  orgIDIn: [Int!]
+  orgID: ID
+  orgIDIn: [ID!]
   orgIDIsNil: Boolean
-  orgIDLT: Int
-  orgIDLTE: Int
-  orgIDNEQ: Int
-  orgIDNotIn: [Int!]
+  orgIDNEQ: ID
+  orgIDNotIn: [ID!]
   orgIDNotNil: Boolean
   """status field predicates"""
   status: AppDictItemSimpleStatus
@@ -1676,8 +1676,7 @@ input CreateAppDictItemInput {
   dictID: ID
   """名称"""
   name: String!
-  """组织ID,空为全局字典"""
-  orgID: Int
+  orgID: ID
   """状态"""
   status: AppDictItemSimpleStatus
 }
@@ -3917,6 +3916,16 @@ input PolicyRuleInput {
 }
 
 type Query {
+  """根据ref_code获取数据字典,用于批量获取"""
+  appDictByRefCode(
+    """ref_code规则：<appCode:appDictCode>"""
+    refCodes: [String!]!
+  ): [AppDict!]!
+  """根据ref_code获取数据字典值"""
+  appDictItemByRefCode(
+    """ref_code规则：<appCode:appDictCode>"""
+    refCode: String!
+  ): [AppDictItem!]!
   """数据字典查询"""
   appDicts(
     """Returns the elements in the list that come after the specified cursor."""

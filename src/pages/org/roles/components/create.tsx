@@ -23,7 +23,7 @@ export default (props: {
     { t } = useTranslation(),
     [orgRoleInfo, setOrgRoleInfo] = useState<OrgRole>(),
     [saveLoading, setSaveLoading] = useState(false),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveDisabled, setSaveDisabled] = useState(true);
 
   useEffect(() => {
@@ -33,9 +33,13 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);

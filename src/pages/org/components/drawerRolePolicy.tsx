@@ -27,7 +27,7 @@ export default (props: {
     [saveDisabled, setSaveDisabled] = useState(true),
     [keyword, setKeyword] = useState<string>(),
     [selectedDatas, setSelectedDatas] = useState<OrgPolicy[]>([]),
-    [, setLeavePromptWhen] = useLeavePrompt(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [dataSource, setdataSource] = useState<OrgPolicy[]>([]);
 
   useEffect(() => {
@@ -37,9 +37,13 @@ export default (props: {
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     onFinish = async () => {
       setSaveLoading(true);

@@ -63,6 +63,10 @@
       {
         "name": "文件来源",
         "path": "/system/file/source"
+      },
+      {
+        "name": "数据字典",
+        "path": "/dict"
       }
     ]
   }
