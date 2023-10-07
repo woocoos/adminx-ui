@@ -199,4 +199,24 @@ export const initStoreData = (store: IMockStore) => {
   store.set('OrgUserPreference', 1, {
     id: 1, userID: 1, orgID: 1, menuFavorite: null, menuRecent: null, user: store.get("User", 1), org: store.get('Org', 1)
   })
+
+  // AppDict
+  store.set('AppDict', 1, {
+    id: 1, code: "sex", items: [
+      store.get('AppDictItem', 1),
+      store.get('AppDictItem', 2),
+      store.get('AppDictItem', 3),
+    ]
+  })
+
+  // AppDictItem
+  store.set('AppDictItem', 1, {
+    id: 1, code: "male", name: '男', dictID: "1", dict: store.get('AppDict', 1)
+  })
+  store.set('AppDictItem', 2, {
+    id: 2, code: "female", name: '女', dictID: "1", dict: store.get('AppDict', 1)
+  })
+  store.set('AppDictItem', 3, {
+    id: 3, code: "confidentiality", name: '保密', dictID: "1", dict: store.get('AppDict', 1)
+  })
 }

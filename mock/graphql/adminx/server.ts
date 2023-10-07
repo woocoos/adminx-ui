@@ -113,6 +113,18 @@ const schemaWithMocks = addMocksToSchema({
       ],
       orgRecycleUsers: relayStylePaginationMock(store),
       globalID: (_, { type, id }) => btoa(`${type}:${id}`),
+      appDictByRefCode: (_, { refCodes }) => {
+        return [
+          store.get('AppDict', 1),
+        ]
+      },
+      appDictItemByRefCode: (_, { refCodes }) => {
+        return [
+          store.get('AppDictItem', 1),
+          store.get('AppDictItem', 2),
+          store.get('AppDictItem', 3),
+        ]
+      },
       node: (root, args, context, info) => {
         const decoded = Buffer.from(args.id, 'base64').toString()
         const [type, did] = decoded?.split(':', 2)
