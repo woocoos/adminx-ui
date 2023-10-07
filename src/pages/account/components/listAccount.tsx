@@ -310,7 +310,7 @@ export const UserList = (props: {
                   </Auth> : '',
                 props.orgInfo?.kind === 'root'
                   ? <Button>
-                    <Link to="/account/recycle">{t('recycle_bin')}</Link>
+                    <Link to={`${props.isFromSystem ? `/system/account/recycle?orgId=${props.orgId}` : '/account/recycle'}`}>{t('recycle_bin')}</Link>
                   </Button> : '',
                 props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
                   <Button

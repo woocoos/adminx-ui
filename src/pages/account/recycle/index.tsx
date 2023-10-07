@@ -7,8 +7,12 @@ import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/auth';
 import { User, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { Link } from '@ice/runtime';
 
-export default () => {
+export default (props: {
+  isFromSystem?: boolean;
+  orgId?: string;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [userState] = store.useModel('user'),
@@ -73,9 +77,14 @@ export default () => {
       title: t('recycle_bin'),
       style: { background: token.colorBgContainer },
       breadcrumb: {
-        items: [
+        items: props.isFromSystem ? [
           { title: t('system_conf') },
-          { title: t('account_manage') },
+          { title: <Link to="/system/org">{t('org_manage')}</Link> },
+          { title: <Link to={`/system/org/users?id=${props.orgId}`}>{t('user_manage')}</Link> },
+          { title: t('recycle_bin') },
+        ] : [
+          { title: t('system_conf') },
+          { title: <Link to="/org/users">{t('user_manage')}</Link> },
           { title: t('recycle_bin') },
         ],
       },
