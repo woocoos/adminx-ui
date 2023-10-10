@@ -8,7 +8,7 @@ import i18n from '@/i18n';
 import { MenuDataItem, useToken } from '@ant-design/pro-components';
 import { monitorKeyChange } from '@/pkg/localStore';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
-import { logout, urlSpm } from '@/services/auth';
+import { getAppDeployConfig, logout, urlSpm } from '@/services/auth';
 import { createFromIconfontCN } from '@ant-design/icons';
 import { getFilesRaw } from '@knockout-js/api';
 
@@ -21,6 +21,7 @@ const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
     [appState, appDispatcher] = store.useModel('app'),
+    [open, setOpen] = useState(false),
     [checkLeave] = useLeavePrompt(),
     location = useLocation(),
     { token } = useToken(),
@@ -73,10 +74,11 @@ export default () => {
       IconFont={IconFont}
       onClickMenuItem={async (item, isOpen) => {
         if (checkLeave()) {
+          const url = item.path ?? ''
           if (isOpen) {
-            window.open(await urlSpm(item.path ?? ''));
+            window.open(await urlSpm(url));
           } else {
-            history?.push(await urlSpm(item.path ?? ''));
+            history?.push(await urlSpm(url));
           }
         }
       }}
@@ -105,6 +107,30 @@ export default () => {
         onChange: (value) => {
           appDispatcher.updateDarkMode(value);
         },
+      }}
+      aggregateMenuProps={{
+        open: open,
+        onChangeOpen: setOpen,
+        onClick: async (menuItem, app, isOpen) => {
+          if (checkLeave()) {
+            let url = menuItem.route ?? '';
+            const appDeployConfig = await getAppDeployConfig();
+            if (appDeployConfig) {
+              const adcData = appDeployConfig.find(adc => adc.appCode == app.code);
+              if (adcData) {
+                url = `${adcData.entry}${menuItem.route}`.replaceAll('//', '/');
+              }
+            }
+            if (url) {
+              if (isOpen) {
+                window.open(await urlSpm(url));
+              } else {
+                history?.push(await urlSpm(url));
+              }
+            }
+            setOpen(false);
+          }
+        }
       }}
       proLayoutProps={{
         token: {

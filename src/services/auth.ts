@@ -89,15 +89,21 @@ export async function login(username: string, password: string, captcha?: string
   }
 }
 
+const appDeployConfig: AppDeployConfig[] = [];
+
 /**
  * 获取应用部署配置文件
  * @returns
  */
 export async function getAppDeployConfig() {
+  if (appDeployConfig.length) {
+    return appDeployConfig;
+  }
   if (ICE_APP_DEPLOY_CONFIG) {
     try {
-      const result = await request.get(ICE_APP_DEPLOY_CONFIG);
-      return result as AppDeployConfig[];
+      const result = await request.get(ICE_APP_DEPLOY_CONFIG) as AppDeployConfig[];
+      appDeployConfig.push(...result);
+      return appDeployConfig;
     } catch (error) {
     }
   }
