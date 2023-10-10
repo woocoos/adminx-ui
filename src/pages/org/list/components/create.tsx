@@ -1,7 +1,6 @@
 import { Org, OrgKind, User, UserUserType } from '@/generated/adminx/graphql';
 import InputAccount from '@/pages/account/components/inputAccount';
-import { createOrgInfo, getOrgInfo, getOrgList, getOrgPathList, updateOrgInfo } from '@/services/adminx/org';
-import store from '@/store';
+import { createOrgInfo, getOrgInfo, updateOrgInfo } from '@/services/adminx/org';
 import { TreeEditorAction, formatTreeData, updateFormat } from '@/util';
 import { DrawerForm, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
@@ -30,10 +29,10 @@ export default (props: {
   id?: string;
   kind: OrgKind;
   scene?: TreeEditorAction;
+  parentDataSource: Org[];
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
-    [userState] = store.useModel('user'),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
@@ -45,31 +44,15 @@ export default (props: {
 
   const
     parentRequest = async () => {
-      const result: Org[] = [],
-        list: SelectTreeData[] = [
-          {
-            value: '0', title: t('top_org'), children: [],
-          },
-        ];
-      if (props.kind === 'root') {
-        const data = await getOrgList({
-          pageSize: 999,
-          where: {
-            kind: props.kind,
-          },
-        });
-        if (data?.totalCount) {
-          result.push(...(data.edges?.map(item => item?.node) as Org[] || []));
-        }
-      } else {
-        const data = await getOrgPathList(userState.tenantId, props.kind);
-        if (data.length) {
-          result.push(...data);
-        }
-      }
-      if (result) {
+      const list: SelectTreeData[] = [
+        {
+          value: '0', title: t('top_org'), children: [],
+        },
+      ];
+
+      if (props.parentDataSource.length) {
         list[0].children = formatTreeData(
-          result.map(item => {
+          props.parentDataSource.map(item => {
             return {
               value: item.id,
               parentId: item.parentID,
@@ -124,7 +107,14 @@ export default (props: {
       let isTrue = false;
       if (props.scene === 'editor') {
         if (props.id) {
-          const result = await updateOrgInfo(props.id, updateFormat(values, oldInfo || {}));
+          const result = await updateOrgInfo(props.id, updateFormat({
+            name: values.name,
+            parentID: values.parentID,
+            ownerID: values.owner?.id,
+            domain: values.domain,
+            countryCode: values.countryCode,
+            profile: values.profile,
+          }, oldInfo || {}));
           if (result?.id) {
             isTrue = true;
           }

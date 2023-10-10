@@ -3546,6 +3546,22 @@ export type OrgRoleUserWhereInput = {
  */
 export type OrgRoleWhereInput = {
   and?: InputMaybe<Array<OrgRoleWhereInput>>;
+  /** comments field predicates */
+  comments?: InputMaybe<Scalars['String']['input']>;
+  commentsContains?: InputMaybe<Scalars['String']['input']>;
+  commentsContainsFold?: InputMaybe<Scalars['String']['input']>;
+  commentsEqualFold?: InputMaybe<Scalars['String']['input']>;
+  commentsGT?: InputMaybe<Scalars['String']['input']>;
+  commentsGTE?: InputMaybe<Scalars['String']['input']>;
+  commentsHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  commentsHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  commentsIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  commentsIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  commentsLT?: InputMaybe<Scalars['String']['input']>;
+  commentsLTE?: InputMaybe<Scalars['String']['input']>;
+  commentsNEQ?: InputMaybe<Scalars['String']['input']>;
+  commentsNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  commentsNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** created_at field predicates */
   createdAt?: InputMaybe<Scalars['Time']['input']>;
   createdAtGT?: InputMaybe<Scalars['Time']['input']>;

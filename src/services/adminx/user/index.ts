@@ -288,15 +288,26 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
  * @returns
  */
 export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
-  const result = await mutation(
-    userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
-    rootOrgID: rootOrgID,
-    input,
-  });
-
-  if (result.data?.createOrganizationUser?.id) {
-    return result.data?.createOrganizationUser;
+  if (userType === UserUserType.Account) {
+    const result = await mutation(
+      mutationCreateAccount, {
+      rootOrgID: rootOrgID,
+      input,
+    });
+    if (result.data?.createOrganizationAccount?.id) {
+      return result.data?.createOrganizationAccount;
+    }
+  } else {
+    const result = await mutation(
+      mutationCreateUser, {
+      rootOrgID: rootOrgID,
+      input,
+    });
+    if (result.data?.createOrganizationUser?.id) {
+      return result.data?.createOrganizationUser;
+    }
   }
+
   return null;
 }
 

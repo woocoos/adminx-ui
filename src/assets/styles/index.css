@@ -70,3 +70,7 @@
 .innerTable .ant-pro-card-body, .innerTable .ant-form {
   padding: 0;
 }
+
+.ant-breadcrumb {
+  padding-block-start: 0 !important;
+}

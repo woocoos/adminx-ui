@@ -347,6 +347,7 @@ export default {
     pwd_step_0_mfa_sub_title: 'Please enter the security code displayed by the MFA application',
     pwd_reset_success_sub_title: 'The password is reset successfully. You can use the new password to log in to the login page',
     page_404_title: 'The page you are looking for does not exist',
+    login_force_domains: "You are not yet a system tenant and cannot access the system!",
 
   },
 };

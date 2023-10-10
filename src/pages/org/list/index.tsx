@@ -45,6 +45,7 @@ export const OrgList = (props: {
     ],
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     [dataSource, setDataSource] = useState<Org[]>([]),
+    [parentDataSource, setParentDataSource] = useState<Org[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -276,6 +277,7 @@ export const OrgList = (props: {
                   table.total = result.totalCount;
                 }
               }
+              setParentDataSource([...list]);
               if (list.length) {
                 table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
                 setExpandedRowKeys(list.map(item => item.id));
@@ -291,6 +293,7 @@ export const OrgList = (props: {
           title={modal.title}
           id={modal.id}
           scene={modal.scene}
+          parentDataSource={parentDataSource}
           kind={kind}
           onClose={onDrawerClose}
         />

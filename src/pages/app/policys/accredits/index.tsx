@@ -89,6 +89,7 @@ export default () => {
           onOk: async (close) => {
             const result = await revokeOrgAppPolicy(record.id, appPolicyInfo.id);
             if (result) {
+              message.success(t('submit_success'));
               proTableRef.current?.reload();
               close();
             }

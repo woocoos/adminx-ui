@@ -146,7 +146,10 @@ export default (props: {
                 const table = { data: [] as OrgPolicy[], success: true, total: 0 },
                   where: OrgPolicyWhereInput = {};
                 if (keyword) {
-                  where.nameContains = keyword;
+                  where.or = [
+                    { nameContains: keyword },
+                    { commentsContains: keyword },
+                  ]
                 }
                 const result = await getOrgPolicyList(props.orgId, {
                   current: params.current,

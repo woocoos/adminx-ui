@@ -128,7 +128,10 @@ export default (props: {
                 const table = { data: [] as OrgRole[], success: true, total: 0 },
                   where: OrgRoleWhereInput = {};
                 if (keyword) {
-                  where.nameContains = keyword;
+                  where.or = [
+                    { nameContains: keyword },
+                    { commentsContains: keyword },
+                  ]
                 }
                 where.kind = props.kind;
                 const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({

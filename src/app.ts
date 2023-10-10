@@ -13,13 +13,14 @@ import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { isInIcestark } from '@ice/stark-app';
 import { userPermissions, setFilesApi } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
+  ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
-
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
@@ -54,12 +55,12 @@ export default defineAppConfig(() => ({
 export const dataLoader = defineDataLoader(async () => {
   setFilesApi(ICE_API_FILES_PREFIX);
   if (!isInIcestark()) {
-    const signCid = `sign_cid=${ICE_APP_CODE}`
+    const signCid = `sign_cid=${ICE_APP_CODE}`;
     if (document.cookie.indexOf(signCid) === -1) {
-      removeItem('token')
-      removeItem('refreshToken')
+      removeItem('token');
+      removeItem('refreshToken');
     }
-    document.cookie = signCid
+    document.cookie = signCid;
     await parseSpm()
   }
   let locale = getItem<string>('locale'),
@@ -121,7 +122,8 @@ export const urqlConfig = defineUrqlConfig([
           }
         },
         beforeRefreshTime: 5 * 60 * 1000,
-        login: ICE_LOGIN_URL ?? '/login',
+        headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
+        login: ICE_LOGIN_URL,
         refreshApi: `${ICE_API_AUTH_PREFIX ?? '/api-auth'}/login/refresh-token`
       }
     }
@@ -131,14 +133,13 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const { user } = appData,
-    initialAuth = {};
+  const initialAuth = {};
   // 判断路由权限
   if (!['/login', '/login/retrievePassword'].includes(location.pathname)) {
-    if (user.token) {
+    if (appData?.user?.token) {
       const ups = await userPermissions(ICE_APP_CODE, {
-        Authorization: `Bearer ${user.token}`,
-        'X-Tenant-ID': user.tenantId,
+        Authorization: getRequestHeaderAuthorization(appData.user.token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
+        'X-Tenant-ID': appData.user.tenantId,
       });
       if (ups) {
         ups.forEach(item => {
@@ -158,11 +159,10 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const { app, user } = appData;
   return {
     initialStates: {
-      app,
-      user,
+      user: appData?.user,
+      app: appData?.app,
     },
   };
 });
@@ -179,6 +179,7 @@ export const requestConfig = defineRequestConfig({
         }
       },
     },
+    headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
     login: ICE_LOGIN_URL,
   })
 });

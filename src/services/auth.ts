@@ -51,7 +51,15 @@ export type ForgetPwdBeginRes = {
   errors?: OasErrors[];
 };
 
+export type AppDeployConfig = {
+  title: string;
+  appCode: string;
+  entry: string;
+  forceTenantId: boolean;
+};
+
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
+  ICE_APP_DEPLOY_CONFIG = process.env.ICE_APP_DEPLOY_CONFIG ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login'
 
 /**
@@ -81,6 +89,20 @@ export async function login(username: string, password: string, captcha?: string
   }
 }
 
+/**
+ * 获取应用部署配置文件
+ * @returns
+ */
+export async function getAppDeployConfig() {
+  if (ICE_APP_DEPLOY_CONFIG) {
+    try {
+      const result = await request.get(ICE_APP_DEPLOY_CONFIG);
+      return result as AppDeployConfig[];
+    } catch (error) {
+    }
+  }
+  return null;
+}
 
 let refreshTokenFn: NodeJS.Timeout;
 
@@ -97,11 +119,15 @@ export function refreshToken() {
       const jwt = jwtDcode<JwtPayload>(userState.token);
       if ((jwt.exp || 0) * 1000 - Date.now() < 30 * 60 * 1000) {
         // 小于30分钟的时候需要刷新token
-        const tr = await request.post(`${ICE_API_AUTH_PREFIX}/login/refresh-token`, {
-          refreshToken: userState.refreshToken,
-        });
-        if (tr.accessToken) {
-          store.dispatch.user.updateToken(tr.accessToken);
+        try {
+
+          const tr = await request.post(`${ICE_API_AUTH_PREFIX}/login/refresh-token`, {
+            refreshToken: userState.refreshToken,
+          });
+          if (tr.accessToken) {
+            store.dispatch.user.updateToken(tr.accessToken);
+          }
+        } catch (error) {
         }
       }
     }
@@ -115,7 +141,9 @@ export function refreshToken() {
 export async function logout() {
   const userState = store.getModelState('user');
   if (userState.token) {
-    request.post(`${ICE_API_AUTH_PREFIX}/logout`);
+    try {
+      request.post(`${ICE_API_AUTH_PREFIX}/logout`);
+    } catch (error) { }
   }
   const userDispatcher = store.getModelDispatchers('user')
   userDispatcher.logout();

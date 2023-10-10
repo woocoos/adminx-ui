@@ -347,7 +347,7 @@ export default {
     pwd_step_0_mfa_sub_title: '请输入 MFA 应用程序展示的安全码',
     pwd_reset_success_sub_title: '密码重置成功，您可使用新密码前往登录页面进行登录',
     page_404_title: '您访问的页面不存在',
-    // "": "",
+    login_force_domains: "您还不是系统租户无法进入系统！",
     // "": "",
     // "": "",
   },

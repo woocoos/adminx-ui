@@ -115,10 +115,6 @@ export default (props: {
               actionRef={proTableRef}
               request={async (params) => {
                 const table = { data: [] as AppPolicy[], success: true, total: 0 };
-                if (keyword) {
-                  params.nameContains = keyword;
-                }
-                params.status = 'active';
                 if (props.appInfo) {
                   const result = await getAppPolicyList(
                     props.appInfo.id,
