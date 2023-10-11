@@ -151,7 +151,6 @@ export default (props: {
             },
             password,
           }, props.userType);
-          debugger;
           if (result?.id) {
             isTrue = true;
           }
