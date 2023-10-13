@@ -8,6 +8,11 @@ import MfaVerify from './components/mfaVerify';
 import { Result, message } from 'antd';
 import ResetPassword from './components/resetPassword';
 import { useSearchParams } from 'ice';
+import { appAccess } from '@/services/adminx/app';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '';
 
 export default () => {
   const { t } = useTranslation(),
@@ -34,9 +39,18 @@ export default () => {
         }
       }
       if (isEnterApp) {
-        await userDispatcher.loginAfter(result);
-        message.success(t('login_success'));
-        location.replace(await urlSpm(redirect || '/'));
+        const tenantId = result.user?.domains?.[0]?.id ?? '';
+        const isAppAccess = await appAccess(ICE_APP_CODE, {
+          Authorization: getRequestHeaderAuthorization(result.accessToken, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
+          'X-Tenant-ID': tenantId,
+        })
+        if (isAppAccess) {
+          await userDispatcher.loginAfter(result);
+          message.success(t('login_success'));
+          location.replace(await urlSpm(redirect || '/'));
+        } else {
+          message.error(t('login_not_app_access'));
+        }
       }
     }
   }

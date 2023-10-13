@@ -2,6 +2,7 @@ import { PageOrgRoleList } from '../roles';
 import store from '@/store';
 import { OrgRoleKind } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 export default () => {
   const [userState] = store.useModel('user');
@@ -11,3 +12,8 @@ export default () => {
   </KeepAlive>
   );
 };
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/org/groups'],
+}));

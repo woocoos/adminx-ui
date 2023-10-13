@@ -12,6 +12,7 @@ import Auth from '@/components/auth';
 import { Org, OrgKind } from '@/generated/adminx/graphql';
 import { Link } from '@ice/runtime';
 import { KeepAlive } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 export const PageOrgUsers = (props: {
   orgId: string;
@@ -170,3 +171,9 @@ export default () => {
   </KeepAlive>
   );
 };
+
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/org/users'],
+}));

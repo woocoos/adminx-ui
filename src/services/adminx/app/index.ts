@@ -50,6 +50,10 @@ const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){
   deleteApp(appID: $appId)
 }`);
 
+const queryAppAccess = gql(/* GraphQL */`query appAccess($appCode: String!){
+  appAccess( appCode: $appCode )
+}`);
+
 /**
  * 获取应用信息
  * @param params
@@ -93,6 +97,26 @@ export async function getAppInfo(appId: string) {
 
   if (result.data?.node?.__typename === 'App') {
     return result.data.node;
+  }
+  return null;
+}
+
+/**
+ * 获取应用信息
+ * @param appCode
+ * @returns
+ */
+export async function appAccess(appCode: string, headers?: Record<string, string>) {
+  const
+    result = await query(
+      queryAppAccess, {
+      appCode,
+    }, {
+      fetchOptions: { headers },
+    });
+
+  if (result.data?.appAccess) {
+    return result.data.appAccess;
   }
   return null;
 }

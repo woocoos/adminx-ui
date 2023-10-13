@@ -13,6 +13,7 @@ import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
 import { App, OrgRoleKind, User } from '@/generated/adminx/graphql';
 import { getFilesRaw } from '@knockout-js/api';
+import { definePageConfig } from 'ice';
 
 export default () => {
   const { token } = useToken(),
@@ -156,3 +157,7 @@ export default () => {
   );
 };
 
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/'],
+}));

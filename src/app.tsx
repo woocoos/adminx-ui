@@ -14,6 +14,8 @@ import { isInIcestark } from '@ice/stark-app';
 import { userPermissions, setFilesApi } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+import { Button, Result } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
@@ -154,6 +156,14 @@ export const authConfig = defineAuthConfig(async (appData) => {
   }
   return {
     initialAuth,
+    NoAuthFallback: () => {
+      const { t } = useTranslation()
+      return (
+        <Result status="403"
+          title="403"
+          subTitle={t('page_403')} />
+      )
+    }
   };
 });
 

@@ -348,6 +348,8 @@ export default {
     pwd_reset_success_sub_title: 'The password is reset successfully. You can use the new password to log in to the login page',
     page_404_title: 'The page you are looking for does not exist',
     login_force_domains: "You are not yet a system tenant and cannot access the system!",
+    login_not_app_access: "You do not have access to the application system",
+    page_403: "Sorry, you are not authorized to access this page",
 
   },
 };

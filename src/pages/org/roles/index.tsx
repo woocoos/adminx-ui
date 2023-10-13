@@ -12,6 +12,7 @@ import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
 import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 
 export const PageOrgRoleList = (props: {
@@ -289,3 +290,8 @@ export default () => {
     <PageOrgRoleList orgId={userState.tenantId} />
   </KeepAlive>);
 };
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/org/roles'],
+}));

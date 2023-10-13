@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 export const PageOrgPolicys = (props: {
   isFromSystem?: boolean;
@@ -208,3 +209,7 @@ export const PageOrgPolicys = (props: {
 export default () => (<KeepAlive clearAlive>
   <PageOrgPolicys />
 </KeepAlive>);
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/org/policys'],
+}));

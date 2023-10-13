@@ -95,6 +95,16 @@ const schemaWithMocks = addMocksToSchema({
         store.get('AppAction', 1),
         store.get('AppAction', 2),
         store.get('AppAction', 3),
+        store.get('AppAction', 4),
+        store.get('AppAction', 5),
+        store.get('AppAction', 6),
+        store.get('AppAction', 7),
+        store.get('AppAction', 8),
+        store.get('AppAction', 9),
+        store.get('AppAction', 10),
+        store.get('AppAction', 11),
+        store.get('AppAction', 12),
+        store.get('AppAction', 13),
       ],
       checkPermission: (_, { permission }) => {
         // permission => appCode:action

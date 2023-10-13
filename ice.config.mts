@@ -25,10 +25,7 @@ const externals = {
   'react-i18next': 'ReactI18next',
   'i18next': 'i18next',
   '@ant-design/pro-components': 'ProComponents',
-  'dayjs': 'dayjs',
   'antd': 'antd',
-  '@monaco-editor/loader': 'monaco_loader',
-  'jwt-decode': 'jwt_decode',
 }
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config

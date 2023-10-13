@@ -23,6 +23,7 @@ const documents = {
     "mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){id}\n}": types.UpdateAppDocument,
     "mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){ id }\n}": types.CreateAppDocument,
     "mutation delApp($appId:ID!){\n  deleteApp(appID: $appId)\n}": types.DelAppDocument,
+    "query appAccess($appCode: String!){\n  appAccess( appCode: $appCode )\n}": types.AppAccessDocument,
     "query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){\n  node(id:$gid){\n    ... on App{\n      id\n      menus(first:$first,where:$where,orderBy:$orderBy){\n        totalCount,\n        edges{\n          cursor,node{\n            id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n            action{ id,name }\n          }\n        }\n      }\n    }\n  }\n}": types.AppMenuListDocument,
     "mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){id}\n}": types.UpdateAppMenuDocument,
     "mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){id}\n}": types.CreateAppMenuDocument,
@@ -199,6 +200,10 @@ export function gql(source: "mutation createApp($input: CreateAppInput!){\n  cre
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation delApp($appId:ID!){\n  deleteApp(appID: $appId)\n}"): (typeof documents)["mutation delApp($appId:ID!){\n  deleteApp(appID: $appId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query appAccess($appCode: String!){\n  appAccess( appCode: $appCode )\n}"): (typeof documents)["query appAccess($appCode: String!){\n  appAccess( appCode: $appCode )\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

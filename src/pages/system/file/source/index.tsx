@@ -8,6 +8,7 @@ import { Button, Modal, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Create from './components/create';
+import { definePageConfig } from 'ice';
 
 const PageFileSourceList = () => {
   const { t } = useTranslation(),
@@ -176,3 +177,8 @@ export default () => {
     <PageFileSourceList />
   </KeepAlive>);
 };
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/system/file/source'],
+}));

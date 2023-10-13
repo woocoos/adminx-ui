@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { User } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 export default () => {
   const
@@ -131,3 +132,7 @@ export default () => {
     </PageContainer>
   );
 };
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/user/info'],
+}));

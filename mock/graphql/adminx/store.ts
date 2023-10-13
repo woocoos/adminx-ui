@@ -138,9 +138,19 @@ export const initStoreData = (store: IMockStore) => {
   store.set('App', 2, { id: 2, name: 'app2', code: 'app2' })
 
   // AppAction
-  store.set('AppAction', 1, { id: 1, name: 'app1Action1', method: 'read', appID: 1, app: store.get('App', 1) })
-  store.set('AppAction', 2, { id: 2, name: 'app1Action2', method: 'write', appID: 1, app: store.get('App', 1) })
-  store.set('AppAction', 3, { id: 3, name: 'app1Action3', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 1, { id: 1, name: '/', method: 'read', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 2, { id: 2, name: '/user/info', method: 'write', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 3, { id: 3, name: '/user/safety', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 4, { id: 4, name: '/org/departments', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 5, { id: 5, name: '/org/users', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 6, { id: 6, name: '/org/policys', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 7, { id: 7, name: '/org/groups', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 8, { id: 8, name: '/org/roles', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 9, { id: 9, name: '/system/org', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 10, { id: 10, name: '/system/account', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 11, { id: 11, name: '/system/app', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 12, { id: 12, name: '/system/file/source', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 13, { id: 13, name: '/dict', method: 'list', appID: 1, app: store.get('App', 1) })
 
   // AppPolicy
   store.set('AppPolicy', 1, {
@@ -211,12 +221,12 @@ export const initStoreData = (store: IMockStore) => {
 
   // AppDictItem
   store.set('AppDictItem', 1, {
-    id: 1, code: "male", name: '男', dictID: "1", dict: store.get('AppDict', 1)
+    id: 1, code: "male", name: '男', dictID: "1", refCode: "app1:sex", dict: store.get('AppDict', 1)
   })
   store.set('AppDictItem', 2, {
-    id: 2, code: "female", name: '女', dictID: "1", dict: store.get('AppDict', 1)
+    id: 2, code: "female", name: '女', dictID: "1", refCode: "app1:sex", dict: store.get('AppDict', 1)
   })
   store.set('AppDictItem', 3, {
-    id: 3, code: "confidentiality", name: '保密', dictID: "1", dict: store.get('AppDict', 1)
+    id: 3, code: "confidentiality", name: '保密', dictID: "1", refCode: "app1:sex", dict: store.get('AppDict', 1)
   })
 }

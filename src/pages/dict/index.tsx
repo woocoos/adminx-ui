@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
 import { useRef, useState } from 'react';
-import { Link } from 'ice';
+import { Link, definePageConfig } from 'ice';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { AppDict, AppDictWhereInput } from '@/generated/adminx/graphql';
@@ -176,3 +176,9 @@ export default () => {
     </>
   );
 };
+
+
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/dict'],
+}));

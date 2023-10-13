@@ -348,7 +348,8 @@ export default {
     pwd_reset_success_sub_title: '密码重置成功，您可使用新密码前往登录页面进行登录',
     page_404_title: '您访问的页面不存在',
     login_force_domains: "您还不是系统租户无法进入系统！",
-    // "": "",
+    login_not_app_access: "您还无进入应用系统的权限",
+    page_403: "对不起，您没有权限访问此页面",
     // "": "",
   },
 };
