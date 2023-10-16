@@ -44,6 +44,7 @@ const schemaWithMocks = addMocksToSchema({
       permissions: relayStylePaginationMock(store),
     },
     Query: {
+      appAccess: () => true,
       apps: relayStylePaginationMock(store),
       organizations: (_, { where }) => {
         if (where.kind === 'org') {

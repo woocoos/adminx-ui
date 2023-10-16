@@ -121,11 +121,12 @@ export default () => {
                 url = `${adcData.entry}${menuItem.route}`.replaceAll('//', '/');
               }
             }
+            url = await urlSpm(url)
             if (url) {
               if (isOpen) {
-                window.open(await urlSpm(url));
+                window.open(url);
               } else {
-                history?.push(await urlSpm(url));
+                history?.push(url);
               }
             }
             setOpen(false);

@@ -101,7 +101,7 @@ export async function getAppDeployConfig() {
   }
   if (ICE_APP_DEPLOY_CONFIG) {
     try {
-      const result = await request.get(ICE_APP_DEPLOY_CONFIG) as AppDeployConfig[];
+      const result = await request.get(`${ICE_APP_DEPLOY_CONFIG}?t=${Date.now()}`) as AppDeployConfig[];
       appDeployConfig.push(...result);
       return appDeployConfig;
     } catch (error) {
@@ -359,6 +359,8 @@ export async function urlSpm(url: string, tenantId?: string) {
       } catch (error) {
       }
       return u.href
+    } else {
+      return u.href.replace(u.origin, '')
     }
   }
   return url
