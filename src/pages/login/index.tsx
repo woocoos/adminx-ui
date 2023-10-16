@@ -18,6 +18,7 @@ export default () => {
   const { t } = useTranslation(),
     [searchParams] = useSearchParams(),
     [res, setRes] = useState<LoginRes>(),
+    [isLoginSuccess, setIsLoginSuccess] = useState(false),
     [, userDispatcher] = store.useModel('user');
 
   document.title = t('login');
@@ -45,11 +46,13 @@ export default () => {
           'X-Tenant-ID': tenantId,
         })
         if (isAppAccess) {
+          setIsLoginSuccess(true);
           await userDispatcher.loginAfter(result);
           message.success(t('login_success'));
           location.replace(await urlSpm(redirect || '/'));
         } else {
           message.error(t('login_not_app_access'));
+          setRes(undefined);
         }
       }
     }
@@ -76,7 +79,7 @@ export default () => {
           /> : <></>
         }
         {
-          res?.accessToken ? <Result
+          isLoginSuccess ? <Result
             status="success"
             style={{
               height: '100%',
