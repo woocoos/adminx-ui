@@ -112,11 +112,15 @@ export const urqlConfig = defineUrqlConfig([
       authOpts: {
         store: {
           getState: () => {
-            const { token, tenantId, refreshToken } = store.getModelState('user')
+            const userState = store.getModelState('user'),
+              token = userState.token ? userState.token : getItem<string>('token') as string,
+              tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string,
+              refreshToken = userState.refreshToken ? userState.refreshToken : getItem<string>('refreshToken') as string;
+
             return {
-              token: token ?? getItem<string>('token'),
-              tenantId: tenantId ?? getItem<string>('tenantId'),
-              refreshToken: refreshToken ?? getItem<string>('refreshToken'),
+              token: token,
+              tenantId: tenantId,
+              refreshToken: refreshToken,
             }
           },
           setStateToken: (newToken) => {
@@ -185,10 +189,12 @@ export const requestConfig = defineRequestConfig({
   interceptors: requestInterceptor({
     store: {
       getState: () => {
-        const { token, tenantId } = store.getModelState('user');
+        const userState = store.getModelState('user'),
+          token = userState.token ? userState.token : getItem<string>('token') as string,
+          tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string;
         return {
-          token: token ?? getItem<string>('token'),
-          tenantId: tenantId ?? getItem<string>('tenantId'),
+          token: token,
+          tenantId: tenantId,
         }
       },
     },
