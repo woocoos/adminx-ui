@@ -135,13 +135,16 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const initialAuth = {};
+  const initialAuth = {},
+    token = appData?.user?.token ?? getItem<string>('token'),
+    tenantId = appData?.user?.tenantId ?? getItem<string>('tenantId');
+
   // 判断路由权限
   if (!['/login', '/login/retrievePassword'].includes(location.pathname)) {
-    if (appData?.user?.token) {
+    if (token) {
       const ups = await userPermissions(ICE_APP_CODE, {
-        Authorization: getRequestHeaderAuthorization(appData.user.token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
-        'X-Tenant-ID': appData.user.tenantId,
+        Authorization: getRequestHeaderAuthorization(token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
+        'X-Tenant-ID': tenantId,
       });
       if (ups) {
         ups.forEach(item => {
