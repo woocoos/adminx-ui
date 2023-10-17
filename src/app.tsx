@@ -14,7 +14,7 @@ import { isInIcestark } from '@ice/stark-app';
 import { userPermissions, setFilesApi } from '@knockout-js/api';
 import { logout, parseSpm } from './services/auth';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
-import { Button, Result } from 'antd';
+import { Result } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -176,26 +176,10 @@ export const authConfig = defineAuthConfig(async (appData) => {
 
 // store数据项
 export const storeConfig = defineStoreConfig(async (appData) => {
-  const locale = appData?.app?.locale ?? getItem<string>('locale'),
-    darkMode = appData?.app?.darkMode ?? getItem<string>('darkMode'),
-    compactMode = appData?.app?.compactMode ?? getItem<string>('compactMode'),
-    token = appData?.user?.token ?? getItem<string>('token'),
-    refreshToken = appData?.user?.refreshToken ?? getItem<string>('refreshToken'),
-    tenantId = appData?.user?.tenantId ?? getItem<string>('tenantId'),
-    user = appData?.user?.user ?? getItem<User>('user');
   return {
     initialStates: {
-      app: {
-        locale,
-        darkMode,
-        compactMode,
-      },
-      user: {
-        token,
-        refreshToken,
-        tenantId,
-        user,
-      },
+      app: appData?.app,
+      user: appData?.user,
     },
   };
 });
