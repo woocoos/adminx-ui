@@ -79,9 +79,11 @@ export const dataLoader = defineDataLoader(async () => {
       const jwt = jwtDcode<JwtPayload>(token);
       if ((jwt.exp || 0) * 1000 < Date.now()) {
         token = '';
+        removeItem('token');
       }
     } catch (err) {
       token = '';
+      removeItem('token');
     }
   }
   if (!locale) {
