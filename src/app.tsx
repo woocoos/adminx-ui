@@ -10,11 +10,11 @@ import { browserLanguage } from './util';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
 import { User } from './generated/adminx/graphql';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
-import { isInIcestark } from '@ice/stark-app';
 import { userPermissions, setFilesApi } from '@knockout-js/api';
-import { logout, parseSpm } from './services/auth';
+import { logout } from './services/auth';
+import { parseSpm } from './services/auth/noStore';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
-import { Result } from 'antd';
+import { Result, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
@@ -56,15 +56,13 @@ export default defineAppConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   setFilesApi(ICE_API_FILES_PREFIX);
-  if (!isInIcestark()) {
-    const signCid = `sign_cid=${ICE_APP_CODE}`;
-    if (document.cookie.indexOf(signCid) === -1) {
-      removeItem('token');
-      removeItem('refreshToken');
-    }
-    document.cookie = signCid;
-    await parseSpm()
+  const signCid = `sign_cid=${ICE_APP_CODE}`;
+  if (document.cookie.indexOf(signCid) === -1) {
+    removeItem('token');
+    removeItem('refreshToken');
   }
+  document.cookie = signCid;
+  await parseSpm();
   let locale = getItem<string>('locale'),
     token = getItem<string>('token'),
     refreshToken = getItem<string>('refreshToken'),
@@ -129,12 +127,18 @@ export const urqlConfig = defineUrqlConfig([
             store.dispatch.user.updateToken(newToken)
           }
         },
+        error: (err, errstr) => {
+          if (errstr) {
+            message.error(errstr)
+          }
+          return false;
+        },
         beforeRefreshTime: 5 * 60 * 1000,
         headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
         login: ICE_LOGIN_URL,
         refreshApi: `${ICE_API_AUTH_PREFIX ?? '/api-auth'}/login/refresh-token`
       }
-    }
+    },
   },
 ])
 
@@ -187,21 +191,27 @@ export const storeConfig = defineStoreConfig(async (appData) => {
 });
 
 // 请求配置
-export const requestConfig = defineRequestConfig({
-  interceptors: requestInterceptor({
-    store: {
-      getState: () => {
-        const userState = store.getModelState('user'),
-          token = userState.token ? userState.token : getItem<string>('token') as string,
-          tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string;
-        return {
-          token: token,
-          tenantId: tenantId,
-        }
+export const requestConfig = defineRequestConfig(() => {
+  return {
+    interceptors: requestInterceptor({
+      store: {
+        getState: () => {
+          const token = getItem<string>('token') as string,
+            tenantId = getItem<string>('tenantId') as string;
+          return {
+            token: token,
+            tenantId: tenantId,
+          }
+        },
       },
-    },
-    headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
-    login: ICE_LOGIN_URL,
-  })
+      headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
+      login: ICE_LOGIN_URL,
+      error: (err, str) => {
+        if (str) {
+          window.antd.message.error(str)
+        }
+      }
+    })
+  }
 });
 

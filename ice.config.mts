@@ -11,23 +11,12 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
-  ICE_STATIC_CDN = process.env.ICE_STATIC_CDN ?? '',
   ICE_PROXY_FILES = process.env.ICE_PROXY_FILES ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '',
   minify = NODE_ENV === 'production' ? 'swc' : false;
-
-const externals = {
-  'react': 'React',
-  'react-dom': 'ReactDOM',
-  'react-i18next': 'ReactI18next',
-  'i18next': 'i18next',
-  '@ant-design/pro-components': 'ProComponents',
-  'dayjs': 'dayjs',
-  'antd': 'antd',
-}
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
 export default defineConfig(() => ({
@@ -44,7 +33,14 @@ export default defineConfig(() => ({
       '**/components/**',   // 添加此配置忽略components被解析成路由组件
     ],
   },
-  externals: ICE_STATIC_CDN ? externals : {},
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+    'react-i18next': 'ReactI18next',
+    'i18next': 'i18next',
+    'antd': 'antd',
+    '@ant-design/pro-components': 'ProComponents',
+  },
   plugins: [
     icestark({ type: 'child' }),
     urqlPlugin(),
