@@ -7,11 +7,12 @@ import { AppDict, AppDictItem, OrgKind, TreeAction, } from '@/generated/adminx/g
 import { EnumAppDictItemStatus, delAppDictItemInfo, getAppDictItemList, moveAppDictItemInfo } from '@/services/adminx/dict';
 import InputOrg from '@/pages/org/components/inputOrg';
 import Create from './components/create';
-import { Link } from '@ice/runtime';
+import { Link, useSearchParams } from '@ice/runtime';
 
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    [searchParams] = useSearchParams(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<AppDictItem>[] = [
@@ -144,7 +145,7 @@ export default () => {
           columns={columns}
           request={async (params, sort, filter) => {
             const table = { data: [] as AppDictItem[], success: true, total: 0 };
-            const result = await getAppDictItemList('');
+            const result = await getAppDictItemList(searchParams.get('id') ?? '');
             if (result?.id) {
               setDictInfo(result as AppDict);
             }
