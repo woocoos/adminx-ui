@@ -56,12 +56,12 @@ export default defineAppConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   setFilesApi(ICE_API_FILES_PREFIX);
-  const sign = `sign_cid=y;`;
+  const sign = `sign_cid=y`;
   if (document.cookie.indexOf(sign) === -1) {
     removeItem('token');
     removeItem('refreshToken');
   }
-  document.cookie = `${sign} path=/`;
+  document.cookie = `${sign}; path=/`;
   await parseSpm();
   let locale = getItem<string>('locale'),
     token = getItem<string>('token'),
