@@ -1,21 +1,21 @@
-import { defineAppConfig, defineDataLoader } from 'ice';
-import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
-import { defineStoreConfig } from '@ice/plugin-store/esm/types';
-import { defineRequestConfig } from '@ice/plugin-request/esm/types';
-import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
-import store from '@/store';
 import '@/assets/styles/index.css';
 import { getItem, removeItem, setItem } from '@/pkg/localStore';
-import { browserLanguage, getMenuAppActions } from './util';
-import jwtDcode, { JwtPayload } from 'jwt-decode';
-import { User } from './generated/adminx/graphql';
+import store from '@/store';
+import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
-import { userPermissions, setFilesApi } from '@knockout-js/api';
+import { defineRequestConfig } from '@ice/plugin-request/esm/types';
+import { defineStoreConfig } from '@ice/plugin-store/esm/types';
+import { setFilesApi, userPermissions } from '@knockout-js/api';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
+import { Result, message } from 'antd';
+import { defineAppConfig, defineDataLoader } from 'ice';
+import jwtDcode, { JwtPayload } from 'jwt-decode';
+import { useTranslation } from 'react-i18next';
+import { User } from './generated/adminx/graphql';
 import { logout } from './services/auth';
 import { parseSpm } from './services/auth/noStore';
-import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
-import { Result, message } from 'antd';
-import { useTranslation } from 'react-i18next';
+import { browserLanguage, getMenuAppActions } from './util';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
@@ -56,12 +56,12 @@ export default defineAppConfig(() => ({
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
   setFilesApi(ICE_API_FILES_PREFIX);
-  const signCid = `sign_cid=${ICE_APP_CODE}`;
-  if (document.cookie.indexOf(signCid) === -1) {
+  const sign = `sign_cid=y;`;
+  if (document.cookie.indexOf(sign) === -1) {
     removeItem('token');
     removeItem('refreshToken');
   }
-  document.cookie = signCid;
+  document.cookie = `${sign} path=/`;
   await parseSpm();
   let locale = getItem<string>('locale'),
     token = getItem<string>('token'),

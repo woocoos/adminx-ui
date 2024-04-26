@@ -23,7 +23,7 @@ export async function parseSpm() {
   if (spm) {
     try {
       // 存放在cookie中避免重复读取
-      const ck = `spm=${spm}`;
+      const ck = `spm=${spm};`;
       if (document.cookie.indexOf(ck) === -1) {
         const result: LoginRes = await request.post(`${ICE_API_AUTH_PREFIX}/spm/auth`, {
           spm,
@@ -47,7 +47,7 @@ export async function parseSpm() {
           setItem('user', parseData.user);
         }
 
-        document.cookie = ck
+        document.cookie = `${ck} path=/`
       }
     } catch (error) {
     }
