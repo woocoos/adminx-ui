@@ -14,6 +14,7 @@ const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_API_FILE_PREFIX = process.env.ICE_API_FILE_PREFIX ?? '',
   minify = NODE_ENV === 'production' ? 'swc' : false;
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
@@ -60,6 +61,11 @@ export default defineConfig(() => ({
       target: ICE_PROXY_AUTH,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
+    },
+    [ICE_API_FILE_PREFIX]: {
+      target: ICE_PROXY_AUTH,
+      changeOrigin: true,
+      pathRewrite: { [`^${ICE_API_FILE_PREFIX}`]: '' },
     },
   },
 }));
