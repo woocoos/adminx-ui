@@ -11,7 +11,7 @@ interface LoginResponse {
   user?: {
     id: string | number
     displayName: string
-    avatarFileId: string
+    avatar: string
     domains: {
       name: string
       id: string | number
@@ -23,12 +23,12 @@ interface LoginResponse {
   }[]
 }
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxNzIwMTM1ODExLCJpYXQiOjE2ODQxMzU4MTEsImp0aSI6InRva2VuOjE6YTU0YjdiNzMtYjFlNS00YmE0LWFlZDktMjMwMmVhMDgwOTUwIn0.Roi6QokXVLSOUGziglXPP8rBFwhkfEhf7mRSXEL-Wu0",
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwiZXhwIjoxODA4NjQ1NzM2LCJpYXQiOjE3MjIyNDU3MzYsImp0aSI6InRva2VuOjE6YjAzZGUwMjUtOWY1NC00ZWM5LTlkOTktZjliZTcxZTQxMmU5In0.crsf6i9HWnSvfvIH6Us3Ww7dOAQyX4ZT9eBCaIP-2cw",
   refreshToken = "",
   user = {
     id: 1,
     displayName: "admin",
-    avatarFileId: 'png',
+    avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg',
     domains: [
       { name: "wooocoo", id: 1 }
     ]
@@ -112,6 +112,16 @@ export default {
   'POST /mock-api-auth/login/refresh-token': (request: Request, response: Response) => {
     response.send({
       accessToken: token,
+    });
+  },
+
+  'POST /mock-api-auth/oss/sts': (request: Request, response: Response) => {
+    // 本地的  access_key_id  secret_access_key 需要手动修改
+    response.send({
+      access_key_id: 'oTbKaIMXjCnx3HzrH5Qo',
+      secret_access_key: 'XfvZSw6a954U77hZ3rrSr6jmDKEPFhDNHOJJbW4B',
+      expiration: Date.now() + 1000 * 60 * 60 * 24,
+      session_token: undefined,
     });
   },
 

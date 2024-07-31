@@ -5,13 +5,14 @@ import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit }
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
+import store from '@/store';
 
 type ProFormData = {
   redirectURI?: string;
   scopes?: string;
   tokenValidity?: number;
   refreshTokenValidity?: number;
-  logoFileID?: string;
+  logo?: string;
   name?: string;
   code?: string;
   kind?: AppKind;
@@ -26,6 +27,7 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [userState] = store.useModel('user'),
     [appInfo, setAppInfo] = useState<App>(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
@@ -71,7 +73,7 @@ export default (props: {
           scopes: values.scopes,
           tokenValidity: values.tokenValidity,
           refreshTokenValidity: values.refreshTokenValidity,
-          logoFileID: values.logoFileID,
+          logo: values.logo,
           comments: values.comments,
         }, appInfo || {}))
         : await createAppInfo({
@@ -82,7 +84,7 @@ export default (props: {
           scopes: values.scopes,
           tokenValidity: values.tokenValidity,
           refreshTokenValidity: values.refreshTokenValidity,
-          logoFileID: values.logoFileID,
+          logo: values.logo,
           comments: values.comments,
         });
       if (result?.id) {
@@ -130,8 +132,8 @@ export default (props: {
         <ProFormDigit name="refreshTokenValidity" label={`refresh_token ${t('validity')}`} />
       </div>
       <div x-else>
-        <ProFormText name="logoFileID" label="LOGO" >
-          <UploadAvatar accept=".png,.jpeg,.jpg" directory="images" />
+        <ProFormText name="logo" label="LOGO" >
+          <UploadAvatar accept="image/*" directory={`${userState.tenantId}/app/logo`} />
         </ProFormText>
         <ProFormText
           name="name"

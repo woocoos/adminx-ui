@@ -9,7 +9,7 @@ import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { App } from '@/generated/adminx/graphql';
-import { getFilesRaw } from '@knockout-js/api';
+import { parseStorageUrl } from '@knockout-js/api';
 
 export default () => {
   const { token } = useToken(),
@@ -41,18 +41,12 @@ export default () => {
         setLoading(true);
         const result = await getAppInfo(id);
         if (result?.id) {
-          if (result.logoFileID) {
-            await getLogoSrc(result.logoFileID)
+          if (result.logo) {
+            setLogoSrc(await parseStorageUrl(result.logo))
           }
           setAppInfo(result as App);
           setLoading(false);
         }
-      }
-    },
-    getLogoSrc = async (fileId: string | number) => {
-      const result = await getFilesRaw(fileId, 'url')
-      if (typeof result === 'string') {
-        setLogoSrc(result)
       }
     };
 

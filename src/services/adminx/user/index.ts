@@ -51,7 +51,7 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
+      email,mobile,userType,creationType,registerIP,status,comments,avatar
     }
   }
 }`);
@@ -60,7 +60,7 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
+      email,mobile,userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -73,7 +73,7 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
+      email,mobile,userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -118,7 +118,7 @@ const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgI
 }`);
 
 const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  updateUser(userID:$userId,input:$input){ id,displayName,avatarFileID }
+  updateUser(userID:$userId,input:$input){ id,displayName,avatar }
 }`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){

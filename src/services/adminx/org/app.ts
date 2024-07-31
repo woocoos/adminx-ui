@@ -12,7 +12,7 @@ const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: In
         edges{
           cursor,node{
             id,name,code,kind,redirectURI,appKey,appSecret,scopes,
-            tokenValidity,refreshTokenValidity,logoFileID,comments,status,createdAt
+            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt
           }
         }
       }

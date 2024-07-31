@@ -6,7 +6,7 @@ import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import defaultApp from '@/assets/images/default-app.png';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { getFilesRaw } from '@knockout-js/api';
+import { parseStorageUrl } from '@knockout-js/api';
 
 export default (props: {
   open: boolean;
@@ -19,7 +19,7 @@ export default (props: {
   const { t } = useTranslation(),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true
-      { title: 'LOGO', dataIndex: 'logoFileID', width: 90, align: 'center', valueType: 'image', search: false },
+      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
       {
         title: t('name'),
         dataIndex: 'name',
@@ -98,14 +98,14 @@ export default (props: {
             if (result?.totalCount && result.edges) {
               for (const item of result.edges) {
                 if (item?.node) {
-                  let logoFileID: string = defaultApp;
-                  if (item.node?.logoFileID) {
-                    const logo = await getFilesRaw(item.node.logoFileID, 'url');
-                    if (typeof logo === 'string') {
-                      logoFileID = logo;
+                  let logo: string = defaultApp;
+                  if (item.node?.logo) {
+                    const logoRes = await parseStorageUrl(item.node.logo);
+                    if (logoRes) {
+                      logo = logoRes;
                     }
                   }
-                  item.node.logoFileID = logoFileID as any;
+                  item.node.logo = logo;
                   table.data.push(item.node as App);
                 }
               }
@@ -120,14 +120,14 @@ export default (props: {
             if (result?.totalCount && result.edges) {
               for (const item of result.edges) {
                 if (item?.node) {
-                  let logoFileID: string = defaultApp;
-                  if (item.node?.logoFileID) {
-                    const logo = await getFilesRaw(item.node.logoFileID, 'url');
-                    if (typeof logo === 'string') {
-                      logoFileID = logo;
+                  let logo: string = defaultApp;
+                  if (item.node?.logo) {
+                    const logoRes = await parseStorageUrl(item.node.logo);
+                    if (logoRes) {
+                      logo = logoRes;
                     }
                   }
-                  item.node.logoFileID = logoFileID as any;
+                  item.node.logo = logo;
                   table.data.push(item.node as App);
                 }
               }

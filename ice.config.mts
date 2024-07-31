@@ -26,7 +26,7 @@ export default defineConfig(() => ({
   codeSplitting: 'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
-  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/] : true,
+  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/, /@smithy\/*/] : true,
   hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [

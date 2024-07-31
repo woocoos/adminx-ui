@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { getFilesRaw } from '@knockout-js/api';
+import { parseStorageUrl } from '@knockout-js/api';
 
 export const PageAppList = (props: {
   title?: string;
@@ -26,7 +26,7 @@ export const PageAppList = (props: {
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true
-      { title: 'LOGO', dataIndex: 'logoFileID', width: 90, align: 'center', valueType: 'image', search: false },
+      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
       {
         title: t('name'),
         dataIndex: 'name',
@@ -215,14 +215,14 @@ export const PageAppList = (props: {
                   if (result?.totalCount && result.edges) {
                     for (const item of result.edges) {
                       if (item?.node) {
-                        let logoFileID: string = defaultApp;
-                        if (item.node?.logoFileID) {
-                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
-                          if (typeof logo === 'string') {
-                            logoFileID = logo;
+                        let logo: string = defaultApp;
+                        if (item.node?.logo) {
+                          const logoRes = await parseStorageUrl(item.node.logo);
+                          if (logoRes) {
+                            logo = logoRes;
                           }
                         }
-                        item.node.logoFileID = logoFileID as any;
+                        item.node.logo = logo;
                         table.data.push(item.node as App);
                       }
                     }
@@ -237,14 +237,14 @@ export const PageAppList = (props: {
                   if (result?.totalCount && result.edges) {
                     for (const item of result.edges) {
                       if (item?.node) {
-                        let logoFileID: string = defaultApp;
-                        if (item.node?.logoFileID) {
-                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
-                          if (typeof logo === 'string') {
-                            logoFileID = logo;
+                        let logo: string = defaultApp;
+                        if (item.node?.logo) {
+                          const logoRes = await parseStorageUrl(item.node.logo);
+                          if (logoRes) {
+                            logo = logoRes;
                           }
                         }
-                        item.node.logoFileID = logoFileID as any;
+                        item.node.logo = logo;
                         table.data.push(item.node as App);
                       }
                     }
@@ -329,14 +329,14 @@ export const PageAppList = (props: {
                   if (result?.totalCount && result.edges) {
                     for (const item of result.edges) {
                       if (item?.node) {
-                        let logoFileID: string = defaultApp;
-                        if (item.node?.logoFileID) {
-                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
-                          if (typeof logo === 'string') {
-                            logoFileID = logo;
+                        let logo: string = defaultApp;
+                        if (item.node?.logo) {
+                          const logoRes = await parseStorageUrl(item.node.logo);
+                          if (logoRes) {
+                            logo = logoRes;
                           }
                         }
-                        item.node.logoFileID = logoFileID as any;
+                        item.node.logo = logo;
                         table.data.push(item.node as App);
                       }
                     }
@@ -351,14 +351,14 @@ export const PageAppList = (props: {
                   if (result?.totalCount && result.edges) {
                     for (const item of result.edges) {
                       if (item?.node) {
-                        let logoFileID: string = defaultApp;
-                        if (item.node?.logoFileID) {
-                          const logo = await getFilesRaw(item.node.logoFileID, 'url');
-                          if (typeof logo === 'string') {
-                            logoFileID = logo;
+                        let logo: string = defaultApp;
+                        if (item.node?.logo) {
+                          const logoRes = await parseStorageUrl(item.node.logo);
+                          if (logoRes) {
+                            logo = logoRes;
                           }
                         }
-                        item.node.logoFileID = logoFileID as any;
+                        item.node.logo = logo;
                         table.data.push(item.node as App);
                       }
                     }

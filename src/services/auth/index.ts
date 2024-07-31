@@ -17,7 +17,7 @@ export interface LoginRes {
   user?: {
     id: string;
     displayName: string;
-    avatarFileId?: string;
+    avatar?: string;
     domains: {
       id: string;
       name: string;

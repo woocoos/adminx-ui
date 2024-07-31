@@ -10,7 +10,7 @@ import { monitorKeyChange } from '@/pkg/localStore';
 import { Layout, useLeavePrompt } from '@knockout-js/layout';
 import { getAppDeployConfig, logout, urlSpm } from '@/services/auth';
 import { createFromIconfontCN } from '@ant-design/icons';
-import { getFilesRaw } from '@knockout-js/api';
+import { parseStorageUrl } from '@knockout-js/api';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
@@ -32,9 +32,9 @@ export default () => {
   }, [appState.locale]);
 
   useEffect(() => {
-    if (userState.user?.avatarFileId) {
-      getFilesRaw(userState.user.avatarFileId, 'url').then(result => {
-        if (typeof result === 'string') {
+    if (userState.user?.avatar) {
+      parseStorageUrl(userState.user.avatar).then(result => {
+        if (result) {
           setAvatar(result);
         }
       })

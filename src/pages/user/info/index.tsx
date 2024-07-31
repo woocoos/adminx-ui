@@ -83,9 +83,9 @@ export default () => {
           onValuesChange={onValuesChange}
         >
           <ProFormText
-            name="avatarFileID"
+            name="avatar"
           >
-            <UploadAvatar accept='.jpg,.png' directory="images" />
+            <UploadAvatar accept="image/*" directory={`${userState.tenantId}/user/avatar`} />
           </ProFormText>
           <ProFormText
             width="lg"

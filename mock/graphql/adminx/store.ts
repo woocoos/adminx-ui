@@ -91,12 +91,13 @@ export const initStoreData = (store: IMockStore) => {
   // User
   store.set('User', 1, {
     id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com",
+    avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg',
     loginProfile: { mfaEnabled: false }
   })
 
   // app
   store.set('App', 1, {
-    id: 1, name: 'app1', code: 'app1',
+    id: 1, name: 'app1', code: 'app1', logo: 'http://127.0.0.1:9000/test1/test/ivbs8cydz3.jpg',
     actions: listTemp([
       store.get('AppAction', 1),
       store.get('AppAction', 2),
@@ -135,7 +136,7 @@ export const initStoreData = (store: IMockStore) => {
       store.get("Org", 5),
     ])
   })
-  store.set('App', 2, { id: 2, name: 'app2', code: 'app2' })
+  store.set('App', 2, { id: 2, name: 'app2', code: 'app2', logo: 'http://127.0.0.1:9000/test1/test/ivbs8cydz3.jpg', })
 
   // AppAction
   store.set('AppAction', 1, { id: 1, name: '/', method: 'read', appID: 1, app: store.get('App', 1) })
@@ -229,4 +230,15 @@ export const initStoreData = (store: IMockStore) => {
   store.set('AppDictItem', 3, {
     id: 3, code: "confidentiality", name: '保密', dictID: "1", refCode: "app1:sex", dict: store.get('AppDict', 1)
   })
+
+  // OrgFileIdentity
+  store.set('OrgFileIdentity', 1, {
+    id: 1, isDefault: true, source: store.get('FileSource', 1)
+  })
+
+  // FileSource
+  store.set('FileSource', 1, {
+    id: 1, bucket: 'test1', bucketURL: 'http://127.0.0.1:9000/test1', endpoint: 'http://127.0.0.1:9000', region: 'local', stsEndpoint: 'http://127.0.0.1:9000'
+  })
+
 }
