@@ -9,6 +9,8 @@ import { updateFormat } from '@/util';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
 
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
+
 export default () => {
   const
     { t } = useTranslation(),
@@ -85,7 +87,7 @@ export default () => {
           <ProFormText
             name="avatar"
           >
-            <UploadAvatar accept="image/*" directory={`${userState.tenantId}/user/avatar`} />
+            <UploadAvatar accept="image/*" directory={`${userState.tenantId}/${ICE_APP_CODE}/avatar`} />
           </ProFormText>
           <ProFormText
             width="lg"

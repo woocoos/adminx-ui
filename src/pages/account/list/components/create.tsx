@@ -21,6 +21,8 @@ type ProFormData = {
   passwordReset?: boolean;
 };
 
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
+
 export default (props: {
   open: boolean;
   title?: string;
@@ -233,7 +235,7 @@ export default (props: {
         x-if={['base'].includes(props.scene)}
         name="avatar"
       >
-        <UploadAvatar accept="image/*" directory={`${userState.tenantId}/user/avatar`} />
+        <UploadAvatar accept="image/*" directory={`${userState.tenantId}/${ICE_APP_CODE}/avatar`} />
       </ProFormText>
       <div x-if={['create', 'base', 'recycle'].includes(props.scene)}>
         <ProFormText

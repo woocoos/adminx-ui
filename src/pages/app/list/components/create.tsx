@@ -19,6 +19,8 @@ type ProFormData = {
   comments?: string;
 };
 
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
+
 export default (props: {
   open?: boolean;
   title?: string;
@@ -133,7 +135,7 @@ export default (props: {
       </div>
       <div x-else>
         <ProFormText name="logo" label="LOGO" >
-          <UploadAvatar accept="image/*" directory={`${userState.tenantId}/app/logo`} />
+          <UploadAvatar accept="image/*" directory={`${userState.tenantId}/${ICE_APP_CODE}/logo`} />
         </ProFormText>
         <ProFormText
           name="name"
