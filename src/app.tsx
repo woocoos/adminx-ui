@@ -21,8 +21,7 @@ const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
-  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
-  ICE_API_FILES_PREFIX = process.env.ICE_API_FILES_PREFIX ?? '';
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
@@ -55,7 +54,7 @@ export default defineAppConfig(() => ({
 
 // 用来做初始化数据
 export const dataLoader = defineDataLoader(async () => {
-  setStsApi(`${ICE_API_FILES_PREFIX}/oss/sts`);
+  setStsApi(`${ICE_API_AUTH_PREFIX}/oss/sts`);
   const sign = `sign_cid=y`;
   if (document.cookie.indexOf(sign) === -1) {
     removeItem('token');
