@@ -61,8 +61,13 @@ const documents = {
     "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}": types.CreateAppDictItemDocument,
     "mutation deleteAppDictItem($itemId:ID!){\n  deleteAppDictItem(itemID: $itemId)\n}": types.DeleteAppDictItemDocument,
     "mutation moveAppDictItem($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppDictItem(sourceID: $sourceId,targetID:$targetId,action:$action)\n}": types.MoveAppDictItemDocument,
-    "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}": types.FileSourceListDocument,
-    "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}": types.FileSourceInfoDocument,
+    "query fileIdentityList($first: Int,$orderBy:FileIdentityOrder,$where:FileIdentityWhereInput){\n  fileIdentities(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,comments\n        accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n        org{ id,name }\n      }\n    }\n  }\n}": types.FileIdentityListDocument,
+    "query fileIdentityInfo($gid:GID!){\n node(id:$gid){\n  ... on FileIdentity{\n      id,createdBy,createdAt,updatedBy,updatedAt,comments,\n      accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n      org{ id,name }\n    }\n  }\n}": types.FileIdentityInfoDocument,
+    "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}": types.CreateFileIdentityDocument,
+    "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}": types.UpdateFileIdentityDocument,
+    "mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}": types.DeleteFileIdentityDocument,
+    "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket,bucketURL,stsEndpoint,endpointImmutable\n      }\n    }\n  }\n}": types.FileSourceListDocument,
+    "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket,bucketURL,stsEndpoint,endpointImmutable\n    }\n  }\n}": types.FileSourceInfoDocument,
     "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}": types.CreateFileSourceDocument,
     "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}": types.UpdateFileSourceDocument,
     "mutation deleteFileSource($fsId:ID!){\n  deleteFileSource(fsID: $fsId)\n}": types.DeleteFileSourceDocument,
@@ -355,11 +360,31 @@ export function gql(source: "mutation moveAppDictItem($sourceId:ID!,$targetId:ID
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}"): (typeof documents)["query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket\n      }\n    }\n  }\n}"];
+export function gql(source: "query fileIdentityList($first: Int,$orderBy:FileIdentityOrder,$where:FileIdentityWhereInput){\n  fileIdentities(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,comments\n        accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n        org{ id,name }\n      }\n    }\n  }\n}"): (typeof documents)["query fileIdentityList($first: Int,$orderBy:FileIdentityOrder,$where:FileIdentityWhereInput){\n  fileIdentities(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,comments\n        accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n        org{ id,name }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}"): (typeof documents)["query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket\n    }\n  }\n}"];
+export function gql(source: "query fileIdentityInfo($gid:GID!){\n node(id:$gid){\n  ... on FileIdentity{\n      id,createdBy,createdAt,updatedBy,updatedAt,comments,\n      accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n      org{ id,name }\n    }\n  }\n}"): (typeof documents)["query fileIdentityInfo($gid:GID!){\n node(id:$gid){\n  ... on FileIdentity{\n      id,createdBy,createdAt,updatedBy,updatedAt,comments,\n      accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n      org{ id,name }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}"): (typeof documents)["mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}"): (typeof documents)["mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}"): (typeof documents)["mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket,bucketURL,stsEndpoint,endpointImmutable\n      }\n    }\n  }\n}"): (typeof documents)["query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket,bucketURL,stsEndpoint,endpointImmutable\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket,bucketURL,stsEndpoint,endpointImmutable\n    }\n  }\n}"): (typeof documents)["query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket,bucketURL,stsEndpoint,endpointImmutable\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

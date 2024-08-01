@@ -43,8 +43,28 @@ const schemaWithMocks = addMocksToSchema({
       avatarFileID: () => 'png',
       permissions: relayStylePaginationMock(store),
     },
+    FileIdentity: {
+      policy: () => JSON.stringify({
+        "Statement": [
+          {
+            "Action": [
+              "oss:GetObject",
+              "oss:PutObject",
+              "oss:DeleteObject",
+              "oss:ListParts",
+              "oss:AbortMultipartUpload",
+              "oss:ListObjects"
+            ],
+            "Effect": "Allow",
+            "Resource": ["acs:oss:*:*:*"]
+          }
+        ],
+        "Version": "1"
+      }),
+      roleArn: () => 'acs:ram::5755321561100682:role/devossrwrole'
+    },
     Query: {
-      fileIdentitiesForOrg:() => [
+      fileIdentitiesForOrg: () => [
         store.get('OrgFileIdentity', 1),
       ],
       appAccess: () => true,
@@ -63,6 +83,12 @@ const schemaWithMocks = addMocksToSchema({
           ])
         }
       },
+      fileSources: () => {
+        return listTemp([
+          store.get('FileSource', 1),
+        ])
+      },
+      fileIdentities: relayStylePaginationMock(store),
       users: relayStylePaginationMock(store),
       orgGroups: relayStylePaginationMock(store),
       orgRoleUsers: relayStylePaginationMock(store),

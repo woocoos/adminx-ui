@@ -1,11 +1,12 @@
 import { gql } from "@/generated/adminx";
-import { CreateFileSourceInput, FileSourceOrder, FileSourceWhereInput, UpdateFileSourceInput } from "@/generated/adminx/graphql";
+import { CreateFileSourceInput, FileSourceKind, FileSourceOrder, FileSourceWhereInput, UpdateFileSourceInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
 export const EnumFileSourceKind = {
-  local: { text: 'local' },
-  alioss: { text: 'alioss' },
+  [FileSourceKind.Local]: { text: 'local' },
+  [FileSourceKind.AliOss]: { text: 'alioss' },
+  [FileSourceKind.Minio]: { text: 'minio' },
 };
 
 const fileSourcesQuery = gql(/* GraphQL */`query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){
@@ -14,7 +15,7 @@ const fileSourcesQuery = gql(/* GraphQL */`query fileSourceList($first: Int,$ord
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,
-        bucket
+        bucket,bucketURL,stsEndpoint,endpointImmutable
       }
     }
   }
@@ -24,7 +25,7 @@ const fileSourceInfoQuery = gql(/* GraphQL */`query fileSourceInfo($gid:GID!){
  node(id:$gid){
   ... on FileSource{
       id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,
-      bucket
+      bucket,bucketURL,stsEndpoint,endpointImmutable
     }
   }
 }`);

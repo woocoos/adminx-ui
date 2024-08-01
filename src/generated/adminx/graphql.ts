@@ -1824,13 +1824,12 @@ export type CreateFileIdentityInput = {
   durationSeconds?: InputMaybe<Scalars['Int']['input']>;
   /** 租户默认的凭证 */
   isDefault?: InputMaybe<Scalars['Boolean']['input']>;
+  orgID: Scalars['ID']['input'];
   /** 指定返回的STS令牌的权限的策略 */
   policy?: InputMaybe<Scalars['String']['input']>;
   /** 角色的资源名称(ARN)，用于STS */
   roleArn: Scalars['String']['input'];
   sourceID: Scalars['ID']['input'];
-  /** 组织ID */
-  tenantID: Scalars['ID']['input'];
 };
 
 /**
@@ -1881,6 +1880,7 @@ export type CreateOrgInput = {
   countryCode?: InputMaybe<Scalars['String']['input']>;
   /** 默认域名 */
   domain?: InputMaybe<Scalars['String']['input']>;
+  fileIdentityIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** 组织名称 */
   name: Scalars['String']['input'];
   ownerID?: InputMaybe<Scalars['ID']['input']>;
@@ -2114,6 +2114,7 @@ export type FileIdentity = Node & {
   id: Scalars['ID']['output'];
   /** 租户默认的凭证 */
   isDefault: Scalars['Boolean']['output'];
+  org: Org;
   /** 指定返回的STS令牌的权限的策略 */
   policy?: Maybe<Scalars['String']['output']>;
   /** 角色的资源名称(ARN)，用于STS */
@@ -2226,6 +2227,9 @@ export type FileIdentityWhereInput = {
   fileSourceIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
   fileSourceIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   fileSourceIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** org edge predicates */
+  hasOrg?: InputMaybe<Scalars['Boolean']['input']>;
+  hasOrgWith?: InputMaybe<Array<OrgWhereInput>>;
   /** source edge predicates */
   hasSource?: InputMaybe<Scalars['Boolean']['input']>;
   hasSourceWith?: InputMaybe<Array<FileSourceWhereInput>>;
@@ -2275,11 +2279,7 @@ export type FileIdentityWhereInput = {
   roleArnNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
   /** tenant_id field predicates */
   tenantID?: InputMaybe<Scalars['ID']['input']>;
-  tenantIDGT?: InputMaybe<Scalars['ID']['input']>;
-  tenantIDGTE?: InputMaybe<Scalars['ID']['input']>;
   tenantIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
-  tenantIDLT?: InputMaybe<Scalars['ID']['input']>;
-  tenantIDLTE?: InputMaybe<Scalars['ID']['input']>;
   tenantIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   tenantIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** updated_at field predicates */
@@ -2378,6 +2378,7 @@ export type FileSourceEdge = {
 /** FileSourceKind is enum for the field kind */
 export enum FileSourceKind {
   AliOss = 'aliOSS',
+  AwsS3 = 'awsS3',
   Local = 'local',
   Minio = 'minio'
 }
@@ -3413,6 +3414,8 @@ export type Org = Node & {
   displaySort?: Maybe<Scalars['Int']['output']>;
   /** 默认域名 */
   domain?: Maybe<Scalars['String']['output']>;
+  /** 组织下文件凭证 */
+  fileIdentities?: Maybe<Array<FileIdentity>>;
   id: Scalars['ID']['output'];
   /** 是否允许解除应用策略 */
   isAllowRevokeAppPolicy: Scalars['Boolean']['output'];
@@ -4294,6 +4297,9 @@ export type OrgWhereInput = {
   /** children edge predicates */
   hasChildren?: InputMaybe<Scalars['Boolean']['input']>;
   hasChildrenWith?: InputMaybe<Array<OrgWhereInput>>;
+  /** file_identities edge predicates */
+  hasFileIdentities?: InputMaybe<Scalars['Boolean']['input']>;
+  hasFileIdentitiesWith?: InputMaybe<Array<FileIdentityWhereInput>>;
   /** org_user edge predicates */
   hasOrgUser?: InputMaybe<Scalars['Boolean']['input']>;
   hasOrgUserWith?: InputMaybe<Array<OrgUserWhereInput>>;
@@ -5154,13 +5160,12 @@ export type UpdateFileIdentityInput = {
   durationSeconds?: InputMaybe<Scalars['Int']['input']>;
   /** 租户默认的凭证 */
   isDefault?: InputMaybe<Scalars['Boolean']['input']>;
+  orgID?: InputMaybe<Scalars['ID']['input']>;
   /** 指定返回的STS令牌的权限的策略 */
   policy?: InputMaybe<Scalars['String']['input']>;
   /** 角色的资源名称(ARN)，用于STS */
   roleArn?: InputMaybe<Scalars['String']['input']>;
   sourceID?: InputMaybe<Scalars['ID']['input']>;
-  /** 组织ID */
-  tenantID?: InputMaybe<Scalars['ID']['input']>;
 };
 
 /**
@@ -5212,6 +5217,7 @@ export type UpdateOauthClientInput = {
 export type UpdateOrgInput = {
   addAppIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   addChildIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  addFileIdentityIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   addPermissionIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   addPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   addRolesAndGroupIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -5220,6 +5226,7 @@ export type UpdateOrgInput = {
   clearChildren?: InputMaybe<Scalars['Boolean']['input']>;
   clearCountryCode?: InputMaybe<Scalars['Boolean']['input']>;
   clearDomain?: InputMaybe<Scalars['Boolean']['input']>;
+  clearFileIdentities?: InputMaybe<Scalars['Boolean']['input']>;
   clearOwner?: InputMaybe<Scalars['Boolean']['input']>;
   clearPermissions?: InputMaybe<Scalars['Boolean']['input']>;
   clearPolicies?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5240,6 +5247,7 @@ export type UpdateOrgInput = {
   profile?: InputMaybe<Scalars['String']['input']>;
   removeAppIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeChildIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  removeFileIdentityIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removePermissionIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removePolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeRolesAndGroupIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -6732,6 +6740,44 @@ export type MoveAppDictItemMutationVariables = Exact<{
 
 export type MoveAppDictItemMutation = { __typename?: 'Mutation', moveAppDictItem: boolean };
 
+export type FileIdentityListQueryVariables = Exact<{
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<FileIdentityOrder>;
+  where?: InputMaybe<FileIdentityWhereInput>;
+}>;
+
+
+export type FileIdentityListQuery = { __typename?: 'Query', fileIdentities: { __typename?: 'FileIdentityConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'FileIdentityEdge', cursor: any, node?: { __typename?: 'FileIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, comments?: string | null, accessKeyID: string, accessKeySecret: string, durationSeconds?: number | null, fileSourceID: string, isDefault: boolean, policy?: string | null, roleArn: string, tenantID: string, org: { __typename?: 'Org', id: string, name: string } } | null } | null> | null } };
+
+export type FileIdentityInfoQueryVariables = Exact<{
+  gid: Scalars['GID']['input'];
+}>;
+
+
+export type FileIdentityInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'File' } | { __typename?: 'FileIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, comments?: string | null, accessKeyID: string, accessKeySecret: string, durationSeconds?: number | null, fileSourceID: string, isDefault: boolean, policy?: string | null, roleArn: string, tenantID: string, org: { __typename?: 'Org', id: string, name: string } } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'User' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+
+export type CreateFileIdentityMutationVariables = Exact<{
+  input: CreateFileIdentityInput;
+}>;
+
+
+export type CreateFileIdentityMutation = { __typename?: 'Mutation', createFileIdentity: { __typename?: 'FileIdentity', id: string } };
+
+export type UpdateFileIdentityMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  input: UpdateFileIdentityInput;
+}>;
+
+
+export type UpdateFileIdentityMutation = { __typename?: 'Mutation', updateFileIdentity: { __typename?: 'FileIdentity', id: string } };
+
+export type DeleteFileIdentityMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteFileIdentityMutation = { __typename?: 'Mutation', deleteFileIdentity: boolean };
+
 export type FileSourceListQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<FileSourceOrder>;
@@ -6739,14 +6785,14 @@ export type FileSourceListQueryVariables = Exact<{
 }>;
 
 
-export type FileSourceListQuery = { __typename?: 'Query', fileSources: { __typename?: 'FileSourceConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'FileSourceEdge', cursor: any, node?: { __typename?: 'FileSource', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, kind: FileSourceKind, comments?: string | null, endpoint: string, region: string, bucket: string } | null } | null> | null } };
+export type FileSourceListQuery = { __typename?: 'Query', fileSources: { __typename?: 'FileSourceConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'FileSourceEdge', cursor: any, node?: { __typename?: 'FileSource', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, kind: FileSourceKind, comments?: string | null, endpoint: string, region: string, bucket: string, bucketURL: string, stsEndpoint: string, endpointImmutable: boolean } | null } | null> | null } };
 
 export type FileSourceInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type FileSourceInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'File' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileSource', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, kind: FileSourceKind, comments?: string | null, endpoint: string, region: string, bucket: string } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'User' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type FileSourceInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'File' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileSource', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, kind: FileSourceKind, comments?: string | null, endpoint: string, region: string, bucket: string, bucketURL: string, stsEndpoint: string, endpointImmutable: boolean } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'User' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
 
 export type CreateFileSourceMutationVariables = Exact<{
   input: CreateFileSourceInput;
@@ -7456,8 +7502,13 @@ export const UpdateAppDictItemDocument = {"kind":"Document","definitions":[{"kin
 export const CreateAppDictItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createAppDictItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"dictId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateAppDictItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAppDictItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"dictID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"dictId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateAppDictItemMutation, CreateAppDictItemMutationVariables>;
 export const DeleteAppDictItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteAppDictItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"itemId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteAppDictItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"itemID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"itemId"}}}]}]}}]} as unknown as DocumentNode<DeleteAppDictItemMutation, DeleteAppDictItemMutationVariables>;
 export const MoveAppDictItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"moveAppDictItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"sourceId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"targetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"action"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"TreeAction"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"moveAppDictItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"sourceID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"sourceId"}}},{"kind":"Argument","name":{"kind":"Name","value":"targetID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"targetId"}}},{"kind":"Argument","name":{"kind":"Name","value":"action"},"value":{"kind":"Variable","name":{"kind":"Name","value":"action"}}}]}]}}]} as unknown as DocumentNode<MoveAppDictItemMutation, MoveAppDictItemMutationVariables>;
-export const FileSourceListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"fileSourceList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FileSourceOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FileSourceWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"fileSources"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"endpoint"}},{"kind":"Field","name":{"kind":"Name","value":"region"}},{"kind":"Field","name":{"kind":"Name","value":"bucket"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FileSourceListQuery, FileSourceListQueryVariables>;
-export const FileSourceInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"fileSourceInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FileSource"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"endpoint"}},{"kind":"Field","name":{"kind":"Name","value":"region"}},{"kind":"Field","name":{"kind":"Name","value":"bucket"}}]}}]}}]}}]} as unknown as DocumentNode<FileSourceInfoQuery, FileSourceInfoQueryVariables>;
+export const FileIdentityListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"fileIdentityList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FileIdentityOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FileIdentityWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"fileIdentities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"accessKeyID"}},{"kind":"Field","name":{"kind":"Name","value":"accessKeySecret"}},{"kind":"Field","name":{"kind":"Name","value":"durationSeconds"}},{"kind":"Field","name":{"kind":"Name","value":"fileSourceID"}},{"kind":"Field","name":{"kind":"Name","value":"isDefault"}},{"kind":"Field","name":{"kind":"Name","value":"policy"}},{"kind":"Field","name":{"kind":"Name","value":"roleArn"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"org"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<FileIdentityListQuery, FileIdentityListQueryVariables>;
+export const FileIdentityInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"fileIdentityInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FileIdentity"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"accessKeyID"}},{"kind":"Field","name":{"kind":"Name","value":"accessKeySecret"}},{"kind":"Field","name":{"kind":"Name","value":"durationSeconds"}},{"kind":"Field","name":{"kind":"Name","value":"fileSourceID"}},{"kind":"Field","name":{"kind":"Name","value":"isDefault"}},{"kind":"Field","name":{"kind":"Name","value":"policy"}},{"kind":"Field","name":{"kind":"Name","value":"roleArn"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"org"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FileIdentityInfoQuery, FileIdentityInfoQueryVariables>;
+export const CreateFileIdentityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createFileIdentity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateFileIdentityInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createFileIdentity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateFileIdentityMutation, CreateFileIdentityMutationVariables>;
+export const UpdateFileIdentityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateFileIdentity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateFileIdentityInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateFileIdentity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateFileIdentityMutation, UpdateFileIdentityMutationVariables>;
+export const DeleteFileIdentityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteFileIdentity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteFileIdentity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteFileIdentityMutation, DeleteFileIdentityMutationVariables>;
+export const FileSourceListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"fileSourceList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FileSourceOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"FileSourceWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"fileSources"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"endpoint"}},{"kind":"Field","name":{"kind":"Name","value":"region"}},{"kind":"Field","name":{"kind":"Name","value":"bucket"}},{"kind":"Field","name":{"kind":"Name","value":"bucketURL"}},{"kind":"Field","name":{"kind":"Name","value":"stsEndpoint"}},{"kind":"Field","name":{"kind":"Name","value":"endpointImmutable"}}]}}]}}]}}]}}]} as unknown as DocumentNode<FileSourceListQuery, FileSourceListQueryVariables>;
+export const FileSourceInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"fileSourceInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"FileSource"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"endpoint"}},{"kind":"Field","name":{"kind":"Name","value":"region"}},{"kind":"Field","name":{"kind":"Name","value":"bucket"}},{"kind":"Field","name":{"kind":"Name","value":"bucketURL"}},{"kind":"Field","name":{"kind":"Name","value":"stsEndpoint"}},{"kind":"Field","name":{"kind":"Name","value":"endpointImmutable"}}]}}]}}]}}]} as unknown as DocumentNode<FileSourceInfoQuery, FileSourceInfoQueryVariables>;
 export const CreateFileSourceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createFileSource"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateFileSourceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createFileSource"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateFileSourceMutation, CreateFileSourceMutationVariables>;
 export const UpdateFileSourceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateFileSource"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fsId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateFileSourceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateFileSource"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"fsID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fsId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateFileSourceMutation, UpdateFileSourceMutationVariables>;
 export const DeleteFileSourceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteFileSource"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"fsId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteFileSource"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"fsID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"fsId"}}}]}]}}]} as unknown as DocumentNode<DeleteFileSourceMutation, DeleteFileSourceMutationVariables>;

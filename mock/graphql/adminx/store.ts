@@ -236,6 +236,11 @@ export const initStoreData = (store: IMockStore) => {
     id: 1, isDefault: true, source: store.get('FileSource', 1)
   })
 
+  // FileIdentity
+  store.set('FileIdentity', 1, {
+    id: 1, isDefault: true,
+  })
+
   // FileSource
   store.set('FileSource', 1, {
     id: 1, bucket: 'test1', bucketURL: 'http://127.0.0.1:9000/test1', endpoint: 'http://127.0.0.1:9000', region: 'local', stsEndpoint: 'http://127.0.0.1:9000'

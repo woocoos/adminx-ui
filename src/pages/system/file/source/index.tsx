@@ -8,7 +8,7 @@ import { Button, Modal, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Create from './components/create';
-import { definePageConfig } from 'ice';
+import { definePageConfig, Link } from 'ice';
 
 const PageFileSourceList = () => {
   const { t } = useTranslation(),
@@ -30,19 +30,35 @@ const PageFileSourceList = () => {
         valueEnum: EnumFileSourceKind,
       },
       {
-        title: "bucket",
+        title: "Bucket",
         dataIndex: 'bucket',
         width: 100,
       },
       {
-        title: "region",
+        title: "Bucket Url",
+        dataIndex: 'bucketURL',
+        width: 100,
+      },
+      {
+        title: "Region",
         dataIndex: 'region',
         width: 100,
       },
       {
-        title: "endpoint",
+        title: "Endpoint",
         dataIndex: 'endpoint',
         width: 100,
+      },
+      {
+        title: "Sts Endpoint",
+        dataIndex: 'stsEndpoint',
+        width: 100,
+      },
+      {
+        title: t('custDomain'), dataIndex: 'endpointImmutable', width: 100, search: false,
+        render: (text, record) => {
+          return record.endpointImmutable ? t('yes') : t('no');
+        }
       },
       { title: t('description'), dataIndex: 'comments', width: 120, search: false },
       {
@@ -51,7 +67,7 @@ const PageFileSourceList = () => {
         fixed: 'right',
         align: 'center',
         search: false,
-        width: 90,
+        width: 120,
         render: (text, record) => {
           return (<Space>
             <Auth authKey="updateFileSource">
@@ -61,6 +77,9 @@ const PageFileSourceList = () => {
                 {t('edit')}
               </a>
             </Auth>
+            <Link key="proof" to={`/system/file/identity?fs_id=${record.id}`}>
+              {t('proof')}
+            </Link>
             <Auth authKey="deleteFileSource">
               <a key="editor" onClick={() => {
                 Modal.confirm({
@@ -115,7 +134,7 @@ const PageFileSourceList = () => {
     <ProTable
       actionRef={proTableRef}
       rowKey={'id'}
-      search={false}
+      search={{ labelWidth: 100 }}
       toolbar={{
         title: t('file_source_list'),
         actions: [
@@ -140,6 +159,8 @@ const PageFileSourceList = () => {
         where.bucketContains = params.bucket;
         where.regionContains = params.region;
         where.endpointContains = params.endpoint;
+        where.bucketURLContains = params.bucketURL;
+        where.stsEndpointContains = params.stsEndpoint;
         const result = await getFileSourceList({
           current: params.current,
           pageSize: params.pageSize,

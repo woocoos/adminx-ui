@@ -1,6 +1,6 @@
 import { FileSource, FileSourceKind } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { DrawerForm, ProFormSelect, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
@@ -8,9 +8,12 @@ import { EnumFileSourceKind, createFileSource, getFileSourceInfo, updateFileSour
 
 type ProFormData = {
   kind: FileSourceKind;
-  endpoint?: string;
-  region?: string;
-  bucket?: string;
+  endpoint: string;
+  stsEndpoint: string;
+  endpointImmutable?: boolean;
+  region: string;
+  bucket: string;
+  bucketURL: string;
   comments?: string;
 };
 
@@ -45,15 +48,23 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       const data: ProFormData = {
-        kind: FileSourceKind.Local
+        kind: FileSourceKind.Local,
+        endpoint: '',
+        stsEndpoint: '',
+        region: '',
+        bucket: '',
+        bucketURL: ''
       };
       if (props.id) {
         const result = await getFileSourceInfo(props.id);
         if (result?.id) {
           data.kind = result.kind;
-          data.endpoint = result.endpoint || undefined;
-          data.region = result.region || undefined;
-          data.bucket = result.bucket || undefined;
+          data.endpoint = result.endpoint;
+          data.stsEndpoint = result.stsEndpoint;
+          data.region = result.region;
+          data.bucket = result.bucket;
+          data.bucketURL = result.bucketURL;
+          data.endpointImmutable = result.endpointImmutable;
           data.comments = result.comments || undefined;
           setOldInfo(result as FileSource);
         }
@@ -79,7 +90,6 @@ export default (props: {
           isTrue = true;
         }
       }
-
 
       if (isTrue) {
         setSaveDisabled(true);
@@ -124,18 +134,42 @@ export default (props: {
       />
       <ProFormText
         name="bucket"
-        label="bucket"
+        label="Bucket"
         rules={[
           { required: true, message: `${t('please_enter_file_source_bucket')}` },
         ]}
       />
       <ProFormText
+        name="bucketURL"
+        label="Bucket Url"
+        rules={[
+          { required: true, message: `${t('please_enter_file_source_bucket_url')}` },
+        ]}
+      />
+      <ProFormText
         name="region"
-        label="region"
+        label="Region"
+        rules={[
+          { required: true, message: `${t('please_enter_file_source_region')}` },
+        ]}
       />
       <ProFormText
         name="endpoint"
-        label="endpoint"
+        label="Endpoint"
+        rules={[
+          { required: true, message: `${t('please_enter_file_source_endpoint')}` },
+        ]}
+      />
+      <ProFormText
+        name="stsEndpoint"
+        label="Sts Endpoint"
+        rules={[
+          { required: true, message: `${t('please_enter_file_source_sts_endpoint')}` },
+        ]}
+      />
+      <ProFormSwitch
+        name="endpointImmutable"
+        label={t('custDomain')}
       />
       <ProFormTextArea
         name="comments"
