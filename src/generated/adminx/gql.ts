@@ -66,6 +66,7 @@ const documents = {
     "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}": types.CreateFileIdentityDocument,
     "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}": types.UpdateFileIdentityDocument,
     "mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}": types.DeleteFileIdentityDocument,
+    "mutation setDefaultFileIdentity($id:ID!,$orgId: ID!){\n  setDefaultFileIdentity(identityID:$id,orgID:$orgId)\n}": types.SetDefaultFileIdentityDocument,
     "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket,bucketURL,stsEndpoint,endpointImmutable\n      }\n    }\n  }\n}": types.FileSourceListDocument,
     "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket,bucketURL,stsEndpoint,endpointImmutable\n    }\n  }\n}": types.FileSourceInfoDocument,
     "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}": types.CreateFileSourceDocument,
@@ -377,6 +378,10 @@ export function gql(source: "mutation updateFileIdentity($id:ID!,$input: UpdateF
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}"): (typeof documents)["mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation setDefaultFileIdentity($id:ID!,$orgId: ID!){\n  setDefaultFileIdentity(identityID:$id,orgID:$orgId)\n}"): (typeof documents)["mutation setDefaultFileIdentity($id:ID!,$orgId: ID!){\n  setDefaultFileIdentity(identityID:$id,orgID:$orgId)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

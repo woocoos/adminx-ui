@@ -1807,8 +1807,6 @@ input CreateFileIdentityInput {
   comments: String
   """STS令牌的有效期，默认3600s"""
   durationSeconds: Int
-  """租户默认的凭证"""
-  isDefault: Boolean
   orgID: ID!
   """指定返回的STS令牌的权限的策略"""
   policy: String
@@ -2797,6 +2795,8 @@ type Mutation {
   saveOrgUserPreference(input: OrgUserPreferenceInput!): OrgUserPreference!
   """发送MFA至用户邮箱"""
   sendMFAToUserByEmail(userID: ID!): Boolean!
+  """设置默认凭证"""
+  setDefaultFileIdentity(identityID: ID!, orgID: ID!): Boolean!
   """更新应用"""
   updateApp(appID: ID!, input: UpdateAppInput!): App
   """更新应用操作"""
@@ -4618,8 +4618,6 @@ input UpdateFileIdentityInput {
   comments: String
   """STS令牌的有效期，默认3600s"""
   durationSeconds: Int
-  """租户默认的凭证"""
-  isDefault: Boolean
   orgID: ID
   """指定返回的STS令牌的权限的策略"""
   policy: String

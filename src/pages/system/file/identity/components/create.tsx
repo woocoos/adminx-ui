@@ -12,7 +12,6 @@ type ProFormData = {
   accessKeyID?: string
   accessKeySecret?: string
   durationSeconds?: number
-  isDefault?: boolean
   org?: Org;
   policy?: string;
   roleArn?: string
@@ -58,7 +57,6 @@ export default (props: {
           data.accessKeyID = result.accessKeyID
           data.accessKeySecret = result.accessKeySecret
           data.durationSeconds = result.durationSeconds ?? undefined
-          data.isDefault = result.isDefault
           data.org = result.org as Org
           data.policy = ''
           if (result.policy) {
@@ -89,7 +87,6 @@ export default (props: {
         accessKeySecret: values.accessKeySecret ?? '',
         comments: values.comments,
         durationSeconds: values.durationSeconds ?? 3600,
-        isDefault: values.isDefault,
         orgID: values.org?.id ?? '',
         policy: values.policy,
         roleArn: values.roleArn ?? '',
@@ -199,10 +196,6 @@ export default (props: {
         rules={[
           { required: true, message: `${t('please_enter_role_arn')}` },
         ]}
-      />
-      <ProFormSwitch
-        name="isDefault"
-        label={t('default')}
       />
       <ProFormTextArea
         name="comments"

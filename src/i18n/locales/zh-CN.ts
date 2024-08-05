@@ -99,6 +99,7 @@ export default {
     confirm_disauthorization: '确认是否解除授权',
     confirm_enable_MFA: '确认是否开启MFA多因素认证',
     confirm_close_MFA: '确认是否关闭MFA多因素认证',
+    'confirm_set_default_{{field}}': '确认是否{{field}}设为默认',
     submit_success: '提交成功',
     login_success: '登录成功',
     go_login: '前往登录',
@@ -201,6 +202,7 @@ export default {
     app_dict_item: '数据字典明细',
     create_app_dict_item: '创建数据字典明细',
     edit_app_dict_item: '编辑数据字典明细',
+    set_default: '设置默认',
 
     // 创建
     create_user: '创建用户',
@@ -266,6 +268,7 @@ export default {
     please_enter_org: '请输入组织',
     please_select: '请选择',
     please_select_app: '请选择应用',
+    please_select_list_item: '请选择列表上的项',
     please_enter_role_arn: '请输入角色ARN',
     search_keyword: '搜索关键字',
     search_app: '搜索应用',

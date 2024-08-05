@@ -99,6 +99,7 @@ export default {
     confirm_disauthorization: 'confirm disauthorization',
     confirm_enable_MFA: 'confirm enable MFA Multi-factor certification',
     confirm_close_MFA: 'confirm close MFA Multi-factor certification',
+    'confirm_set_default_{{field}}': 'confirm {{field}} set default',
     submit_success: 'submit success',
     login_success: 'login success',
     go_login: 'go login',
@@ -201,6 +202,7 @@ export default {
     app_dict_item: 'Data dictionary detail',
     create_app_dict_item: 'Create data dictionary details',
     edit_app_dict_item: 'Edit data dictionary details',
+    set_default: 'Set Default',
 
     // 创建
     create_user: 'Create a user',
@@ -266,6 +268,7 @@ export default {
     please_enter_org: 'Please enter the organization',
     please_select: 'Please select',
     please_select_app: 'Please select Application',
+    please_select_list_item: 'Please select an item on the list',
     please_enter_role_arn: 'Please enter Role ARN',
     search_keyword: 'Search keyword',
     search_app: 'Search application',

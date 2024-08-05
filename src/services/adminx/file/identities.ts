@@ -45,6 +45,10 @@ const mutationDelFileIdentity = gql(/* GraphQL */`mutation deleteFileIdentity($i
   deleteFileIdentity(id: $id)
 }`);
 
+const mutationSetDefaultFileIdentity = gql(/* GraphQL */`mutation setDefaultFileIdentity($id:ID!,$orgId: ID!){
+  setDefaultFileIdentity(identityID:$id,orgID:$orgId)
+}`);
+
 
 /**
  * 获取文件来源凭证
@@ -145,6 +149,25 @@ export async function delFileIdentity(id: string) {
 
   if (result.data?.deleteFileIdentity) {
     return result.data.deleteFileIdentity;
+  }
+  return null;
+}
+
+/**
+ * 删除
+ * @param fsId
+ * @returns
+ */
+export async function setDefaultFileIdentity(id: string, orgId: string) {
+  const
+    result = await mutation(
+      mutationSetDefaultFileIdentity, {
+      id,
+      orgId
+    });
+
+  if (result.data?.setDefaultFileIdentity) {
+    return result.data.setDefaultFileIdentity;
   }
   return null;
 }

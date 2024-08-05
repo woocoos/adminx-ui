@@ -3,12 +3,12 @@ import Auth from '@/components/auth';
 import { FileIdentity, FileIdentityWhereInput, FileSource, OrgKind, } from '@/generated/adminx/graphql';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { KeepAlive } from '@knockout-js/layout';
-import { Button, Modal, Space, Tooltip } from 'antd';
+import { Button, message, Modal, Space, Tooltip } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Create from './components/create';
 import { definePageConfig, useSearchParams } from 'ice';
-import { delFileIdentity, getFileIdentityList } from '@/services/adminx/file/identities';
+import { delFileIdentity, getFileIdentityList, setDefaultFileIdentity } from '@/services/adminx/file/identities';
 import InputOrg from '@/pages/org/components/inputOrg';
 import { getFileSourceInfo } from '@/services/adminx/file/source';
 
@@ -29,7 +29,7 @@ const PageFileSourceList = () => {
       },
       {
         title: t('organization'),
-        dataIndex: 'organization',
+        dataIndex: 'org',
         width: 90,
         renderFormItem: () => {
           return <InputOrg kind={OrgKind.Root} />
@@ -47,6 +47,7 @@ const PageFileSourceList = () => {
         title: "AccessKeySecret",
         dataIndex: 'accessKeySecret',
         width: 100,
+        search: false,
       },
       {
         title: "RoleArn",
@@ -121,6 +122,7 @@ const PageFileSourceList = () => {
       },
     ],
     [dataSource, setDataSource] = useState<FileIdentity[]>([]),
+    [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -178,6 +180,34 @@ const PageFileSourceList = () => {
               {t('create_file_source')}
             </Button>
           </Auth>,
+          <Auth authKey={'createFileSource'}>
+            <Button
+              type="default"
+              onClick={() => {
+                const dsData = dataSource.find(item => item.id == selectedRowKeys[0]);
+                if (dsData) {
+                  Modal.confirm({
+                    title: t('set_default'),
+                    content: t('confirm_set_default_{{field}}', {
+                      field: `ID: ${dsData.id}`
+                    }),
+                    onOk: async (close) => {
+                      const result = await setDefaultFileIdentity(dsData.id, dsData.tenantID);
+                      if (result) {
+                        message.success(`${t('submit_success')}`)
+                        close();
+                        proTableRef.current?.reload()
+                      }
+                    },
+                  })
+                } else {
+                  message.warning(`${t('please_select_list_item')}`)
+                }
+              }}
+            >
+              {t('set_default')}
+            </Button>
+          </Auth>,
         ],
       }}
       scroll={{ x: 'max-content' }}
@@ -187,8 +217,9 @@ const PageFileSourceList = () => {
           where: FileIdentityWhereInput = {}, fsInfo = await getFsInfo();
         if (fsInfo) {
           where.fileSourceID = fsInfo.id;
-          where.accessKeyID = params.accessKeyID;
-          where.accessKeySecret = params.accessKeySecret;
+          where.accessKeyIDContains = params.accessKeyID;
+          console.log(params)
+          where.tenantID = params.org?.id;
           const result = await getFileIdentityList({
             current: params.current,
             pageSize: params.pageSize,
@@ -202,11 +233,17 @@ const PageFileSourceList = () => {
               }
             })
           }
+          setSelectedRowKeys([]);
           setDataSource(table.data);
         }
         return table;
       }}
       pagination={{ showSizeChanger: true }}
+      rowSelection={{
+        selectedRowKeys: selectedRowKeys,
+        onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+        type: 'radio',
+      }}
     />
     <Create
       open={modal.open}
