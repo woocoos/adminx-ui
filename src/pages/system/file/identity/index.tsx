@@ -180,7 +180,7 @@ const PageFileSourceList = () => {
               {t('create_file_source')}
             </Button>
           </Auth>,
-          <Auth authKey={'createFileSource'}>
+          <Auth authKey={'setDefaultFileIdentity'}>
             <Button
               type="default"
               onClick={() => {
