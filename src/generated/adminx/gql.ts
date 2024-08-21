@@ -69,8 +69,8 @@ const documents = {
     "mutation setDefaultFileIdentity($id:ID!,$orgId: ID!){\n  setDefaultFileIdentity(identityID:$id,orgID:$orgId)\n}": types.SetDefaultFileIdentityDocument,
     "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket,bucketURL,stsEndpoint,endpointImmutable\n      }\n    }\n  }\n}": types.FileSourceListDocument,
     "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n  ... on FileSource{\n      id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n      bucket,bucketURL,stsEndpoint,endpointImmutable\n    }\n  }\n}": types.FileSourceInfoDocument,
-    "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}": types.CreateFileSourceDocument,
-    "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}": types.UpdateFileSourceDocument,
+    "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n    bucket,bucketURL,stsEndpoint,endpointImmutable\n  }\n}": types.CreateFileSourceDocument,
+    "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n    bucket,bucketURL,stsEndpoint,endpointImmutable\n  }\n}": types.UpdateFileSourceDocument,
     "mutation deleteFileSource($fsId:ID!){\n  deleteFileSource(fsID: $fsId)\n}": types.DeleteFileSourceDocument,
     "query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id\n      apps(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,name,code,kind,redirectURI,appKey,appSecret,scopes,\n            tokenValidity,refreshTokenValidity,logo,comments,status,createdAt\n          }\n        }\n      }\n    }\n  }\n}": types.OrgAppListDocument,
     "mutation assignOrgApp($orgId:ID!,$appId:ID!){\n  assignOrganizationApp(orgID: $orgId,appID: $appId)\n}": types.AssignOrgAppDocument,
@@ -393,11 +393,11 @@ export function gql(source: "query fileSourceInfo($gid:GID!){\n node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}"): (typeof documents)["mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){id}\n}"];
+export function gql(source: "mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n    bucket,bucketURL,stsEndpoint,endpointImmutable\n  }\n}"): (typeof documents)["mutation createFileSource($input: CreateFileSourceInput!){\n  createFileSource(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n    bucket,bucketURL,stsEndpoint,endpointImmutable\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}"): (typeof documents)["mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){id}\n}"];
+export function gql(source: "mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n    bucket,bucketURL,stsEndpoint,endpointImmutable\n  }\n}"): (typeof documents)["mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){\n  updateFileSource(fsID:$fsId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n    bucket,bucketURL,stsEndpoint,endpointImmutable\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -32,11 +32,17 @@ const fileSourceInfoQuery = gql(/* GraphQL */`query fileSourceInfo($gid:GID!){
 
 
 const mutationCreateFileSource = gql(/* GraphQL */`mutation createFileSource($input: CreateFileSourceInput!){
-  createFileSource(input:$input){id}
+  createFileSource(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,
+    bucket,bucketURL,stsEndpoint,endpointImmutable
+  }
 }`);
 
 const mutationUpdateFileSource = gql(/* GraphQL */`mutation updateFileSource($fsId:ID!,$input: UpdateFileSourceInput!){
-  updateFileSource(fsID:$fsId,input:$input){id}
+  updateFileSource(fsID:$fsId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,
+    bucket,bucketURL,stsEndpoint,endpointImmutable
+  }
 }`);
 
 const mutationDelFileSource = gql(/* GraphQL */`mutation deleteFileSource($fsId:ID!){

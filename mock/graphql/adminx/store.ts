@@ -1,4 +1,4 @@
-import { IMockStore } from "@graphql-tools/mock"
+import { IMockStore, Ref } from "@graphql-tools/mock"
 
 /**
  * 展示列表的模板
@@ -17,6 +17,110 @@ export const listTemp = (list: any[]) => {
     totalCount: list.length,
   }
 }
+
+
+/**
+ * 添加时列表一起添加
+ * @param store
+ * @param ref
+ * @param addData
+ * @returns
+ */
+export const addListTemp = (store: IMockStore, ref: Ref, addData: Ref) => {
+  const typeNameEdge = `${addData.$ref.typeName}Edge`,
+    edgeKey = `${Math.round(Math.random() * 1000000)}-${addData.$ref.key}`
+
+  store.set(typeNameEdge, edgeKey, 'node', addData)
+
+  const edgesRef = store.get(ref, 'edges') as Ref[]
+  edgesRef.push(
+    store.get(typeNameEdge, edgeKey) as Ref
+  )
+
+  store.set(ref, 'edges', edgesRef)
+  store.set(ref, 'totalCount', edgesRef.length)
+
+  return addData;
+}
+
+/**
+ * 普通列表添加
+ * @param store
+ * @param ref
+ * @param field
+ * @param addData
+ */
+export const addList = (store: IMockStore, ref: Ref, field: string, addData: Ref) => {
+  const refs = store.get(ref, field) as Ref[]
+  refs.push(addData);
+  store.set(ref, field, refs);
+}
+
+/**
+ * 移除时列表一起移除
+ * @param store
+ * @param ref
+ * @param key
+ */
+export const delListTemp = (store: IMockStore, ref: Ref, key: string) => {
+  const edgesRef = store.get(ref, 'edges') as Ref[]
+  const updateEdgesRef = edgesRef.filter(itemRef => itemRef.$ref.key.indexOf(key) === -1)
+  store.set(ref, 'edges', updateEdgesRef)
+  store.set(ref, 'totalCount', updateEdgesRef.length)
+}
+
+/**
+ * 普通列表移除
+ * @param store
+ * @param ref
+ * @param field
+ * @param key
+ */
+export const delList = (store: IMockStore, ref: Ref, field: string, key: string) => {
+  const refs = store.get(ref, field) as Ref[]
+  const updateRefs = refs.filter(itemRef => itemRef.$ref.key != key)
+  store.set(ref, field, updateRefs);
+}
+
+/**
+ * 获取完整的对象
+ * @param store
+ * @param ref
+ */
+export const getObject = (store: IMockStore, ref: Ref) => {
+  const data = store['store'][ref.$ref.typeName][ref.$ref.key],
+    keys = Object.keys(data);
+  if (keys.length) {
+    const result = {};
+    keys.forEach(key => {
+      const keyData: (Ref | number | string | boolean)[] | Ref | number | boolean | string = data[key];
+      if (keyData) {
+        if (Array.isArray(keyData)) {
+          result[key] = keyData.map(item => {
+            if (item) {
+              if (typeof item === 'object') {
+                return getObject(store, store.get(item.$ref.typeName, item.$ref.key) as Ref)
+              } else {
+                return item;
+              }
+            } else {
+              return null;
+            }
+          })
+        } else if (typeof keyData === 'object') {
+          result[key] = getObject(store, store.get(keyData.$ref.typeName, keyData.$ref.key) as Ref)
+        } else {
+          result[key] = keyData
+        }
+      } else {
+        result[key] = null;
+      }
+    })
+    return result;
+  }
+  return null
+}
+
 
 
 /**
@@ -50,6 +154,9 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'orgPolicyReferences', listTemp([
     store.get('Permission', 1),
     store.get('Permission', 2),
+  ]))
+  store.set('Query', 'ROOT', 'fileSources', listTemp([
+    store.get('FileSource', 1),
   ]))
   // -------------root-end------------------------
 

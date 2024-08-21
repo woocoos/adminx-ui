@@ -1,9 +1,9 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { addMocksToSchema, createMockStore, mockServer, relayStylePaginationMock } from '@graphql-tools/mock';
+import { addMocksToSchema, createMockStore, mockServer, Ref, relayStylePaginationMock } from '@graphql-tools/mock';
 import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
-import { initStoreData, listTemp } from "./store";
+import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
 const typeDefs = readFileSync(join(process.cwd(), 'script', 'generated', "adminx.graphql"), 'utf-8');
@@ -81,11 +81,7 @@ const schemaWithMocks = addMocksToSchema({
           ])
         }
       },
-      fileSources: () => {
-        return listTemp([
-          store.get('FileSource', 1),
-        ])
-      },
+      fileSources: relayStylePaginationMock(store),
       fileIdentities: relayStylePaginationMock(store),
       users: relayStylePaginationMock(store),
       orgGroups: relayStylePaginationMock(store),
@@ -182,11 +178,32 @@ const schemaWithMocks = addMocksToSchema({
           store.set("OrgUserPreference", 1, 'menuRecent', input.menuRecent)
         }
         return { id: 1 };
-      }
+      },
+      // 测试 mutation 的前端处理
+      createFileSource: (_, { input }) => {
+        input.id = `${Date.now()}`
+        store.set('FileSource', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'fileSources') as Ref,
+          store.get('FileSource', input.id) as Ref
+        );
+      },
+      updateFileSource: (_, { fsID, input }) => {
+        store.set('FileSource', fsID, input)
+        return store.get('FileSource', fsID)
+      },
+      deleteFileSource: (_, { fsID }) => {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'fileSources') as Ref,
+          fsID,
+        )
+        return true
+      },
     }
   }
 })
-
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)
 

@@ -21,7 +21,7 @@ export default (props: {
   open?: boolean;
   title?: string;
   id?: string;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: FileSource) => void;
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
@@ -78,24 +78,21 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
       if (props.id) {
         const result = await updateFileSource(props.id, updateFormat(values, oldInfo || {}));
         if (result?.id) {
-          isTrue = true;
+          setSaveLoading(false);
+          setSaveDisabled(true);
+          props.onClose?.(true, result as FileSource);
         }
       } else {
         const result = await createFileSource(values);
         if (result?.id) {
-          isTrue = true;
+          setSaveLoading(false);
+          setSaveDisabled(true);
+          props.onClose?.(true, result as FileSource);
         }
       }
-
-      if (isTrue) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
-      }
-      setSaveLoading(false);
       return false;
     };
 
