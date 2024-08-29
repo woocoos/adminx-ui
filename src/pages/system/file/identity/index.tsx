@@ -44,12 +44,6 @@ const PageFileSourceList = () => {
         width: 100,
       },
       {
-        title: "AccessKeySecret",
-        dataIndex: 'accessKeySecret',
-        width: 100,
-        search: false,
-      },
-      {
         title: "RoleArn",
         dataIndex: 'roleArn',
         width: 100,
@@ -218,7 +212,6 @@ const PageFileSourceList = () => {
         if (fsInfo) {
           where.fileSourceID = fsInfo.id;
           where.accessKeyIDContains = params.accessKeyID;
-          console.log(params)
           where.tenantID = params.org?.id;
           const result = await getFileIdentityList({
             current: params.current,

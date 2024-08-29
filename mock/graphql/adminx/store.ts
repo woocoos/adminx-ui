@@ -158,6 +158,9 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'fileSources', listTemp([
     store.get('FileSource', 1),
   ]))
+  store.set('Query', 'ROOT', 'fileIdentities', listTemp([
+    store.get('OrgFileIdentity', 1),
+  ]))
   // -------------root-end------------------------
 
   // Org

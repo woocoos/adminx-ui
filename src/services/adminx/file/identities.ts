@@ -4,7 +4,7 @@ import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
 export const EnumFileSourceKind = {
-  [FileSourceKind.Local]: { text: 'local' },
+  [FileSourceKind.AwsS3]: { text: 'awsS3' },
   [FileSourceKind.AliOss]: { text: 'alioss' },
   [FileSourceKind.Minio]: { text: 'minio' },
 };
@@ -15,7 +15,7 @@ const fileIdentityQuery = gql(/* GraphQL */`query fileIdentityList($first: Int,$
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,comments
-        accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
+        accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
         org{ id,name }
       }
     }
@@ -26,10 +26,14 @@ const fileIdentityInfoQuery = gql(/* GraphQL */`query fileIdentityInfo($gid:GID!
  node(id:$gid){
   ... on FileIdentity{
       id,createdBy,createdAt,updatedBy,updatedAt,comments,
-      accessKeyID,accessKeySecret,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
+      accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
       org{ id,name }
     }
   }
+}`);
+
+const fileIdentityAccessKeySecretQuery = gql(/* GraphQL */`query fileIdentityAccessKeySecret($id:ID!){
+ fileIdentityAccessKeySecret(id:$id)
 }`);
 
 
@@ -95,7 +99,20 @@ export async function getFileIdentityInfo(fsId: string) {
   return null;
 }
 
+/**
+ * 获取文件来源
+ * @param fsId
+ * @returns
+ */
+export async function getAccessKeySecret(fileIdentityId: string) {
+  const
+    result = await query(
+      fileIdentityAccessKeySecretQuery, {
+      id: fileIdentityId,
+    });
 
+  return result.data?.fileIdentityAccessKeySecret;
+}
 
 /**
  * 创建

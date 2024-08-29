@@ -62,9 +62,6 @@ const schemaWithMocks = addMocksToSchema({
       roleArn: () => 'acs:ram::5755321561100682:role/devossrwrole'
     },
     Query: {
-      fileIdentitiesForOrg: () => [
-        store.get('OrgFileIdentity', 1),
-      ],
       appAccess: () => true,
       apps: relayStylePaginationMock(store),
       organizations: (_, { where }) => {

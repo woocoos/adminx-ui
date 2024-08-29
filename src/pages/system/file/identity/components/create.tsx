@@ -1,12 +1,13 @@
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormDigit, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useEffect, useState } from 'react';
+import { DrawerForm, ProFormDigit, ProFormInstance, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { FileIdentity, Org, OrgKind } from '@/generated/adminx/graphql';
-import { createFileIdentity, getFileIdentityInfo, updateFileIdentity } from '@/services/adminx/file/identities';
+import { createFileIdentity, getAccessKeySecret, getFileIdentityInfo, updateFileIdentity } from '@/services/adminx/file/identities';
 import InputOrg from '@/pages/org/components/inputOrg';
 import Editor from '@/components/editor';
+import { Button } from 'antd';
 
 type ProFormData = {
   accessKeyID?: string
@@ -27,9 +28,12 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    formRef = useRef<ProFormInstance>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
+    [aksLoading, setAksLoading] = useState(false),
+    [aks, setAks] = useState<string>(),
     [oldInfo, setOldInfo] = useState<FileIdentity>();
 
   useEffect(() => {
@@ -50,12 +54,12 @@ export default (props: {
     getRequest = async () => {
       setSaveLoading(false);
       setSaveDisabled(true);
+      setAks(undefined);
       const data: ProFormData = {};
       if (props.id) {
         const result = await getFileIdentityInfo(props.id);
         if (result?.id) {
           data.accessKeyID = result.accessKeyID
-          data.accessKeySecret = result.accessKeySecret
           data.durationSeconds = result.durationSeconds ?? undefined
           data.org = result.org as Org
           data.policy = ''
@@ -75,6 +79,14 @@ export default (props: {
         data.durationSeconds = 3600
       }
       return data;
+    },
+    getAks = async () => {
+      if (oldInfo) {
+        setAksLoading(true)
+        const result = await getAccessKeySecret(oldInfo.id);
+        setAks(result);
+        setAksLoading(false)
+      }
     },
     onValuesChange = () => {
       setSaveDisabled(false);
@@ -112,9 +124,15 @@ export default (props: {
       return false;
     };
 
+  useEffect(() => {
+    if (aks) {
+      formRef.current?.setFieldValue("accessKeySecret", aks);
+    }
+  }, [aks]);
 
   return (
     <DrawerForm
+      formRef={formRef}
       drawerProps={{
         width: 500,
         destroyOnClose: true,
@@ -153,13 +171,34 @@ export default (props: {
           { required: true, message: `${t('please_enter_file_source_kind')}` },
         ]}
       />
-      <ProFormText
-        name="accessKeySecret"
-        label="AccessKeySecret"
-        rules={[
-          { required: true, message: `${t('please_enter_file_source_bucket')}` },
-        ]}
-      />
+      {oldInfo ? <>
+        {aks ? <ProFormText
+          name="accessKeySecret"
+          label="AccessKeySecret"
+          rules={[
+            { required: true, message: `${t('please_enter_file_source_bucket')}` },
+          ]}
+        /> : <div>
+          如要变更 AccessKeySecret <Button
+            type="link"
+            loading={aksLoading}
+            onClick={() => {
+              getAks()
+            }}>
+            请点击这里
+          </Button>
+          <br />
+          <br />
+        </div>}
+      </> :
+        <ProFormText
+          name="accessKeySecret"
+          label="AccessKeySecret"
+          rules={[
+            { required: true, message: `${t('please_enter_file_source_bucket')}` },
+          ]}
+        />
+      }
       <ProFormDigit
         name="durationSeconds"
         label={`STS ${t('validity')}(s)`}
