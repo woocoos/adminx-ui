@@ -1,6 +1,6 @@
 
 import Auth from '@/components/auth';
-import { FileIdentity, FileIdentityWhereInput, FileSource, OrgKind, } from '@/generated/adminx/graphql';
+import { FileIdentity, FileIdentityWhereInput, FileSource, } from '@/generated/adminx/graphql';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { KeepAlive } from '@knockout-js/layout';
 import { Button, message, Modal, Space, Tooltip } from 'antd';
@@ -9,7 +9,6 @@ import { useTranslation } from 'react-i18next';
 import Create from './components/create';
 import { definePageConfig, useSearchParams } from 'ice';
 import { delFileIdentity, getFileIdentityList, setDefaultFileIdentity } from '@/services/adminx/file/identities';
-import InputOrg from '@/pages/org/components/inputOrg';
 import { getFileSourceInfo } from '@/services/adminx/file/source';
 
 const PageFileSourceList = () => {
@@ -26,17 +25,6 @@ const PageFileSourceList = () => {
         dataIndex: 'id',
         width: 80,
         search: false,
-      },
-      {
-        title: t('organization'),
-        dataIndex: 'org',
-        width: 90,
-        renderFormItem: () => {
-          return <InputOrg kind={OrgKind.Root} />
-        },
-        render(text, record) {
-          return record.org?.name;
-        },
       },
       {
         title: "AccessKeyID",
@@ -212,7 +200,6 @@ const PageFileSourceList = () => {
         if (fsInfo) {
           where.fileSourceID = fsInfo.id;
           where.accessKeyIDContains = params.accessKeyID;
-          where.tenantID = params.org?.id;
           const result = await getFileIdentityList({
             current: params.current,
             pageSize: params.pageSize,

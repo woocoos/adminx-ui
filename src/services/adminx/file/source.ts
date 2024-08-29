@@ -4,7 +4,7 @@ import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
 export const EnumFileSourceKind = {
-  [FileSourceKind.Local]: { text: 'local' },
+  [FileSourceKind.AwsS3]: { text: 'awsS3' },
   [FileSourceKind.AliOss]: { text: 'alioss' },
   [FileSourceKind.Minio]: { text: 'minio' },
 };

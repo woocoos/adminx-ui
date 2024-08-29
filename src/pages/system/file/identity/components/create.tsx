@@ -3,17 +3,16 @@ import { DrawerForm, ProFormDigit, ProFormInstance, ProFormText, ProFormTextArea
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
-import { FileIdentity, Org, OrgKind } from '@/generated/adminx/graphql';
+import { FileIdentity } from '@/generated/adminx/graphql';
 import { createFileIdentity, getAccessKeySecret, getFileIdentityInfo, updateFileIdentity } from '@/services/adminx/file/identities';
-import InputOrg from '@/pages/org/components/inputOrg';
 import Editor from '@/components/editor';
 import { Button } from 'antd';
+import store from '@/store';
 
 type ProFormData = {
   accessKeyID?: string
   accessKeySecret?: string
   durationSeconds?: number
-  org?: Org;
   policy?: string;
   roleArn?: string
   sourceID?: string
@@ -28,6 +27,7 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [userState] = store.useModel('user'),
     formRef = useRef<ProFormInstance>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
@@ -61,7 +61,6 @@ export default (props: {
         if (result?.id) {
           data.accessKeyID = result.accessKeyID
           data.durationSeconds = result.durationSeconds ?? undefined
-          data.org = result.org as Org
           data.policy = ''
           if (result.policy) {
             try {
@@ -99,7 +98,6 @@ export default (props: {
         accessKeySecret: values.accessKeySecret ?? '',
         comments: values.comments,
         durationSeconds: values.durationSeconds ?? 3600,
-        orgID: values.org?.id ?? '',
         policy: values.policy,
         roleArn: values.roleArn ?? '',
         sourceID: props.fsId,
@@ -110,7 +108,7 @@ export default (props: {
           isTrue = true;
         }
       } else {
-        const result = await createFileIdentity(data);
+        const result = await createFileIdentity({ ...data, orgID: userState.tenantId });
         if (result?.id) {
           isTrue = true;
         }
@@ -155,15 +153,6 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <ProFormText
-        name="org"
-        label={t('organization')}
-        rules={[
-          { required: true, message: `${t('please_enter_org')}` },
-        ]}
-      >
-        <InputOrg kind={OrgKind.Root} />
-      </ProFormText>
       <ProFormText
         name="accessKeyID"
         label="AccessKeyID"
