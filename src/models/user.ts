@@ -1,12 +1,12 @@
 import { createModel } from 'ice';
 import { LoginRes } from '@/services/auth';
 import { setItem, removeItem, getItem } from '@/pkg/localStore';
-import { User } from '@/__generated__/adminx/graphql';
+import { User } from '@/generated/adminx/graphql';
 
 type UserState = {
   id: string;
   displayName: string;
-  avatarFileId?: string;
+  avatar?: string;
 };
 
 type ModelState = {
@@ -72,7 +72,7 @@ export default createModel({
           this.saveUser({
             id: payload.user.id,
             displayName: payload.user.displayName,
-            avatarFileID: payload.user?.avatarFileId || '',
+            avatar: payload.user?.avatar || '',
           } as User)
           if (payload.user.domains?.length) {
             const tenantId = getItem<string>('tenantId')
@@ -102,7 +102,7 @@ export default createModel({
       this.updateUser({
         id: user.id,
         displayName: user.displayName,
-        avatarFileId: user.avatarFileID || undefined,
+        avatar: user.avatar || undefined,
       });
     },
     /**

@@ -1,4 +1,4 @@
-const module = 'adminx';
+const module = 'resource';
 
 /**
  * 获取持久化数据

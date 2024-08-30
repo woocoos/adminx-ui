@@ -7,9 +7,9 @@ import { EnumAppKind, EnumAppStatus, getAppInfo } from '@/services/adminx/app';
 import { Button, Divider } from 'antd';
 import AppCreate from '../list/components/create';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
-import { App } from '@/__generated__/adminx/graphql';
-import { getFilesRaw } from '@/services/files';
+import Auth from '@/components/auth';
+import { App } from '@/generated/adminx/graphql';
+import { parseStorageUrl } from '@knockout-js/api';
 
 export default () => {
   const { token } = useToken(),
@@ -42,17 +42,11 @@ export default () => {
         const result = await getAppInfo(id);
         if (result?.id) {
           if (result.logo) {
-            await getLogoSrc(result.logo)
+            setLogoSrc(await parseStorageUrl(result.logo))
           }
           setAppInfo(result as App);
           setLoading(false);
         }
-      }
-    },
-    getLogoSrc = async (fileId: string) => {
-      const result = await getFilesRaw(fileId, 'url')
-      if (typeof result === 'string') {
-        setLogoSrc(result)
       }
     };
 

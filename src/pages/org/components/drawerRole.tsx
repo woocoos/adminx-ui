@@ -1,12 +1,11 @@
 import { Alert, Col, Input, List, Row, Space, message } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/adminx/org/role';
 import { useTranslation } from 'react-i18next';
-import { TableParams } from '@/services/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/adminx/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
   open: boolean;
@@ -26,44 +25,24 @@ export default (props: {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [keyword, setKeyword] = useState<string>(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [selectedDatas, setSelectedDatas] = useState<OrgRole[]>([]),
     [dataSource, setdataSource] = useState<OrgRole[]>([]);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 },
-        where: OrgRoleWhereInput = {};
-      if (keyword) {
-        where.nameContains = keyword;
-      }
-      where.kind = props.kind;
-      const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      }, {
-        userId: props.userInfo?.id,
-      }) : await getOrgGroupList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      }, {
-        userId: props.userInfo?.id,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as OrgRole[];
-        table.total = result.totalCount;
-      }
-      setdataSource(table.data);
-      return table;
-    },
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     onFinish = async () => {
       let isTree = false,
@@ -145,7 +124,36 @@ export default (props: {
               className="innerTable"
               columns={columns}
               actionRef={proTableRef}
-              request={getRequest}
+              request={async (params) => {
+                const table = { data: [] as OrgRole[], success: true, total: 0 },
+                  where: OrgRoleWhereInput = {};
+                if (keyword) {
+                  where.or = [
+                    { nameContains: keyword },
+                    { commentsContains: keyword },
+                  ]
+                }
+                where.kind = props.kind;
+                const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
+                  current: params.current,
+                  pageSize: params.pageSize,
+                  where,
+                }, {
+                  userId: props.userInfo?.id,
+                }) : await getOrgGroupList({
+                  current: params.current,
+                  pageSize: params.pageSize,
+                  where,
+                }, {
+                  userId: props.userInfo?.id,
+                });
+                if (result?.totalCount) {
+                  table.data = result.edges?.map(item => item?.node) as OrgRole[];
+                  table.total = result.totalCount;
+                }
+                setdataSource(table.data);
+                return table;
+              }}
               search={false}
               toolbar={{
                 settings: [],

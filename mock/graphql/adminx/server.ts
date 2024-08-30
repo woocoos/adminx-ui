@@ -1,12 +1,12 @@
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { addMocksToSchema, createMockStore, mockServer, relayStylePaginationMock } from '@graphql-tools/mock';
+import { addMocksToSchema, createMockStore, mockServer, Ref, relayStylePaginationMock } from '@graphql-tools/mock';
 import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
-import { initStoreData, listTemp } from "./store";
+import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
-const typeDefs = readFileSync(join(process.cwd(), 'script', '__generated__', "adminx.graphql"), 'utf-8');
+const typeDefs = readFileSync(join(process.cwd(), 'script', 'generated', "adminx.graphql"), 'utf-8');
 const schema = makeExecutableSchema({ typeDefs });
 const mocks = {
   ID: () => casual.integer(1, 1000000000),
@@ -27,7 +27,6 @@ const schemaWithMocks = addMocksToSchema({
   preserveResolvers,
   resolvers: {
     App: {
-      logo: () => 'png',
       menus: relayStylePaginationMock(store),
       actions: relayStylePaginationMock(store),
       resources: relayStylePaginationMock(store),
@@ -40,10 +39,30 @@ const schemaWithMocks = addMocksToSchema({
       apps: relayStylePaginationMock(store),
     },
     User: {
-      avatarFileID: () => 'png',
       permissions: relayStylePaginationMock(store),
     },
+    FileIdentity: {
+      policy: () => JSON.stringify({
+        "Statement": [
+          {
+            "Action": [
+              "oss:GetObject",
+              "oss:PutObject",
+              "oss:DeleteObject",
+              "oss:ListParts",
+              "oss:AbortMultipartUpload",
+              "oss:ListObjects"
+            ],
+            "Effect": "Allow",
+            "Resource": ["acs:oss:*:*:*"]
+          }
+        ],
+        "Version": "1"
+      }),
+      roleArn: () => 'acs:ram::5755321561100682:role/devossrwrole'
+    },
     Query: {
+      appAccess: () => true,
       apps: relayStylePaginationMock(store),
       organizations: (_, { where }) => {
         if (where.kind === 'org') {
@@ -59,6 +78,8 @@ const schemaWithMocks = addMocksToSchema({
           ])
         }
       },
+      fileSources: relayStylePaginationMock(store),
+      fileIdentities: relayStylePaginationMock(store),
       users: relayStylePaginationMock(store),
       orgGroups: relayStylePaginationMock(store),
       orgRoleUsers: relayStylePaginationMock(store),
@@ -69,6 +90,7 @@ const schemaWithMocks = addMocksToSchema({
       appPolicyAssignedToOrgs: () => [
         store.get('Org', 1),
       ],
+      orgUserPreference: () => store.get('OrgUserPreference', 1),
       orgPolicyReferences: relayStylePaginationMock(store),
       appResources: relayStylePaginationMock(store),
       orgAppResources: relayStylePaginationMock(store),
@@ -94,6 +116,16 @@ const schemaWithMocks = addMocksToSchema({
         store.get('AppAction', 1),
         store.get('AppAction', 2),
         store.get('AppAction', 3),
+        store.get('AppAction', 4),
+        store.get('AppAction', 5),
+        store.get('AppAction', 6),
+        store.get('AppAction', 7),
+        store.get('AppAction', 8),
+        store.get('AppAction', 9),
+        store.get('AppAction', 10),
+        store.get('AppAction', 11),
+        store.get('AppAction', 12),
+        store.get('AppAction', 13),
       ],
       checkPermission: (_, { permission }) => {
         // permission => appCode:action
@@ -107,8 +139,23 @@ const schemaWithMocks = addMocksToSchema({
       userRootOrgs: () => [
         store.get('Org', 1),
       ],
+      userApps: () => [
+        store.get('App', 1),
+      ],
       orgRecycleUsers: relayStylePaginationMock(store),
       globalID: (_, { type, id }) => btoa(`${type}:${id}`),
+      appDictByRefCode: (_, { refCodes }) => {
+        return [
+          store.get('AppDict', 1),
+        ]
+      },
+      appDictItemByRefCode: (_, { refCodes }) => {
+        return [
+          store.get('AppDictItem', 1),
+          store.get('AppDictItem', 2),
+          store.get('AppDictItem', 3),
+        ]
+      },
       node: (root, args, context, info) => {
         const decoded = Buffer.from(args.id, 'base64').toString()
         const [type, did] = decoded?.split(':', 2)
@@ -120,11 +167,40 @@ const schemaWithMocks = addMocksToSchema({
       updateUser: (_, { userID, input }) => {
         store.set('User', userID, input)
         return store.get('User', userID)
-      }
+      },
+      saveOrgUserPreference: (_, { input }) => {
+        if (input.menuFavorite) {
+          store.set("OrgUserPreference", 1, 'menuFavorite', input.menuFavorite)
+        } else if (input.menuRecent) {
+          store.set("OrgUserPreference", 1, 'menuRecent', input.menuRecent)
+        }
+        return { id: 1 };
+      },
+      // 测试 mutation 的前端处理
+      createFileSource: (_, { input }) => {
+        input.id = `${Date.now()}`
+        store.set('FileSource', input.id, input)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'fileSources') as Ref,
+          store.get('FileSource', input.id) as Ref
+        );
+      },
+      updateFileSource: (_, { fsID, input }) => {
+        store.set('FileSource', fsID, input)
+        return store.get('FileSource', fsID)
+      },
+      deleteFileSource: (_, { fsID }) => {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'fileSources') as Ref,
+          fsID,
+        )
+        return true
+      },
     }
   }
 })
-
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)
 

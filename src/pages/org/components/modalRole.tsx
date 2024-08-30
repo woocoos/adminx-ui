@@ -3,8 +3,7 @@ import { useState } from 'react';
 import { getOrgGroupList, getOrgRoleList } from '@/services/adminx/org/role';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { TableParams } from '@/services/graphql';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/__generated__/adminx/graphql';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
 
 
 export default (props: {
@@ -45,43 +44,16 @@ export default (props: {
     });
   }
 
-  const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 },
-        where: OrgRoleWhereInput = {};
-      where.kind = props.kind;
-      where.orgID = props.orgId;
-      where.nameContains = params.nameContains;
-      const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      }) : await getOrgGroupList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as OrgRole[];
-        table.total = result.totalCount;
-      }
-      setDataSource(table.data);
-      setSelectedRowKeys([]);
-      return table;
-    },
-    handleOk = () => {
-      props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
-    },
-    handleCancel = () => {
-      props?.onClose(undefined);
-    };
-
   return (
     <Modal
       title={props.title}
       open={props.open}
-      onOk={handleOk}
-      onCancel={handleCancel}
+      onOk={() => {
+        props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
+      }}
+      onCancel={() => {
+        props?.onClose(undefined);
+      }}
       width={900}
     >
       <ProTable
@@ -100,7 +72,29 @@ export default (props: {
           type: props.isMultiple ? 'checkbox' : 'radio',
         }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as OrgRole[], success: true, total: 0 },
+            where: OrgRoleWhereInput = {};
+          where.kind = props.kind;
+          where.orgID = props.orgId;
+          where.nameContains = params.nameContains;
+          const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          }) : await getOrgGroupList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as OrgRole[];
+            table.total = result.totalCount;
+          }
+          setDataSource(table.data);
+          setSelectedRowKeys([]);
+          return table;
+        }}
         onRow={(record) => {
           return {
             onClick: () => {

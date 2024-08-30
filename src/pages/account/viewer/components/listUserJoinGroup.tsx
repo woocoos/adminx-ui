@@ -2,13 +2,12 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
 import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/adminx/org/role';
 import DrawerRole from '@/pages/org/components/drawerRole';
-import Auth from '@/components/Auth';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
 
 
 export default (props: {
@@ -66,24 +65,6 @@ export default (props: {
     });
 
   const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as OrgRole[], success: true, total: 0 },
-        where: OrgRoleWhereInput = {};
-      where.nameContains = params.nameContains;
-      where.createdAt = params.createdAt;
-      const result = await getUserJoinGroupList(props.userInfo.id, {
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as OrgRole[];
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: OrgRole) => {
       Modal.confirm({
         title: t('disauthorization'),
@@ -132,7 +113,24 @@ export default (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as OrgRole[], success: true, total: 0 },
+            where: OrgRoleWhereInput = {};
+          where.nameContains = params.nameContains;
+          where.createdAt = params.createdAt;
+          const result = await getUserJoinGroupList(props.userInfo.id, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as OrgRole[];
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

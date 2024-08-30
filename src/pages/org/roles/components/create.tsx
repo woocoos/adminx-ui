@@ -1,10 +1,10 @@
-import { OrgRole, OrgRoleKind } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { OrgRole, OrgRoleKind } from '@/generated/adminx/graphql';
 import { createOrgRole, getOrgRoleInfo, updateOrgRole } from '@/services/adminx/org/role';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   name: string;
@@ -23,16 +23,23 @@ export default (props: {
     { t } = useTranslation(),
     [orgRoleInfo, setOrgRoleInfo] = useState<OrgRole>(),
     [saveLoading, setSaveLoading] = useState(false),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);

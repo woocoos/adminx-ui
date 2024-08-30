@@ -1,6 +1,5 @@
-import { Org, OrgKind, OrgWhereInput } from '@/__generated__/adminx/graphql';
+import { Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
 import { getAppOrgList } from '@/services/adminx/app/org';
-import { TableParams } from '@/services/graphql';
 import { EnumOrgKind, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import store from '@/store';
 import { formatTreeData } from '@/util';
@@ -16,8 +15,8 @@ export default (props: {
   title: string;
   orgId?: string;
   appId?: string;
-  tableTitle?: string;
   kind?: OrgKind;
+  tableTitle?: string;
   onClose: (selectData?: Org[]) => void;
 }) => {
   const { t } = useTranslation(),
@@ -46,61 +45,18 @@ export default (props: {
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as Org[], success: true, total: 0 },
-        where: OrgWhereInput = {};
-      setExpandedRowKeys([]);
-      if (props.appId) {
-        where.nameContains = params.name;
-        where.codeContains = params.code;
-        where.kind = params.kind;
-        const data = await getAppOrgList(props.appId, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (data?.totalCount) {
-          table.data = data.edges?.map(item => item?.node) as Org[];
-          table.total = data.totalCount;
-        }
-        setAllList(table.data);
-      } else {
-        let list: Org[] = [];
-        if (props.kind === 'org') {
-          list = await getOrgPathList(props.orgId || userState.tenantId, props.kind);
-          table.total = list.length;
-        } else {
-          where.kind = props.kind;
-          const result = await getOrgList({
-            pageSize: 999,
-            where,
-          });
-          if (result?.totalCount) {
-            list = result.edges?.map(item => item?.node) as Org[];
-            table.total = result.totalCount;
-          }
-        }
-
-        if (list.length) {
-          table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
-          setExpandedRowKeys(list.map(item => item.id));
-        }
-        setAllList(list);
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
-    handleOk = () => {
-      props?.onClose(allList.filter(item => selectedRowKeys.includes(item.id)));
-    },
-    handleCancel = () => {
-      props?.onClose();
-    };
-
   return (
-    <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
+    <Modal
+      title={props.title}
+      open={props.open}
+      onOk={() => {
+        props?.onClose(allList.filter(item => selectedRowKeys.includes(item.id)));
+      }}
+      onCancel={() => {
+        props?.onClose();
+      }}
+      width={900}
+    >
       <ProTable
         size="small"
         rowKey={'id'}
@@ -118,7 +74,51 @@ export default (props: {
         }}
         scroll={{ x: 'max-content', y: 300 }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as Org[], success: true, total: 0 },
+            where: OrgWhereInput = {};
+          setExpandedRowKeys([]);
+          if (props.appId) {
+            where.nameContains = params.name;
+            where.codeContains = params.code;
+            where.kind = params.kind;
+            const data = await getAppOrgList(props.appId, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (data?.totalCount) {
+              table.data = data.edges?.map(item => item?.node) as Org[];
+              table.total = data.totalCount;
+            }
+            setAllList(table.data);
+          } else {
+            let list: Org[] = [];
+            if (props.kind === 'org') {
+              list = await getOrgPathList(props.orgId || userState.tenantId, props.kind);
+              table.total = list.length;
+            } else {
+              where.kind = props.kind;
+              const result = await getOrgList({
+                pageSize: 999,
+                where,
+              });
+              if (result?.totalCount) {
+                list = result.edges?.map(item => item?.node) as Org[];
+                table.total = result.totalCount;
+              }
+            }
+
+            if (list.length) {
+              table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
+              setExpandedRowKeys(list.map(item => item.id));
+            }
+            setAllList(list);
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         pagination={false}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,

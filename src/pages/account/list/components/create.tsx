@@ -1,5 +1,4 @@
-import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
+import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType } from '@/generated/adminx/graphql';
 import { getOrgInfo } from '@/services/adminx/org';
 import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/adminx/user';
 import store from '@/store';
@@ -9,7 +8,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
-import UploadFiles from '@/components/UploadFiles';
+import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   principalName?: string;
@@ -21,6 +20,8 @@ type ProFormData = {
   canLogin?: boolean;
   passwordReset?: boolean;
 };
+
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
 
 export default (props: {
   open: boolean;
@@ -35,12 +36,15 @@ export default (props: {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [initValues, setInitValues] = useState<User | UserLoginProfile | null>(null),
     [domain, setDomain] = useState<string>(''),
     [setKind, setSetKind] = useState<UserLoginProfileSetKind>(UserLoginProfileSetKind.Auto),
     [userState] = store.useModel('user');
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     getBase = async () => {
@@ -53,9 +57,13 @@ export default (props: {
     },
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       let info: User | UserLoginProfile | null = null;
@@ -225,9 +233,9 @@ export default (props: {
       </div>
       <ProFormText
         x-if={['base'].includes(props.scene)}
-        name="avatarFileID"
+        name="avatar"
       >
-        <UploadFiles accept='.jpg,.png' />
+        <UploadAvatar accept="image/*" directory={`${userState.tenantId}/${ICE_APP_CODE}/avatar`} />
       </ProFormText>
       <div x-if={['create', 'base', 'recycle'].includes(props.scene)}>
         <ProFormText

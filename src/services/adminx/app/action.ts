@@ -1,12 +1,13 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 export const EnumAppActionKind = {
   restful: { text: 'restful' },
   graphql: { text: 'graphql' },
   rpc: { text: 'rpc' },
+  route: { text: 'route' },
   function: { text: 'function' },
 };
 
@@ -66,7 +67,7 @@ export async function getAppActionList(
     orderBy?: AppActionOrder;
   }) {
   const
-    result = await pagingRequest(
+    result = await paging(
       queryAppActionList, {
       gid: gid('app', appId),
       first: gather.pageSize || 20,
@@ -88,7 +89,7 @@ export async function getAppActionList(
  */
 export async function getAppActionInfo(appActionId: string) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppActionInfo, {
       gid: gid('app_action', appActionId),
     });
@@ -107,7 +108,7 @@ export async function getAppActionInfo(appActionId: string) {
  */
 export async function createAppAction(appId: string, input: CreateAppActionInput | CreateAppActionInput[]) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationCreateAppAction, {
       appId,
       input,
@@ -127,7 +128,7 @@ export async function createAppAction(appId: string, input: CreateAppActionInput
  */
 export async function updateAppAction(appActionId: string, input: UpdateAppActionInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationUpdateAppAction, {
       appActionId,
       input,
@@ -146,7 +147,7 @@ export async function updateAppAction(appActionId: string, input: UpdateAppActio
  */
 export async function delAppAction(appActionId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationDelAppAction, {
       appActionId,
     });

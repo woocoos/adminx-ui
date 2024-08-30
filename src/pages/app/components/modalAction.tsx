@@ -3,8 +3,7 @@ import { EnumAppActionKind, EnumAppActionMethod, getAppActionList } from '@/serv
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useState } from 'react';
-import { TableParams } from '@/services/graphql';
-import { AppAction, AppActionWhereInput } from '@/__generated__/adminx/graphql';
+import { AppAction, AppActionWhereInput } from '@/generated/adminx/graphql';
 
 export default (props: {
   open: boolean;
@@ -34,35 +33,17 @@ export default (props: {
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
 
-  const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppAction[], success: true, total: 0 },
-        where: AppActionWhereInput = {};
-      where.nameContains = params.nameContains;
-      where.kind = params.kind;
-      where.method = params.method;
-      const result = await getAppActionList(props.appId, {
-        current: params.current,
-        pageSize: params.pageSize,
-        where,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as AppAction[];
-        table.total = result.totalCount;
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
-    handleOk = () => {
-      props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
-    },
-    handleCancel = () => {
-      props?.onClose();
-    };
-
   return (
-    <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
+    <Modal
+      title={props.title}
+      open={props.open}
+      onOk={() => {
+        props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
+      }}
+      onCancel={() => {
+        props?.onClose();
+      }} width={900}
+    >
       <ProTable
         size="small"
         rowKey={'id'}
@@ -74,7 +55,25 @@ export default (props: {
         scroll={{ x: 'max-content', y: 300 }}
         options={false}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as AppAction[], success: true, total: 0 },
+            where: AppActionWhereInput = {};
+          where.nameContains = params.nameContains;
+          where.kind = params.kind;
+          where.method = params.method;
+          const result = await getAppActionList(props.appId, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.data = result.edges?.map(item => item?.node) as AppAction[];
+            table.total = result.totalCount;
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

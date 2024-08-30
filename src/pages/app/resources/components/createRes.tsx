@@ -1,8 +1,8 @@
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { getAppResInfo, updateAppRes } from '@/services/adminx/app/resource';
 import { DrawerForm, ProFormText } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 type ProFormData = {
   name: string;
@@ -18,17 +18,24 @@ export default (props: {
   onClose: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);

@@ -1,7 +1,7 @@
-import { gql } from '@/__generated__/adminx';
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 
 const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
@@ -100,14 +100,14 @@ export async function getOrgUserList(
     orgRoleId?: string;
   },
 ) {
-  const result = isGrant?.orgRoleId ? await pagingRequest(
+  const result = isGrant?.orgRoleId ? await paging(
     queryOrgUserListAndIsOrgRole, {
     orgRoleId: isGrant.orgRoleId,
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, gather.current || 1) : await pagingRequest(
+  }, gather.current || 1) : await paging(
     queryOrgUserList, {
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
@@ -141,14 +141,14 @@ export async function getOrgRoleUserList(
     orgRoleId?: string;
   },
 ) {
-  const result = isGrant?.orgRoleId ? await pagingRequest(
+  const result = isGrant?.orgRoleId ? await paging(
     queryOrgRoleUserListAndIsOrgRole, {
     roleId,
     orgRoleId: isGrant.orgRoleId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
-  }, gather.current || 1) : await pagingRequest(
+  }, gather.current || 1) : await paging(
     queryOrgRoleUserList, {
     roleId,
     first: gather.pageSize || 20,
@@ -169,7 +169,7 @@ export async function getOrgRoleUserList(
  */
 export async function allotOrgUser(input: CreateOrgUserInput) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationAllotOrgUser, {
       input,
     });
@@ -188,7 +188,7 @@ export async function allotOrgUser(input: CreateOrgUserInput) {
  */
 export async function removeOrgUser(orgId: string, userId: string) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       mutationRemoveOrgUser, {
       orgId,
       userId,
@@ -208,7 +208,7 @@ export async function removeOrgUser(orgId: string, userId: string) {
  */
 export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
   const
-    result = await queryRequest(
+    result = await query(
       queryOrgUserNum, {
       gid: gid('org', orgId),
       where,

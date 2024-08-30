@@ -1,4 +1,3 @@
-import { TableParams } from '@/services/graphql';
 import { getRecycleUserList } from '@/services/adminx/user';
 import store from '@/store';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
@@ -6,10 +5,14 @@ import { Space, message } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
-import Auth from '@/components/Auth';
-import { User, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { User, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { Link } from '@ice/runtime';
 
-export default () => {
+export default (props: {
+  isFromSystem?: boolean;
+  orgId?: string;
+}) => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [userState] = store.useModel('user'),
@@ -69,36 +72,19 @@ export default () => {
       title: '',
     });
 
-  const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as User[], success: true, total: 0 },
-        where: UserWhereInput = {};
-      let orderBy: UserOrder | undefined;
-      where.displayNameContains = params.displayNameContains;
-      where.emailContains = params.emailContains;
-      where.mobileContains = params.mobileContains;
-      const result = await getRecycleUserList({
-        current: params.current,
-        pageSize: params.pageSize,
-        where: where,
-        orderBy: orderBy,
-      });
-      if (result?.totalCount) {
-        table.data = result.edges?.map(item => item?.node) as User[] || [];
-        table.total = result.totalCount;
-      }
-      setDataSource(table.data);
-      return table;
-    };
-
   return (<PageContainer
     header={{
       title: t('recycle_bin'),
       style: { background: token.colorBgContainer },
       breadcrumb: {
-        items: [
+        items: props.isFromSystem ? [
           { title: t('system_conf') },
-          { title: t('account_manage') },
+          { title: <Link to="/system/org">{t('org_manage')}</Link> },
+          { title: <Link to={`/system/org/users?id=${props.orgId}`}>{t('user_manage')}</Link> },
+          { title: t('recycle_bin') },
+        ] : [
+          { title: t('system_conf') },
+          { title: <Link to="/org/users">{t('user_manage')}</Link> },
           { title: t('recycle_bin') },
         ],
       },
@@ -117,7 +103,26 @@ export default () => {
       }}
       scroll={{ x: 'max-content' }}
       columns={columns}
-      request={getRequest}
+      request={async (params) => {
+        const table = { data: [] as User[], success: true, total: 0 },
+          where: UserWhereInput = {};
+        let orderBy: UserOrder | undefined;
+        where.displayNameContains = params.displayNameContains;
+        where.emailContains = params.emailContains;
+        where.mobileContains = params.mobileContains;
+        const result = await getRecycleUserList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where: where,
+          orderBy: orderBy,
+        });
+        if (result?.totalCount) {
+          table.data = result.edges?.map(item => item?.node) as User[] || [];
+          table.total = result.totalCount;
+        }
+        setDataSource(table.data);
+        return table;
+      }}
       pagination={{ showSizeChanger: true }}
     />
     <CreateAccount

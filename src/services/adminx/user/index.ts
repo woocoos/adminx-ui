@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { gql } from '@/__generated__/adminx';
-import { AppActionKind, AppActionMethod, AppActionWhereInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/__generated__/adminx/graphql';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
+import { gql } from '@/generated/adminx';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
 
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
@@ -12,16 +12,26 @@ export const EnumUserIdentityKind = {
 };
 
 export const EnumUserStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 };
 
 export const EnumUserLoginProfileMfaStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 };
+
+export const EnumUserAccessKeyStatus = {
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
+};
+
 
 export type UpdateUserInfoScene = 'create' | 'base' | 'loginProfile' | 'identity' | 'recycle';
 
@@ -41,7 +51,7 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
+      email,mobile,userType,creationType,registerIP,status,comments,avatar
     }
   }
 }`);
@@ -50,7 +60,7 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
+      email,mobile,userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -63,7 +73,7 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatarFileID
+      email,mobile,userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -87,6 +97,18 @@ const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:
   }
 }`);
 
+
+const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,
+      oauthClients{
+        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+      }
+    }
+  }
+}`);
+
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
   createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
 }`);
@@ -96,7 +118,7 @@ const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgI
 }`);
 
 const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  updateUser(userID:$userId,input:$input){ id,displayName }
+  updateUser(userID:$userId,input:$input){ id,displayName,avatar }
 }`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){
@@ -139,24 +161,6 @@ const queryCheckPermission = gql(/* GraphQL */`query  checkPermission($permissio
   checkPermission(permission: $permission)
 }`);
 
-const queryUserPermissionList = gql(/* GraphQL */`query userPermissionList($where: AppActionWhereInput){
-  userPermissions(where: $where){
-    id,appID,name,kind,method
-  }
-}`);
-
-const queryUserMenuList = gql(/* GraphQL */`query userMenuList($appCode:String!){
-  userMenus(appCode: $appCode){
-    id,parentID,kind,name,comments,displaySort,icon,route
-  }
-}`);
-
-const queryUserRootOrgList = gql(/* GraphQL */`query userRootOrgs{
-  userRootOrgs{
-    id,parentID,kind,domain,code,name,status,path,displaySort,countryCode,timezone
-  }
-}`);
-
 const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
@@ -173,6 +177,22 @@ const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!
   recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
 }`);
 
+const mutationCreateOauthClient = gql(/* GraphQL */`mutation createOauthClient($input: CreateOauthClientInput!){
+  createOauthClient( input: $input ){ id }
+}`);
+
+const mutationEnableOauthClient = gql(/* GraphQL */`mutation enableOauthClient($id: ID!){
+  enableOauthClient( id: $id ){ id }
+}`);
+
+const mutationDisableOauthClient = gql(/* GraphQL */`mutation disableOauthClient($id: ID!){
+  disableOauthClient( id: $id ){ id }
+}`);
+
+const mutationDelOauthClient = gql(/* GraphQL */`mutation delOauthClient($id: ID!){
+  deleteOauthClient( id: $id )
+}`);
+
 
 /**
  * 获取用户信息
@@ -186,7 +206,7 @@ export async function getUserList(gather: {
   where?: UserWhereInput;
   orderBy?: UserOrder;
 }) {
-  const result = await pagingRequest(queryUserList, {
+  const result = await paging(queryUserList, {
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy,
@@ -203,7 +223,7 @@ export async function getUserList(gather: {
  * @returns
  */
 export async function getUserInfo(userId: string) {
-  const result = await queryRequest(queryUserInfo, {
+  const result = await query(queryUserInfo, {
     gid: gid('user', userId),
   });
 
@@ -219,7 +239,7 @@ export async function getUserInfo(userId: string) {
  * @returns
  */
 export async function getUserInfoLoginProfile(userId: string) {
-  const result = await queryRequest(queryUserInfoLoginProfile, {
+  const result = await query(queryUserInfoLoginProfile, {
     gid: gid('user', userId),
   })
 
@@ -235,7 +255,7 @@ export async function getUserInfoLoginProfile(userId: string) {
  * @returns
  */
 export async function getUserInfoIdentities(userId: string) {
-  const result = await queryRequest(queryUserInfoIdentities, {
+  const result = await query(queryUserInfoIdentities, {
     gid: gid('user', userId),
   });
 
@@ -251,7 +271,7 @@ export async function getUserInfoIdentities(userId: string) {
  * @returns
  */
 export async function getUserInfoLoginProfileIdentities(userId: string) {
-  const result = await queryRequest(queryUserInfoLoginProfileIdentities, {
+  const result = await query(queryUserInfoLoginProfileIdentities, {
     gid: gid('user', userId),
   });
 
@@ -268,15 +288,26 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
  * @returns
  */
 export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
-  const result = await mutationRequest(
-    userType === UserUserType.Account ? mutationCreateAccount : mutationCreateUser, {
-    rootOrgID: rootOrgID,
-    input,
-  });
-
-  if (result.data?.createOrganizationUser?.id) {
-    return result.data?.createOrganizationUser;
+  if (userType === UserUserType.Account) {
+    const result = await mutation(
+      mutationCreateAccount, {
+      rootOrgID: rootOrgID,
+      input,
+    });
+    if (result.data?.createOrganizationAccount?.id) {
+      return result.data?.createOrganizationAccount;
+    }
+  } else {
+    const result = await mutation(
+      mutationCreateUser, {
+      rootOrgID: rootOrgID,
+      input,
+    });
+    if (result.data?.createOrganizationUser?.id) {
+      return result.data?.createOrganizationUser;
+    }
   }
+
   return null;
 }
 
@@ -288,7 +319,7 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
  * @returns
  */
 export async function updateUserInfo(userId: string, input: UpdateUserInput) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationUpdateUser, {
     userId,
     input,
@@ -307,7 +338,7 @@ export async function updateUserInfo(userId: string, input: UpdateUserInput) {
  * @returns
  */
 export async function updateUserProfile(userId: string, input: UpdateUserLoginProfileInput) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationUpdateUserLoginProfile, {
     userId,
     input,
@@ -326,7 +357,7 @@ export async function updateUserProfile(userId: string, input: UpdateUserLoginPr
  * @returns
  */
 export async function bindUserIdentity(input: CreateUserIdentityInput) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationBindUserIdentity, {
     input,
   });
@@ -343,7 +374,7 @@ export async function bindUserIdentity(input: CreateUserIdentityInput) {
  * @returns
  */
 export async function delUserIdentity(identityId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationDelUserIdentity, {
     identityId,
   });
@@ -360,7 +391,7 @@ export async function delUserIdentity(identityId: string) {
  * @returns
  */
 export async function delUserInfo(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationDelUser, {
     userId,
   });
@@ -377,7 +408,7 @@ export async function delUserInfo(userId: string) {
  * @returns
  */
 export async function resetUserPasswordByEmail(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationResetUserPwdEmail, {
     userId,
   });
@@ -395,7 +426,7 @@ export async function resetUserPasswordByEmail(userId: string) {
  * @returns
  */
 export async function updatePassword(oldPwd: string, newPwd: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationChangePwd, {
     oldPwd,
     newPwd,
@@ -414,7 +445,7 @@ export async function updatePassword(oldPwd: string, newPwd: string) {
  * @returns
  */
 export async function enableMFA(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationEnableMfa, {
     userId,
   });
@@ -431,7 +462,7 @@ export async function enableMFA(userId: string) {
  * @returns
  */
 export async function disableMFA(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationDisableMfa, {
     userId,
   });
@@ -448,7 +479,7 @@ export async function disableMFA(userId: string) {
  * @returns
  */
 export async function sendMFAEmail(userId: string) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationSendMfaEmail, {
     userId,
   });
@@ -466,7 +497,7 @@ export async function sendMFAEmail(userId: string) {
  * @returns
  */
 export async function checkPermission(permission: string) {
-  const result = await queryRequest(
+  const result = await query(
     queryCheckPermission, {
     permission,
   });
@@ -476,63 +507,6 @@ export async function checkPermission(permission: string) {
   }
   return null;
 }
-
-
-/**
- * 获取用户的权限
- * @param where
- * @returns
- */
-export async function userPermissions(headers?: Record<string, any>) {
-  const result = await queryRequest(
-    queryUserPermissionList,
-    {
-      where: {
-        hasAppWith: [{ code: process.env.ICE_APP_CODE }],
-        or: [
-          { kind: AppActionKind.Function },
-          { kindNEQ: AppActionKind.Function, method: AppActionMethod.Write }
-        ],
-      }
-    },
-    headers,
-  );
-
-  if (result.data?.userPermissions) {
-    return result?.data?.userPermissions;
-  }
-  return null;
-}
-
-/**
- * 获取用户授权的菜单
- * @param appCode
- * @returns
- */
-export async function userMenus(appCode: string) {
-  const result = await queryRequest(
-    queryUserMenuList, {
-    appCode,
-  });
-
-  if (result.data?.userMenus) {
-    return result?.data?.userMenus;
-  }
-  return null;
-}
-
-/**
- * 获取用户root组织
- * @returns
- */
-export async function userRootOrgs() {
-  const result = await queryRequest(queryUserRootOrgList, {});
-  if (result.data?.userRootOrgs) {
-    return result?.data?.userRootOrgs;
-  }
-  return null;
-}
-
 
 /**
  * 获取回收站用户
@@ -546,7 +520,7 @@ export async function getRecycleUserList(gather: {
   where?: UserWhereInput;
   orderBy?: UserOrder;
 }) {
-  const result = await pagingRequest(queryOrgRecycleUserList, {
+  const result = await paging(queryOrgRecycleUserList, {
     first: gather.pageSize,
     where: gather.where,
     orderBy: gather.orderBy,
@@ -569,7 +543,7 @@ export async function restoreRecycleUser(
   setKind: UserLoginProfileSetKind,
   pwdInput?: CreateUserPasswordInput,
 ) {
-  const result = await mutationRequest(
+  const result = await mutation(
     mutationRecOrgUser, {
     userId,
     setKind,
@@ -581,4 +555,81 @@ export async function restoreRecycleUser(
     return result?.data?.recoverOrgUser;
   }
   return null;
+}
+
+/**
+ * 获取用户accesskey
+ * @param userId
+ * @returns
+ */
+export async function getAccessKeyList(userId: string) {
+  const result = await query(queryUserAccessKeyList, {
+    gid: gid('user', userId),
+  });
+
+  if (result.data?.node?.__typename == "User") {
+    return result.data.node.oauthClients
+  }
+  return null
+}
+
+/**
+ * 创建 accessKey
+ * @param input
+ * @returns
+ */
+export async function createAccessKey(input: CreateOauthClientInput) {
+  const result = await mutation(mutationCreateOauthClient, {
+    input,
+  });
+  if (result.data?.createOauthClient.id) {
+    return result.data.createOauthClient
+  }
+  return null;
+}
+
+/**
+ * 启用 accessKey
+ * @param accessKeyId
+ * @returns
+ */
+export async function enableAccessKey(accessKeyId: string) {
+  const result = await mutation(mutationEnableOauthClient, {
+    id: accessKeyId,
+  })
+  if (result.data?.enableOauthClient.id) {
+    return result.data.enableOauthClient
+  }
+  return null
+}
+
+/**
+ * 禁用 accessKey
+ * @param accessKeyId
+ * @returns
+ */
+export async function disableAccessKey(accessKeyId: string) {
+  const result = await mutation(mutationDisableOauthClient, {
+    id: accessKeyId,
+
+  })
+  if (result.data?.disableOauthClient.id) {
+    return result.data.disableOauthClient
+  }
+  return null
+}
+
+/**
+ * 移除accessKey
+ * @param accessKeyId
+ * @returns
+ */
+export async function delAccessKey(accessKeyId: string) {
+  const result = await mutation(mutationDelOauthClient, {
+    id: accessKeyId,
+  })
+  if (result.data?.deleteOauthClient) {
+    return result.data.deleteOauthClient
+  }
+  return null
 }

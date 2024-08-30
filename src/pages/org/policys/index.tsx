@@ -1,15 +1,15 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { TableSort, TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getOrgInfo } from '@/services/adminx/org';
 import { delOrgPolicy, getOrgPolicyList } from '@/services/adminx/org/policy';
 import store from '@/store';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
-import KeepAlive from '@/components/KeepAlive';
-import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/generated/adminx/graphql';
+import { KeepAlive } from '@knockout-js/layout';
+import { definePageConfig } from 'ice';
 
 export const PageOrgPolicys = (props: {
   isFromSystem?: boolean;
@@ -95,32 +95,6 @@ export const PageOrgPolicys = (props: {
       }
       return null;
     },
-    getRequest = async (params: TableParams, sort: TableSort) => {
-      const table = { data: [] as OrgPolicy[], success: true, total: 0 },
-        where: OrgPolicyWhereInput = {},
-        info = orgInfo || await getOrg();
-      if (info?.id) {
-        if (params.type) {
-          where.appPolicyIDNotNil = params.type === 'sys' ? true : undefined;
-          where.appPolicyIDIsNil = params.type === 'cust' ? true : undefined;
-        }
-        where.nameContains = params.nameContains;
-        const result = await getOrgPolicyList(info?.id, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        }, sort);
-        if (result) {
-          table.data = result.edges?.map(item => item?.node) as OrgPolicy[];
-          table.total = result.totalCount;
-        } else {
-          table.total = 0;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
     onDel = (record: OrgPolicy) => {
       Modal.confirm({
         title: t('delete'),
@@ -195,7 +169,32 @@ export const PageOrgPolicys = (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params, sort) => {
+          const table = { data: [] as OrgPolicy[], success: true, total: 0 },
+            where: OrgPolicyWhereInput = {},
+            info = orgInfo || await getOrg();
+          if (info?.id) {
+            if (params.type) {
+              where.appPolicyIDNotNil = params.type === 'sys' ? true : undefined;
+              where.appPolicyIDIsNil = params.type === 'cust' ? true : undefined;
+            }
+            where.nameContains = params.nameContains;
+            const result = await getOrgPolicyList(info?.id, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            }, sort);
+            if (result) {
+              table.data = result.edges?.map(item => item?.node) as OrgPolicy[];
+              table.total = result.totalCount;
+            } else {
+              table.total = 0;
+            }
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
@@ -210,3 +209,7 @@ export const PageOrgPolicys = (props: {
 export default () => (<KeepAlive clearAlive>
   <PageOrgPolicys />
 </KeepAlive>);
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/org/policys'],
+}));

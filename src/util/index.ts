@@ -1,39 +1,22 @@
-import { TreeAction } from '@/__generated__/adminx/graphql';
-import { TreeDataState } from '@/services/graphql';
-import CryptoJS from 'crypto-js';
+import { TreeAction } from '@/generated/adminx/graphql';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
+import { ReactNode } from 'react';
+import menuJson from '../components/layout/menu.json';
+
+export type TreeEditorAction = 'editor' | 'peer' | 'child';
+
+export type TreeDataState<T> = {
+  key: string;
+  title: string | ReactNode;
+  children?: TreeDataState<T>[];
+  parentId: string | number;
+  node?: T;
+};
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
-/**
- * 设置gid
- * @param type
- * @param id
- * @returns
- */
-export const gid = (type: string, id: string | number) => {
-  return CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(`${type}:${id}`));
-};
-
-/**
- * 解析gid
- * @param gid
- * @returns
- */
-export const parseGid = (gid: string) => {
-  return CryptoJS.enc.Base64.parse(gid).toString(CryptoJS.enc.Utf8);
-};
-
-/**
- * 前往登录
- */
-export const goLogin = () => {
-  if (!location.pathname.split('/').includes('login')) {
-    location.href = `${process.env.ICE_LOGIN_URL}?redirect=${encodeURIComponent(location.href)}`
-  }
-}
 
 /**
  * 首字母大写
@@ -240,3 +223,34 @@ export const updateFormat = <T>(target: T, original: Record<string, any>) => {
   }
   return ud as T;
 };
+
+
+type MenuJsonData = {
+  name: string;
+  icon?: string;
+  children?: MenuJsonData[];
+  path?: string;
+}
+
+/**
+ * 开发的时候方便设置好权限信息
+ * @returns
+ */
+export const getMenuAppActions = (list?: MenuJsonData[]) => {
+  const initialAuth: Record<string, true> = {},
+    menuJsonList: MenuJsonData[] = list?.length ? list : menuJson;
+  if (process.env.NODE_ENV === 'development') {
+    menuJsonList?.forEach((item: MenuJsonData) => {
+      if (item.path) {
+        initialAuth[item.path] = true;
+      }
+      if (item.children) {
+        const childAuth = getMenuAppActions(item.children);
+        for (let key in childAuth) {
+          initialAuth[key] = true;
+        }
+      }
+    });
+  }
+  return initialAuth;
+}

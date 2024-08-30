@@ -1,13 +1,12 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams, TableSort, TableFilter } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { EnumPermissionPrincipalKind, delPermssion, getOrgPolicyReferenceList } from '@/services/adminx/permission';
 import { getOrgPolicyInfo } from '@/services/adminx/org/policy';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
-import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/generated/adminx/graphql';
 
 export default (props: {
   isFromSystem?: boolean;
@@ -61,37 +60,6 @@ export default (props: {
 
 
   const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as Permission[], success: true, total: 0 },
-        orgPolicyId = searchParams.get('id');
-      if (orgPolicyId) {
-        const info = orgPolicyInfo?.id == orgPolicyId ? orgPolicyInfo : await getOrgPolicyInfo(orgPolicyId);
-        if (info?.id) {
-          setOrgPolicy(info as OrgPolicy);
-          const where: PermissionWhereInput = {};
-          if (params.keyword) {
-            where.or = [
-              { hasRoleWith: [{ nameContains: params.keyword }] },
-              { hasUserWith: [{ displayNameContains: params.keyword }] },
-            ];
-          }
-          where.principalKindIn = filter.principalKind as PermissionPrincipalKind[] | null;
-          const result = await getOrgPolicyReferenceList(orgPolicyId, {
-            current: params.current,
-            pageSize: params.pageSize,
-            where,
-          });
-          if (result) {
-            table.data = result.edges?.map(item => item?.node) as Permission[] || [];
-            table.total = result.totalCount;
-          } else {
-            table.total = 0;
-          }
-        }
-      }
-      setDataSource(table.data);
-      return table;
-    },
     revokeOrg = (record: Permission) => {
       Modal.confirm({
         title: t('disauthorization'),
@@ -145,7 +113,37 @@ export default (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
-          request={getRequest}
+          request={async (params, sort, filter) => {
+            const table = { data: [] as Permission[], success: true, total: 0 },
+              orgPolicyId = searchParams.get('id');
+            if (orgPolicyId) {
+              const info = orgPolicyInfo?.id == orgPolicyId ? orgPolicyInfo : await getOrgPolicyInfo(orgPolicyId);
+              if (info?.id) {
+                setOrgPolicy(info as OrgPolicy);
+                const where: PermissionWhereInput = {};
+                if (params.keyword) {
+                  where.or = [
+                    { hasRoleWith: [{ nameContains: params.keyword }] },
+                    { hasUserWith: [{ displayNameContains: params.keyword }] },
+                  ];
+                }
+                where.principalKindIn = filter.principalKind as PermissionPrincipalKind[] | null;
+                const result = await getOrgPolicyReferenceList(orgPolicyId, {
+                  current: params.current,
+                  pageSize: params.pageSize,
+                  where,
+                });
+                if (result) {
+                  table.data = result.edges?.map(item => item?.node) as Permission[] || [];
+                  table.total = result.totalCount;
+                } else {
+                  table.total = 0;
+                }
+              }
+            }
+            setDataSource(table.data);
+            return table;
+          }}
           pagination={{ showSizeChanger: true }}
         />
       </PageContainer >

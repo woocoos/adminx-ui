@@ -1,5 +1,5 @@
-import { UserIdentity } from '@/__generated__/adminx/graphql';
-import Auth, { checkAuth } from '@/components/Auth';
+import { UserIdentity } from '@/generated/adminx/graphql';
+import Auth, { checkAuth } from '@/components/auth';
 import { EnumUserIdentityKind, EnumUserStatus, bindUserIdentity, delUserIdentity, getUserInfoIdentities } from '@/services/adminx/user';
 import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-components';
 import { Drawer, Popconfirm, message } from 'antd';

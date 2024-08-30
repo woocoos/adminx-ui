@@ -2,17 +2,16 @@ import { PageContainer, ProCard, useToken, ProForm, ProFormText, ProFormSelect, 
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
-import { formatTreeData, getTreeDropData, updateFormat } from '@/util';
-import { TreeDataState, TreeEditorAction } from '@/services/graphql';
+import { TreeDataState, TreeEditorAction, formatTreeData, getTreeDropData, updateFormat } from '@/util';
 import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import Auth, { checkAuth } from '@/components/Auth';
+import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/__generated__/adminx/graphql';
+import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/generated/adminx/graphql';
 import { getAppInfo } from '@/services/adminx/app';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 
 type TreeSelectedData = {
@@ -48,10 +47,13 @@ export default () => {
     }),
     [actionTitle, setActionTitle] = useState<string>(''),
     [, setFormFieldsValue] = useState<AppMenu>(),
+    [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     customerTitleRender = (nodeData: TreeDataState<AppMenu>) => {

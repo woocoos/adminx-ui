@@ -9,10 +9,11 @@ import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
 import { Link, history, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import style from './index.module.css';
-import { PermissionPrincipalKind, User, UserUserType } from '@/__generated__/adminx/graphql';
-import { getFilesRaw } from '@/services/files';
+import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
+import AccessKey from './components/accessKey';
+import { parseStorageUrl } from '@knockout-js/api';
 
 export default (props: {
   isFromOrg?: boolean;
@@ -49,18 +50,15 @@ export default (props: {
         setLoading(true);
         const info = await getUserInfoLoginProfileIdentities(id);
         if (info?.id) {
-          if (info.avatarFileID) {
-            await getAvatar(info.avatarFileID)
+          if (info.avatar) {
+            const avatarRes = await parseStorageUrl(info.avatar);
+            if (avatarRes) {
+              setAvatar(avatarRes)
+            }
           }
           setInfo(info as User);
           setLoading(false);
         }
-      }
-    },
-    getAvatar = async (fileId: string) => {
-      const result = await getFilesRaw(fileId, 'url')
-      if (typeof result === 'string') {
-        setAvatar(result)
       }
     },
     identityRender = () => {
@@ -310,6 +308,8 @@ export default (props: {
                     </ProDescriptions.Item>
                   </> : <></>}
                 </ProDescriptions>
+                <Divider />
+                <AccessKey userId={info.id} />
               </>
               ,
             }, {

@@ -7,8 +7,8 @@ import { UserList } from '@/pages/account/components/listAccount';
 import CreateOrgRole from '../../roles/components/create';
 import ListRolePermission from '../../roles/components/listRolePermission';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
-import { OrgRole } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { OrgRole } from '@/generated/adminx/graphql';
 
 export default (props: {
   isFromSystem?: boolean;

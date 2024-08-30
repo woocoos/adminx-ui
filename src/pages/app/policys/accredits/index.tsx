@@ -2,15 +2,14 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppPolicyInfo } from '@/services/adminx/app/policy';
 import { assignOrgAppPolicy, revokeOrgAppPolicy } from '@/services/adminx/org/policy';
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppPolicyAssignedOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
-import { AppPolicy, Org, OrgWhereInput } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { AppPolicy, Org, OrgWhereInput } from '@/generated/adminx/graphql';
 
 
 export default () => {
@@ -82,23 +81,6 @@ export default () => {
       }
       return null;
     },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as Org[], success: true, total: 0 },
-        where: OrgWhereInput = {},
-        info = searchParams.get('id') == appPolicyInfo?.id ? appPolicyInfo : await getInfo();
-      where.nameContains = params.nameContains;
-      if (info) {
-        const result = await getAppPolicyAssignedOrgList(info.id, where, {
-          appPolicyId: info.id,
-        });
-        if (result) {
-          table.data = result as Org[];
-          table.total = result.length;
-        }
-      }
-      setSelectedRowKeys([]);
-      return table;
-    },
     onDel = (record: Org) => {
       if (appPolicyInfo) {
         Modal.confirm({
@@ -107,6 +89,7 @@ export default () => {
           onOk: async (close) => {
             const result = await revokeOrgAppPolicy(record.id, appPolicyInfo.id);
             if (result) {
+              message.success(t('submit_success'));
               proTableRef.current?.reload();
               close();
             }
@@ -160,7 +143,23 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as Org[], success: true, total: 0 },
+            where: OrgWhereInput = {},
+            info = searchParams.get('id') == appPolicyInfo?.id ? appPolicyInfo : await getInfo();
+          where.nameContains = params.nameContains;
+          if (info) {
+            const result = await getAppPolicyAssignedOrgList(info.id, where, {
+              appPolicyId: info.id,
+            });
+            if (result) {
+              table.data = result as Org[];
+              table.total = result.length;
+            }
+          }
+          setSelectedRowKeys([]);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

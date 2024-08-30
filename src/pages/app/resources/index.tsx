@@ -1,14 +1,13 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Space } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/adminx/app';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppResList } from '@/services/adminx/app/resource';
 import CreateRes from './components/createRes';
-import Auth from '@/components/Auth';
-import { App, AppRes, AppResWhereInput } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { App, AppRes, AppResWhereInput } from '@/generated/adminx/graphql';
 
 
 export default () => {
@@ -86,47 +85,26 @@ export default () => {
         }
       }
       return null;
-    },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppRes[], success: true, total: 0 },
-        where: AppResWhereInput = {},
-        info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
-      where.nameContains = params.nameContains;
-      where.typeNameContains = params.typeNameContains;
-      if (info) {
-        const result = await getAppResList(info.id, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as AppRes[];
-          table.total = result.totalCount;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-      // },
-      // onDel = (record: AppRes) => {
-      //   Modal.confirm({
-      //     title: t('delete'),
-      //     content: `${t('confirm_delete')}：${record.name}`,
-      //     onOk: async (close) => {
-      //       // 没有接口
-      //       // const result =
-      //       // if (result === true) {
-      //       //     if (dataSource.length === 1) {
-      //       //         const pageInfo = { ...proTableRef.current?.pageInfo }
-      //       //         pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
-      //       //         proTableRef.current?.setPageInfo?.(pageInfo)
-      //       //     }
-      //       //     proTableRef.current?.reload();
-      //       //     close();
-      //       // }
-      //     },
-      //   });
-    };
+    }
+  // onDel = (record: AppRes) => {
+  //   Modal.confirm({
+  //     title: t('delete'),
+  //     content: `${t('confirm_delete')}：${record.name}`,
+  //     onOk: async (close) => {
+  //       // 没有接口
+  //       // const result =
+  //       // if (result === true) {
+  //       //     if (dataSource.length === 1) {
+  //       //         const pageInfo = { ...proTableRef.current?.pageInfo }
+  //       //         pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
+  //       //         proTableRef.current?.setPageInfo?.(pageInfo)
+  //       //     }
+  //       //     proTableRef.current?.reload();
+  //       //     close();
+  //       // }
+  //     },
+  //   });
+  // };
 
   return (
     <PageContainer
@@ -156,7 +134,27 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as AppRes[], success: true, total: 0 },
+            where: AppResWhereInput = {},
+            info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
+          where.nameContains = params.nameContains;
+          where.typeNameContains = params.typeNameContains;
+          if (info) {
+            const result = await getAppResList(info.id, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as AppRes[];
+              table.total = result.totalCount;
+            }
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

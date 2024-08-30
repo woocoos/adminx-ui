@@ -5,24 +5,44 @@ import auth from '@ice/plugin-auth';
 import antd from '@ice/plugin-antd';
 import jsxPlus from '@ice/plugin-jsx-plus';
 import icestark from '@ice/plugin-icestark';
+import urqlPlugin from '@knockout-js/ice-urql';
+
+const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
+  ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
+  NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
+  ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
+  ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
+  ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_API_FILE_PREFIX = process.env.ICE_API_FILE_PREFIX ?? '',
+  minify = NODE_ENV === 'production' ? 'swc' : false;
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
-const minify = process.env.NODE_ENV === 'production' ? 'swc' : false;
-
 export default defineConfig(() => ({
   ssg: false,
   ssr: false,
   minify,
-  codeSplitting: 'page',
-  devPublicPath: process.env.ICE_DEV_PUBLIC_PATH,
-  publicPath: process.env.ICE_BUILD_PUBLIC_PATH,
+  codeSplitting: 'page-vendors',
+  devPublicPath: ICE_DEV_PUBLIC_PATH,
+  publicPath: ICE_BUILD_PUBLIC_PATH,
+  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/, /@smithy\/*/] : true,
+  hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [
       '**/components/**',   // 添加此配置忽略components被解析成路由组件
     ],
   },
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+    'react-i18next': 'ReactI18next',
+    'i18next': 'i18next',
+    'antd': 'antd',
+    '@ant-design/pro-components': 'ProComponents',
+  },
   plugins: [
     icestark({ type: 'child' }),
+    urqlPlugin(),
     request(),
     store(),
     auth(),
@@ -32,20 +52,20 @@ export default defineConfig(() => ({
     }),
   ],
   proxy: {
-    '/api-adminx': {
-      target: process.env.ICE_PROXY_ADMINX,
+    [ICE_API_ADMINX_PREFIX]: {
+      target: ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { '^/api-adminx': '' },
+      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}`]: '' },
     },
-    '/api-files': {
-      target: process.env.ICE_PROXY_FILES,
+    [ICE_API_AUTH_PREFIX]: {
+      target: ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { '^/api-files': '' },
+      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
     },
-    '/api-auth': {
-      target: process.env.ICE_PROXY_AUTH,
+    [ICE_API_FILE_PREFIX]: {
+      target: ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { '^/api-auth': '' },
+      pathRewrite: { [`^${ICE_API_FILE_PREFIX}`]: '' },
     },
   },
 }));

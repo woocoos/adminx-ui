@@ -1,11 +1,11 @@
-import { App, AppKind } from '@/__generated__/adminx/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import UploadFiles from '@/components/UploadFiles';
+import { App, AppKind } from '@/generated/adminx/graphql';
 import { createAppInfo, getAppInfo, updateAppInfo } from '@/services/adminx/app';
 import { updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormDigit } from '@ant-design/pro-components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
+import store from '@/store';
 
 type ProFormData = {
   redirectURI?: string;
@@ -19,6 +19,8 @@ type ProFormData = {
   comments?: string;
 };
 
+const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
+
 export default (props: {
   open?: boolean;
   title?: string;
@@ -27,18 +29,26 @@ export default (props: {
   onClose?: (isSuccess?: boolean) => void;
 }) => {
   const { t } = useTranslation(),
+    [userState] = store.useModel('user'),
     [appInfo, setAppInfo] = useState<App>(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     getRequest = async () => {
       setSaveLoading(false);
@@ -125,7 +135,7 @@ export default (props: {
       </div>
       <div x-else>
         <ProFormText name="logo" label="LOGO" >
-          <UploadFiles accept=".png,.jpng,.jpeg,.jpg" />
+          <UploadAvatar accept="image/*" directory={`${userState.tenantId}/${ICE_APP_CODE}/logo`} />
         </ProFormText>
         <ProFormText
           name="name"

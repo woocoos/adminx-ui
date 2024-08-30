@@ -1,12 +1,13 @@
-import { gid } from '@/util';
-import { mutationRequest, pagingRequest, queryRequest } from '../';
-import { gql } from '@/__generated__/adminx';
-import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/__generated__/adminx/graphql';
+import { gql } from '@/generated/adminx';
+import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumOrgStatus = {
-  active: { text: '活跃', status: 'success' },
-  inactive: { text: '失活', status: 'default' },
-  processing: { text: '处理中', status: 'warning' },
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
 },
   EnumOrgKind = {
     root: { text: '组织' },
@@ -74,7 +75,7 @@ export async function getOrgList(gather: {
   orderBy?: OrgOrder;
 }) {
   const
-    result = await pagingRequest(queryOrgList, {
+    result = await paging(queryOrgList, {
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy || {
@@ -120,7 +121,7 @@ export async function getOrgPathList(orgId: string, kind: OrgKind) {
  */
 export async function getOrgInfo(orgId: string) {
   const
-    result = await queryRequest(queryOrgInfo, {
+    result = await query(queryOrgInfo, {
       gid: gid('org', orgId),
     });
   if (result.data?.node?.__typename === 'Org') {
@@ -137,7 +138,7 @@ export async function getOrgInfo(orgId: string) {
  */
 export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
   const
-    result = await mutationRequest(mutationUpdateOrg, {
+    result = await mutation(mutationUpdateOrg, {
       orgId,
       input,
     });
@@ -155,7 +156,7 @@ export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
  */
 export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
   const
-    result = await mutationRequest(
+    result = await mutation(
       kind === OrgKind.Root ? mutationCreateRootOrg : mutationCreateOrg, {
       input,
     });
@@ -172,7 +173,7 @@ export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
  */
 export async function createRootOrgInfo(input: EnableDirectoryInput) {
   const
-    result = await mutationRequest(mutationEnableDirectory, {
+    result = await mutation(mutationEnableDirectory, {
       input,
     });
   if (result.data?.enableDirectory?.id) {
@@ -188,7 +189,7 @@ export async function createRootOrgInfo(input: EnableDirectoryInput) {
  */
 export async function delOrgInfo(orgId: string) {
   const
-    result = await mutationRequest(mutationDelOrg, {
+    result = await mutation(mutationDelOrg, {
       orgId,
     });
   if (result.data?.deleteOrganization) {
@@ -205,7 +206,7 @@ export async function delOrgInfo(orgId: string) {
  */
 export async function moveOrg(sourceId: string, targetId: string, action: TreeAction) {
   const
-    result = await mutationRequest(mutationMoveOrg, {
+    result = await mutation(mutationMoveOrg, {
       sourceId,
       targetId,
       action,

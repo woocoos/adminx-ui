@@ -1,14 +1,13 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal } from 'antd';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/adminx/app';
 import CreateAppAction from './components/create';
 import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/adminx/app/action';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/Auth';
-import { App, AppAction, AppActionWhereInput } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { App, AppAction, AppActionKind, AppActionWhereInput } from '@/generated/adminx/graphql';
 
 export type AppActionListRef = {
   getSelect: () => AppAction[];
@@ -64,7 +63,7 @@ const AppActionList = (props: {
       search: false,
       width: 80,
       render: (text, record) => {
-        return (<Space>
+        return record.kind !== AppActionKind.Route ? (<Space>
           <Auth authKey={'updateAppAction'}>
             <a
               key="editor"
@@ -82,7 +81,7 @@ const AppActionList = (props: {
               {t('delete')}
             </a>
           </Auth>
-        </Space>);
+        </Space>) : <></>;
       },
     },
   );
@@ -97,28 +96,6 @@ const AppActionList = (props: {
         }
       }
       return null;
-    },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppAction[], success: true, total: 0 },
-        where: AppActionWhereInput = {},
-        info = appInfo?.id === appId ? appInfo : await getApp();
-      where.nameContains = params.nameContains;
-      where.kind = params.kind;
-      where.method = params.method;
-      if (info) {
-        const result = await getAppActionList(info.id, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as AppAction[];
-          table.total = result.totalCount;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
     },
     onDel = (record: AppAction) => {
       Modal.confirm({
@@ -183,16 +160,6 @@ const AppActionList = (props: {
         toolbar={{
           title: `${t('app')}:${appInfo?.name || '-'}`,
           actions: [
-            <Button
-              key="import"
-              onClick={
-                () => {
-                  alert('还未实现');
-                }
-              }
-            >
-              {t('sync_permission')}
-            </Button >,
             <Auth authKey="createAppActions">
               <Button
                 key="created"
@@ -208,7 +175,28 @@ const AppActionList = (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as AppAction[], success: true, total: 0 },
+            where: AppActionWhereInput = {},
+            info = appInfo?.id === appId ? appInfo : await getApp();
+          where.nameContains = params.nameContains;
+          where.kind = params.kind;
+          where.method = params.method;
+          if (info) {
+            const result = await getAppActionList(info.id, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as AppAction[];
+              table.total = result.totalCount;
+            }
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         pagination={{ showSizeChanger: true }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,

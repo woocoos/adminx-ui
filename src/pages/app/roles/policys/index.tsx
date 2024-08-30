@@ -2,13 +2,12 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { Link, useSearchParams } from '@ice/runtime';
 import { getAppRoleInfo, getAppRoleInfoPolicieList, revokeAppRolePolicy } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
-import Auth from '@/components/Auth';
+import Auth from '@/components/auth';
 import DrawerRolePolicy from '../../components/drawerRolePolicy';
-import { AppRole, AppPolicy, App } from '@/__generated__/adminx/graphql';
+import { AppRole, AppPolicy, App } from '@/generated/adminx/graphql';
 
 
 export default () => {
@@ -66,24 +65,6 @@ export default () => {
         }
       }
       return null;
-    },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppPolicy[], success: true, total: 0 },
-        info = await getInfo();
-      if (info) {
-        const result = await getAppRoleInfoPolicieList(info.id);
-        if (result) {
-          table.data = result.policies?.filter(item => {
-            if (params.name) {
-              return item.name.indexOf(params.name) > -1;
-            }
-            return true;
-          }) as AppPolicy[] || [];
-          table.total = table.data?.length;
-        }
-      }
-      setSelectedRowKeys([]);
-      return table;
     },
     onDel = (record: AppPolicy) => {
       if (appRoleInfo) {
@@ -146,7 +127,24 @@ export default () => {
         }}
         scroll={{ x: 'max-content', y: 500 }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as AppPolicy[], success: true, total: 0 },
+            info = await getInfo();
+          if (info) {
+            const result = await getAppRoleInfoPolicieList(info.id);
+            if (result) {
+              table.data = result.policies?.filter(item => {
+                if (params.name) {
+                  return item.name.indexOf(params.name) > -1;
+                }
+                return true;
+              }) as AppPolicy[] || [];
+              table.total = table.data?.length;
+            }
+          }
+          setSelectedRowKeys([]);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },

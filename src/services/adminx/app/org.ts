@@ -1,7 +1,7 @@
-import { gid } from '@/util';
-import { gql } from '@/__generated__/adminx';
-import { OrgOrder, OrgWhereInput } from '@/__generated__/adminx/graphql';
-import { pagingRequest, queryRequest } from '../';
+import { gql } from '@/generated/adminx';
+import { OrgOrder, OrgWhereInput } from '@/generated/adminx/graphql';
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
   node(id:$gid){
@@ -61,7 +61,7 @@ export async function getAppOrgList(
     orderBy?: OrgOrder;
   }) {
   const
-    result = await pagingRequest(
+    result = await paging(
       queryAppOrgList, {
       gid: gid('app', appId),
       first: gather.pageSize || 20,
@@ -86,7 +86,7 @@ export async function getAppRoleAssignedOrgList(
   where?: OrgWhereInput,
 ) {
   const
-    result = await queryRequest(
+    result = await query(
       queryAppRoleAssignedToOrgList, {
       appRoleId,
       where,
@@ -111,12 +111,12 @@ export async function getAppPolicyAssignedOrgList(
   },
 ) {
   const
-    result = isGrant?.appPolicyId ? await queryRequest(
+    result = isGrant?.appPolicyId ? await query(
       queryAppPolicyAssignedToOrgListAndIsGrant, {
       appPolicyId,
       appPolicyIdToIsAllow: isGrant.appPolicyId,
       where,
-    }) : await queryRequest(
+    }) : await query(
       queryAppPolicyAssignedToOrgList, {
       appPolicyId,
       where,

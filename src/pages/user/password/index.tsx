@@ -1,12 +1,11 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PageContainer, ProForm, ProFormInstance, ProFormText, useToken } from '@ant-design/pro-components';
 import { Card, message } from 'antd';
-import store from '@/store';
 import { updatePassword } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
 import { Link } from '@ice/runtime';
-import { goLogin } from '@/util';
+import { useLeavePrompt } from '@knockout-js/layout';
+import { logout } from '@/services/auth';
 
 type FormValues = { oldPwd: string; newPwd: string; reNewPwd: string };
 
@@ -16,9 +15,11 @@ export default () => {
     { token } = useToken(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
-    [, userDispatcher] = store.useModel('user');
+    [, setLeavePromptWhen] = useLeavePrompt();
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
     getRequest = async () => {
@@ -34,8 +35,7 @@ export default () => {
       const result = await updatePassword(values.oldPwd, values.newPwd);
       if (result === true) {
         message.success(t('submit_success'));
-        await userDispatcher.logout();
-        goLogin();
+        logout()
         setSaveDisabled(true);
       }
       setSaveLoading(false);

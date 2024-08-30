@@ -7,7 +7,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import UnbindMFA from './components/unbindMFA';
 import styles from './index.module.css';
-import { User } from '@/__generated__/adminx/graphql';
+import { User } from '@/generated/adminx/graphql';
+import { definePageConfig } from 'ice';
 
 export default () => {
   const { t } = useTranslation(),
@@ -105,3 +106,7 @@ export default () => {
 
   </PageContainer>);
 };
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/user/safety'],
+}));

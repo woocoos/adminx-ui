@@ -11,8 +11,9 @@ import { getOrgGroupQty, getOrgRoleQty } from '@/services/adminx/org/role';
 import { getOrgPolicyQty } from '@/services/adminx/org/policy';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
-import { App, OrgRoleKind, User } from '@/__generated__/adminx/graphql';
-import { formatArrayFilesRaw, getFilesRaw } from '@/services/files';
+import { App, OrgRoleKind, User } from '@/generated/adminx/graphql';
+import { parseStorageUrl } from '@knockout-js/api';
+import { definePageConfig } from 'ice';
 
 export default () => {
   const { token } = useToken(),
@@ -34,8 +35,8 @@ export default () => {
         const result = await getUserInfo(userState.user.id);
         if (result?.id) {
           setInfo(result as User);
-          if (result.avatarFileID) {
-            await getAvatar(result.avatarFileID)
+          if (result.avatar) {
+            setAvatar(await parseStorageUrl(result.avatar))
           }
           setUserQty(await getOrgUserQty(userState.tenantId));
           setUserGroupQty(await getOrgGroupQty());
@@ -45,21 +46,26 @@ export default () => {
           const orgAppsRes = await getOrgAppList(userState.tenantId, {
             pageSize: 999,
           });
-          if (orgAppsRes) {
-            const orgApps = orgAppsRes.edges?.map(item => item?.node) as App[]
-            setMyApps(
-              await formatArrayFilesRaw(orgApps, 'logo', defaultApp)
-            );
+          if (orgAppsRes?.edges) {
+            const orgApps: App[] = [];
+            for (const item of orgAppsRes.edges) {
+              if (item?.node) {
+                let logo: string = defaultApp;
+                if (item.node?.logo) {
+                  const logoRes = await parseStorageUrl(item.node.logo);
+                  if (logoRes) {
+                    logo = logoRes;
+                  }
+                }
+                item.node.logo = logo;
+                orgApps.push(item.node as App);
+              }
+            }
+            setMyApps(orgApps);
           }
         }
       }
       setLoading(false);
-    },
-    getAvatar = async (fileId: string) => {
-      const result = await getFilesRaw(fileId, 'url');
-      if (typeof result === 'string') {
-        setAvatar(result);
-      }
     };
 
   useEffect(() => {
@@ -130,7 +136,7 @@ export default () => {
             colSpan={6}
             title={
               <Space>
-                <Avatar src={item.logo} />
+                <Avatar src={item.logo || defaultApp} />
                 <span style={{ display: 'inline-block', lineHeight: '30px' }} >{item.name}</span>
               </Space>
             }
@@ -145,3 +151,7 @@ export default () => {
   );
 };
 
+
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/'],
+}));

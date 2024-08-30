@@ -2,14 +2,14 @@ import { ProCard } from '@ant-design/pro-components';
 import { Divider, Radio, Tabs, Row, Col, Button, Popconfirm } from 'antd';
 import { CSSProperties, useEffect, useState } from 'react';
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
-import ActionsTransfer from '@/components/ActionsTransfer';
+import ActionsTransfer from '@/components/actionsTransfer';
 import { getAppList } from '@/services/adminx/app';
-import Editor from '@monaco-editor/react';
 import InputApp from '@/pages/app/components/inputApp';
 import { useTranslation } from 'react-i18next';
-import AppPolicyRes from '@/components/AppPolicyRes';
+import AppPolicyRes from '@/components/appPolicyRes';
 import { getOrgAppActionList } from '@/services/adminx/org/app';
-import { AppAction, PolicyEffect, PolicyRule, App } from '@/__generated__/adminx/graphql';
+import { AppAction, PolicyEffect, PolicyRule, App } from '@/generated/adminx/graphql';
+import Editor from '@/components/editor';
 
 const RuleItem = (props: {
   orgId: string;

@@ -1,7 +1,7 @@
-import { OrgRoleKind } from '@/__generated__/adminx/graphql';
-import KeepAlive from '@/components/KeepAlive';
+import { OrgRoleKind } from '@/generated/adminx/graphql';
 import { PageOrgRoleList } from '@/pages/org/roles';
 import { useSearchParams } from '@ice/runtime';
+import { KeepAlive } from '@knockout-js/layout';
 
 export default () => {
   const [searchParams] = useSearchParams();

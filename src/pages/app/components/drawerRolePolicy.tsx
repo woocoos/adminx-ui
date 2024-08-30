@@ -1,13 +1,12 @@
 import { getAppPolicyList } from '@/services/adminx/app/policy';
 import { assignAppRolePolicy } from '@/services/adminx/app/role';
 import { Col, Input, List, Row, Space, Tag, message } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
-import { TableParams } from '@/services/graphql';
-import { setLeavePromptWhen } from '@/components/LeavePrompt';
-import { App, AppPolicy, AppRole } from '@/__generated__/adminx/graphql';
+import { App, AppPolicy, AppRole } from '@/generated/adminx/graphql';
+import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
   open: boolean;
@@ -25,36 +24,24 @@ export default (props: {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [keyword, setKeyword] = useState<string>(),
+    [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [selectedDatas, setSelectedDatas] = useState<AppPolicy[]>([]),
     [dataSource, setDataSource] = useState<AppPolicy[]>([]);
 
-  setLeavePromptWhen(saveDisabled);
+  useEffect(() => {
+    setLeavePromptWhen(saveDisabled);
+  }, [saveDisabled]);
 
   const
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppPolicy[], success: true, total: 0 };
-      if (keyword) {
-        params.nameContains = keyword;
-      }
-      params.status = 'active';
-      if (props.appInfo) {
-        const result = await getAppPolicyList(
-          props.appInfo.id,
-          { appRoleId: props.roleInfo?.id },
-        );
-        if (result?.length) {
-          table.data = result as AppPolicy[];
-          table.total = result.length;
-        }
-      }
-      setDataSource(table.data);
-      return table;
-    },
     onOpenChange = (open: boolean) => {
       if (!open) {
-        props.onClose?.();
+        if (checkLeave()) {
+          props.onClose?.();
+          setSaveDisabled(true);
+        }
+      } else {
+        setSaveDisabled(true);
       }
-      setSaveDisabled(true);
     },
     onFinish = async () => {
       if (props.roleInfo?.id) {
@@ -126,7 +113,21 @@ export default (props: {
               className="innerTable"
               columns={columns}
               actionRef={proTableRef}
-              request={getRequest}
+              request={async (params) => {
+                const table = { data: [] as AppPolicy[], success: true, total: 0 };
+                if (props.appInfo) {
+                  const result = await getAppPolicyList(
+                    props.appInfo.id,
+                    { appRoleId: props.roleInfo?.id },
+                  );
+                  if (result?.length) {
+                    table.data = result as AppPolicy[];
+                    table.total = result.length;
+                  }
+                }
+                setDataSource(table.data);
+                return table;
+              }}
               search={false}
               toolbar={{
                 settings: [],

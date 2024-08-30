@@ -3,11 +3,10 @@ import { Modal } from 'antd';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
-import { TableFilter, TableParams, TableSort } from '@/services/graphql';
 import { getOrgAppList } from '@/services/adminx/org/app';
 import defaultApp from '@/assets/images/default-app.png';
-import { App, AppKind, AppWhereInput } from '@/__generated__/adminx/graphql';
-import { formatArrayFilesRaw } from '@/services/files';
+import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
+import { parseStorageUrl } from '@knockout-js/api';
 
 export default (props: {
   open: boolean;
@@ -59,50 +58,19 @@ export default (props: {
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
 
-  const
-    getRequest = async (params: TableParams, sort: TableSort, filter: TableFilter) => {
-      const table = { data: [] as App[], success: true, total: 0 },
-        where: AppWhereInput = {};
-      where.nameContains = params.nameContains;
-      where.codeContains = params.codeContains;
-      where.kindIn = filter.kind as AppKind[];
-
-      if (props.orgId) {
-        const result = await getOrgAppList(props.orgId, {
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as App[];
-          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
-          table.total = result.totalCount;
-        }
-      } else {
-        const result = await getAppList({
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.data = result.edges?.map(item => item?.node) as App[];
-          table.data = await formatArrayFilesRaw(table.data, "logo", defaultApp)
-          table.total = result.totalCount;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
-    },
-    handleOk = () => {
-      props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
-    },
-    handleCancel = () => {
-      props?.onClose();
-    };
 
   return (
-    <Modal title={props.title} open={props.open} onOk={handleOk} onCancel={handleCancel} width={900}>
+    <Modal
+      title={props.title}
+      open={props.open}
+      onOk={() => {
+        props?.onClose(dataSource.filter(item => selectedRowKeys.includes(item.id)));
+      }}
+      onCancel={() => {
+        props?.onClose();
+      }}
+      width={900}
+    >
       <ProTable
         rowKey={'id'}
         size="small"
@@ -114,7 +82,62 @@ export default (props: {
         options={false}
         scroll={{ x: 'max-content', y: 300 }}
         columns={columns}
-        request={getRequest}
+        request={async (params, sort, filter) => {
+          const table = { data: [] as App[], success: true, total: 0 },
+            where: AppWhereInput = {};
+          where.nameContains = params.nameContains;
+          where.codeContains = params.codeContains;
+          where.kindIn = filter.kind as AppKind[];
+
+          if (props.orgId) {
+            const result = await getOrgAppList(props.orgId, {
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount && result.edges) {
+              for (const item of result.edges) {
+                if (item?.node) {
+                  let logo: string = defaultApp;
+                  if (item.node?.logo) {
+                    const logoRes = await parseStorageUrl(item.node.logo);
+                    if (logoRes) {
+                      logo = logoRes;
+                    }
+                  }
+                  item.node.logo = logo;
+                  table.data.push(item.node as App);
+                }
+              }
+              table.total = result.totalCount;
+            }
+          } else {
+            const result = await getAppList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount && result.edges) {
+              for (const item of result.edges) {
+                if (item?.node) {
+                  let logo: string = defaultApp;
+                  if (item.node?.logo) {
+                    const logoRes = await parseStorageUrl(item.node.logo);
+                    if (logoRes) {
+                      logo = logoRes;
+                    }
+                  }
+                  item.node.logo = logo;
+                  table.data.push(item.node as App);
+                }
+              }
+              table.total = result.totalCount;
+            }
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         pagination={{ showSizeChanger: true }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,

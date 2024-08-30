@@ -1,6 +1,6 @@
-import KeepAlive from '@/components/KeepAlive';
 import { PageOrgUsers } from '@/pages/org/users';
 import { useSearchParams } from '@ice/runtime';
+import { KeepAlive } from '@knockout-js/layout';
 
 export default () => {
   const [searchParams] = useSearchParams();

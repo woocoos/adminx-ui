@@ -7,3 +7,10 @@
     margin: 0 0 10px;
   }
 }
+
+
+.viewerTable :global {
+  .ant-pro-card .ant-pro-card-body {
+    padding: 0;
+  }
+}

@@ -1,14 +1,13 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Modal, Alert } from 'antd';
 import { useRef, useState } from 'react';
-import { TableParams } from '@/services/graphql';
 import { getAppInfo } from '@/services/adminx/app';
 import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/adminx/app/policy';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/Auth';
-import KeepAlive from '@/components/KeepAlive';
-import { App, AppPolicy } from '@/__generated__/adminx/graphql';
+import Auth from '@/components/auth';
+import { App, AppPolicy } from '@/generated/adminx/graphql';
+import { KeepAlive } from '@knockout-js/layout';
 
 
 const PageAppPolicys = (props: {
@@ -74,30 +73,6 @@ const PageAppPolicys = (props: {
         }
       }
       return null;
-    },
-    getRequest = async (params: TableParams) => {
-      const table = { data: [] as AppPolicy[], success: true, total: 0 },
-        info = props.appId == appInfo?.id ? appInfo : await getApp();
-      if (info) {
-        const result = await getAppPolicyList(info.id);
-        if (result) {
-          // 前端过滤
-          table.data = result.filter(item => {
-            let isTrue = true;
-            if (params.name) {
-              isTrue = item.name.indexOf(params.name) > -1;
-            }
-            if (isTrue && params.status) {
-              isTrue = item.status === params.status;
-            }
-            return isTrue;
-          }) as AppPolicy[];
-          table.total = table.data.length;
-        }
-      }
-      setSelectedRowKeys([]);
-      setDataSource(table.data);
-      return table;
     },
     onDel = (record: AppPolicy) => {
       Modal.confirm({
@@ -165,7 +140,30 @@ const PageAppPolicys = (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
-        request={getRequest}
+        request={async (params) => {
+          const table = { data: [] as AppPolicy[], success: true, total: 0 },
+            info = props.appId == appInfo?.id ? appInfo : await getApp();
+          if (info) {
+            const result = await getAppPolicyList(info.id);
+            if (result) {
+              // 前端过滤
+              table.data = result.filter(item => {
+                let isTrue = true;
+                if (params.name) {
+                  isTrue = item.name.indexOf(params.name) > -1;
+                }
+                if (isTrue && params.status) {
+                  isTrue = item.status === params.status;
+                }
+                return isTrue;
+              }) as AppPolicy[];
+              table.total = table.data.length;
+            }
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
         rowSelection={{
           selectedRowKeys: selectedRowKeys,
           onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
