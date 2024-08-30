@@ -95,7 +95,6 @@ export default (props: {
       let isTrue = false;
       const data = {
         accessKeyID: values.accessKeyID ?? '',
-        accessKeySecret: values.accessKeySecret ?? '',
         comments: values.comments,
         durationSeconds: values.durationSeconds ?? 3600,
         policy: values.policy,
@@ -103,12 +102,26 @@ export default (props: {
         sourceID: props.fsId,
       }
       if (props.id) {
-        const result = await updateFileIdentity(props.id, updateFormat(data, oldInfo || {}));
-        if (result?.id) {
-          isTrue = true;
+        if (aks && aks != values.accessKeySecret) {
+          const result = await updateFileIdentity(props.id, updateFormat({
+            ...data,
+            accessKeySecret: values.accessKeySecret
+          }, oldInfo || {}));
+          if (result?.id) {
+            isTrue = true;
+          }
+        } else {
+          const result = await updateFileIdentity(props.id, updateFormat(data, oldInfo || {}));
+          if (result?.id) {
+            isTrue = true;
+          }
         }
       } else {
-        const result = await createFileIdentity({ ...data, orgID: userState.tenantId });
+        const result = await createFileIdentity({
+          ...data,
+          accessKeySecret: values.accessKeySecret ?? '',
+          orgID: userState.tenantId
+        });
         if (result?.id) {
           isTrue = true;
         }
