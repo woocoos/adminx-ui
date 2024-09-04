@@ -1,5 +1,5 @@
 import { gql } from "@/generated/adminx";
-import { CreateFileIdentityInput, FileIdentityOrder, FileIdentityWhereInput, FileSourceKind, UpdateFileIdentityInput } from "@/generated/adminx/graphql";
+import { CreateFileIdentityInput, FileIdentityOrder, FileIdentityOrderField, FileIdentityWhereInput, FileSourceKind, OrderDirection, UpdateFileIdentityInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
@@ -79,7 +79,10 @@ export async function getFileIdentityList(
       fileIdentityQuery, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: FileIdentityOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.fileIdentities) {

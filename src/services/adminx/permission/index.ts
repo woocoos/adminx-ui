@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/generated/adminx/graphql';
+import { CreatePermissionInput, OrderDirection, PermissionOrder, PermissionOrderField, PermissionWhereInput, UpdatePermissionInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -138,7 +138,10 @@ export async function getOrgPolicyReferenceList(
     orgPolicyId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.orgPolicyReferences) {
     return result.data.orgPolicyReferences;
@@ -164,7 +167,10 @@ export async function getOrgPermissionList(
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.permissions;
@@ -189,7 +195,10 @@ export async function getUserPermissionList(
     gid: gid('user', userId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1,
   );
   if (result.data?.node?.__typename === 'User') {
@@ -219,7 +228,10 @@ export async function getUserExtendGroupPolicyList(
     userId: userId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1,
   );
   if (result.data?.userExtendGroupPolicies) {

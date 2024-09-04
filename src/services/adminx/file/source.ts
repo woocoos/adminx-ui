@@ -1,5 +1,5 @@
 import { gql } from "@/generated/adminx";
-import { CreateFileSourceInput, FileSourceKind, FileSourceOrder, FileSourceWhereInput, UpdateFileSourceInput } from "@/generated/adminx/graphql";
+import { CreateFileSourceInput, FileSourceKind, FileSourceOrder, FileSourceOrderField, FileSourceWhereInput, OrderDirection, UpdateFileSourceInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
@@ -67,7 +67,10 @@ export async function getFileSourceList(
       fileSourcesQuery, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: FileSourceOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.fileSources) {

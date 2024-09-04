@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { AssignRoleUserInput, CreateOrgRoleInput, OrgRoleOrder, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/generated/adminx/graphql';
+import { AssignRoleUserInput, CreateOrgRoleInput, OrderDirection, OrgRoleOrder, OrgRoleOrderField, OrgRoleWhereInput, UpdateOrgRoleInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -135,12 +135,18 @@ export async function getOrgGroupList(
     userId: isGrant.userId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: OrgRoleOrderField.CreatedAt
+    },
   }, gather.current || 1) : await paging(
     queryOrgGroupList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: OrgRoleOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.orgGroups) {
     return result.data?.orgGroups;
@@ -170,7 +176,10 @@ export async function getUserJoinGroupList(
       userId: userId,
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgRoleOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.userGroups) {
@@ -202,12 +211,18 @@ export async function getOrgRoleList(
       userId: isGrant.userId,
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgRoleOrderField.CreatedAt
+      },
     }, gather.current || 1) : await paging(
       queryOrgRoleList, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgRoleOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.orgRoles) {

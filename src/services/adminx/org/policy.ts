@@ -1,6 +1,6 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/generated/adminx/graphql';
+import { CreateOrgPolicyInput, OrderDirection, OrgPolicyOrder, OrgPolicyOrderField, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
@@ -115,7 +115,10 @@ export async function getOrgPolicyList(
     roleId: isGrant.roleId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: OrgPolicyOrderField.CreatedAt
+    },
   }, gather.current || 1) :
     isGrant?.userId ? await paging(
       queryOrgPolicyListAndIsGrantUser, {
@@ -123,13 +126,19 @@ export async function getOrgPolicyList(
       userId: isGrant.userId,
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgPolicyOrderField.CreatedAt
+      },
     }, gather.current || 1) : await paging(
       queryOrgPolicyList, {
       gid: gid('org', orgId),
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgPolicyOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {

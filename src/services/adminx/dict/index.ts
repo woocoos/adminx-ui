@@ -1,5 +1,5 @@
 import { gql } from "@/generated/adminx";
-import { AppDictOrder, AppDictWhereInput, CreateAppDictInput, CreateAppDictItemInput, TreeAction, UpdateAppDictInput, UpdateAppDictItemInput } from "@/generated/adminx/graphql";
+import { AppDictOrder, AppDictOrderField, AppDictWhereInput, CreateAppDictInput, CreateAppDictItemInput, OrderDirection, TreeAction, UpdateAppDictInput, UpdateAppDictItemInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
@@ -113,7 +113,10 @@ export async function getAppDictList(
       appDictListQuery, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: AppDictOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.appDicts) {

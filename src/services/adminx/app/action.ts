@@ -1,6 +1,6 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/generated/adminx/graphql';
+import { AppActionOrder, AppActionOrderField, AppActionWhereInput, CreateAppActionInput, OrderDirection, UpdateAppActionInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 export const EnumAppActionKind = {
@@ -76,7 +76,10 @@ export async function getAppActionList(
       gid: gid('app', appId),
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: AppActionOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'App') {

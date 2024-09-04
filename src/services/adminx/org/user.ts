@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOrgUserInput, OrderDirection, UserOrder, UserOrderField, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -106,13 +106,19 @@ export async function getOrgUserList(
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1) : await paging(
     queryOrgUserList, {
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
@@ -147,13 +153,19 @@ export async function getOrgRoleUserList(
     orgRoleId: isGrant.orgRoleId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1) : await paging(
     queryOrgRoleUserList, {
     roleId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.orgRoleUsers) {

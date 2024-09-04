@@ -1,6 +1,6 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { AppOrder, AppWhereInput } from '@/generated/adminx/graphql';
+import { AppOrder, AppOrderField, AppWhereInput, OrderDirection } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
@@ -55,7 +55,10 @@ export async function getOrgAppList(
     gid: gid('org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: AppOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {

@@ -1,6 +1,6 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 export const EnumUserIdentityKind = {
@@ -232,7 +232,10 @@ export async function getUserList(gather: {
   const result = await paging(queryUserList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.users) {
     return result.data.users;
@@ -546,7 +549,10 @@ export async function getRecycleUserList(gather: {
   const result = await paging(queryOrgRecycleUserList, {
     first: gather.pageSize,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.orgRecycleUsers) {
     return result?.data?.orgRecycleUsers;
