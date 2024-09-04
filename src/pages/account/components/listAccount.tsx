@@ -15,6 +15,7 @@ import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import store from '@/store';
 import { OrderDirection, Org, OrgRole, OrgRoleKind, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export const UserList = (props: {
@@ -212,9 +213,7 @@ export const UserList = (props: {
         onOk: async (close) => {
           const result = await delUserInfo(record.id);
           if (result === true) {
-            const idx = dataSource.findIndex(item => item.id === record.id);
-            dataSource.splice(idx, 1);
-            setDataSource([...dataSource]);
+            setDataSource(delDataSource(dataSource, record.id));
             if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
@@ -235,9 +234,7 @@ export const UserList = (props: {
           if (props?.orgId) {
             const result = props.orgInfo?.kind === 'root' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id);
             if (result === true) {
-              const idx = dataSource.findIndex(item => item.id === record.id);
-              dataSource.splice(idx, 1);
-              setDataSource([...dataSource]);
+              setDataSource(delDataSource(dataSource, record.id));
               if (dataSource.length === 0) {
                 const pageInfo = { ...proTableRef.current?.pageInfo };
                 pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
@@ -259,9 +256,7 @@ export const UserList = (props: {
           if (props.orgRole) {
             const result = await revokeOrgRoleUser(props.orgRole.id, record.id);
             if (result === true) {
-              const idx = dataSource.findIndex(item => item.id === record.id);
-              dataSource.splice(idx, 1);
-              setDataSource([...dataSource]);
+              setDataSource(delDataSource(dataSource, record.id));
               if (dataSource.length === 0) {
                 const pageInfo = { ...proTableRef.current?.pageInfo };
                 pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
@@ -504,15 +499,9 @@ export const UserList = (props: {
         orgId={userState.tenantId}
         userType={props.userType || UserUserType.Member}
         scene="create"
-        onClose={(isSuccess, newInfo: User) => {
+        onClose={(isSuccess, newInfo) => {
           if (isSuccess && newInfo) {
-            const idx = dataSource.findIndex(item => item.id == newInfo.id)
-            if (idx === -1) {
-              dataSource.unshift(newInfo)
-            } else {
-              dataSource[idx] = newInfo
-            }
-            setDataSource([...dataSource])
+            setDataSource(saveDataSource(dataSource, newInfo as User))
           }
           setModal({ open: false, title: '', scene: modal.scene });
         }}

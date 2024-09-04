@@ -5,6 +5,7 @@ import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-compon
 import { Drawer, Popconfirm, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export default (props: {
@@ -73,9 +74,7 @@ export default (props: {
                 const reulst = await delUserIdentity(record.id);
                 if (reulst === true) {
                   setLoading(true);
-                  const idx = dataSource.findIndex(item => item.id === record.id);
-                  dataSource.splice(idx, 1);
-                  setDataSource([...dataSource]);
+                  setDataSource(delDataSource(dataSource, record.id));
                   message.success(t('submit_success'));
                 }
               }}
@@ -144,13 +143,7 @@ export default (props: {
               if (result?.id) {
                 setLoading(true);
                 message.success(t('submit_success'));
-                const idx = dataSource.findIndex(item => item.id == result.id)
-                if (idx === -1) {
-                  dataSource.push(result)
-                } else {
-                  dataSource[idx] = result
-                }
-                setDataSource([...dataSource])
+                setDataSource(saveDataSource(dataSource, record))
               }
               setIsAction(true);
             }

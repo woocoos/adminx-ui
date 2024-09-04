@@ -8,7 +8,7 @@ import { t } from 'i18next';
 
 export type TreeEditorAction = 'editor' | 'peer' | 'child';
 
-export type TreeSort = 'ASC' | 'DESC';
+export type OrderSort = 'ASC' | 'DESC';
 
 export type TreeDataState<T> = {
   key: string;
@@ -264,13 +264,13 @@ export const getMenuAppActions = (list?: MenuJsonData[]) => {
  * @param updateData
  * @param defaultKeys
  */
-export const updateTreeData = <T extends { children?: T[] }>(
+export const saveTreeData = <T extends { children?: T[] }>(
   treeList: Array<T>,
   updateData: T,
   defaultKeys?: {
     id?: string,
     parentId?: string,
-    sort?: TreeSort,
+    sort?: OrderSort,
   }) => {
   const keys = {
     id: 'id', parentId: 'parentId', sort: 'ASC',
@@ -292,7 +292,7 @@ export const updateTreeData = <T extends { children?: T[] }>(
         for (let i = 0; i < treeList.length; i++) {
           const childList = treeList[i].children;
           if (childList) {
-            updateTreeData(childList, updateData, defaultKeys)
+            saveTreeData(childList, updateData, defaultKeys)
           }
         }
       } else {
@@ -342,4 +342,57 @@ export const delTreeData = <T extends { children?: T[] }>(
   } else {
     treeList.splice(idx, 1)
   }
+}
+
+/**
+ * 创建或修改数据
+ * @param dataSource
+ * @param data
+ * @param defaultKeys
+ */
+export const saveDataSource = <T extends { id: string }>(
+  dataSource: Array<T>,
+  data: T,
+  defaultKeys?: {
+    id?: string,
+    sort?: OrderSort,
+  }) => {
+  const keys = {
+    id: 'id',
+    sort: 'DESC',
+    ...defaultKeys
+  }
+  const idx = dataSource.findIndex(item => item[keys.id] == data[keys.id])
+  if (idx === -1) {
+    switch (keys.sort) {
+      case 'ASC':
+        dataSource.push(data)
+        break;
+      case 'DESC':
+        dataSource.unshift(data)
+        break;
+      default:
+        dataSource.unshift(data)
+        break;
+    }
+  } else {
+    dataSource[idx] = data
+  }
+  return [...dataSource];
+}
+
+/**
+ * 根据id一移除数据
+ * @param dataSource
+ * @param id
+ * @param defaultKeys
+ */
+export const delDataSource = <T extends { id: string }>(dataSource: Array<T>, id: string, defaultKeys?: {
+  id?: string,
+}) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }
+  return dataSource.filter(item => item[keys.id] != id)
 }

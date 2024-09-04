@@ -7,6 +7,7 @@ import { getOrgPolicyInfo } from '@/services/adminx/org/policy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { OrgPolicy, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/generated/adminx/graphql';
+import { delDataSource } from '@/util';
 
 export default (props: {
   isFromSystem?: boolean;
@@ -67,9 +68,7 @@ export default (props: {
         onOk: async (close) => {
           const result = await delPermssion(record.id, record.orgID);
           if (result === true) {
-            const idx = dataSource.findIndex(item => item.id === record.id);
-            dataSource.splice(idx, 1);
-            setDataSource([...dataSource]);
+            setDataSource(delDataSource(dataSource, record.id));
             if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;

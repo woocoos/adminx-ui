@@ -7,6 +7,7 @@ import styles from "../index.module.css";
 import { useTranslation } from "react-i18next";
 import CreateAccessKey from "./createAccessKey";
 import Auth from "@/components/auth";
+import { delDataSource, saveDataSource } from "@/util";
 
 export default (props: {
   userId: string;
@@ -106,9 +107,7 @@ export default (props: {
                 onConfirm={async () => {
                   const result = await delAccessKey(record.id);
                   if (result) {
-                    const idx = dataSource.findIndex(item => item.id === record.id);
-                    dataSource.splice(idx, 1);
-                    setDataSource([...dataSource]);
+                    setDataSource(delDataSource(dataSource, record.id));
                     message.success('submit_success')
                   }
                 }}
@@ -172,13 +171,7 @@ export default (props: {
       userId={props.userId}
       onClose={(isSuccess, newInfo) => {
         if (isSuccess && newInfo) {
-          const idx = dataSource.findIndex(item => item.id == newInfo.id)
-          if (idx === -1) {
-            dataSource.unshift(newInfo)
-          } else {
-            dataSource[idx] = newInfo
-          }
-          setDataSource([...dataSource])
+          setDataSource(saveDataSource(dataSource, newInfo))
         }
         setModal({ open: false, title: modal.title })
       }}

@@ -8,6 +8,7 @@ import { EnumAppDictItemStatus, delAppDictItemInfo, getAppDictItemList, moveAppD
 import InputOrg from '@/pages/org/components/inputOrg';
 import Create from './components/create';
 import { Link, useSearchParams } from '@ice/runtime';
+import { delDataSource, saveDataSource } from '@/util';
 
 export default () => {
   const { token } = useToken(),
@@ -81,9 +82,7 @@ export default () => {
                 onOk: async (close) => {
                   const result = await delAppDictItemInfo(record.id);
                   if (result === true) {
-                    const idx = dataSource.findIndex(item => item.id === record.id);
-                    dataSource.splice(idx, 1);
-                    setDataSource([...dataSource]);
+                    setDataSource(delDataSource(dataSource, record.id));
                     if (dataSource.length === 0) {
                       const pageInfo = { ...proTableRef.current?.pageInfo };
                       pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
@@ -237,13 +236,7 @@ export default () => {
             id={modal.id}
             onClose={(isSuccess, newInfo) => {
               if (isSuccess && newInfo) {
-                const idx = dataSource.findIndex(item => item.id == newInfo.id)
-                if (idx === -1) {
-                  dataSource.unshift(newInfo)
-                } else {
-                  dataSource[idx] = newInfo
-                }
-                setDataSource([...dataSource])
+                setDataSource(saveDataSource(dataSource, newInfo))
               }
               setModal({ open: false, title: '', id: '' });
             }}

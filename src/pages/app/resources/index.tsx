@@ -8,6 +8,7 @@ import { getAppResList } from '@/services/adminx/app/resource';
 import CreateRes from './components/createRes';
 import Auth from '@/components/auth';
 import { App, AppRes, AppResWhereInput } from '@/generated/adminx/graphql';
+import { saveDataSource } from '@/util';
 
 
 export default () => {
@@ -151,13 +152,7 @@ export default () => {
           appId={appInfo?.id}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
-              const idx = dataSource.findIndex(item => item.id == newInfo.id)
-              if (idx === -1) {
-                dataSource.unshift(newInfo)
-              } else {
-                dataSource[idx] = newInfo
-              }
-              setDataSource([...dataSource])
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: modal.title, id: '' });
           }}

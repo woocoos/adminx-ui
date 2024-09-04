@@ -8,6 +8,7 @@ import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/adminx/org/r
 import DrawerRole from '@/pages/org/components/drawerRole';
 import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
+import { delDataSource } from '@/util';
 
 
 export default (props: {
@@ -72,9 +73,7 @@ export default (props: {
         onOk: async (close) => {
           const result = await revokeOrgRoleUser(record.id, props.userInfo.id);
           if (result === true) {
-            const idx = dataSource.findIndex(item => item.id === record.id);
-            dataSource.splice(idx, 1);
-            setDataSource([...dataSource]);
+            setDataSource(delDataSource(dataSource, record.id));
             if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;

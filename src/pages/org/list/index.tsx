@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
-import { TreeEditorAction, delTreeData, formatTreeData, loopTreeData, updateTreeData } from '@/util';
+import { TreeEditorAction, delTreeData, formatTreeData, saveDataSource } from '@/util';
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
@@ -291,13 +291,7 @@ export const OrgList = (props: {
           kind={kind}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
-              const idx = dataSource.findIndex(item => item.id == newInfo.id)
-              if (idx === -1) {
-                dataSource.unshift(newInfo as OrgTree)
-              } else {
-                dataSource[idx] = newInfo as OrgTree
-              }
-              setDataSource([...dataSource])
+              setDataSource(saveDataSource(dataSource, newInfo as OrgTree))
             }
             setModal({ open: false, title: '', id: '', scene: 'editor' });
           }}

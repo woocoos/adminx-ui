@@ -2,7 +2,7 @@ import { PageContainer, ProCard, useToken, ProForm, ProFormText, ProFormSelect, 
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
-import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, updateTreeData } from '@/util';
+import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, saveTreeData } from '@/util';
 import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
@@ -225,7 +225,7 @@ export default () => {
             if (result?.id) {
               message.success(t('submit_success'));
               setSaveDisabled(true);
-              updateTreeData(treeData, {
+              saveTreeData(treeData, {
                 key: result.id,
                 title: result.name,
                 parentId: result.parentID,
@@ -246,7 +246,7 @@ export default () => {
               message.success(t('submit_success'));
               setSaveDisabled(true);
               editorMenuAction(result[0] as AppMenu, 'editor');
-              updateTreeData(treeData, {
+              saveTreeData(treeData, {
                 key: result[0].id,
                 title: result[0].name,
                 parentId: result[0].parentID,
@@ -268,7 +268,7 @@ export default () => {
             message.success(t('submit_success'));
             setSaveDisabled(true);
             editorMenuAction(result[0] as AppMenu, 'editor');
-            updateTreeData(treeData, {
+            saveTreeData(treeData, {
               key: result[0].id,
               title: result[0].name,
               parentId: result[0].parentID,
@@ -289,7 +289,7 @@ export default () => {
             message.success(t('submit_success'));
             setSaveDisabled(true);
             editorMenuAction(result[0] as AppMenu, 'editor');
-            updateTreeData(treeData, {
+            saveTreeData(treeData, {
               key: result[0].id,
               title: result[0].name,
               parentId: result[0].parentID,

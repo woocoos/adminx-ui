@@ -13,6 +13,7 @@ import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export const PageOrgRoleList = (props: {
@@ -133,9 +134,7 @@ export const PageOrgRoleList = (props: {
         onOk: async (close) => {
           const result = await delOrgRole(record.id);
           if (result === true) {
-            const idx = dataSource.findIndex(item => item.id === record.id);
-            dataSource.splice(idx, 1);
-            setDataSource([...dataSource]);
+            setDataSource(delDataSource(dataSource, record.id));
             if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
@@ -239,13 +238,7 @@ export const PageOrgRoleList = (props: {
           orgId={props.orgId}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
-              const idx = dataSource.findIndex(item => item.id == newInfo.id)
-              if (idx === -1) {
-                dataSource.unshift(newInfo)
-              } else {
-                dataSource[idx] = newInfo
-              }
-              setDataSource([...dataSource])
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: '', id: '', scene: 'editor' });
           }}
