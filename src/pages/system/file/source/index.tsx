@@ -98,7 +98,6 @@ const PageFileSourceList = () => {
                         proTableRef.current?.setPageInfo?.(pageInfo);
                         proTableRef.current?.reload();
                       }
-                      // issue: 删除中间数据后不会自动补充下一页的数据
                       close();
                     }
                   },
@@ -120,45 +119,8 @@ const PageFileSourceList = () => {
       open: false,
       title: '',
     }),
-    [dataSource, setDataSource] = useState<FileSource[]>([]),
-    [wheres, setWheres] = useState<Record<string, any>>({}),
-    [sort, setSort] = useState<Record<string, SortOrder | undefined>>({}),
-    [current, setCurrent] = useState(1),
-    [pageSize, setPageSize] = useState(15),
-    [total, setTotal] = useState(0);
+    [dataSource, setDataSource] = useState<FileSource[]>([]);
 
-  // 获取dataSource数据
-  const reqDataSource = async () => {
-    const list: FileSource[] = [],
-      where: FileSourceWhereInput = {};
-    where.kind = wheres.kind;
-    where.bucketContains = wheres.bucket;
-    where.regionContains = wheres.region;
-    where.endpointContains = wheres.endpoint;
-    where.bucketURLContains = wheres.bucketURL;
-    where.stsEndpointContains = wheres.stsEndpoint;
-    const result = await getFileSourceList({
-      current: current,
-      pageSize: pageSize,
-      where,
-    });
-    if (result?.totalCount) {
-      setTotal(result.totalCount);
-      result.edges?.forEach(item => {
-        if (item?.node) {
-          list.push(item.node as FileSource);
-        }
-      })
-    } else {
-      setTotal(0);
-    }
-    setDataSource(list);
-  }
-
-  useEffect(() => {
-    // 需要自己调用数据获取
-    reqDataSource()
-  }, [current, pageSize, sort])
 
   return (<PageContainer
     header={{
@@ -196,60 +158,49 @@ const PageFileSourceList = () => {
       scroll={{ x: 'max-content' }}
       columns={columns}
       dataSource={dataSource}
-      pagination={{
-        current,
-        pageSize,
-        total,
-        showSizeChanger: true,
-        // 处理分页
-        onChange(page, pageSize) {
-          setCurrent(page);
-          setPageSize(pageSize);
-        },
-      }}
-      options={{
-        // 工具栏点击刷新
-        reload: () => {
-          reqDataSource()
-        }
-      }}
-      // 表格上方搜索
-      onSubmit={(params) => {
-        setWheres({ ...wheres, ...params })
-      }}
-      // table column上的操作
-      onChange={(pagination, filters, sorter, extra) => {
-        // 处理排序
-        if (!Array.isArray(sorter) && sorter.columnKey) {
-          setSort({
-            [sorter.columnKey]: sorter.order
+      request={async (params) => {
+        const table = { data: [] as FileSource[], success: true, total: 0 },
+          where: FileSourceWhereInput = {}
+        where.kind = params.kind;
+        where.bucketContains = params.bucket;
+        where.regionContains = params.region;
+        where.endpointContains = params.endpoint;
+        where.bucketURLContains = params.bucketURL;
+        where.stsEndpointContains = params.stsEndpoint;
+        const result = await getFileSourceList({
+          current: params.current,
+          pageSize: params.pageSize,
+          where,
+        });
+        if (result?.totalCount) {
+          table.total = result.totalCount;
+          result.edges?.forEach(item => {
+            if (item?.node) {
+              table.data.push(item.node as FileSource);
+            }
           })
+        } else {
         }
-        // 处理过滤
-        if (Object.keys(filters).length) {
-          setWheres({ ...wheres, ...filters })
-        }
+        setDataSource(table.data);
+        return table;
       }}
-
+      pagination={{
+        showSizeChanger: true,
+      }}
     />
     <Create
       open={modal.open}
       title={modal.title}
       id={modal.id}
       onClose={(isSuccess, newInfo) => {
-        if (isSuccess) {
-          if (newInfo) {
-            const idx = dataSource.findIndex(item => item.id == newInfo.id)
-            if (idx === -1) {
-              // 新增
-              // 需要考虑排序问题使用push或者unshift
-              dataSource.push(newInfo)
-            } else {
-              // 更新
-              dataSource[idx] = newInfo
-            }
-            setDataSource([...dataSource])
+        if (isSuccess && newInfo) {
+          const idx = dataSource.findIndex(item => item.id == newInfo.id)
+          if (idx === -1) {
+            dataSource.unshift(newInfo)
+          } else {
+            dataSource[idx] = newInfo
           }
+          setDataSource([...dataSource])
         }
         setModal({ open: false, title: modal.title })
       }}

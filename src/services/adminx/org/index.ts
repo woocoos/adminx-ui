@@ -38,19 +38,35 @@ const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
 }`);
 
 const mutationCreateRootOrg = gql(/* GraphQL */`mutation createRootOrg($input: CreateOrgInput!){
-  createRoot(input:$input){id}
+  createRoot(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+  }
 }`);
 
 const mutationUpdateOrg = gql(/* GraphQL */`mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){
-  updateOrganization(orgID:$orgId,input:$input){id}
+  updateOrganization(orgID:$orgId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+  }
 }`);
 
 const mutationCreateOrg = gql(/* GraphQL */`mutation createOrg($input: CreateOrgInput!){
-  createOrganization(input:$input){id}
+  createOrganization(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+  }
 }`);
 
 const mutationEnableDirectory = gql(/* GraphQL */`mutation enableDirectory($input: EnableDirectoryInput!){
-  enableDirectory(input:$input){id}
+  enableDirectory(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    owner { id,displayName }
+  }
 }`);
 
 const mutationDelOrg = gql(/* GraphQL */`mutation delOrg($orgId:ID!){

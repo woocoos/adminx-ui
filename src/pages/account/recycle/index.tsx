@@ -62,7 +62,7 @@ export default (props: {
         },
       },
     ],
-    [, setDataSource] = useState<User[]>([]),
+    [dataSource, setDataSource] = useState<User[]>([]),
     [modal, setModal] = useState<{
       open: boolean;
       title: string;
@@ -103,6 +103,7 @@ export default (props: {
       }}
       scroll={{ x: 'max-content' }}
       columns={columns}
+      dataSource={dataSource}
       request={async (params) => {
         const table = { data: [] as User[], success: true, total: 0 },
           where: UserWhereInput = {};
@@ -132,9 +133,11 @@ export default (props: {
       recycleInfo={modal.data}
       scene="recycle"
       userType={UserUserType.Member}
-      onClose={(isSuccess) => {
+      onClose={(isSuccess, newInfo) => {
         if (isSuccess) {
-          proTableRef.current?.reload();
+          if (newInfo) {
+            setDataSource(dataSource.filter(item => item.id !== newInfo.id));
+          }
           message.success(t('submit_success'));
         }
         setModal({ open: false, title: modal.title });

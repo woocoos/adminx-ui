@@ -4,8 +4,11 @@ import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { ReactNode } from 'react';
 import menuJson from '../components/layout/menu.json';
+import { t } from 'i18next';
 
 export type TreeEditorAction = 'editor' | 'peer' | 'child';
+
+export type TreeSort = 'ASC' | 'DESC';
 
 export type TreeDataState<T> = {
   key: string;
@@ -253,4 +256,90 @@ export const getMenuAppActions = (list?: MenuJsonData[]) => {
     });
   }
   return initialAuth;
+}
+
+/**
+ * 新增或更新tree结构数据
+ * @param treeList
+ * @param updateData
+ * @param defaultKeys
+ */
+export const updateTreeData = <T extends { children?: T[] }>(
+  treeList: Array<T>,
+  updateData: T,
+  defaultKeys?: {
+    id?: string,
+    parentId?: string,
+    sort?: TreeSort,
+  }) => {
+  const keys = {
+    id: 'id', parentId: 'parentId', sort: 'ASC',
+    ...defaultKeys
+  }
+  const idx = treeList.findIndex(item => item[keys.id] === updateData[keys.id])
+  if (idx === -1) {
+    const pIdx = treeList.findIndex(item => item[keys.id] === updateData[keys.parentId])
+    if (updateData[keys.parentId] === treeList[0][keys.parentId]) {
+      // 属于这一层
+      if (keys.sort === 'ASC') {
+        treeList.push(updateData)
+      } else {
+        treeList.unshift(updateData)
+      }
+    } else {
+      if (pIdx === -1) {
+        // 继续在children寻找位置
+        for (let i = 0; i < treeList.length; i++) {
+          const childList = treeList[i].children;
+          if (childList) {
+            updateTreeData(childList, updateData, defaultKeys)
+          }
+        }
+      } else {
+        // 父节点在这一层
+        if (treeList[pIdx].children) {
+          if (keys.sort === 'ASC') {
+            treeList[pIdx].children.push(updateData)
+          } else {
+            treeList[pIdx].children.unshift(updateData)
+          }
+        } else {
+          treeList[pIdx].children = [updateData]
+        }
+      }
+    }
+  } else {
+    // 更新
+    treeList[idx] = updateData
+  }
+}
+
+
+/**
+ * 移除tree数据
+ * @param treeList
+ * @param id
+ * @param defaultKeys
+ */
+export const delTreeData = <T extends { children?: T[] }>(
+  treeList: Array<T>,
+  id: string,
+  defaultKeys?: {
+    id?: string,
+  }) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }
+  const idx = treeList.findIndex(item => item[keys.id] === id)
+  if (idx === -1) {
+    for (let i = 0; i < treeList.length; i++) {
+      const childList = treeList[i].children;
+      if (childList) {
+        delTreeData(childList, id, defaultKeys)
+      }
+    }
+  } else {
+    treeList.splice(idx, 1)
+  }
 }

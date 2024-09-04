@@ -37,11 +37,15 @@ const queryAppRoleInfoPolicieList = gql(/* GraphQL */`query appRoleInfoPolicieLi
 }`);
 
 const mutationCreateAppRole = gql(/* GraphQL */`mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){
-  createAppRole(appID:$appId,input:$input){id}
+  createAppRole(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+  }
 }`);
 
 const mutationUpdateAppRole = gql(/* GraphQL */`mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){
-  updateAppRole(roleID:$appRoleId,input:$input){id}
+  updateAppRole(roleID:$appRoleId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+  }
 }`);
 
 const mutationDelAppRole = gql(/* GraphQL */`mutation delAppRole($appRoleId:ID!){

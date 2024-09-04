@@ -38,11 +38,19 @@ const fileIdentityAccessKeySecretQuery = gql(/* GraphQL */`query fileIdentityAcc
 
 
 const mutationCreateFileIdentity = gql(/* GraphQL */`mutation createFileIdentity($input: CreateFileIdentityInput!){
-  createFileIdentity(input:$input){id}
+  createFileIdentity(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,comments
+    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
+    org{ id,name }
+  }
 }`);
 
 const mutationUpdateFileIdentity = gql(/* GraphQL */`mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){
-  updateFileIdentity(id:$id,input:$input){id}
+  updateFileIdentity(id:$id,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,comments
+    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
+    org{ id,name }
+  }
 }`);
 
 const mutationDelFileIdentity = gql(/* GraphQL */`mutation deleteFileIdentity($id:ID!){

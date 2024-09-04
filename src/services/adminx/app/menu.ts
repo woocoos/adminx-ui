@@ -21,11 +21,17 @@ const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: I
 }`);
 
 const mutationUpdateAppMenu = gql(/* GraphQL */`mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){
-  updateAppMenu(menuID:$menuId,input:$input){id}
+  updateAppMenu(menuID:$menuId,input:$input){
+    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
+    action{ id,name }
+  }
 }`);
 
 const mutationCreateAppMenu = gql(/* GraphQL */`mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){
-  createAppMenus(appID:$appId,input:$input){id}
+  createAppMenus(appID:$appId,input:$input){
+    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
+    action{ id,name }
+  }
 }`);
 
 const mutationDelAppMenu = gql(/* GraphQL */`mutation delAppMenu($menuId:ID!){

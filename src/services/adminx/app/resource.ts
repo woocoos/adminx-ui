@@ -28,7 +28,9 @@ const queryAppResInfo = gql(/* GraphQL */`query appResInfo($gid:GID!){
 }`);
 
 const mutationUpdateAppRes = gql(/* GraphQL */`mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){
-  updateAppRes(appResID:$appResId,input:$input){id}
+  updateAppRes(appResID:$appResId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern
+  }
 }`);
 
 

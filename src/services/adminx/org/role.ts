@@ -69,11 +69,15 @@ const queryOrgRoleInfo = gql(/* GraphQL */`query orgRoleInfo($gid:GID!){
 }`);
 
 const mutationCreateOrgRole = gql(/* GraphQL */`mutation createOrgRole($input: CreateOrgRoleInput!){
-  createRole(input:$input){id}
+  createRole(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+  }
 }`);
 
 const mutationUpdateOrgRole = gql(/* GraphQL */`mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){
-  updateRole(roleID:$orgRoleId,input:$input){id}
+  updateRole(roleID:$orgRoleId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+  }
 }`);
 
 const mutationDelOrgRole = gql(/* GraphQL */`mutation deleteOrgRole($orgRoleId:ID!){

@@ -66,8 +66,12 @@ export default (props: {
                   onConfirm={async () => {
                     const result = await disableAccessKey(record.id);
                     if (result?.id) {
+                      const idx = dataSource.findIndex(item => item.id == result.id)
+                      if (idx != -1) {
+                        dataSource[idx] = result as OauthClient
+                      }
+                      setDataSource([...dataSource])
                       message.success('submit_success')
-                      proTableRef.current?.reload();
                     }
                   }}
                 >
@@ -81,8 +85,12 @@ export default (props: {
                   onConfirm={async () => {
                     const result = await enableAccessKey(record.id);
                     if (result?.id) {
+                      const idx = dataSource.findIndex(item => item.id == result.id)
+                      if (idx != -1) {
+                        dataSource[idx] = result as OauthClient
+                      }
+                      setDataSource([...dataSource])
                       message.success('submit_success')
-                      proTableRef.current?.reload();
                     }
                   }}
                 >
@@ -98,8 +106,10 @@ export default (props: {
                 onConfirm={async () => {
                   const result = await delAccessKey(record.id);
                   if (result) {
+                    const idx = dataSource.findIndex(item => item.id === record.id);
+                    dataSource.splice(idx, 1);
+                    setDataSource([...dataSource]);
                     message.success('submit_success')
-                    proTableRef.current?.reload();
                   }
                 }}
               >
@@ -112,6 +122,7 @@ export default (props: {
         }
       }
     ],
+    [dataSource, setDataSource] = useState<OauthClient[]>([]),
     [modal, setModal] = useState({
       open: false,
       title: ''
@@ -142,15 +153,15 @@ export default (props: {
       scroll={{ x: 'max-content' }}
       options={false}
       columns={columns}
+      dataSource={dataSource}
       request={async () => {
         const table = { data: [] as OauthClient[], success: true, total: 0 }
-
         const result = await getAccessKeyList(props.userId);
         if (result?.length) {
           table.data = result as OauthClient[];
           table.total = result.length;
         }
-
+        setDataSource(table.data);
         return table;
       }}
       pagination={false}
@@ -159,9 +170,15 @@ export default (props: {
       open={modal.open}
       title={modal.title}
       userId={props.userId}
-      onClose={(isSuccess) => {
-        if (isSuccess) {
-          proTableRef.current?.reload()
+      onClose={(isSuccess, newInfo) => {
+        if (isSuccess && newInfo) {
+          const idx = dataSource.findIndex(item => item.id == newInfo.id)
+          if (idx === -1) {
+            dataSource.unshift(newInfo)
+          } else {
+            dataSource[idx] = newInfo
+          }
+          setDataSource([...dataSource])
         }
         setModal({ open: false, title: modal.title })
       }}

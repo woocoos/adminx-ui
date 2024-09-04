@@ -11,7 +11,7 @@ import ListUserJoinGroup from './components/listUserJoinGroup';
 import { Link, history, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
 import style from './index.module.css';
-import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
+import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType } from '@/generated/adminx/graphql';
 import AccessKey from './components/accessKey';
 import { parseStorageUrl } from '@knockout-js/api';
 
@@ -38,12 +38,6 @@ export default (props: {
     });
 
   const
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        getRequest();
-      }
-      setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
-    },
     getRequest = async () => {
       const id = searchParams.get('id');
       if (id) {
@@ -112,7 +106,6 @@ export default (props: {
             const result = await sendMFAEmail(info.id);
             if (result) {
               message.success(t('submit_success'));
-              await getRequest();
               close();
             }
           },
@@ -316,7 +309,6 @@ export default (props: {
               label: t('join_group'),
               key: 'group',
               children: <ListUserJoinGroup userInfo={info} />,
-
             }, {
               label: t('permission_manage'),
               key: 'permission',
@@ -357,14 +349,46 @@ export default (props: {
         id={info?.id}
         scene={modal.scene}
         userType={modal.userType}
-        onClose={onDrawerClose}
+        onClose={async (isSuccess, newInfo) => {
+          if (isSuccess && newInfo) {
+            if (modal.scene === 'base') {
+              const userInfo = newInfo as User
+              if (userInfo.avatar) {
+                if (userInfo.avatar != info?.avatar) {
+                  const avatarRes = await parseStorageUrl(userInfo.avatar);
+                  if (avatarRes) {
+                    setAvatar(avatarRes)
+                  }
+                }
+              } else {
+                setAvatar(undefined)
+              }
+              setInfo({ ...info, ...userInfo })
+            } else if (modal.scene === 'loginProfile') {
+              const loginProfileInfo = newInfo as UserLoginProfile
+              setInfo({
+                ...info,
+                loginProfile: loginProfileInfo
+              } as User)
+            }
+          }
+          setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
+        }}
       />
       <UserCreateIdentity
         x-if={modal.scene === 'identity'}
         open={modal.open}
         title={modal.title}
         id={info?.id}
-        onClose={onDrawerClose}
+        onClose={(isSuccess, newInfo) => {
+          if (isSuccess && newInfo) {
+            setInfo({
+              ...info,
+              identities: newInfo
+            } as User)
+          }
+          setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
+        }}
       />
     </PageContainer>
   );

@@ -3,7 +3,7 @@ import Auth, { checkAuth } from '@/components/auth';
 import { EnumUserIdentityKind, EnumUserStatus, bindUserIdentity, delUserIdentity, getUserInfoIdentities } from '@/services/adminx/user';
 import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-components';
 import { Drawer, Popconfirm, message } from 'antd';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 
@@ -11,13 +11,14 @@ export default (props: {
   open?: boolean;
   title?: string;
   id?: string | null;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: UserIdentity[]) => void;
 }) => {
   const proTableRef = useRef<ActionType>(),
     { t } = useTranslation(),
     [loading, setLoading] = useState(false),
     // 是否操作过
     [isAction, setIsAction] = useState(false),
+    [dataSource, setDataSource] = useState<UserIdentity[]>([]),
     columns: ProColumns<UserIdentity>[] = [
       {
         title: t('type'),
@@ -71,8 +72,11 @@ export default (props: {
                 setIsAction(true);
                 const reulst = await delUserIdentity(record.id);
                 if (reulst === true) {
+                  setLoading(true);
+                  const idx = dataSource.findIndex(item => item.id === record.id);
+                  dataSource.splice(idx, 1);
+                  setDataSource([...dataSource]);
                   message.success(t('submit_success'));
-                  proTableRef.current?.reload();
                 }
               }}
             >
@@ -84,24 +88,9 @@ export default (props: {
       },
     ];
 
-  const
-    onOpenChange = () => {
-      props.onClose?.(isAction);
-    },
-    getRequest = async () => {
-      setLoading(true);
-      const table = { data: [] as UserIdentity[], success: true, total: 0 };
-      if (props.id) {
-        const userInfo = await getUserInfoIdentities(props.id);
-        if (userInfo?.identities) {
-          table.data = userInfo.identities;
-          table.total = userInfo?.identities.length;
-        }
-      }
-      setLoading(false);
-      return table;
-    };
-
+  useEffect(() => {
+    setLoading(false);
+  }, [dataSource])
 
   return (
     <Drawer
@@ -110,14 +99,30 @@ export default (props: {
       placement="right"
       title={props.title}
       open={props?.open}
-      onClose={onOpenChange}
+      onClose={() => {
+        props.onClose?.(isAction, dataSource);
+      }}
     >
       <EditableProTable
         actionRef={proTableRef}
         rowKey="id"
         loading={loading}
         columns={columns}
-        request={getRequest}
+        dataSource={dataSource}
+        request={async () => {
+          setLoading(true);
+          const table = { data: [] as UserIdentity[], success: true, total: 0 };
+          if (props.id) {
+            const userInfo = await getUserInfoIdentities(props.id);
+            if (userInfo?.identities) {
+              table.data = userInfo.identities;
+              table.total = userInfo?.identities.length;
+            }
+          }
+          setDataSource(table.data)
+          setLoading(false);
+          return table;
+        }}
         recordCreatorProps={checkAuth('deleteUserIdentity') ? {
           record: { id: 'new', status: 'active' } as any,
           creatorButtonText: t('add'),
@@ -137,8 +142,15 @@ export default (props: {
                 userID: props.id,
               });
               if (result?.id) {
+                setLoading(true);
                 message.success(t('submit_success'));
-                proTableRef.current?.reload();
+                const idx = dataSource.findIndex(item => item.id == result.id)
+                if (idx === -1) {
+                  dataSource.push(result)
+                } else {
+                  dataSource[idx] = result
+                }
+                setDataSource([...dataSource])
               }
               setIsAction(true);
             }

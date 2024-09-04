@@ -24,7 +24,7 @@ export default (props: {
   title?: string;
   id?: string;
   fsId: string;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: FileIdentity) => void;
 }) => {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
@@ -92,7 +92,6 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
       const data = {
         accessKeyID: values.accessKeyID ?? '',
         comments: values.comments,
@@ -108,12 +107,14 @@ export default (props: {
             accessKeySecret: values.accessKeySecret
           }, oldInfo || {}));
           if (result?.id) {
-            isTrue = true;
+            setSaveDisabled(true);
+            props.onClose?.(true);
           }
         } else {
           const result = await updateFileIdentity(props.id, updateFormat(data, oldInfo || {}));
           if (result?.id) {
-            isTrue = true;
+            setSaveDisabled(true);
+            props.onClose?.(true, result as FileIdentity);
           }
         }
       } else {
@@ -123,13 +124,9 @@ export default (props: {
           orgID: userState.tenantId
         });
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result as FileIdentity);
         }
-      }
-
-      if (isTrue) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
       }
       setSaveLoading(false);
       return false;

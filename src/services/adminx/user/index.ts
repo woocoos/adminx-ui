@@ -41,7 +41,7 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        email,mobile,userType,creationType,registerIP,status,comments,avatar
       }
     }
   }
@@ -110,23 +110,37 @@ const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GI
 }`);
 
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
-  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
+  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+    email,mobile,userType,creationType,registerIP,status,comments,avatar
+   }
 }`);
 
 const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
-  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }
+  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+    email,mobile,userType,creationType,registerIP,status,comments,avatar
+  }
 }`);
 
 const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  updateUser(userID:$userId,input:$input){ id,displayName,avatar }
+  updateUser(userID:$userId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+    email,mobile,userType,creationType,registerIP,status,comments,avatar
+   }
 }`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){
-  updateLoginProfile(userID:$userId,input:$input){ id }
+  updateLoginProfile(userID:$userId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
+    canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
+   }
 }`);
 
 const mutationBindUserIdentity = gql(/* GraphQL */`mutation bindUserIdentity($input: CreateUserIdentityInput!){
-  bindUserIdentity(input:$input){ id }
+  bindUserIdentity(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
+   }
 }`);
 
 const mutationDelUserIdentity = gql(/* GraphQL */`mutation deleteUserIdentity($identityId:ID!){
@@ -174,19 +188,28 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
 }`);
 
 const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
-  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
+  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+    email,mobile,userType,creationType,registerIP,status,comments,avatar
+  }
 }`);
 
 const mutationCreateOauthClient = gql(/* GraphQL */`mutation createOauthClient($input: CreateOauthClientInput!){
-  createOauthClient( input: $input ){ id }
+  createOauthClient( input: $input ){
+    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+  }
 }`);
 
 const mutationEnableOauthClient = gql(/* GraphQL */`mutation enableOauthClient($id: ID!){
-  enableOauthClient( id: $id ){ id }
+  enableOauthClient( id: $id ){
+    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+  }
 }`);
 
 const mutationDisableOauthClient = gql(/* GraphQL */`mutation disableOauthClient($id: ID!){
-  disableOauthClient( id: $id ){ id }
+  disableOauthClient( id: $id ){
+    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+  }
 }`);
 
 const mutationDelOauthClient = gql(/* GraphQL */`mutation delOauthClient($id: ID!){

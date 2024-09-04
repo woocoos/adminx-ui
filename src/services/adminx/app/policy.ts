@@ -49,11 +49,15 @@ const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
 }`);
 
 const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){
-  createAppPolicy(appID:$appId,input:$input){id}
+  createAppPolicy(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+  }
 }`);
 
 const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){
-  updateAppPolicy(policyID:$appPolicyId,input:$input){id}
+  updateAppPolicy(policyID:$appPolicyId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+  }
 }`);
 
 const mutationDelAppPolicy = gql(/* GraphQL */`mutation delAppPolicy($appPolicyId:ID!){

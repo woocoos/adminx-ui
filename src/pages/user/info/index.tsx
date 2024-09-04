@@ -47,6 +47,7 @@ export default () => {
         const result = await updateUserInfo(userState.user.id, updateFormat(values, userInfo || {}));
         if (result?.id) {
           message.success(t('submit_success'));
+          setUserInfo(result as User);
           await userDispatcher.saveUser(result as User);
           setSaveDisabled(true);
         }

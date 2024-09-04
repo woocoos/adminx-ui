@@ -133,23 +133,20 @@ export const PageOrgRoleList = (props: {
         onOk: async (close) => {
           const result = await delOrgRole(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            const idx = dataSource.findIndex(item => item.id === record.id);
+            dataSource.splice(idx, 1);
+            setDataSource([...dataSource]);
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             message.success('submit_success');
             close();
           }
         },
       });
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '', id: '', scene: 'editor' });
     };
 
   useEffect(() => {
@@ -209,6 +206,7 @@ export const PageOrgRoleList = (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params) => {
             const table = { data: [] as OrgRole[], success: true, total: 0 },
               where: OrgRoleWhereInput = {};
@@ -239,7 +237,18 @@ export const PageOrgRoleList = (props: {
           id={modal.id}
           kind={kind}
           orgId={props.orgId}
-          onClose={onDrawerClose}
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              const idx = dataSource.findIndex(item => item.id == newInfo.id)
+              if (idx === -1) {
+                dataSource.unshift(newInfo)
+              } else {
+                dataSource[idx] = newInfo
+              }
+              setDataSource([...dataSource])
+            }
+            setModal({ open: false, title: '', id: '', scene: 'editor' });
+          }}
         />
         <DrawerUser
           x-if={modal.scene === 'addUser' && modal.open}
@@ -248,9 +257,6 @@ export const PageOrgRoleList = (props: {
           orgId={props.orgId}
           orgRole={modal.data}
           onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
-            }
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />
@@ -261,9 +267,6 @@ export const PageOrgRoleList = (props: {
           open={modal.open}
           title={modal.title}
           onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
-            }
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />
@@ -272,9 +275,6 @@ export const PageOrgRoleList = (props: {
           open={modal.open}
           title={modal.title}
           onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
-            }
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />

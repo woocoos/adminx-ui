@@ -26,6 +26,9 @@ const schemaWithMocks = addMocksToSchema({
   store,
   preserveResolvers,
   resolvers: {
+    AppActionConnection: {
+      totalCount: () => Math.floor(Math.random() * 100 + 1),
+    },
     App: {
       menus: relayStylePaginationMock(store),
       actions: relayStylePaginationMock(store),
@@ -198,6 +201,17 @@ const schemaWithMocks = addMocksToSchema({
         )
         return true
       },
+      createAppMenus: (_, { appID, input }) => {
+        const data = input[0]
+        data.id = `${Date.now()}`
+        data.appID = appID
+        store.set('AppMenu', data.id, data)
+        return [store.get('AppMenu', data.id)]
+      },
+      updateAppMenu: (_, { menuID, input }) => {
+        store.set('AppMenu', menuID, input)
+        return store.get('AppMenu', menuID)
+      }
     }
   }
 })

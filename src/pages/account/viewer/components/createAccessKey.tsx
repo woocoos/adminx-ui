@@ -1,4 +1,4 @@
-import { OauthClientGrantTypes } from '@/generated/adminx/graphql';
+import { OauthClient, OauthClientGrantTypes } from '@/generated/adminx/graphql';
 import { createAccessKey } from '@/services/adminx/user';
 import { ProFormText, ModalForm } from '@ant-design/pro-components';
 import { message } from 'antd';
@@ -14,7 +14,7 @@ export default (props: {
   open: boolean;
   title: string;
   userId: string;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: OauthClient) => void;
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
@@ -55,7 +55,7 @@ export default (props: {
       if (result?.id) {
         message.success(t('submit_success'));
         setSaveDisabled(true);
-        props.onClose(true);
+        props.onClose(true, result as OauthClient);
       }
       setSaveLoading(false);
       return false;

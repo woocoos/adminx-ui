@@ -97,11 +97,23 @@ const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
 }`);
 
 const mutationCreatePermission = gql(/* GraphQL */`mutation createPermission($input: CreatePermissionInput!){
-  grant(input:$input){id}
+  grant(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+    role{ id,orgID,kind,name,isAppRole }
+    orgPolicy{ id,orgID,appPolicyID,name }
+    user{ id,displayName }
+  }
 }`);
 
 const mutationUpdatePermission = gql(/* GraphQL */`mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){
-  updatePermission(permissionID:$permissionId,input:$input){id}
+  updatePermission(permissionID:$permissionId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+    role{ id,orgID,kind,name,isAppRole }
+    orgPolicy{ id,orgID,appPolicyID,name }
+    user{ id,displayName }
+  }
 }`);
 
 const mutationDelPermission = gql(/* GraphQL */`mutation revoke($permissionId:ID!,$orgId:ID!){

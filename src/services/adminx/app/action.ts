@@ -42,11 +42,15 @@ const queryAppActionInfo = gql(/* GraphQL */`query AppActionInfo($gid:GID!){
 }`);
 
 const mutationCreateAppAction = gql(/* GraphQL */`mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){
-  createAppActions(appID:$appId,input:$input){id}
+  createAppActions(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+  }
 }`);
 
 const mutationUpdateAppAction = gql(/* GraphQL */`mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){
-  updateAppAction(actionID:$appActionId,input:$input){id}
+  updateAppAction(actionID:$appActionId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+  }
 }`);
 
 const mutationDelAppAction = gql(/* GraphQL */`mutation delAppAction($appActionId:ID!){

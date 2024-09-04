@@ -132,12 +132,15 @@ export const PageAppList = (props: {
         onOk: async (close) => {
           const result = await delAppInfo(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            const idx = dataSource.findIndex(item => item.id === record.id);
+            dataSource.splice(idx, 1);
+            setDataSource([...dataSource]);
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -151,23 +154,20 @@ export const PageAppList = (props: {
           if (props.orgId) {
             const result = await revokeOrgApp(props.orgId, record.id);
             if (result === true) {
-              if (dataSource.length === 1) {
+              const idx = dataSource.findIndex(item => item.id === record.id);
+              dataSource.splice(idx, 1);
+              setDataSource([...dataSource]);
+              if (dataSource.length === 0) {
                 const pageInfo = { ...proTableRef.current?.pageInfo };
                 pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
                 proTableRef.current?.setPageInfo?.(pageInfo);
+                proTableRef.current?.reload();
               }
-              proTableRef.current?.reload();
               close();
             }
           }
         },
       });
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '', id: '' });
     };
 
   return (
@@ -200,6 +200,7 @@ export const PageAppList = (props: {
               }}
               scroll={{ x: 'max-content', y: 300 }}
               columns={columns}
+              dataSource={dataSource}
               request={async (params, sort, filter) => {
                 const table = { data: [] as App[], success: true, total: 0 },
                   where: AppWhereInput = {};
@@ -314,6 +315,7 @@ export const PageAppList = (props: {
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}
+              dataSource={dataSource}
               request={async (params, sort, filter) => {
                 const table = { data: [] as App[], success: true, total: 0 },
                   where: AppWhereInput = {};
@@ -375,7 +377,18 @@ export const PageAppList = (props: {
               open={modal.open}
               title={modal.title}
               id={modal.id}
-              onClose={onDrawerClose}
+              onClose={(isSuccess, newInfo) => {
+                if (isSuccess && newInfo) {
+                  const idx = dataSource.findIndex(item => item.id == newInfo.id)
+                  if (idx === -1) {
+                    dataSource.unshift(newInfo)
+                  } else {
+                    dataSource[idx] = newInfo
+                  }
+                  setDataSource([...dataSource])
+                }
+                setModal({ open: false, title: '', id: '' });
+              }}
             />
           </PageContainer >
         )

@@ -5,12 +5,14 @@ import { useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
-import { TreeEditorAction, formatTreeData } from '@/util';
+import { TreeEditorAction, delTreeData, formatTreeData, loopTreeData, updateTreeData } from '@/util';
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
+
+type OrgTree = Org & { children?: Org[] }
 
 export const OrgList = (props: {
   title?: string;
@@ -44,8 +46,8 @@ export const OrgList = (props: {
       { title: t('description'), dataIndex: 'profile', width: 120, search: false },
     ],
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
-    [dataSource, setDataSource] = useState<Org[]>([]),
-    [parentDataSource, setParentDataSource] = useState<Org[]>([]),
+    [dataSource, setDataSource] = useState<OrgTree[]>([]),
+    [parentDataSource, setParentDataSource] = useState<OrgTree[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -158,22 +160,12 @@ export const OrgList = (props: {
         onOk: async (close) => {
           const result = await delOrgInfo(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
-              const pageInfo = { ...proTableRef.current?.pageInfo };
-              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
-              proTableRef.current?.setPageInfo?.(pageInfo);
-            }
-            proTableRef.current?.reload();
+            delTreeData(dataSource as any, record.id)
+            setDataSource([...dataSource])
             close();
           }
         },
       });
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '', id: '', scene: 'editor' });
     },
     editorAction = (info: Org, action: TreeEditorAction) => {
       let title = '';
@@ -242,8 +234,9 @@ export const OrgList = (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params) => {
-            const table = { data: [] as Org[], success: true, total: 0 },
+            const table = { data: [] as OrgTree[], success: true, total: 0 },
               where: OrgWhereInput = {};
             setExpandedRowKeys([]);
             if (props.appId) {
@@ -256,14 +249,15 @@ export const OrgList = (props: {
                 where,
               });
               if (data?.totalCount) {
-                table.data = data.edges?.map(item => item?.node) as Org[];
+                table.data = data.edges?.map(item => item?.node) as OrgTree[];
                 table.total = data.totalCount;
               }
             } else {
-              let list: Org[] = [];
+              let list: OrgTree[] = [];
               if (kind === 'org') {
                 if (props.tenantId) {
-                  list = await getOrgPathList(props.tenantId, kind);
+                  const restul = await getOrgPathList(props.tenantId, kind);
+                  list = restul.map(item => item) as OrgTree[] || [];
                   table.total = list.length;
                 }
               } else {
@@ -273,7 +267,7 @@ export const OrgList = (props: {
                   where,
                 });
                 if (result?.totalCount) {
-                  list = result.edges?.map(item => item?.node) as Org[] || [];
+                  list = result.edges?.map(item => item?.node) as OrgTree[] || [];
                   table.total = result.totalCount;
                 }
               }
@@ -295,7 +289,18 @@ export const OrgList = (props: {
           scene={modal.scene}
           parentDataSource={parentDataSource}
           kind={kind}
-          onClose={onDrawerClose}
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              const idx = dataSource.findIndex(item => item.id == newInfo.id)
+              if (idx === -1) {
+                dataSource.unshift(newInfo as OrgTree)
+              } else {
+                dataSource[idx] = newInfo as OrgTree
+              }
+              setDataSource([...dataSource])
+            }
+            setModal({ open: false, title: '', id: '', scene: 'editor' });
+          }}
         />
       </PageContainer>
     </>

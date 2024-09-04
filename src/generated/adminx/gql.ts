@@ -15,18 +15,18 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
 const documents = {
     "query appActionList($gid: GID!,$first: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      actions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n          }\n        }\n      }\n    }\n  }\n}": types.AppActionListDocument,
     "query AppActionInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppAction{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n    }\n  }\n}": types.AppActionInfoDocument,
-    "mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){id}\n}": types.CreateAppActionDocument,
-    "mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){id}\n}": types.UpdateAppActionDocument,
+    "mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}": types.CreateAppActionDocument,
+    "mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}": types.UpdateAppActionDocument,
     "mutation delAppAction($appActionId:ID!){\n  deleteAppAction(actionID: $appActionId)\n}": types.DelAppActionDocument,
     "query appList($first: Int,$orderBy:AppOrder,$where:AppWhereInput){\n  apps(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n        refreshTokenValidity,logo,comments,status,createdAt\n      }\n    }\n  }\n}": types.AppListDocument,
     "query appInfo($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n      refreshTokenValidity,logo,comments,status,createdAt\n    }\n  }\n}": types.AppInfoDocument,
-    "mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){id}\n}": types.UpdateAppDocument,
-    "mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){ id }\n}": types.CreateAppDocument,
+    "mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}": types.UpdateAppDocument,
+    "mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}": types.CreateAppDocument,
     "mutation delApp($appId:ID!){\n  deleteApp(appID: $appId)\n}": types.DelAppDocument,
     "query appAccess($appCode: String!){\n  appAccess( appCode: $appCode )\n}": types.AppAccessDocument,
     "query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){\n  node(id:$gid){\n    ... on App{\n      id\n      menus(first:$first,where:$where,orderBy:$orderBy){\n        totalCount,\n        edges{\n          cursor,node{\n            id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n            action{ id,name }\n          }\n        }\n      }\n    }\n  }\n}": types.AppMenuListDocument,
-    "mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){id}\n}": types.UpdateAppMenuDocument,
-    "mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){id}\n}": types.CreateAppMenuDocument,
+    "mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){\n    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n    action{ id,name }\n  }\n}": types.UpdateAppMenuDocument,
+    "mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){\n    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n    action{ id,name }\n  }\n}": types.CreateAppMenuDocument,
     "mutation delAppMenu($menuId:ID!){\n  deleteAppMenu(menuID: $menuId)\n}": types.DelAppMenuDocument,
     "mutation moveAppMenu($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppMenu(sourceID:$sourceId,targetID:$targetId,action:$action)\n}": types.MoveAppMenuDocument,
     "query appOrgList($gid: GID!,$first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      orgs(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n            domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n            owner { id,displayName }\n          }\n        }\n      }\n    }\n  }\n}": types.AppOrgListDocument,
@@ -36,36 +36,36 @@ const documents = {
     "query appPolicieList($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n      }\n    }\n  }\n}": types.AppPolicieListDocument,
     "query appPolicieListAndIsGrant($gid:GID!,$appRoleId:ID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n        isGrantAppRole(appRoleID: $appRoleId)\n      }\n    }\n  }\n}": types.AppPolicieListAndIsGrantDocument,
     "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppPolicy{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,\n      rules{ effect,actions,resources,conditions }\n      app{ id,name }\n    }\n  }\n}": types.AppPolicyInfoDocument,
-    "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){id}\n}": types.CreateAppPolicyDocument,
-    "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){id}\n}": types.UpdateAppPolicyDocument,
+    "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}": types.CreateAppPolicyDocument,
+    "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}": types.UpdateAppPolicyDocument,
     "mutation delAppPolicy($appPolicyId:ID!){\n  deleteAppPolicy(policyID: $appPolicyId)\n}": types.DelAppPolicyDocument,
     "query appResList($gid: GID!,$first: Int,$orderBy:AppResOrder,$where:AppResWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      resources(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n          }\n        }\n      }\n    }\n  }\n}": types.AppResListDocument,
     "query appResInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppRes{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n    }\n  }\n}": types.AppResInfoDocument,
-    "mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){id}\n}": types.UpdateAppResDocument,
+    "mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n  }\n}": types.UpdateAppResDocument,
     "query appRoleList($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      roles{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n      }\n    }\n  }\n}": types.AppRoleListDocument,
     "query appRoleInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppRole{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n      app{ id,name,code }\n    }\n  }\n}": types.AppRoleInfoDocument,
     "query appRoleInfoPolicieList($gid:GID!){\n  node(id:$gid){\n    ... on AppRole{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n      app{ id,name,code }\n      policies{\n        id,appID,name,comments,autoGrant,status,\n        rules{ effect,actions,resources,conditions }\n      }\n    }\n  }\n}": types.AppRoleInfoPolicieListDocument,
-    "mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){\n  createAppRole(appID:$appId,input:$input){id}\n}": types.CreateAppRoleDocument,
-    "mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){\n  updateAppRole(roleID:$appRoleId,input:$input){id}\n}": types.UpdateAppRoleDocument,
+    "mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){\n  createAppRole(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n  }\n}": types.CreateAppRoleDocument,
+    "mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){\n  updateAppRole(roleID:$appRoleId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n  }\n}": types.UpdateAppRoleDocument,
     "mutation delAppRole($appRoleId:ID!){\n  deleteAppRole(roleID: $appRoleId)\n}": types.DelAppRoleDocument,
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
     "query appDictList($first: Int,$orderBy:AppDictOrder,$where:AppDictWhereInput){\n  appDicts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n        app{id,name}\n      }\n    }\n  }\n}": types.AppDictListDocument,
     "query appDictInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       app{id,name}\n     }\n   }\n }": types.AppDictInfoDocument,
-    "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{\n          id,name\n        }\n       }\n     }\n   }\n }": types.AppDictItemListDocument,
+    "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{ id,name }\n       }\n     }\n   }\n }": types.AppDictItemListDocument,
     "query appDictItemInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDictItem{\n      id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n      org{ id,name }\n     }\n   }\n }": types.AppDictItemInfoDocument,
-    "mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){id}\n}": types.UpdateAppDictDocument,
-    "mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){ id }\n}": types.CreateAppDictDocument,
+    "mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n    app{id,name}\n  }\n}": types.UpdateAppDictDocument,
+    "mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n    app{id,name}\n   }\n}": types.CreateAppDictDocument,
     "mutation deleteAppDict($dictId:ID!){\n  deleteAppDict(dictID: $dictId)\n}": types.DeleteAppDictDocument,
-    "mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){id}\n}": types.UpdateAppDictItemDocument,
-    "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}": types.CreateAppDictItemDocument,
+    "mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){\n    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n    org{ id,name }\n  }\n}": types.UpdateAppDictItemDocument,
+    "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){\n    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n    org{ id,name }\n  }\n}": types.CreateAppDictItemDocument,
     "mutation deleteAppDictItem($itemId:ID!){\n  deleteAppDictItem(itemID: $itemId)\n}": types.DeleteAppDictItemDocument,
     "mutation moveAppDictItem($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppDictItem(sourceID: $sourceId,targetID:$targetId,action:$action)\n}": types.MoveAppDictItemDocument,
     "query fileIdentityList($first: Int,$orderBy:FileIdentityOrder,$where:FileIdentityWhereInput){\n  fileIdentities(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,comments\n        accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n        org{ id,name }\n      }\n    }\n  }\n}": types.FileIdentityListDocument,
     "query fileIdentityInfo($gid:GID!){\n node(id:$gid){\n  ... on FileIdentity{\n      id,createdBy,createdAt,updatedBy,updatedAt,comments,\n      accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n      org{ id,name }\n    }\n  }\n}": types.FileIdentityInfoDocument,
     "query fileIdentityAccessKeySecret($id:ID!){\n fileIdentityAccessKeySecret(id:$id)\n}": types.FileIdentityAccessKeySecretDocument,
-    "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}": types.CreateFileIdentityDocument,
-    "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}": types.UpdateFileIdentityDocument,
+    "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,comments\n    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n    org{ id,name }\n  }\n}": types.CreateFileIdentityDocument,
+    "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,comments\n    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n    org{ id,name }\n  }\n}": types.UpdateFileIdentityDocument,
     "mutation deleteFileIdentity($id:ID!){\n  deleteFileIdentity(id: $id)\n}": types.DeleteFileIdentityDocument,
     "mutation setDefaultFileIdentity($id:ID!,$orgId: ID!){\n  setDefaultFileIdentity(identityID:$id,orgID:$orgId)\n}": types.SetDefaultFileIdentityDocument,
     "query fileSourceList($first: Int,$orderBy:FileSourceOrder,$where:FileSourceWhereInput){\n  fileSources(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,kind,comments,endpoint,region,\n        bucket,bucketURL,stsEndpoint,endpointImmutable\n      }\n    }\n  }\n}": types.FileSourceListDocument,
@@ -79,10 +79,10 @@ const documents = {
     "query orgAppActionList($appCode:String!){\n  orgAppActions(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}": types.OrgAppActionListDocument,
     "query orgList($first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){\n  organizations(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n        domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n        owner { id,displayName }\n      }\n    }\n  }\n}": types.OrgListDocument,
     "query orgInfo($gid:GID!){\n  node(id: $gid){\n    ... on Org{\n      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n      domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n      owner { id,displayName }\n    }\n  }\n}": types.OrgInfoDocument,
-    "mutation createRootOrg($input: CreateOrgInput!){\n  createRoot(input:$input){id}\n}": types.CreateRootOrgDocument,
-    "mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){\n  updateOrganization(orgID:$orgId,input:$input){id}\n}": types.UpdateOrgDocument,
-    "mutation createOrg($input: CreateOrgInput!){\n  createOrganization(input:$input){id}\n}": types.CreateOrgDocument,
-    "mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){id}\n}": types.EnableDirectoryDocument,
+    "mutation createRootOrg($input: CreateOrgInput!){\n  createRoot(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}": types.CreateRootOrgDocument,
+    "mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){\n  updateOrganization(orgID:$orgId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}": types.UpdateOrgDocument,
+    "mutation createOrg($input: CreateOrgInput!){\n  createOrganization(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}": types.CreateOrgDocument,
+    "mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}": types.EnableDirectoryDocument,
     "mutation delOrg($orgId:ID!){\n  deleteOrganization(orgID: $orgId)\n}": types.DelOrgDocument,
     "mutation moveOrg($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)\n}": types.MoveOrgDocument,
     "query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n          }\n        }\n      }\n    }\n  }\n}": types.OrgPolicyListDocument,
@@ -90,8 +90,8 @@ const documents = {
     "query orgPolicyListAndIsGrantUser($gid: GID!,$userId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n            isGrantUser(userID: $userId)\n          }\n        }\n      }\n    }\n  }\n}": types.OrgPolicyListAndIsGrantUserDocument,
     "query orgPolicyListAndIsGrantRole($gid: GID!,$roleId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n            isGrantRole(roleID: $roleId)\n          }\n        }\n      }\n    }\n  }\n}": types.OrgPolicyListAndIsGrantRoleDocument,
     "query orgPolicyInfo($gid:GID!){\n  node(id:$gid){\n    ... on OrgPolicy{\n      id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments,\n      rules{ effect,actions,resources,conditions }\n    }\n  }\n}": types.OrgPolicyInfoDocument,
-    "mutation createOrgPolicy($input: CreateOrgPolicyInput!){\n  createOrganizationPolicy(input:$input){id}\n}": types.CreateOrgPolicyDocument,
-    "mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){\n  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}\n}": types.UpdateOrgPolicyDocument,
+    "mutation createOrgPolicy($input: CreateOrgPolicyInput!){\n  createOrganizationPolicy(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n  }\n}": types.CreateOrgPolicyDocument,
+    "mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){\n  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n  }\n}": types.UpdateOrgPolicyDocument,
     "mutation deleteOrgPolicy($orgPolicyId:ID!){\n  deleteOrganizationPolicy(orgPolicyID:$orgPolicyId)\n}": types.DeleteOrgPolicyDocument,
     "mutation assignOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){\n  assignOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)\n}": types.AssignOrgAppPolicyDocument,
     "mutation revokeOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){\n  revokeOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)\n}": types.RevokeOrgAppPolicyDocument,
@@ -101,8 +101,8 @@ const documents = {
     "query orgRoleList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){\n  orgRoles(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n      }\n    }\n  }\n}": types.OrgRoleListDocument,
     "query orgRoleListAndIsGrant($userId:ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){\n  orgRoles(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n        isGrantUser(userID: $userId)\n      }\n    }\n  }\n}": types.OrgRoleListAndIsGrantDocument,
     "query orgRoleInfo($gid:GID!){\n  node(id:$gid){\n    ... on OrgRole{\n      id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n    }\n  }\n}": types.OrgRoleInfoDocument,
-    "mutation createOrgRole($input: CreateOrgRoleInput!){\n  createRole(input:$input){id}\n}": types.CreateOrgRoleDocument,
-    "mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){\n  updateRole(roleID:$orgRoleId,input:$input){id}\n}": types.UpdateOrgRoleDocument,
+    "mutation createOrgRole($input: CreateOrgRoleInput!){\n  createRole(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n  }\n}": types.CreateOrgRoleDocument,
+    "mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){\n  updateRole(roleID:$orgRoleId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n  }\n}": types.UpdateOrgRoleDocument,
     "mutation deleteOrgRole($orgRoleId:ID!){\n  deleteRole(roleID:$orgRoleId)\n}": types.DeleteOrgRoleDocument,
     "mutation assignOrgRoleUser($input: AssignRoleUserInput!){\n  assignRoleUser(input:$input)\n}": types.AssignOrgRoleUserDocument,
     "mutation revokeOrgRoleUser($orgRoleId:ID!,$userId:ID!){\n  revokeRoleUser(roleID:$orgRoleId,userID:$userId)\n}": types.RevokeOrgRoleUserDocument,
@@ -123,20 +123,20 @@ const documents = {
     "query userPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){\n  node(id:$gid){\n    ... on User{\n      permissions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n            userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n            role{ id,orgID,kind,name,isAppRole }\n            orgPolicy{ id,orgID,appPolicyID,name }\n            user{ id,displayName }\n          }\n        }\n      }\n    }\n  }\n}": types.UserPrmissionListDocument,
     "query userExtendGroupPolicieList($userId: ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){\n  userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n        role{ id,orgID,kind,name,isAppRole }\n        orgPolicy{ id,orgID,appPolicyID,name }\n        user{ id,displayName }\n      }\n    }\n  }\n}": types.UserExtendGroupPolicieListDocument,
     "query permissionInfo($gid:GID!){\n  node(id:$gid){\n    ... on Permission{\n      id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n      userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n      role{ id,orgID,kind,name,isAppRole }\n      orgPolicy{ id,orgID,appPolicyID,name }\n      user{ id,displayName }\n    }\n  }\n}": types.PermissionInfoDocument,
-    "mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){id}\n}": types.CreatePermissionDocument,
-    "mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){id}\n}": types.UpdatePermissionDocument,
+    "mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}": types.CreatePermissionDocument,
+    "mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}": types.UpdatePermissionDocument,
     "mutation revoke($permissionId:ID!,$orgId:ID!){\n  revoke(permissionID:$permissionId,orgID:$orgId)\n}": types.RevokeDocument,
-    "query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}": types.UserListDocument,
+    "query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments,avatar\n      }\n    }\n  }\n}": types.UserListDocument,
     "query userInfo($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,avatar\n    }\n  }\n}": types.UserInfoDocument,
     "query userInfoLoginProfile($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,avatar\n      loginProfile{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n      }\n    }\n  }\n}": types.UserInfoLoginProfileDocument,
     "query userInfoLoginProfileIdentities($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,avatar\n      loginProfile{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n      }\n      identities{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n      }\n    }\n  }\n}": types.UserInfoLoginProfileIdentitiesDocument,
     "query userInfoIdentities($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n      email,mobile,userType,creationType,registerIP,status,comments,\n      identities{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n      }\n    }\n  }\n}": types.UserInfoIdentitiesDocument,
     "query userAccessKeyList($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,\n      oauthClients{\n        id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n      }\n    }\n  }\n}": types.UserAccessKeyListDocument,
-    "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}": types.CreateUserDocument,
-    "mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }\n}": types.CreateAccountDocument,
-    "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName,avatar }\n}": types.UpdateUserDocument,
-    "mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){ id }\n}": types.UpdateUserLoginProfileDocument,
-    "mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){ id }\n}": types.BindUserIdentityDocument,
+    "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n   }\n}": types.CreateUserDocument,
+    "mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n  }\n}": types.CreateAccountDocument,
+    "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n   }\n}": types.UpdateUserDocument,
+    "mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n    canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n   }\n}": types.UpdateUserLoginProfileDocument,
+    "mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n   }\n}": types.BindUserIdentityDocument,
     "mutation deleteUserIdentity($identityId:ID!){\n  deleteUserIdentity(id:$identityId)\n}": types.DeleteUserIdentityDocument,
     "mutation deleteUser($userId:ID!){\n  deleteUser(userID:$userId)\n}": types.DeleteUserDocument,
     "mutation resetUserPasswordByEmail($userId:ID!){\n  resetUserPasswordByEmail(userId: $userId)\n}": types.ResetUserPasswordByEmailDocument,
@@ -146,10 +146,10 @@ const documents = {
     "mutation sendMfaEmail($userId:ID!){\n  sendMFAToUserByEmail(userID:$userId)\n}": types.SendMfaEmailDocument,
     "query  checkPermission($permission:String!){\n  checkPermission(permission: $permission)\n}": types.CheckPermissionDocument,
     "query orgRecycleUsers($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  orgRecycleUsers(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}": types.OrgRecycleUsersDocument,
-    "mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }\n}": types.RecoverOrgUserDocument,
-    "mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){ id }\n}": types.CreateOauthClientDocument,
-    "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){ id }\n}": types.EnableOauthClientDocument,
-    "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){ id }\n}": types.DisableOauthClientDocument,
+    "mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n  }\n}": types.RecoverOrgUserDocument,
+    "mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}": types.CreateOauthClientDocument,
+    "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}": types.EnableOauthClientDocument,
+    "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}": types.DisableOauthClientDocument,
     "mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}": types.DelOauthClientDocument,
 };
 
@@ -178,11 +178,11 @@ export function gql(source: "query AppActionInfo($gid:GID!){\n  node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){id}\n}"): (typeof documents)["mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){id}\n}"];
+export function gql(source: "mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}"): (typeof documents)["mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){\n  createAppActions(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){id}\n}"): (typeof documents)["mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}"): (typeof documents)["mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){\n  updateAppAction(actionID:$appActionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -198,11 +198,11 @@ export function gql(source: "query appInfo($gid:GID!){\n  node(id:$gid){\n    ..
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){id}\n}"): (typeof documents)["mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){id}\n}"];
+export function gql(source: "mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"): (typeof documents)["mutation updateApp($appId:ID!,$input: UpdateAppInput!){\n  updateApp(appID:$appId,input:$input){\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){ id }\n}"): (typeof documents)["mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){ id }\n}"];
+export function gql(source: "mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"): (typeof documents)["mutation createApp($input: CreateAppInput!){\n  createApp(input:$input){\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -218,11 +218,11 @@ export function gql(source: "query appMenuList($gid:GID!,$first: Int,$where: App
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){id}\n}"): (typeof documents)["mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){\n    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n    action{ id,name }\n  }\n}"): (typeof documents)["mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){\n  updateAppMenu(menuID:$menuId,input:$input){\n    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n    action{ id,name }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){id}\n}"): (typeof documents)["mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){id}\n}"];
+export function gql(source: "mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){\n    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n    action{ id,name }\n  }\n}"): (typeof documents)["mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){\n  createAppMenus(appID:$appId,input:$input){\n    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route\n    action{ id,name }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -262,11 +262,11 @@ export function gql(source: "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){id}\n}"): (typeof documents)["mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){id}\n}"];
+export function gql(source: "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}"): (typeof documents)["mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){id}\n}"): (typeof documents)["mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}"): (typeof documents)["mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -282,7 +282,7 @@ export function gql(source: "query appResInfo($gid:GID!){\n  node(id:$gid){\n   
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){id}\n}"): (typeof documents)["mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n  }\n}"): (typeof documents)["mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -298,11 +298,11 @@ export function gql(source: "query appRoleInfoPolicieList($gid:GID!){\n  node(id
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){\n  createAppRole(appID:$appId,input:$input){id}\n}"): (typeof documents)["mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){\n  createAppRole(appID:$appId,input:$input){id}\n}"];
+export function gql(source: "mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){\n  createAppRole(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n  }\n}"): (typeof documents)["mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){\n  createAppRole(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){\n  updateAppRole(roleID:$appRoleId,input:$input){id}\n}"): (typeof documents)["mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){\n  updateAppRole(roleID:$appRoleId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){\n  updateAppRole(roleID:$appRoleId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n  }\n}"): (typeof documents)["mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){\n  updateAppRole(roleID:$appRoleId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -326,7 +326,7 @@ export function gql(source: "query appDictInfo($gid:GID!){\n  node(id:$gid){\n  
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{\n          id,name\n        }\n       }\n     }\n   }\n }"): (typeof documents)["query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{\n          id,name\n        }\n       }\n     }\n   }\n }"];
+export function gql(source: "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{ id,name }\n       }\n     }\n   }\n }"): (typeof documents)["query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{ id,name }\n       }\n     }\n   }\n }"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -334,11 +334,11 @@ export function gql(source: "query appDictItemInfo($gid:GID!){\n  node(id:$gid){
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){id}\n}"): (typeof documents)["mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n    app{id,name}\n  }\n}"): (typeof documents)["mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){\n  updateAppDict(dictID:$dictId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n    app{id,name}\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){ id }\n}"): (typeof documents)["mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){ id }\n}"];
+export function gql(source: "mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n    app{id,name}\n   }\n}"): (typeof documents)["mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){\n  createAppDict(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n    app{id,name}\n   }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -346,11 +346,11 @@ export function gql(source: "mutation deleteAppDict($dictId:ID!){\n  deleteAppDi
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){id}\n}"): (typeof documents)["mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){id}\n}"];
+export function gql(source: "mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){\n    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n    org{ id,name }\n  }\n}"): (typeof documents)["mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){\n  updateAppDictItem(itemID:$itemId,input:$input){\n    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n    org{ id,name }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}"): (typeof documents)["mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){ id }\n}"];
+export function gql(source: "mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){\n    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n    org{ id,name }\n  }\n}"): (typeof documents)["mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){\n  createAppDictItem(dictID:$dictId,input:$input){\n    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n    org{ id,name }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -374,11 +374,11 @@ export function gql(source: "query fileIdentityAccessKeySecret($id:ID!){\n fileI
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}"): (typeof documents)["mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){id}\n}"];
+export function gql(source: "mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,comments\n    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n    org{ id,name }\n  }\n}"): (typeof documents)["mutation createFileIdentity($input: CreateFileIdentityInput!){\n  createFileIdentity(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,comments\n    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n    org{ id,name }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}"): (typeof documents)["mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){id}\n}"];
+export function gql(source: "mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,comments\n    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n    org{ id,name }\n  }\n}"): (typeof documents)["mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){\n  updateFileIdentity(id:$id,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,comments\n    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,\n    org{ id,name }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -434,19 +434,19 @@ export function gql(source: "query orgInfo($gid:GID!){\n  node(id: $gid){\n    .
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createRootOrg($input: CreateOrgInput!){\n  createRoot(input:$input){id}\n}"): (typeof documents)["mutation createRootOrg($input: CreateOrgInput!){\n  createRoot(input:$input){id}\n}"];
+export function gql(source: "mutation createRootOrg($input: CreateOrgInput!){\n  createRoot(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"): (typeof documents)["mutation createRootOrg($input: CreateOrgInput!){\n  createRoot(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){\n  updateOrganization(orgID:$orgId,input:$input){id}\n}"): (typeof documents)["mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){\n  updateOrganization(orgID:$orgId,input:$input){id}\n}"];
+export function gql(source: "mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){\n  updateOrganization(orgID:$orgId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"): (typeof documents)["mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){\n  updateOrganization(orgID:$orgId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createOrg($input: CreateOrgInput!){\n  createOrganization(input:$input){id}\n}"): (typeof documents)["mutation createOrg($input: CreateOrgInput!){\n  createOrganization(input:$input){id}\n}"];
+export function gql(source: "mutation createOrg($input: CreateOrgInput!){\n  createOrganization(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"): (typeof documents)["mutation createOrg($input: CreateOrgInput!){\n  createOrganization(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){id}\n}"): (typeof documents)["mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){id}\n}"];
+export function gql(source: "mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"): (typeof documents)["mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,\n    owner { id,displayName }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -478,11 +478,11 @@ export function gql(source: "query orgPolicyInfo($gid:GID!){\n  node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createOrgPolicy($input: CreateOrgPolicyInput!){\n  createOrganizationPolicy(input:$input){id}\n}"): (typeof documents)["mutation createOrgPolicy($input: CreateOrgPolicyInput!){\n  createOrganizationPolicy(input:$input){id}\n}"];
+export function gql(source: "mutation createOrgPolicy($input: CreateOrgPolicyInput!){\n  createOrganizationPolicy(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n  }\n}"): (typeof documents)["mutation createOrgPolicy($input: CreateOrgPolicyInput!){\n  createOrganizationPolicy(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){\n  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}\n}"): (typeof documents)["mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){\n  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}\n}"];
+export function gql(source: "mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){\n  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n  }\n}"): (typeof documents)["mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){\n  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -522,11 +522,11 @@ export function gql(source: "query orgRoleInfo($gid:GID!){\n  node(id:$gid){\n  
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createOrgRole($input: CreateOrgRoleInput!){\n  createRole(input:$input){id}\n}"): (typeof documents)["mutation createOrgRole($input: CreateOrgRoleInput!){\n  createRole(input:$input){id}\n}"];
+export function gql(source: "mutation createOrgRole($input: CreateOrgRoleInput!){\n  createRole(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n  }\n}"): (typeof documents)["mutation createOrgRole($input: CreateOrgRoleInput!){\n  createRole(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){\n  updateRole(roleID:$orgRoleId,input:$input){id}\n}"): (typeof documents)["mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){\n  updateRole(roleID:$orgRoleId,input:$input){id}\n}"];
+export function gql(source: "mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){\n  updateRole(roleID:$orgRoleId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n  }\n}"): (typeof documents)["mutation updateOrgRole($orgRoleId:ID!,$input: UpdateOrgRoleInput!){\n  updateRole(roleID:$orgRoleId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -610,11 +610,11 @@ export function gql(source: "query permissionInfo($gid:GID!){\n  node(id:$gid){\
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){id}\n}"): (typeof documents)["mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){id}\n}"];
+export function gql(source: "mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}"): (typeof documents)["mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){id}\n}"): (typeof documents)["mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){id}\n}"];
+export function gql(source: "mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}"): (typeof documents)["mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -622,7 +622,7 @@ export function gql(source: "mutation revoke($permissionId:ID!,$orgId:ID!){\n  r
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}"): (typeof documents)["query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments\n      }\n    }\n  }\n}"];
+export function gql(source: "query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments,avatar\n      }\n    }\n  }\n}"): (typeof documents)["query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        email,mobile,userType,creationType,registerIP,status,comments,avatar\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -646,23 +646,23 @@ export function gql(source: "query userAccessKeyList($gid:GID!){\n  node(id:$gid
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}"): (typeof documents)["mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }\n}"];
+export function gql(source: "mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n   }\n}"): (typeof documents)["mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n   }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }\n}"): (typeof documents)["mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }\n}"];
+export function gql(source: "mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n  }\n}"): (typeof documents)["mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){\n  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName,avatar }\n}"): (typeof documents)["mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){ id,displayName,avatar }\n}"];
+export function gql(source: "mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n   }\n}"): (typeof documents)["mutation updateUser($userId:ID!,$input: UpdateUserInput!){\n  updateUser(userID:$userId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n   }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){ id }\n}"): (typeof documents)["mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){ id }\n}"];
+export function gql(source: "mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n    canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n   }\n}"): (typeof documents)["mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){\n  updateLoginProfile(userID:$userId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n    canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n   }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){ id }\n}"): (typeof documents)["mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){ id }\n}"];
+export function gql(source: "mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n   }\n}"): (typeof documents)["mutation bindUserIdentity($input: CreateUserIdentityInput!){\n  bindUserIdentity(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status\n   }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -702,19 +702,19 @@ export function gql(source: "query orgRecycleUsers($first: Int,$orderBy:UserOrde
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }\n}"): (typeof documents)["mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }\n}"];
+export function gql(source: "mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n  }\n}"): (typeof documents)["mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){\n  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){\n    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n    email,mobile,userType,creationType,registerIP,status,comments,avatar\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){ id }\n}"): (typeof documents)["mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){ id }\n}"];
+export function gql(source: "mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}"): (typeof documents)["mutation createOauthClient($input: CreateOauthClientInput!){\n  createOauthClient( input: $input ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){ id }\n}"): (typeof documents)["mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){ id }\n}"];
+export function gql(source: "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}"): (typeof documents)["mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){ id }\n}"): (typeof documents)["mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){ id }\n}"];
+export function gql(source: "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}"): (typeof documents)["mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

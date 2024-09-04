@@ -18,7 +18,7 @@ export default (props: {
   open?: boolean;
   title?: string;
   id?: string | null;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: AppDict) => void;
 }) => {
   const { t } = useTranslation(),
     [info, setInfo] = useState<AppDict>(),
@@ -71,7 +71,7 @@ export default (props: {
         });
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose?.(true);
+        props.onClose?.(true, result as AppDict);
       }
       setSaveLoading(false);
       return false;

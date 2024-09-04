@@ -18,7 +18,7 @@ export default (props: {
   title?: string;
   id?: string;
   appId?: string;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: AppAction) => void;
 }) => {
   const { t } = useTranslation(),
     [appActionInfo, setAppActionInfo] = useState<AppAction>(),
@@ -58,7 +58,6 @@ export default (props: {
       setSaveDisabled(false);
     },
     onFinish = async (values: ProFormData) => {
-      let isTrue = false;
       setSaveLoading(true);
       if (props.id) {
         const result = await updateAppAction(props.id, updateFormat<UpdateAppActionInput>({
@@ -68,7 +67,8 @@ export default (props: {
           name: values.name,
         }, appActionInfo || {}));
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result as AppAction);
         }
       } else {
         if (props.appId) {
@@ -80,13 +80,10 @@ export default (props: {
             name: values.name,
           });
           if (result?.[0]?.id) {
-            isTrue = true;
+            setSaveDisabled(true);
+            props.onClose?.(true, result[0] as AppAction);
           }
         }
-      }
-      if (isTrue) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
       }
       setSaveLoading(false);
       return false;

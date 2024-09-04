@@ -75,12 +75,15 @@ export default () => {
                 onOk: async (close) => {
                   const result = await delAppDictInfo(record.id);
                   if (result === true) {
-                    if (dataSource.length === 1) {
+                    const idx = dataSource.findIndex(item => item.id === record.id);
+                    dataSource.splice(idx, 1);
+                    setDataSource([...dataSource]);
+                    if (dataSource.length === 0) {
                       const pageInfo = { ...proTableRef.current?.pageInfo };
                       pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
                       proTableRef.current?.setPageInfo?.(pageInfo);
+                      proTableRef.current?.reload();
                     }
-                    proTableRef.current?.reload();
                     close();
                   }
                 },
@@ -136,6 +139,7 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as AppDict[], success: true, total: 0 },
               where: AppDictWhereInput = {};
@@ -165,9 +169,15 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              const idx = dataSource.findIndex(item => item.id == newInfo.id)
+              if (idx === -1) {
+                dataSource.unshift(newInfo)
+              } else {
+                dataSource[idx] = newInfo
+              }
+              setDataSource([...dataSource])
             }
             setModal({ open: false, title: '', id: '' });
           }}

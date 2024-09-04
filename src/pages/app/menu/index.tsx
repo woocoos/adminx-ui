@@ -2,7 +2,7 @@ import { PageContainer, ProCard, useToken, ProForm, ProFormText, ProFormSelect, 
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
-import { TreeDataState, TreeEditorAction, formatTreeData, getTreeDropData, updateFormat } from '@/util';
+import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, updateTreeData } from '@/util';
 import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
@@ -195,7 +195,7 @@ export default () => {
           const result = await delAppMenu(menuInfo.id);
           if (result) {
             editorMenuAction(undefined, 'editor');
-            await getMenusRequest();
+            delTreeData(treeData, menuInfo.id, { id: 'key' })
             message.success(t('submit_success'));
             close();
           }
@@ -212,7 +212,6 @@ export default () => {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
       if (appInfo) {
         if (selectedTree.action === 'editor') {
           if (selectedTree.info?.id) {
@@ -224,66 +223,81 @@ export default () => {
               route: values.kind === AppMenuKind.Menu ? values.route : null,
             }, selectedTree.info));
             if (result?.id) {
-              isTrue = true;
+              message.success(t('submit_success'));
+              setSaveDisabled(true);
+              updateTreeData(treeData, {
+                key: result.id,
+                title: result.name,
+                parentId: result.parentID,
+                node: result as AppMenu,
+              }, { id: 'key' })
+              setTreeData([...treeData])
             }
           } else {
-            const input = {
+            const result = await createAppMenu(appInfo.id, {
               comments: values.comments,
               icon: values.icon,
               kind: values.kind,
               name: values.name,
               parentID: selectedTree.info?.parentID || 0,
               route: values.route,
-            },
-              result = await createAppMenu(appInfo.id, input);
+            });
             if (result?.[0]?.id) {
-              isTrue = true;
-              editorMenuAction({
-                id: result[0].id,
-                ...input,
-              } as AppMenu, 'editor');
+              message.success(t('submit_success'));
+              setSaveDisabled(true);
+              editorMenuAction(result[0] as AppMenu, 'editor');
+              updateTreeData(treeData, {
+                key: result[0].id,
+                title: result[0].name,
+                parentId: result[0].parentID,
+                node: result[0] as AppMenu,
+              }, { id: 'key' })
+              setTreeData([...treeData])
             }
           }
         } else if (selectedTree.action === 'child') {
-          const input = {
+          const result = await createAppMenu(appInfo.id, {
             comments: values.comments,
             icon: values.icon,
             kind: values.kind,
             name: values.name,
             parentID: Number(selectedTree.info?.id) || 0,
             route: values.route,
-          },
-            result = await createAppMenu(appInfo.id, input);
+          });
           if (result?.[0]?.id) {
-            isTrue = true;
-            editorMenuAction({
-              id: result[0].id,
-              ...input,
-            } as AppMenu, 'editor');
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            editorMenuAction(result[0] as AppMenu, 'editor');
+            updateTreeData(treeData, {
+              key: result[0].id,
+              title: result[0].name,
+              parentId: result[0].parentID,
+              node: result[0] as AppMenu,
+            }, { id: 'key' })
+            setTreeData([...treeData])
           }
         } else if (selectedTree.action === 'peer') {
-          const input = {
+          const result = await createAppMenu(appInfo.id, {
             comments: values.comments,
             icon: values.icon,
             kind: values.kind,
             name: values.name,
             parentID: selectedTree.info?.parentID || 0,
             route: values.route,
-          },
-            result = await createAppMenu(appInfo.id, input);
+          });
           if (result?.[0]?.id) {
-            isTrue = true;
-            editorMenuAction({
-              id: result[0].id,
-              ...input,
-            } as AppMenu, 'editor');
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            editorMenuAction(result[0] as AppMenu, 'editor');
+            updateTreeData(treeData, {
+              key: result[0].id,
+              title: result[0].name,
+              parentId: result[0].parentID,
+              node: result[0] as AppMenu,
+            }, { id: 'key' })
+            setTreeData([...treeData])
           }
         }
-      }
-      if (isTrue) {
-        message.success(t('submit_success'));
-        await getMenusRequest();
-        setSaveDisabled(true);
       }
       setSaveLoading(false);
       return false;

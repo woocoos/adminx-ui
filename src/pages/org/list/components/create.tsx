@@ -30,7 +30,7 @@ export default (props: {
   kind: OrgKind;
   scene?: TreeEditorAction;
   parentDataSource: Org[];
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: Org) => void;
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
@@ -104,7 +104,6 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
       if (props.scene === 'editor') {
         if (props.id) {
           const result = await updateOrgInfo(props.id, updateFormat({
@@ -116,7 +115,8 @@ export default (props: {
             profile: values.profile,
           }, oldInfo || {}));
           if (result?.id) {
-            isTrue = true;
+            setSaveDisabled(true);
+            props.onClose?.(true, result as Org);
           }
         } else {
           const result = await createOrgInfo({
@@ -128,7 +128,8 @@ export default (props: {
             profile: values.profile,
           }, props.kind);
           if (result?.id) {
-            isTrue = true;
+            setSaveDisabled(true);
+            props.onClose?.(true, result as Org);
           }
         }
       } else if (props.scene === 'peer') {
@@ -141,7 +142,8 @@ export default (props: {
           profile: values.profile,
         }, props.kind);
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result as Org);
         }
       } else if (props.scene === 'child') {
         const result = await createOrgInfo({
@@ -153,13 +155,9 @@ export default (props: {
           profile: values.profile,
         }, props.kind);
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result as Org);
         }
-      }
-
-      if (isTrue) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
       }
       setSaveLoading(false);
       return false;

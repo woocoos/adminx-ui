@@ -17,7 +17,7 @@ export default (props: {
   id?: string;
   orgId: string;
   kind: OrgRoleKind;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: OrgRole) => void;
 }) => {
   const
     { t } = useTranslation(),
@@ -59,8 +59,6 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
-
       if (props.id) {
         const result = await updateOrgRole(props.id, updateFormat({
           kind: props.kind,
@@ -68,7 +66,8 @@ export default (props: {
           comments: values.comments,
         }, orgRoleInfo || {}));
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result as OrgRole);
         }
       } else {
         const result = await createOrgRole({
@@ -78,13 +77,9 @@ export default (props: {
           orgID: props.orgId,
         });
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result as OrgRole);
         }
-      }
-
-      if (isTrue) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
       }
       setSaveLoading(false);
       return false;

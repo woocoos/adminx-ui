@@ -67,11 +67,15 @@ const queryOrgPolicyInfo = gql(/* GraphQL */`query orgPolicyInfo($gid:GID!){
 }`);
 
 const mutationCreateOrgPolicy = gql(/* GraphQL */`mutation createOrgPolicy($input: CreateOrgPolicyInput!){
-  createOrganizationPolicy(input:$input){id}
+  createOrganizationPolicy(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+  }
 }`);
 
 const mutationUpdateOrgPolicy = gql(/* GraphQL */`mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){
-  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}
+  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+  }
 }`);
 
 const mutationDelOrgPolicy = gql(/* GraphQL */`mutation deleteOrgPolicy($orgPolicyId:ID!){

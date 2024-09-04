@@ -3,6 +3,7 @@ import { DrawerForm, ProFormText } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
+import { AppRes } from '@/generated/adminx/graphql';
 
 type ProFormData = {
   name: string;
@@ -15,7 +16,7 @@ export default (props: {
   title?: string;
   id?: string;
   appId: string;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: AppRes) => void;
 }) => {
   const { t } = useTranslation(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
@@ -58,7 +59,7 @@ export default (props: {
       }) : null;
       if (info?.id) {
         setSaveDisabled(true);
-        props.onClose?.(true);
+        props.onClose?.(true, info);
       }
       setSaveLoading(false);
       return false;

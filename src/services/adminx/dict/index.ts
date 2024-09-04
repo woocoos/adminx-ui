@@ -37,9 +37,7 @@ const appDictItemListQuery = gql(/* GraphQL */`query appDictItemList($gid:GID!){
        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
        items{
         id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
-        org{
-          id,name
-        }
+        org{ id,name }
        }
      }
    }
@@ -55,11 +53,17 @@ const appDictItemInfoQuery = gql(/* GraphQL */`query appDictItemInfo($gid:GID!){
  }`);
 
 const mutationUpdateAppDict = gql(/* GraphQL */`mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){
-  updateAppDict(dictID:$dictId,input:$input){id}
+  updateAppDict(dictID:$dictId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
+    app{id,name}
+  }
 }`);
 
 const mutationCreateAppDict = gql(/* GraphQL */`mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){
-  createAppDict(appID:$appId,input:$input){ id }
+  createAppDict(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
+    app{id,name}
+   }
 }`);
 
 const mutationDelAppDict = gql(/* GraphQL */`mutation deleteAppDict($dictId:ID!){
@@ -67,11 +71,17 @@ const mutationDelAppDict = gql(/* GraphQL */`mutation deleteAppDict($dictId:ID!)
 }`);
 
 const mutationUpdateAppDictItem = gql(/* GraphQL */`mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){
-  updateAppDictItem(itemID:$itemId,input:$input){id}
+  updateAppDictItem(itemID:$itemId,input:$input){
+    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
+    org{ id,name }
+  }
 }`);
 
 const mutationCreateAppDictItem = gql(/* GraphQL */`mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){
-  createAppDictItem(dictID:$dictId,input:$input){ id }
+  createAppDictItem(dictID:$dictId,input:$input){
+    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
+    org{ id,name }
+  }
 }`);
 
 const mutationDelAppDictItem = gql(/* GraphQL */`mutation deleteAppDictItem($itemId:ID!){

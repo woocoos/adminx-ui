@@ -5,7 +5,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { getOrgPolicyList } from '@/services/adminx/org/policy';
 import { createPermission } from '@/services/adminx/permission';
 import { useTranslation } from 'react-i18next';
-import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/generated/adminx/graphql';
+import { OrgPolicy, OrgPolicyWhereInput, OrgRole, Permission, PermissionPrincipalKind, User } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
@@ -14,7 +14,7 @@ export default (props: {
   orgId: string;
   userInfo?: User;
   orgRoleInfo?: OrgRole;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: Permission) => void;
 }) => {
   const
     { t } = useTranslation(),
@@ -47,7 +47,6 @@ export default (props: {
     },
     onFinish = async () => {
       setSaveLoading(true);
-      let isTree = false;
       for (let idx in selectedDatas) {
         const item = selectedDatas[idx];
         if (props.orgRoleInfo) {
@@ -58,7 +57,9 @@ export default (props: {
             roleID: props.orgRoleInfo.id,
           });
           if (result?.id) {
-            isTree = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as Permission);
           }
         } else if (props.userInfo) {
           const result = await createPermission({
@@ -68,14 +69,11 @@ export default (props: {
             userID: props.userInfo.id,
           });
           if (result?.id) {
-            isTree = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as Permission);
           }
         }
-      }
-      if (isTree) {
-        message.success(t('submit_success'));
-        setSaveDisabled(true);
-        props.onClose(true);
       }
       setSaveLoading(false);
       return false;

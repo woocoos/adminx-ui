@@ -39,11 +39,17 @@ const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
 }`);
 
 const mutationUpdateApp = gql(/* GraphQL */`mutation updateApp($appId:ID!,$input: UpdateAppInput!){
-  updateApp(appID:$appId,input:$input){id}
+  updateApp(appID:$appId,input:$input){
+    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+    refreshTokenValidity,logo,comments,status,createdAt
+  }
 }`);
 
 const mutationCreateApp = gql(/* GraphQL */`mutation createApp($input: CreateAppInput!){
-  createApp(input:$input){ id }
+  createApp(input:$input){
+    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+    refreshTokenValidity,logo,comments,status,createdAt
+  }
 }`);
 
 const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){

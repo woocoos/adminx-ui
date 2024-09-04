@@ -59,7 +59,7 @@ export default () => {
         },
       },
     ],
-    [, setDataSource] = useState<AppRes[]>([]),
+    [dataSource, setDataSource] = useState<AppRes[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
     // 弹出层处理
@@ -86,25 +86,6 @@ export default () => {
       }
       return null;
     }
-  // onDel = (record: AppRes) => {
-  //   Modal.confirm({
-  //     title: t('delete'),
-  //     content: `${t('confirm_delete')}：${record.name}`,
-  //     onOk: async (close) => {
-  //       // 没有接口
-  //       // const result =
-  //       // if (result === true) {
-  //       //     if (dataSource.length === 1) {
-  //       //         const pageInfo = { ...proTableRef.current?.pageInfo }
-  //       //         pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1
-  //       //         proTableRef.current?.setPageInfo?.(pageInfo)
-  //       //     }
-  //       //     proTableRef.current?.reload();
-  //       //     close();
-  //       // }
-  //     },
-  //   });
-  // };
 
   return (
     <PageContainer
@@ -134,6 +115,7 @@ export default () => {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params) => {
           const table = { data: [] as AppRes[], success: true, total: 0 },
             where: AppResWhereInput = {},
@@ -167,8 +149,16 @@ export default () => {
           title={modal.title}
           id={modal.id}
           appId={appInfo?.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) { proTableRef.current?.reload(); }
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              const idx = dataSource.findIndex(item => item.id == newInfo.id)
+              if (idx === -1) {
+                dataSource.unshift(newInfo)
+              } else {
+                dataSource[idx] = newInfo
+              }
+              setDataSource([...dataSource])
+            }
             setModal({ open: false, title: modal.title, id: '' });
           }}
         />

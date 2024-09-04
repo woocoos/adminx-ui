@@ -31,7 +31,7 @@ export default (props: {
   userType: UserUserType;
   recycleInfo?: User;
   scene: UpdateUserInfoScene;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: User | UserLoginProfile) => void;
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
@@ -94,17 +94,21 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
+
       if (props.id) {
         if (props.scene === 'base') {
           const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}));
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as User);
           }
         } else if (props.scene === 'loginProfile') {
           const result = await updateUserProfile(props.id, updateFormat(values, initValues || {}));
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as UserLoginProfile);
           }
         }
       } else {
@@ -129,7 +133,9 @@ export default (props: {
             principalName: values.principalName,
           }, setKind, pwdInput);
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as User);
           }
         } else {
           let password: CreateUserPasswordInput | undefined;
@@ -154,15 +160,13 @@ export default (props: {
             password,
           }, props.userType);
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as User);
           }
         }
       }
-      if (isTrue) {
-        message.success(t('submit_success'));
-        setSaveDisabled(true);
-        props.onClose(true);
-      }
+
       setSaveLoading(false);
       return false;
     };

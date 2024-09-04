@@ -102,12 +102,15 @@ export const PageOrgPolicys = (props: {
         onOk: async (close) => {
           const result = await delOrgPolicy(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            const idx = dataSource.findIndex(item => item.id === record.id);
+            dataSource.splice(idx, 1);
+            setDataSource([...dataSource]);
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             message.success('submit_success');
             close();
           }
@@ -169,6 +172,7 @@ export const PageOrgPolicys = (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params, sort) => {
           const table = { data: [] as OrgPolicy[], success: true, total: 0 },
             where: OrgPolicyWhereInput = {},

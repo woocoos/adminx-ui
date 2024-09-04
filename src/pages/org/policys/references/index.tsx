@@ -67,12 +67,15 @@ export default (props: {
         onOk: async (close) => {
           const result = await delPermssion(record.id, record.orgID);
           if (result === true) {
-            if (dataSource.length === 1) {
+            const idx = dataSource.findIndex(item => item.id === record.id);
+            dataSource.splice(idx, 1);
+            setDataSource([...dataSource]);
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -113,6 +116,7 @@ export default (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as Permission[], success: true, total: 0 },
               orgPolicyId = searchParams.get('id');

@@ -39,13 +39,7 @@ export default (props: {
       }
       setLoading(false);
     }
-  },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        getRequest();
-      }
-      setModal({ open: false, title: '', scene: modal.scene });
-    };
+  };
 
   useEffect(() => {
     getRequest();
@@ -103,7 +97,12 @@ export default (props: {
           id={info.id}
           orgId={info.orgID || ''}
           kind={info.kind}
-          onClose={onDrawerClose}
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setInfo(newInfo);
+            }
+            setModal({ open: false, title: '', scene: modal.scene });
+          }}
         />) : ''}
       <ProCard
         tabs={{
