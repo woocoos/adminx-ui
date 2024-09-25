@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/auth';
-import { User, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { User, UserOrder, UserUserType, UserWhereInput, UserAddrAddrType } from '@/generated/adminx/graphql';
 import { Link } from '@ice/runtime';
 
 export default (props: {
@@ -34,6 +34,9 @@ export default (props: {
         search: {
           transform: (value) => ({ emailContains: value || undefined }),
         },
+        render: (text, record) => {
+          return <div>{record?.basicAddr?.email || '-'}</div>;
+        },
       },
       {
         title: t('mobile'),
@@ -41,6 +44,9 @@ export default (props: {
         width: 160,
         search: {
           transform: (value) => ({ mobileContains: value || undefined }),
+        },
+        render: (text, record) => {
+          return <div>{record?.basicAddr?.mobile || '-'}</div>;
         },
       },
       {
@@ -109,8 +115,11 @@ export default (props: {
           where: UserWhereInput = {};
         let orderBy: UserOrder | undefined;
         where.displayNameContains = params.displayNameContains;
-        where.emailContains = params.emailContains;
-        where.mobileContains = params.mobileContains;
+        where.hasAddrsWith = []
+        if (params.emailContains)
+          where.hasAddrsWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Basic })
+        if (params.mobileContains)
+          where.hasAddrsWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Basic })
         const result = await getRecycleUserList({
           current: params.current,
           pageSize: params.pageSize,

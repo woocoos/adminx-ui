@@ -212,9 +212,12 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
  * @param target   update对象
  * @param original 对比目标的原始数据
  */
-export const updateFormat = <T>(target: T, original: Record<string, any>) => {
+export const updateFormat = <T>(target: T, original: Record<string, any>, excludeTargetKey?: string[]) => {
   const ud: Record<string, any> = {};
   for (const key in target) {
+    if (excludeTargetKey && excludeTargetKey.includes(key)) {
+      continue;
+    }
     const tValue = target[key];
     if (tValue !== original[key]) {
       ud[key] = tValue;

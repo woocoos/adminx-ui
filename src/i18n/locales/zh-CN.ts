@@ -1,5 +1,9 @@
 export default {
   translation: {
+    gender: '性别',
+    privacy: '保密',
+    male: '男',
+    female: '女',
     verify: '验证',
     complete: '完成',
     success: '成功',
@@ -248,6 +252,7 @@ export default {
     please_enter_display_name: '请输入显示名称',
     please_enter_email: '请输入邮箱',
     please_enter_mobile: '请输入手机',
+    please_enter_gender: '请输入性别',
     please_enter_introduction: '请输入介绍',
     please_enter_name: '请输入名称',
     please_enter_type: '请输入类型',

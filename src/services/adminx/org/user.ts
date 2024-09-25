@@ -13,7 +13,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
         edges{
           cursor,node{
             id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-            email,mobile,userType,creationType,registerIP,status,comments
+            basicAddr{email,mobile},userType,creationType,registerIP,status,comments
           }
         }
       }
@@ -30,7 +30,7 @@ const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrg
         edges{
           cursor,node{
             id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-            email,mobile,userType,creationType,registerIP,status,comments
+            basicAddr{email,mobile},userType,creationType,registerIP,status,comments
             isAssignOrgRole(orgRoleID: $orgRoleId)
             isAllowRevokeRole(orgRoleID: $orgRoleId)
           }
@@ -46,7 +46,7 @@ const queryOrgRoleUserList = gql(/* GraphQL */`query orgRoleUserList($roleId: ID
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        basicAddr{email,mobile},userType,creationType,registerIP,status,comments
       }
     }
   }
@@ -58,7 +58,7 @@ const queryOrgRoleUserListAndIsOrgRole = gql(/* GraphQL */`query orgRoleUserList
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        basicAddr{email,mobile},userType,creationType,registerIP,status,comments
         isAssignOrgRole(orgRoleID: $orgRoleId)
         isAllowRevokeRole(orgRoleID: $orgRoleId)
       }

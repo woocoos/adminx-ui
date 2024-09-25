@@ -1,8 +1,9 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, UpdateUserAddrInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
+// TODO 如何使用i18
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
   email: { text: '邮件' },
@@ -41,7 +42,7 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments,avatar
+        basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
       }
     }
   }
@@ -50,8 +51,8 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
 const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatar
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
     }
   }
 }`);
@@ -59,8 +60,8 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
 const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatar
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -72,8 +73,8 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
 const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLoginProfileIdentities($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatar
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -88,8 +89,8 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
 const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,
       identities{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
       }
@@ -111,22 +112,22 @@ const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GI
 
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
   createOrganizationUser(rootOrgID:$rootOrgID,input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-    email,mobile,userType,creationType,registerIP,status,comments,avatar
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
    }
 }`);
 
 const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
   createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-    email,mobile,userType,creationType,registerIP,status,comments,avatar
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
   }
 }`);
 
-const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  updateUser(userID:$userId,input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-    email,mobile,userType,creationType,registerIP,status,comments,avatar
+const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!,$basicAddr: UpdateUserAddrInput!){
+  updateUser(userID:$userId,input:$input,basicAddr:$basicAddr){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
    }
 }`);
 
@@ -180,17 +181,17 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+        basicAddr{email,mobile},userType,creationType,registerIP,status,comments
       }
     }
   }
 }`);
 
-const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
-  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){
-    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-    email,mobile,userType,creationType,registerIP,status,comments,avatar
+const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$basicAddr: UpdateUserAddrInput!,$pwdInput: CreateUserPasswordInput){
+  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, basicAddr :$basicAddr, pwdInput: $pwdInput ){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
   }
 }`);
 
@@ -344,11 +345,12 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
  * @param input
  * @returns
  */
-export async function updateUserInfo(userId: string, input: UpdateUserInput) {
+export async function updateUserInfo(userId: string, input: UpdateUserInput, basicAddr: UpdateUserAddrInput) {
   const result = await mutation(
     mutationUpdateUser, {
     userId,
     input,
+    basicAddr,
   });
 
   if (result.data?.updateUser?.id) {
@@ -569,6 +571,7 @@ export async function getRecycleUserList(gather: {
 export async function restoreRecycleUser(
   userId: string,
   userInput: UpdateUserInput,
+  basicAddr: UpdateUserAddrInput,
   setKind: UserLoginProfileSetKind,
   pwdInput?: CreateUserPasswordInput,
 ) {
@@ -577,6 +580,7 @@ export async function restoreRecycleUser(
     userId,
     setKind,
     userInput,
+    basicAddr,
     pwdInput,
   });
 

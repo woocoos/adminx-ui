@@ -4,7 +4,7 @@ import { EnumUserStatus, getUserList } from '@/services/adminx/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { getOrgRoleUserList, getOrgUserList } from '@/services/adminx/org/user';
-import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput, UserAddrAddrType } from '@/generated/adminx/graphql';
 
 export default (props: {
   open: boolean;
@@ -42,6 +42,9 @@ export default (props: {
         search: {
           transform: (value) => ({ emailContains: value || undefined }),
         },
+        render: (text, record) => {
+          return <div>{record?.basicAddr?.email || '-'}</div>;
+        },
       },
       {
         title: t('mobile'),
@@ -49,6 +52,9 @@ export default (props: {
         width: 160,
         search: {
           transform: (value) => ({ mobileContains: value || undefined }),
+        },
+        render: (text, record) => {
+          return <div>{record?.basicAddr?.mobile || '-'}</div>;
         },
       },
       {
@@ -101,8 +107,11 @@ export default (props: {
           where.userType = props.userType;
           where.principalNameContains = params.principalNameContains;
           where.displayNameContains = params.displayNameContains;
-          where.emailContains = params.emailContains;
-          where.mobileContains = params.mobileContains;
+          where.hasAddrsWith = []
+          if (params.emailContains)
+            where.hasAddrsWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Basic })
+          if (params.mobileContains)
+            where.hasAddrsWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Basic })
           where.statusIn = filter.status as UserSimpleStatus[] | null;
           if (sort.createdAt) {
             orderBy = {

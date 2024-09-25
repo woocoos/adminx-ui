@@ -11,7 +11,7 @@ import ListUserJoinGroup from './components/listUserJoinGroup';
 import { Link, history, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
 import style from './index.module.css';
-import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType } from '@/generated/adminx/graphql';
+import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGender } from '@/generated/adminx/graphql';
 import AccessKey from './components/accessKey';
 import { parseStorageUrl } from '@knockout-js/api';
 
@@ -113,6 +113,16 @@ export default (props: {
       }
     };
 
+  const showGender = (gender: UserGender | undefined) => {
+    if (gender == UserGender.Female) {
+      return t('female');
+    } else if (gender == UserGender.Male) {
+      return t('male');
+    } else {
+      return t('privacy');
+    }
+  }
+
   useEffect(() => {
     getRequest();
   }, []);
@@ -174,12 +184,15 @@ export default (props: {
                 {info?.displayName}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('mobile')} >
-                {info?.mobile}
+                {info?.basicAddr?.mobile}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('email')}>
-                {info?.email}
+                {info?.basicAddr?.email}
               </ProDescriptions.Item>
-              <ProDescriptions.Item label={t('created_at')} valueType="dateTime" >
+              <ProDescriptions.Item label={t('gender')}>
+                {showGender(info?.gender)}
+              </ProDescriptions.Item>
+              <ProDescriptions.Item label={t('created_at')} valueType="dateTime" span={2}>
                 {info?.createdAt}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('introduction')} span={2} >

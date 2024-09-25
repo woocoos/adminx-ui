@@ -200,7 +200,7 @@ export const initStoreData = (store: IMockStore) => {
 
   // User
   store.set('User', 1, {
-    id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com",
+    id: 1, displayName: 'admin', userType: "account", basicAddr: { email: "admin@woocoo.com" },
     avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg',
     loginProfile: { mfaEnabled: false }
   })

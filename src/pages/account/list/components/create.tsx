@@ -1,14 +1,19 @@
-import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType } from '@/generated/adminx/graphql';
+import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType, UserGender } from '@/generated/adminx/graphql';
 import { getOrgInfo } from '@/services/adminx/org';
 import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/adminx/user';
 import store from '@/store';
-import { DrawerForm, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
+import { DrawerForm, ProFormText, ProFormTextArea, ProFormSwitch, ProFormSelect } from '@ant-design/pro-components';
 import { Alert, Radio, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
+
+type FormUser = User & {
+  email?: string | null;
+  mobile?: string | null;
+};
 
 type ProFormData = {
   principalName?: string;
@@ -37,7 +42,7 @@ export default (props: {
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
-    [initValues, setInitValues] = useState<User | UserLoginProfile | null>(null),
+    [initValues, setInitValues] = useState<FormUser | UserLoginProfile | null>(null),
     [domain, setDomain] = useState<string>(''),
     [setKind, setSetKind] = useState<UserLoginProfileSetKind>(UserLoginProfileSetKind.Auto),
     [userState] = store.useModel('user');
@@ -66,7 +71,7 @@ export default (props: {
       }
     },
     getRequest = async () => {
-      let info: User | UserLoginProfile | null = null;
+      let info: FormUser | UserLoginProfile | null = null;
       if (props.id) {
         const result = await getUserInfoLoginProfile(props.id);
         if (result?.id) {
@@ -75,11 +80,15 @@ export default (props: {
               info = result.loginProfile as UserLoginProfile;
             }
           } else {
-            info = result as User;
+            info = { ...result } as FormUser;
+            info.mobile = result.basicAddr?.mobile
+            info.email = result.basicAddr?.email
           }
         }
       } else if (props.scene === 'recycle' && props.recycleInfo) {
-        info = props.recycleInfo;
+        info = { ...props.recycleInfo };
+        info.mobile = props.recycleInfo.basicAddr?.mobile
+        info.email = props.recycleInfo.basicAddr?.email
         if (domain) {
           info.principalName = info.principalName.replace(`@${domain}`, '');
         }
@@ -97,7 +106,7 @@ export default (props: {
 
       if (props.id) {
         if (props.scene === 'base') {
-          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}));
+          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}, ["email", "mobile"]), updateFormat({ email: values.email, mobile: values.mobile }, (initValues as FormUser)?.basicAddr || {}));
           if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
@@ -128,9 +137,10 @@ export default (props: {
           const result = await restoreRecycleUser(props.recycleInfo.id, {
             comments: values.comments,
             displayName: values.displayName,
+            principalName: values.principalName,
+          }, {
             email: values.email,
             mobile: values.mobile,
-            principalName: values.principalName,
           }, setKind, pwdInput);
           if (result?.id) {
             message.success(t('submit_success'));
@@ -147,8 +157,10 @@ export default (props: {
             };
           }
           const result = await createUserInfo(props?.orgId || userState.tenantId, {
-            mobile: values.mobile,
-            email: values.email,
+            basicAddr: {
+              mobile: values.mobile,
+              email: values.email,
+            },
             principalName: values.principalName || '',
             displayName: values.displayName || '',
             comments: values.comments,
@@ -255,6 +267,23 @@ export default (props: {
           rules={[
             { required: true, message: `${t('please_enter_email')}` },
             { type: 'email', message: `${t('format_error')}` },
+          ]}
+        />
+        <ProFormSelect
+          name="gender"
+          width="lg"
+          label={t('gender')}
+          placeholder={`${t('please_enter_gender')}`}
+          options={[
+            { value: UserGender.Privacy, label: t('privacy') },
+            { value: UserGender.Male, label: t('male') },
+            { value: UserGender.Female, label: t('female') },
+          ]}
+          rules={[
+            {
+              required: true,
+              message: `${t('please_enter_gender')}`,
+            },
           ]}
         />
         <ProFormText name="mobile" label={t('mobile')} />

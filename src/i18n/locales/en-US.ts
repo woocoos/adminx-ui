@@ -1,5 +1,9 @@
 export default {
   translation: {
+    gender: 'gender',
+    privacy: 'privacy',
+    male: 'male',
+    female: 'female',
     verify: 'verify',
     complete: 'complete',
     success: 'success',
@@ -248,6 +252,7 @@ export default {
     please_enter_display_name: 'Please enter a display name',
     please_enter_email: 'Please enter email',
     please_enter_mobile: 'Please enter mobile phone',
+    please_enter_gender: 'Please enter mobile gender',
     please_enter_introduction: 'Please enter introduction',
     please_enter_name: 'Please enter name',
     please_enter_type: 'Please enter type',
