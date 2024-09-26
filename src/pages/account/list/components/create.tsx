@@ -81,14 +81,14 @@ export default (props: {
             }
           } else {
             info = { ...result } as FormUser;
-            info.mobile = result.basicAddr?.mobile
-            info.email = result.basicAddr?.email
+            info.mobile = result.contact?.mobile
+            info.email = result.contact?.email
           }
         }
       } else if (props.scene === 'recycle' && props.recycleInfo) {
         info = { ...props.recycleInfo };
-        info.mobile = props.recycleInfo.basicAddr?.mobile
-        info.email = props.recycleInfo.basicAddr?.email
+        info.mobile = props.recycleInfo.contact?.mobile
+        info.email = props.recycleInfo.contact?.email
         if (domain) {
           info.principalName = info.principalName.replace(`@${domain}`, '');
         }
@@ -106,7 +106,7 @@ export default (props: {
 
       if (props.id) {
         if (props.scene === 'base') {
-          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}, ["email", "mobile"]), updateFormat({ email: values.email, mobile: values.mobile }, (initValues as FormUser)?.basicAddr || {}));
+          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}, ["email", "mobile"]), updateFormat({ email: values.email, mobile: values.mobile }, (initValues as FormUser)?.contact || {}));
           if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
@@ -157,7 +157,7 @@ export default (props: {
             };
           }
           const result = await createUserInfo(props?.orgId || userState.tenantId, {
-            basicAddr: {
+            contact: {
               mobile: values.mobile,
               email: values.email,
             },

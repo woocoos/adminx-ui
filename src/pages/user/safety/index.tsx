@@ -63,7 +63,7 @@ export default () => {
         }
       >
         <ProDescriptions.Item label={t('email')}>
-          {info?.basicAddr?.email}
+          {info?.contact?.email}
         </ProDescriptions.Item>
       </ProDescriptions>
       <Divider />

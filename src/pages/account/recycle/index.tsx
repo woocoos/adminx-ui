@@ -35,7 +35,7 @@ export default (props: {
           transform: (value) => ({ emailContains: value || undefined }),
         },
         render: (text, record) => {
-          return <div>{record?.basicAddr?.email || '-'}</div>;
+          return <div>{record?.contact?.email || '-'}</div>;
         },
       },
       {
@@ -46,7 +46,7 @@ export default (props: {
           transform: (value) => ({ mobileContains: value || undefined }),
         },
         render: (text, record) => {
-          return <div>{record?.basicAddr?.mobile || '-'}</div>;
+          return <div>{record?.contact?.mobile || '-'}</div>;
         },
       },
       {
@@ -115,11 +115,11 @@ export default (props: {
           where: UserWhereInput = {};
         let orderBy: UserOrder | undefined;
         where.displayNameContains = params.displayNameContains;
-        where.hasAddrsWith = []
+        where.hasAddressesWith = []
         if (params.emailContains)
-          where.hasAddrsWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Basic })
+          where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
         if (params.mobileContains)
-          where.hasAddrsWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Basic })
+          where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
         const result = await getRecycleUserList({
           current: params.current,
           pageSize: params.pageSize,

@@ -42,7 +42,7 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+        contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
       }
     }
   }
@@ -52,7 +52,7 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
     }
   }
 }`);
@@ -61,7 +61,7 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -74,7 +74,7 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -90,7 +90,7 @@ const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:
   node(id:$gid){
     ... on User {
       id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-      basicAddr{email,mobile},userType,creationType,registerIP,status,comments,
+      contact{email,mobile},userType,creationType,registerIP,status,comments,
       identities{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
       }
@@ -113,21 +113,21 @@ const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GI
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
   createOrganizationUser(rootOrgID:$rootOrgID,input:$input){
     id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
    }
 }`);
 
 const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
   createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){
     id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
   }
 }`);
 
-const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!,$basicAddr: UpdateUserAddrInput!){
-  updateUser(userID:$userId,input:$input,basicAddr:$basicAddr){
+const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!,$contact: UpdateUserAddrInput!){
+  updateUser(userID:$userId,input:$input,contact:$contact){
     id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
    }
 }`);
 
@@ -182,16 +182,16 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-        basicAddr{email,mobile},userType,creationType,registerIP,status,comments
+        contact{email,mobile},userType,creationType,registerIP,status,comments
       }
     }
   }
 }`);
 
-const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$basicAddr: UpdateUserAddrInput!,$pwdInput: CreateUserPasswordInput){
-  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, basicAddr :$basicAddr, pwdInput: $pwdInput ){
+const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$contact: UpdateUserAddrInput!,$pwdInput: CreateUserPasswordInput){
+  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, contact :$contact, pwdInput: $pwdInput ){
     id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
-    basicAddr{email,mobile},userType,creationType,registerIP,status,comments,avatar
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
   }
 }`);
 
@@ -345,12 +345,12 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
  * @param input
  * @returns
  */
-export async function updateUserInfo(userId: string, input: UpdateUserInput, basicAddr: UpdateUserAddrInput) {
+export async function updateUserInfo(userId: string, input: UpdateUserInput, contact: UpdateUserAddrInput) {
   const result = await mutation(
     mutationUpdateUser, {
     userId,
     input,
-    basicAddr,
+    contact,
   });
 
   if (result.data?.updateUser?.id) {
@@ -571,7 +571,7 @@ export async function getRecycleUserList(gather: {
 export async function restoreRecycleUser(
   userId: string,
   userInput: UpdateUserInput,
-  basicAddr: UpdateUserAddrInput,
+  contact: UpdateUserAddrInput,
   setKind: UserLoginProfileSetKind,
   pwdInput?: CreateUserPasswordInput,
 ) {
@@ -580,7 +580,7 @@ export async function restoreRecycleUser(
     userId,
     setKind,
     userInput,
-    basicAddr,
+    contact,
     pwdInput,
   });
 

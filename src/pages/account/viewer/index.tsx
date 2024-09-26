@@ -184,10 +184,10 @@ export default (props: {
                 {info?.displayName}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('mobile')} >
-                {info?.basicAddr?.mobile}
+                {info?.contact?.mobile}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('email')}>
-                {info?.basicAddr?.email}
+                {info?.contact?.email}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('gender')}>
                 {showGender(info?.gender)}

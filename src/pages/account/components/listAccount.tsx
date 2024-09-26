@@ -60,7 +60,7 @@ export const UserList = (props: {
           transform: (value) => ({ emailContains: value || undefined }),
         },
         render: (text, record) => {
-          return <div>{record?.basicAddr?.email || '-'}</div>;
+          return <div>{record?.contact?.email || '-'}</div>;
         },
       },
       {
@@ -71,7 +71,7 @@ export const UserList = (props: {
           transform: (value) => ({ mobileContains: value || undefined }),
         },
         render: (text, record) => {
-          return <div>{record?.basicAddr?.mobile || '-'}</div>;
+          return <div>{record?.contact?.mobile || '-'}</div>;
         },
       },
       {
@@ -343,11 +343,11 @@ export const UserList = (props: {
               where.userType = props.userType;
               where.principalNameContains = params.principalNameContains;
               where.displayNameContains = params.displayNameContains;
-              where.hasAddrsWith = []
+              where.hasAddressesWith = []
               if (params.emailContains)
-                where.hasAddrsWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Basic })
+                where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
               if (params.mobileContains)
-                where.hasAddrsWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Basic })
+                where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
               where.statusIn = filter.status as UserSimpleStatus[] | null;
               if (sort.createdAt) {
                 orderBy = {
@@ -448,11 +448,11 @@ export const UserList = (props: {
                 where.userType = props.userType;
                 where.principalNameContains = params.principalNameContains;
                 where.displayNameContains = params.displayNameContains;
-                where.hasAddrsWith = []
+                where.hasAddressesWith = []
                 if (params.emailContains)
-                  where.hasAddrsWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Basic })
+                  where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
                 if (params.mobileContains)
-                  where.hasAddrsWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Basic })
+                  where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
                 where.statusIn = filter.status as UserSimpleStatus[] | null;
                 if (sort.createdAt) {
                   orderBy = {

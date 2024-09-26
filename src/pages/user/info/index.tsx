@@ -53,7 +53,7 @@ export default () => {
         const result = await updateUserInfo(
           userState.user.id,
           updateFormat(values, userInfo || {}, ["email", "mobile"]),
-          updateFormat({ email: values.email, mobile: values.mobile }, userInfo?.basicAddr || {}),
+          updateFormat({ email: values.email, mobile: values.mobile }, userInfo?.contact || {}),
         );
         if (result?.id) {
           message.success(t('submit_success'));
@@ -69,8 +69,8 @@ export default () => {
   const toFormUser = (user: User) => {
     return {
       ...user,
-      email: user.basicAddr?.email,
-      mobile: user.basicAddr?.mobile,
+      email: user.contact?.email,
+      mobile: user.contact?.mobile,
     } as FormUser;
   }
 
