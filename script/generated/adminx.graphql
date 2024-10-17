@@ -3,9 +3,6 @@ schema {
   mutation: Mutation
 }
 
-"The @defer directive may be specified on a fragment spread to imply de-prioritization, that causes the fragment to be omitted in the initial response, and delivered as a subsequent response afterward. A query with @defer directive will cause the request to potentially return multiple responses, where non-deferred data is delivered in the initial response and data deferred delivered in a subsequent response. @include and @skip take precedence over @defer."
-directive @defer(if: Boolean = true, label: String) on FRAGMENT_SPREAD | INLINE_FRAGMENT
-
 directive @goField(forceResolver: Boolean, name: String, omittable: Boolean) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
 
 directive @goModel(forceGenerate: Boolean, model: String, models: [String!]) on ENUM | INPUT_OBJECT | INTERFACE | OBJECT | SCALAR | UNION
@@ -166,7 +163,7 @@ type AppActionEdge {
 }
 
 """AppActionKind is enum for the field kind"""
-enum AppActionKind {
+enum AppActionKind @goModel(model: "github.com/woocoos/knockout/ent/appaction.Kind") {
   function
   graphql
   restful
@@ -175,7 +172,7 @@ enum AppActionKind {
 }
 
 """AppActionMethod is enum for the field method"""
-enum AppActionMethod {
+enum AppActionMethod @goModel(model: "github.com/woocoos/knockout/ent/appaction.Method") {
   list
   read
   write
@@ -376,7 +373,7 @@ enum AppDictItemOrderField {
 }
 
 """AppDictItemSimpleStatus is enum for the field status"""
-enum AppDictItemSimpleStatus {
+enum AppDictItemSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -619,7 +616,7 @@ type AppEdge {
 }
 
 """AppKind is enum for the field kind"""
-enum AppKind {
+enum AppKind @goModel(model: "github.com/woocoos/knockout/ent/app.Kind") {
   native
   server
   web
@@ -672,7 +669,7 @@ type AppMenuEdge {
 }
 
 """AppMenuKind is enum for the field kind"""
-enum AppMenuKind {
+enum AppMenuKind @goModel(model: "github.com/woocoos/knockout/ent/appmenu.Kind") {
   dir
   menu
 }
@@ -892,7 +889,7 @@ enum AppPolicyOrderField {
 }
 
 """AppPolicySimpleStatus is enum for the field status"""
-enum AppPolicySimpleStatus {
+enum AppPolicySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -1384,7 +1381,7 @@ input AppRoleWhereInput {
 }
 
 """AppSimpleStatus is enum for the field status"""
-enum AppSimpleStatus {
+enum AppSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -1675,7 +1672,7 @@ enum CountryOrderField {
 }
 
 """CountrySimpleStatus is enum for the field status"""
-enum CountrySimpleStatus {
+enum CountrySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -2519,7 +2516,7 @@ type FileSourceEdge {
 }
 
 """FileSourceKind is enum for the field kind"""
-enum FileSourceKind {
+enum FileSourceKind @goModel(model: "github.com/woocoos/knockout/ent/filesource.Kind") {
   aliOSS
   awsS3
   minio
@@ -2715,6 +2712,8 @@ type Mutation {
   assignRoleUser(input: AssignRoleUserInput!): Boolean!
   """绑定用户凭证(管理端使用)"""
   bindUserIdentity(input: CreateUserIdentityInput!): UserIdentity
+  """更改组织用户类型"""
+  changeOrgUserType(userID: ID!, userType: OrgUserUserType!): Boolean!
   """用户修改自己的登录密码"""
   changePassword(newPwd: String!, oldPwd: String!): Boolean!
   """创建应用"""
@@ -2752,6 +2751,8 @@ type Mutation {
   """创建组织用户"""
   createOrganizationUser(
     input: CreateUserInput!
+    """用户类型"""
+    orgUserType: OrgUserUserType
     """根组织ID"""
     rootOrgID: ID!
   ): User
@@ -2910,7 +2911,7 @@ type Mutation {
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
 """
-interface Node {
+interface Node @goModel(model: "github.com/woocoos/knockout/ent.Noder") {
   """The id of the object."""
   id: ID!
 }
@@ -2939,7 +2940,7 @@ type OauthClient implements Node {
 }
 
 """OauthClientGrantTypes is enum for the field grant_types"""
-enum OauthClientGrantTypes {
+enum OauthClientGrantTypes @goModel(model: "github.com/woocoos/knockout/ent/oauthclient.GrantTypes") {
   client_credentials
 }
 
@@ -2957,7 +2958,7 @@ enum OauthClientOrderField {
 }
 
 """OauthClientSimpleStatus is enum for the field status"""
-enum OauthClientSimpleStatus {
+enum OauthClientSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -3206,7 +3207,7 @@ type OrgFileIdentity {
 }
 
 """OrgKind is enum for the field kind"""
-enum OrgKind {
+enum OrgKind @goModel(model: "github.com/woocoos/knockout/ent/org.Kind") {
   org
   root
 }
@@ -3432,7 +3433,7 @@ type OrgRoleEdge {
 }
 
 """OrgRoleKind is enum for the field kind"""
-enum OrgRoleKind {
+enum OrgRoleKind @goModel(model: "github.com/woocoos/knockout/ent/orgrole.Kind") {
   group
   role
 }
@@ -3627,7 +3628,7 @@ input OrgRoleWhereInput {
 }
 
 """OrgSimpleStatus is enum for the field status"""
-enum OrgSimpleStatus {
+enum OrgSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -3779,7 +3780,7 @@ input OrgUserPreferenceWhereInput {
 }
 
 """OrgUserUserType is enum for the field user_type"""
-enum OrgUserUserType {
+enum OrgUserUserType @goModel(model: "github.com/woocoos/knockout/ent/orguser.UserType") {
   external
   internal
 }
@@ -4166,13 +4167,13 @@ enum PermissionOrderField {
 }
 
 """PermissionPrincipalKind is enum for the field principal_kind"""
-enum PermissionPrincipalKind {
+enum PermissionPrincipalKind @goModel(model: "github.com/woocoos/knockout/ent/permission.PrincipalKind") {
   role
   user
 }
 
 """PermissionSimpleStatus is enum for the field status"""
-enum PermissionSimpleStatus {
+enum PermissionSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -4328,6 +4329,8 @@ input PolicyRuleInput {
 }
 
 type Query {
+  """成员列表"""
+  UserMembers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """检测应用登录授权"""
   appAccess(appCode: String!): Boolean!
   """根据ref_code获取数据字典,用于批量获取"""
@@ -4385,6 +4388,8 @@ type Query {
     """appCode + ":" + action"""
     permission: String!
   ): Boolean!
+  """检测权限 ko-proxy使用"""
+  checkPermissionByJwt(action: String!, appCode: String!, jwtStr: String!, orgID: ID!): Boolean!
   """国家查询"""
   countries(
     """Returns the elements in the list that come after the specified cursor."""
@@ -4590,7 +4595,7 @@ enum RegionOrderField {
 }
 
 """RegionSimpleStatus is enum for the field status"""
-enum RegionSimpleStatus {
+enum RegionSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5400,7 +5405,7 @@ type UserAddr implements Node {
 }
 
 """UserAddrAddrType is enum for the field addr_type"""
-enum UserAddrAddrType {
+enum UserAddrAddrType @goModel(model: "github.com/woocoos/knockout/ent/useraddr.AddrType") {
   contact
   delivery
 }
@@ -5628,7 +5633,7 @@ type UserConnection {
 }
 
 """UserCreationType is enum for the field creation_type"""
-enum UserCreationType {
+enum UserCreationType @goModel(model: "github.com/woocoos/knockout/ent/user.CreationType") {
   invitation
   manual
   register
@@ -5669,7 +5674,7 @@ enum UserDeviceOrderField {
 }
 
 """UserDeviceSimpleStatus is enum for the field status"""
-enum UserDeviceSimpleStatus {
+enum UserDeviceSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -5855,7 +5860,7 @@ type UserEdge {
 }
 
 """UserGender is enum for the field gender"""
-enum UserGender {
+enum UserGender @goModel(model: "github.com/woocoos/knockout/ent/user.Gender") {
   female
   male
   privacy
@@ -5880,7 +5885,7 @@ type UserIdentity implements Node {
 }
 
 """UserIdentityKind is enum for the field kind"""
-enum UserIdentityKind {
+enum UserIdentityKind @goModel(model: "github.com/woocoos/knockout/ent/useridentity.Kind") {
   email
   name
   phone
@@ -5902,7 +5907,7 @@ enum UserIdentityOrderField {
 }
 
 """UserIdentitySimpleStatus is enum for the field status"""
-enum UserIdentitySimpleStatus {
+enum UserIdentitySimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -6061,14 +6066,14 @@ enum UserLoginProfileOrderField {
 }
 
 """UserLoginProfileSetKind is enum for the field set_kind"""
-enum UserLoginProfileSetKind {
+enum UserLoginProfileSetKind @goModel(model: "github.com/woocoos/knockout/ent/userloginprofile.SetKind") {
   auto
   customer
   keep
 }
 
 """UserLoginProfileSimpleStatus is enum for the field mfa_status"""
-enum UserLoginProfileSimpleStatus {
+enum UserLoginProfileSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -6215,12 +6220,12 @@ enum UserPasswordOrderField {
 }
 
 """UserPasswordScene is enum for the field scene"""
-enum UserPasswordScene {
+enum UserPasswordScene @goModel(model: "github.com/woocoos/knockout/ent/userpassword.Scene") {
   login
 }
 
 """UserPasswordSimpleStatus is enum for the field status"""
-enum UserPasswordSimpleStatus {
+enum UserPasswordSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -6309,7 +6314,7 @@ input UserPasswordWhereInput {
 }
 
 """UserSimpleStatus is enum for the field status"""
-enum UserSimpleStatus {
+enum UserSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
   active
   disabled
   inactive
@@ -6317,7 +6322,7 @@ enum UserSimpleStatus {
 }
 
 """UserUserType is enum for the field user_type"""
-enum UserUserType {
+enum UserUserType @goModel(model: "github.com/woocoos/knockout/ent/user.UserType") {
   account
   member
 }

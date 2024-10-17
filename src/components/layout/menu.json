@@ -67,6 +67,10 @@
       {
         "name": "数据字典",
         "path": "/dict"
+      },
+      {
+        "name": "国家地区",
+        "path": "system/country"
       }
     ]
   }

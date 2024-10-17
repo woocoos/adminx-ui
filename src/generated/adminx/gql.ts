@@ -50,6 +50,18 @@ const documents = {
     "mutation delAppRole($appRoleId:ID!){\n  deleteAppRole(roleID: $appRoleId)\n}": types.DelAppRoleDocument,
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
+    "query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}": types.CountryListDocument,
+    "query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}": types.CountryInfoDocument,
+    "mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}": types.UpdateCountryDocument,
+    "mutation createCountry($input: CreateCountryInput!){\n  createCountry(input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}": types.CreateCountryDocument,
+    "mutation delCountry($countryId:ID!){\n  deleteCountry(countryID: $countryId)\n}": types.DelCountryDocument,
+    "mutation moveCountry($action:ListAction!,$sourceId:ID!,$targetId:ID!){\n  moveCountry(action: $action,sourceID:$sourceId,targetId:$targetId)\n}": types.MoveCountryDocument,
+    "query regionList($first: Int,$orderBy:RegionOrder,$where:RegionWhereInput){\n  regions(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n      }\n    }\n  }\n}": types.RegionListDocument,
+    "query regionInfo($gid:GID!){\n  node(id:$gid){\n    ... on Region{\n      id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n    }\n  }\n}": types.RegionInfoDocument,
+    "mutation updateRegion($regionId:ID!,$input: UpdateRegionInput!){\n  updateRegion(regionID:$regionId,input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}": types.UpdateRegionDocument,
+    "mutation createRegion($input: CreateRegionInput!){\n  createRegion(input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}": types.CreateRegionDocument,
+    "mutation delRegion($regionId:ID!){\n  deleteRegion(regionID: $regionId)\n}": types.DelRegionDocument,
+    "mutation moveRegion($action:TreeAction!,$sourceId:ID!,$targetId:ID!){\n  moveRegion(action: $action,sourceID:$sourceId,targetId:$targetId)\n}": types.MoveRegionDocument,
     "query appDictList($first: Int,$orderBy:AppDictOrder,$where:AppDictWhereInput){\n  appDicts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n        app{id,name}\n      }\n    }\n  }\n}": types.AppDictListDocument,
     "query appDictInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       app{id,name}\n     }\n   }\n }": types.AppDictInfoDocument,
     "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{ id,name }\n       }\n     }\n   }\n }": types.AppDictItemListDocument,
@@ -315,6 +327,54 @@ export function gql(source: "mutation assignAppRolePolicy($appId:ID!,$appRoleId:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"): (typeof documents)["mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}"): (typeof documents)["query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}"): (typeof documents)["mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createCountry($input: CreateCountryInput!){\n  createCountry(input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}"): (typeof documents)["mutation createCountry($input: CreateCountryInput!){\n  createCountry(input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delCountry($countryId:ID!){\n  deleteCountry(countryID: $countryId)\n}"): (typeof documents)["mutation delCountry($countryId:ID!){\n  deleteCountry(countryID: $countryId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation moveCountry($action:ListAction!,$sourceId:ID!,$targetId:ID!){\n  moveCountry(action: $action,sourceID:$sourceId,targetId:$targetId)\n}"): (typeof documents)["mutation moveCountry($action:ListAction!,$sourceId:ID!,$targetId:ID!){\n  moveCountry(action: $action,sourceID:$sourceId,targetId:$targetId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query regionList($first: Int,$orderBy:RegionOrder,$where:RegionWhereInput){\n  regions(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query regionList($first: Int,$orderBy:RegionOrder,$where:RegionWhereInput){\n  regions(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query regionInfo($gid:GID!){\n  node(id:$gid){\n    ... on Region{\n      id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n    }\n  }\n}"): (typeof documents)["query regionInfo($gid:GID!){\n  node(id:$gid){\n    ... on Region{\n      id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateRegion($regionId:ID!,$input: UpdateRegionInput!){\n  updateRegion(regionID:$regionId,input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}"): (typeof documents)["mutation updateRegion($regionId:ID!,$input: UpdateRegionInput!){\n  updateRegion(regionID:$regionId,input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createRegion($input: CreateRegionInput!){\n  createRegion(input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}"): (typeof documents)["mutation createRegion($input: CreateRegionInput!){\n  createRegion(input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delRegion($regionId:ID!){\n  deleteRegion(regionID: $regionId)\n}"): (typeof documents)["mutation delRegion($regionId:ID!){\n  deleteRegion(regionID: $regionId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation moveRegion($action:TreeAction!,$sourceId:ID!,$targetId:ID!){\n  moveRegion(action: $action,sourceID:$sourceId,targetId:$targetId)\n}"): (typeof documents)["mutation moveRegion($action:TreeAction!,$sourceId:ID!,$targetId:ID!){\n  moveRegion(action: $action,sourceID:$sourceId,targetId:$targetId)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

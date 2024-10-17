@@ -51,6 +51,7 @@ export default {
     department: '部门',
     version: '版本',
     name: '名称',
+    name_en: '英文名称',
     code: '编码',
     user: '用户',
     description: '描述',
@@ -87,6 +88,7 @@ export default {
     back: '返回',
     proof: '凭证',
     default: '默认',
+    region: '地区',
     401: '登录过期',
     403: '无访问权限',
     404: '找不到方法',
@@ -207,6 +209,8 @@ export default {
     create_app_dict_item: '创建数据字典明细',
     edit_app_dict_item: '编辑数据字典明细',
     set_default: '设置默认',
+    country_region_title: '国家地区',
+    zip_code: '邮政编码',
 
     // 创建
     create_user: '创建用户',
@@ -219,6 +223,7 @@ export default {
     create_org: '创建组织',
     create_user_group: '创建用户组',
     create_file_source: '创建文件来源',
+    create_country: '创建国家',
     // 修改
     'amend_{{field}}': '修改{{field}}',
     amend_basic_info: '修改基本信息',
@@ -237,6 +242,8 @@ export default {
     auth_org_list: '授权组织列表',
     file_source_list: '文件来源列表',
     file_source_identity_list: '文件来源凭证列表',
+    country_list: '国家列表',
+    region_list: '地区列表',
     // 详情
     account_detail: '账户详情',
     member_detail: '成员详情',
@@ -288,6 +295,7 @@ export default {
     please_enter_file_source_region: '请输入Region',
     please_enter_file_source_endpoint: '请输入Endpoint',
     please_enter_file_source_sts_endpoint: '请输入Sts Endpoint',
+    please_enter_zip_code: '请输入邮政编码',
     // 添加
     add: '添加',
     add_resources: '添加资源',
@@ -311,6 +319,7 @@ export default {
     manage_system: '管理系统',
     department_manage: '部门管理',
     user_manage: '用户管理',
+    region_manage: '地区管理',
 
     'file_size_<_{{str}}': '文件必须小于{{str}}',
     '{{num}}_operations': '{{num}}个操作',

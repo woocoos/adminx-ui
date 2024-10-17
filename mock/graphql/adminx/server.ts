@@ -67,6 +67,8 @@ const schemaWithMocks = addMocksToSchema({
     Query: {
       appAccess: () => true,
       apps: relayStylePaginationMock(store),
+      countries: relayStylePaginationMock(store),
+      regions: relayStylePaginationMock(store),
       organizations: (_, { where }) => {
         if (where.kind === 'org') {
           return listTemp([
@@ -211,7 +213,51 @@ const schemaWithMocks = addMocksToSchema({
       updateAppMenu: (_, { menuID, input }) => {
         store.set('AppMenu', menuID, input)
         return store.get('AppMenu', menuID)
-      }
+      },
+      deleteCountry: (_, { countryID }) => {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'countries') as Ref,
+          countryID,
+        )
+        return true
+      },
+      createCountry: (_, { input }) => {
+        const data = input
+        data.id = `${Date.now()}`
+        store.set('Country', data.id, data)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'countries') as Ref,
+          store.get('Country', input.id) as Ref
+        )
+      },
+      updateCountry: (_, { countryID, input }) => {
+        store.set('Country', countryID, input)
+        return store.get('Country', countryID)
+      },
+      deleteRegion: (_, { regionID }) => {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'regions') as Ref,
+          regionID,
+        )
+        return true
+      },
+      createRegion: (_, { input }) => {
+        const data = input
+        data.id = `${Date.now()}`
+        store.set('Region', data.id, data)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'regions') as Ref,
+          store.get('Region', input.id) as Ref
+        )
+      },
+      updateRegion: (_, { regionID, input }) => {
+        store.set('Region', regionID, input)
+        return store.get('Region', regionID)
+      },
     }
   }
 })

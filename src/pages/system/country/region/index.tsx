@@ -1,32 +1,34 @@
+
 import { PageContainer, ProCard, useToken, ProForm, ProFormText, ProFormSelect, ProFormTextArea, ProFormInstance } from '@ant-design/pro-components';
 import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, saveTreeData } from '@/util';
-import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
-import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/generated/adminx/graphql';
-import { getAppInfo } from '@/services/adminx/app';
 import { useLeavePrompt } from '@knockout-js/layout';
-
+import { Country, Region, RegionSimpleStatus, UpdateRegionInput } from '@/generated/adminx/graphql';
+import { getCountryInfo } from '@/services/adminx/country';
+import { createRegionInfo, delRegionInfo, getRegionList, moveRegionInfo, updateRegionInfo } from '@/services/adminx/country/region';
 
 type TreeSelectedData = {
   keys: Array<string>;
   action: TreeEditorAction;
-  info?: AppMenu;
+  info?: Region;
 };
 
 type ProFormData = {
+  countryID: string;
+  parentID: string;
   name: string;
-  kind: AppMenuKind;
-  icon?: string;
-  route?: string;
-  comments?: string;
-};
+  nameEn?: string;
+  shortCode?: string;
+  status?: RegionSimpleStatus;
+  zipCode?: string;
+}
 
 export default () => {
   const { token } = useToken(),
@@ -37,16 +39,16 @@ export default () => {
     id = searchParams.get('id'),
     [loading, setLoading] = useState(false),
     [treeDraggable, setTreeDraggable] = useState(false),
-    [appInfo, setAppInfo] = useState<App>(),
-    [menus, setMenus] = useState<AppMenu[]>([]),
-    [treeData, setTreeData] = useState<TreeDataState<AppMenu>[]>([]),
+    [countryInfo, setCountryInfo] = useState<Country>(),
+    [dataSource, setDataSource] = useState<Region[]>([]),
+    [treeData, setTreeData] = useState<TreeDataState<Region>[]>([]),
     [selectedTree, setSelectedTree] = useState<TreeSelectedData>({
       keys: [],
       info: undefined,
       action: 'editor',
     }),
     [actionTitle, setActionTitle] = useState<string>(''),
-    [, setFormFieldsValue] = useState<AppMenu>(),
+    [, setFormFieldsValue] = useState<Region>(),
     [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -56,9 +58,9 @@ export default () => {
   }, [saveDisabled]);
 
   const
-    customerTitleRender = (nodeData: TreeDataState<AppMenu>) => {
+    customerTitleRender = (nodeData: TreeDataState<Region>) => {
       const items: ItemType[] = [];
-      if (checkAuth('createAppMenus', auth)) {
+      if (checkAuth('createRegion', auth)) {
         items.push({
           key: 'create',
           label: t('created'),
@@ -86,7 +88,7 @@ export default () => {
           ],
         });
       }
-      if (checkAuth('deleteAppMenu', auth)) {
+      if (checkAuth('deleteRegion', auth)) {
         items.push({
           key: 'deo',
           label: <a onClick={() => {
@@ -116,21 +118,24 @@ export default () => {
         if (isInit) {
           setLoading(true);
         }
-        const appResult = await getAppInfo(id);
-        if (appResult?.id) {
-          setAppInfo(appResult as App);
-          const result = await getAppMenus(appResult.id, {
+        const countryResult = await getCountryInfo(id);
+        if (countryResult?.id) {
+          setCountryInfo(countryResult as Country);
+          const result = await getRegionList({
+            where: {
+              countryID: countryResult.id,
+            },
             pageSize: 9999,
           });
           if (result?.totalCount) {
-            const menuList = result.edges?.map(item => item?.node) as AppMenu[];
-            setMenus(menuList);
+            const list = result.edges?.map(item => item?.node) as Region[];
+            setDataSource(list);
             setTreeData(
               formatTreeData(
-                menuList.map(item => ({
+                list.map(item => ({
                   key: item.id,
-                  title: item.name,
-                  parentId: item.parentID,
+                  title: item.name ?? '',
+                  parentId: item.parentID ?? '',
                   node: item,
                 })),
               ),
@@ -141,31 +146,31 @@ export default () => {
       }
     },
     onSearch = (keyword: string) => {
-      const menuInfo = menus.find(item => item.name.indexOf(keyword) > -1);
-      if (menuInfo) {
-        editorMenuAction(menuInfo, 'editor');
+      const info = dataSource.find(item => (item.name ?? '').indexOf(keyword) > -1);
+      if (info) {
+        editorMenuAction(info, 'editor');
       }
     },
     onTreeSelect = (_selectedKeys, selectedEvent) => {
       editorMenuAction(selectedEvent.node.node, 'editor');
     },
-    editorMenuAction = (menuInfo: AppMenu | undefined, action: TreeEditorAction) => {
-      if (menuInfo) {
+    editorMenuAction = (info: Region | undefined, action: TreeEditorAction) => {
+      if (info) {
         let title = '';
-        setSelectedTree({ keys: [menuInfo.id], info: menuInfo, action: action });
+        setSelectedTree({ keys: [info.id], info: info, action: action });
         switch (action) {
           case 'editor':
-            title = `${t('edit')}-${menuInfo.name}`;
-            setFormFieldsValue(menuInfo);
-            formRef.current?.setFieldsValue(menuInfo);
+            title = `${t('edit')}-${info.name}`;
+            setFormFieldsValue(info);
+            formRef.current?.setFieldsValue(info);
             break;
           case 'peer':
-            title = `${t('created')}-${menuInfo.name}-${t('same_level')}`;
+            title = `${t('created')}-${info.name}-${t('same_level')}`;
             setFormFieldsValue(undefined);
             formRef.current?.resetFields();
             break;
           case 'child':
-            title = `${t('created')}-${menuInfo.name}-${t('sublayer')}`;
+            title = `${t('created')}-${info.name}-${t('sublayer')}`;
             setFormFieldsValue(undefined);
             formRef.current?.resetFields();
             break;
@@ -182,20 +187,20 @@ export default () => {
     onTreeDrop = async (dragInfo) => {
       const { sourceId, targetId, action } = getTreeDropData(treeData, dragInfo);
 
-      const result = await moveAppMenu(sourceId, targetId, action);
+      const result = await moveRegionInfo(action, sourceId, targetId);
       if (result) {
         await getMenusRequest();
       }
     },
-    onDelMenu = (menuInfo: AppMenu) => {
+    onDelMenu = (info: Region) => {
       Modal.confirm({
         title: t('delete'),
-        content: `${t('confirm_delete')}：${menuInfo.name}`,
+        content: `${t('confirm_delete')}：${info.name}`,
         onOk: async (close) => {
-          const result = await delAppMenu(menuInfo.id);
+          const result = await delRegionInfo(info.id);
           if (result) {
             editorMenuAction(undefined, 'editor');
-            delTreeData(treeData, menuInfo.id, { id: 'key' })
+            delTreeData(treeData, info.id, { id: 'key' })
             setTreeData([...treeData])
             message.success(t('submit_success'));
             close();
@@ -213,15 +218,15 @@ export default () => {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      if (appInfo) {
+      if (countryInfo) {
         if (selectedTree.action === 'editor') {
           if (selectedTree.info?.id) {
-            const result = await updateAppMenu(selectedTree.info.id, updateFormat<UpdateAppMenuInput>({
-              comments: values.comments,
-              icon: values.icon,
-              kind: values.kind,
+            const result = await updateRegionInfo(selectedTree.info.id, updateFormat<UpdateRegionInput>({
               name: values.name,
-              route: values.kind === AppMenuKind.Menu ? values.route : null,
+              nameEn: values.nameEn,
+              shortCode: values.shortCode,
+              status: values.status,
+              zipCode: values.zipCode,
             }, selectedTree.info));
             if (result?.id) {
               message.success(t('submit_success'));
@@ -229,72 +234,75 @@ export default () => {
               saveTreeData(treeData, {
                 key: result.id,
                 title: result.name,
-                parentId: result.parentID,
-                node: result as AppMenu,
+                parentId: result.parentID ?? '',
+                node: result as Region,
               }, { id: 'key' })
               setTreeData([...treeData])
             }
           } else {
-            const result = await createAppMenu(appInfo.id, {
-              comments: values.comments,
-              icon: values.icon,
-              kind: values.kind,
+            const result = await createRegionInfo({
+              countryID: countryInfo.id,
+              parentID: selectedTree.info?.parentID || "0",
               name: values.name,
-              parentID: selectedTree.info?.parentID || 0,
-              route: values.route,
+              nameEn: values.nameEn,
+              shortCode: values.shortCode,
+              status: values.status,
+              zipCode: values.zipCode,
             });
-            if (result?.[0]?.id) {
+            if (result?.id) {
               message.success(t('submit_success'));
               setSaveDisabled(true);
-              editorMenuAction(result[0] as AppMenu, 'editor');
+              editorMenuAction(result as Region, 'editor');
               saveTreeData(treeData, {
-                key: result[0].id,
-                title: result[0].name,
-                parentId: result[0].parentID,
-                node: result[0] as AppMenu,
+                key: result.id,
+                title: result.name,
+                parentId: result.parentID ?? '',
+                node: result as Region,
               }, { id: 'key' })
               setTreeData([...treeData])
             }
           }
         } else if (selectedTree.action === 'child') {
-          const result = await createAppMenu(appInfo.id, {
-            comments: values.comments,
-            icon: values.icon,
-            kind: values.kind,
+          const result = await createRegionInfo({
+            countryID: countryInfo.id,
+            parentID: selectedTree.info?.id || "0",
             name: values.name,
-            parentID: Number(selectedTree.info?.id) || 0,
-            route: values.route,
+            nameEn: values.nameEn,
+            shortCode: values.shortCode,
+            status: values.status,
+            zipCode: values.zipCode,
           });
-          if (result?.[0]?.id) {
+          if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
-            editorMenuAction(result[0] as AppMenu, 'editor');
+            editorMenuAction(result as Region, 'editor');
             saveTreeData(treeData, {
-              key: result[0].id,
-              title: result[0].name,
-              parentId: result[0].parentID,
-              node: result[0] as AppMenu,
+              key: result.id,
+              title: result.name,
+              parentId: result.parentID ?? '',
+              node: result as Region,
             }, { id: 'key' })
             setTreeData([...treeData])
           }
         } else if (selectedTree.action === 'peer') {
-          const result = await createAppMenu(appInfo.id, {
-            comments: values.comments,
-            icon: values.icon,
-            kind: values.kind,
+          const result = await createRegionInfo({
+            countryID: countryInfo.id,
+            parentID: selectedTree.info?.parentID || "0",
             name: values.name,
-            parentID: selectedTree.info?.parentID || 0,
-            route: values.route,
+            nameEn: values.nameEn,
+            shortCode: values.shortCode,
+            status: values.status,
+            zipCode: values.zipCode,
           });
-          if (result?.[0]?.id) {
+          if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
-            editorMenuAction(result[0] as AppMenu, 'editor');
+            editorMenuAction(result as Region, 'editor');
             saveTreeData(treeData, {
-              key: result[0].id,
-              title: result[0].name,
-              parentId: result[0].parentID,
-              node: result[0] as AppMenu,
+              key: result.id,
+              title: result.name,
+              parentId: result.parentID ?? '',
+              node: result as Region,
             }, { id: 'key' })
             setTreeData([...treeData])
           }
@@ -312,13 +320,13 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: `${appInfo?.name} - ${t('menu_manage')}`,
+        title: `${countryInfo?.name} - ${t('region_manage')}`,
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
-            { title: t('menu_manage') },
+            { title: <Link to={'/system/country'}>{t('country_region_title')}</Link> },
+            { title: t('region_manage') },
           ],
         },
       }}
@@ -330,7 +338,7 @@ export default () => {
               <Input.Search placeholder={`${t('search_keyword')}`} onSearch={onSearch} />
             </Col>
             <Col >
-              <Auth authKey="moveAppMenu">
+              <Auth authKey="moveRegion">
                 <Button
                   type="text"
                   onClick={() => {
@@ -359,7 +367,7 @@ export default () => {
           <ProForm
             formRef={formRef}
             style={{ maxWidth: 400 }}
-            submitter={checkAuth('createAppMenus') || checkAuth('updateAppMenu') ? {
+            submitter={checkAuth('createRegion') || checkAuth('updateRegion') ? {
               searchConfig: {
                 submitText: t('submit'),
                 resetText: t('reset'),
@@ -382,42 +390,35 @@ export default () => {
                 { required: true, message: `${t('please_enter_name')}` },
               ]}
             />
-            <ProFormSelect
-              name="kind"
-              label={t('type')}
-              placeholder={`${t('please_enter_type')}`}
-              options={[
-                { value: 'dir', label: t('directory') },
-                { value: 'menu', label: t('menu') },
-              ]}
-              rules={[
-                { required: true, message: `${t('please_enter_type')}` },
-              ]}
+            <ProFormText
+              name="nameEn"
+              label={t('name_en')}
+              placeholder={`${t('please_enter_name')}`}
             />
             <ProFormText
-              name="icon"
-              label={t('icon')}
-              placeholder={`${t('please_enter_icon')}`}
+              name="shortCode"
+              label={t('code')}
+              placeholder={`${t('please_enter_code')}`}
             />
-            <ProForm.Item noStyle shouldUpdate>
-              {(form) => (
-                form.getFieldValue('kind') == 'menu' ? <>
-                  <ProFormText
-                    name="route"
-                    label={t('route')}
-                    placeholder={`${t('please_enter_route')}`}
-                  />
-                </> : ''
-              )}
-            </ProForm.Item>
-            <ProFormTextArea
-              name="comments"
-              label={t('remarks')}
-              placeholder={`${t('please_enter_remarks')}`}
+            <ProFormText
+              name="zipCode"
+              label={t('zip_code')}
+              placeholder={`${t('please_enter_zip_code')}`}
+            />
+            <ProFormSelect
+              name="status"
+              label={t('status')}
+              placeholder={`${t('please_select')}`}
+              options={[
+                { value: RegionSimpleStatus.Active, label: RegionSimpleStatus.Active },
+                { value: RegionSimpleStatus.Disabled, label: RegionSimpleStatus.Disabled },
+                { value: RegionSimpleStatus.Inactive, label: RegionSimpleStatus.Inactive },
+                { value: RegionSimpleStatus.Processing, label: RegionSimpleStatus.Processing },
+              ]}
             />
           </ProForm>
         </ProCard>
       </ProCard>
     </PageContainer>
   );
-};
+}

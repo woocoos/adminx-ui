@@ -51,6 +51,7 @@ export default {
     department: 'department',
     version: 'version',
     name: 'name',
+    name_en: 'English name',
     code: 'code',
     user: 'user',
     description: 'description',
@@ -87,6 +88,7 @@ export default {
     back: 'Back',
     proof: 'proof',
     default: 'Default',
+    region: 'Region',
     401: 'Login expiration',
     403: 'No access rights',
     404: "Can't find a way",
@@ -207,6 +209,8 @@ export default {
     create_app_dict_item: 'Create data dictionary details',
     edit_app_dict_item: 'Edit data dictionary details',
     set_default: 'Set Default',
+    country_region_title: 'Country Region',
+    zip_code: 'Postal code',
 
     // 创建
     create_user: 'Create a user',
@@ -219,6 +223,8 @@ export default {
     create_org: 'Create organization',
     create_user_group: 'Creating a User Group',
     create_file_source: 'Creating a File source',
+    create_country: 'Creating Country',
+
     // 修改
     'amend_{{field}}': 'Modifying {{field}}',
     amend_basic_info: 'Modifying Basic Information',
@@ -237,6 +243,8 @@ export default {
     auth_org_list: 'List of authorized organizations',
     file_source_list: 'File source list',
     file_source_identity_list: 'File source certificate list',
+    country_list: 'List of countries',
+    region_list: 'List of regions',
     // 详情
     account_detail: 'Account details',
     member_detail: 'Member details',
@@ -288,6 +296,7 @@ export default {
     please_enter_file_source_region: 'Please enter Region',
     please_enter_file_source_endpoint: 'Please enter Endpoint',
     please_enter_file_source_sts_endpoint: 'Please enter Sts Endpoint',
+    please_enter_zip_code: 'Please enter your zip code',
     // 添加
     add: 'Append',
     add_resources: 'Add resource',
@@ -311,6 +320,7 @@ export default {
     manage_system: 'Management system',
     department_manage: 'Department management',
     user_manage: 'User management',
+    region_manage: 'Region management',
 
     'file_size_<_{{str}}': 'File must smaller than {{str}}',
     '{{num}}_operations': '{{num}} operations',

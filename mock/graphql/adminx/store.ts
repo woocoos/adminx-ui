@@ -161,6 +161,15 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'fileIdentities', listTemp([
     store.get('OrgFileIdentity', 1),
   ]))
+  store.set('Query', 'ROOT', 'countries', listTemp([
+    store.get('Country', 1),
+  ]))
+  store.set('Query', 'ROOT', 'regions', listTemp([
+    store.get('Region', 1),
+    store.get('Region', 11),
+    store.get('Region', 12),
+    store.get('Region', 13),
+  ]))
   // -------------root-end------------------------
 
   // Org
@@ -356,4 +365,29 @@ export const initStoreData = (store: IMockStore) => {
     id: 1, bucket: 'test1', bucketURL: 'http://127.0.0.1:9000/test1', endpoint: 'http://127.0.0.1:9000', region: 'local', stsEndpoint: 'http://127.0.0.1:9000'
   })
 
+  // Country
+  store.set('Country', 1, {
+    id: 1, code: 'cn', name: '中国', nameEn: 'CN', regions: [
+      store.get('Region', 1)
+    ]
+  })
+
+  // Region
+  store.set('Region', 1, {
+    id: 1, countryID: 1, parentID: 0, shortCode: 'fujian', name: '福建省', nameEn: 'fujian', displaySort: 0,
+    children: [
+      store.get('Region', 11),
+      store.get('Region', 12),
+      store.get('Region', 13),
+    ]
+  })
+  store.set('Region', 11, {
+    id: 11, countryID: 1, parentID: 1, shortCode: 'fuzhou', name: '福州市', nameEn: 'fuzhou', displaySort: 0,
+  })
+  store.set('Region', 12, {
+    id: 12, countryID: 1, parentID: 1, shortCode: 'quanzhou', name: '泉州市', nameEn: 'quanzhou', displaySort: 1,
+  })
+  store.set('Region', 13, {
+    id: 13, countryID: 1, parentID: 1, shortCode: 'xiamen', name: '厦门市', nameEn: 'xiamen', displaySort: 2,
+  })
 }
