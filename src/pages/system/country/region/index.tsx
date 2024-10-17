@@ -187,7 +187,7 @@ export default () => {
     onTreeDrop = async (dragInfo) => {
       const { sourceId, targetId, action } = getTreeDropData(treeData, dragInfo);
 
-      const result = await moveRegionInfo(action, sourceId, targetId);
+      const result = await moveRegionInfo(sourceId, targetId, action);
       if (result) {
         await getMenusRequest();
       }

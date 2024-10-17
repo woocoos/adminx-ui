@@ -1,4 +1,4 @@
-import { TreeAction } from '@/generated/adminx/graphql';
+import { ListAction, TreeAction } from '@/generated/adminx/graphql';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
@@ -398,4 +398,40 @@ export const delDataSource = <T extends { id: string }>(dataSource: Array<T>, id
     ...defaultKeys
   }
   return dataSource.filter(item => item[keys.id] != id)
+}
+
+
+export const searchMoveList = <T extends Object>(sourceList: T[], newSourceList: T[], defaultKeys?: {
+  id?: string,
+}) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }, length = sourceList.length, changeIdxs: number[] = [];
+  for (let i = 0; i < length; i++) {
+    if (sourceList[i][keys.id] != newSourceList[i][keys.id]) {
+      changeIdxs.push(i);
+    }
+  }
+
+  if (changeIdxs.length >= 2) {
+    if (sourceList[changeIdxs[0]][keys.id] === newSourceList[changeIdxs[1]][keys.id]) {
+      // 上移
+      return {
+        sourceId: newSourceList[changeIdxs[0]][keys.id] as string,
+        targetId: sourceList[changeIdxs[0]][keys.id] as string,
+        action: ListAction.Up,
+      }
+    } else {
+      // 下移
+      const downIdx = changeIdxs.length - 1
+      return {
+        sourceId: newSourceList[changeIdxs[downIdx]][keys.id] as string,
+        targetId: sourceList[changeIdxs[downIdx]][keys.id] as string,
+        action: ListAction.Down,
+      }
+    }
+  }
+
+  return null
 }

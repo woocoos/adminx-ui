@@ -166,7 +166,7 @@ export async function delCountryInfo(countryId: string) {
  * @param targetId
  * @returns
  */
-export async function moveCountryInfo(action: ListAction, sourceId: string, targetId: string) {
+export async function moveCountryInfo(sourceId: string, targetId: string, action: ListAction) {
   const
     result = await mutation(
       mutationMoveCountry, {

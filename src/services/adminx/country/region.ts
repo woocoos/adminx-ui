@@ -156,12 +156,12 @@ export async function delRegionInfo(regionId: string) {
 
 /**
  * 移动
- * @param action
  * @param sourceId
  * @param targetId
+ * @param action
  * @returns
  */
-export async function moveRegionInfo(action: TreeAction, sourceId: string, targetId: string) {
+export async function moveRegionInfo(sourceId: string, targetId: string, action: TreeAction) {
   const
     result = await mutation(
       mutationMoveRegion, {

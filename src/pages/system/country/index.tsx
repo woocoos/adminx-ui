@@ -1,14 +1,14 @@
 
 import Auth from '@/components/auth';
-import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
+import { ActionType, DragSortTable, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { KeepAlive } from '@knockout-js/layout';
-import { Button, Modal, Space } from 'antd';
+import { Button, Col, Modal, Row, Space } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Create from './components/create';
 import { definePageConfig, Link } from 'ice';
-import { delDataSource, saveDataSource } from '@/util';
-import { delCountryInfo, EnumCountryStatus, getCountryList } from '@/services/adminx/country';
+import { delDataSource, saveDataSource, searchMoveList } from '@/util';
+import { delCountryInfo, EnumCountryStatus, getCountryList, moveCountryInfo } from '@/services/adminx/country';
 import { Country, CountryWhereInput } from '@/generated/adminx/graphql';
 
 const PageList = () => {
@@ -101,12 +101,18 @@ const PageList = () => {
       open: false,
       title: '',
     }),
-    [dataSource, setDataSource] = useState<Country[]>([]);
+    [dataSource, setDataSource] = useState<Country[]>([]),
+    [isDragSort, setIsDragSort] = useState(false);
 
 
   return (<PageContainer
     header={{
       title: t('country_list'),
+      extra: <Auth authKey={'moveCountry'}>
+        <Button size="small" onClick={() => {
+          setIsDragSort(!isDragSort);
+        }}>{isDragSort ? t('cancel') : t('drag')}</Button>
+      </Auth>,
       style: { background: token.colorBgContainer },
       breadcrumb: {
         items: [
@@ -116,57 +122,81 @@ const PageList = () => {
       },
     }}
   >
-    <ProTable
-      actionRef={proTableRef}
-      rowKey={'id'}
-      search={{
-        labelWidth: 100,
-      }}
-      toolbar={{
-        title: t('country_list'),
-        actions: [
-          <Auth authKey={'createCountry'}>
-            <Button
-              type="primary"
-              onClick={() => {
-                setModal({ open: true, title: t('create_country') });
-              }}
-            >
-              {t('create_country')}
-            </Button>
-          </Auth>,
-        ],
-      }}
-      scroll={{ x: 'max-content' }}
-      columns={columns}
-      dataSource={dataSource}
-      request={async (params) => {
-        const table = { data: [] as Country[], success: true, total: 0 },
-          where: CountryWhereInput = {}
-        where.codeContains = params.code;
-        where.nameContains = params.name;
-        where.nameEnContains = params.nameEn;
-        const result = await getCountryList({
-          current: params.current,
-          pageSize: params.pageSize,
-          where,
-        });
-        if (result?.totalCount) {
-          table.total = result.totalCount;
-          result.edges?.forEach(item => {
-            if (item?.node) {
-              table.data.push(item.node as Country);
+    {isDragSort ?
+      <DragSortTable
+        columns={columns.filter(item => item.dataIndex !== 'actions')}
+        dataSource={dataSource}
+        rowKey={'id'}
+        pagination={false}
+        dragSortKey="id"
+        search={false}
+        options={false}
+        toolbar={{
+          title: t('country_list'),
+        }}
+        onDragSortEnd={async (newDataSource) => {
+          const moveData = searchMoveList(dataSource, newDataSource)
+          if (moveData) {
+            const result = await moveCountryInfo(moveData.sourceId, moveData.targetId, moveData.action);
+            if (result) {
+              setDataSource(newDataSource);
             }
-          })
-        } else {
-        }
-        setDataSource(table.data);
-        return table;
-      }}
-      pagination={{
-        showSizeChanger: true,
-      }}
-    />
+          }
+        }}
+      />
+      : <ProTable
+        actionRef={proTableRef}
+        rowKey={'id'}
+        search={{
+          labelWidth: 100,
+        }}
+        toolbar={{
+          title: t('country_list'),
+          actions: [
+            <Auth authKey={'createCountry'}>
+              <Button
+                type="primary"
+                onClick={() => {
+                  setModal({ open: true, title: t('create_country') });
+                }}
+              >
+                {t('create_country')}
+              </Button>
+            </Auth>,
+          ],
+        }}
+        scroll={{ x: 'max-content' }}
+        columns={columns}
+        dataSource={dataSource}
+        request={async (params) => {
+          const table = { data: [] as Country[], success: true, total: 0 },
+            where: CountryWhereInput = {}
+          where.codeContains = params.code;
+          where.nameContains = params.name;
+          where.nameEnContains = params.nameEn;
+          const result = await getCountryList({
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          });
+          if (result?.totalCount) {
+            table.total = result.totalCount;
+            result.edges?.forEach(item => {
+              if (item?.node) {
+                table.data.push(item.node as Country);
+              }
+            })
+          } else {
+          }
+          setDataSource(table.data);
+          return table;
+        }}
+        pagination={{
+          showSizeChanger: true,
+        }}
+      />}
+
+
     <Create
       open={modal.open}
       title={modal.title}
