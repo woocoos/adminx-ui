@@ -84,6 +84,41 @@ export async function getCountryList(
 }
 
 /**
+ * 获取缓存信息
+ * @param params
+ * @param filter
+ * @param sort
+ * @returns
+ */
+export async function getCacheCountryList(
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: CountryWhereInput;
+    orderBy?: CountryOrder;
+  },
+) {
+  const
+    result = await paging(
+      queryCountryList, {
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: CountryOrderField.DisplaySort
+      },
+    }, gather.current || 1, {
+      requestPolicy: "cache-first"
+    });
+
+  if (result.data?.countries) {
+    return result.data.countries;
+  }
+  return null;
+}
+
+
+/**
  * 获取信息
  * @param id
  * @returns

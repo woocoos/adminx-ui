@@ -178,6 +178,7 @@ export const initStoreData = (store: IMockStore) => {
   // Org
   store.set('Org', 1, {
     id: 1, name: 'woocoo', code: 'woocoo', domain: 'woocoo', parentID: 0, kind: 'root', ownerID: 1, owner: store.get('User', 1),
+    countryCode: 'cn',
     users: listTemp([
       store.get('User', 1)
     ]),

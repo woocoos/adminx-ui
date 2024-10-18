@@ -1,7 +1,7 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { Button, Space, Dropdown, Modal } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
@@ -10,7 +10,8 @@ import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
+import { Country, Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
+import { getCacheCountryList } from '@/services/adminx/country';
 
 type OrgTree = Org & { children?: Org[] }
 
@@ -27,13 +28,19 @@ export const OrgList = (props: {
     // 表格相关
     proTableRef = useRef<ActionType>(),
     kind = props.kind || OrgKind.Root,
+    [countryList, setCountryList] = useState<Country[]>([]),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
       { title: t('name'), dataIndex: 'name', width: 120 },
       { title: t('code'), dataIndex: 'code', width: 120 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
       { title: t('domain'), dataIndex: 'domain', width: 120, search: false },
-      { title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false },
+      {
+        title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false,
+        render: (text) => {
+          return <div>{countryList.find(item => item.code === text)?.name ?? text}</div>;
+        }
+      },
       {
         title: t('manage_account'),
         dataIndex: 'owner',
@@ -153,6 +160,17 @@ export const OrgList = (props: {
 
 
   const
+    getBase = async () => {
+      const result = await getCacheCountryList({ pageSize: 999 }), list: Country[] = [];
+      if (result) {
+        result.edges?.forEach(item => {
+          if (item?.node) {
+            list.push(item.node as Country)
+          }
+        })
+        setCountryList(list)
+      }
+    },
     onDelOrg = (record: Org) => {
       Modal.confirm({
         title: t('delete'),
@@ -184,6 +202,10 @@ export const OrgList = (props: {
       }
       setModal({ open: true, title: title, id: info.id, scene: action });
     };
+
+  useEffect(() => {
+    getBase()
+  }, [])
 
   return (
     <>

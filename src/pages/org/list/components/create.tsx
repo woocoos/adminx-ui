@@ -2,10 +2,11 @@ import { Org, OrgKind, User, UserUserType } from '@/generated/adminx/graphql';
 import InputAccount from '@/pages/account/components/inputAccount';
 import { createOrgInfo, getOrgInfo, updateOrgInfo } from '@/services/adminx/org';
 import { TreeEditorAction, formatTreeData, updateFormat } from '@/util';
-import { DrawerForm, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
+import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
+import { getCacheCountryList } from '@/services/adminx/country';
 
 type SelectTreeData = {
   value: string;
@@ -34,6 +35,7 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
+    [countryCodeOptions, setCountryCodeOptions] = useState<{ value: string, label: string }[]>([]),
     [saveDisabled, setSaveDisabled] = useState(true),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [oldInfo, setOldInfo] = useState<Org>();
@@ -43,6 +45,18 @@ export default (props: {
   }, [saveDisabled]);
 
   const
+    getBase = async () => {
+      const result = await getCacheCountryList({ pageSize: 999 });
+      if (result) {
+        setCountryCodeOptions(result.edges?.map(item => {
+          return {
+            value: item?.node?.code ?? '',
+            label: item?.node?.name ?? '',
+          };
+        }) ?? []);
+
+      }
+    },
     parentRequest = async () => {
       const list: SelectTreeData[] = [
         {
@@ -163,6 +177,9 @@ export default (props: {
       return false;
     };
 
+  useEffect(() => {
+    getBase()
+  }, []);
 
   return (
     <DrawerForm
@@ -211,10 +228,11 @@ export default (props: {
         label={t('domain')}
         tooltip={t('domain_tooltip')}
       />
-      <ProFormText
+      <ProFormSelect
         x-if={props.kind === 'root'}
         name="countryCode"
         label={t('country_region')}
+        options={countryCodeOptions}
       />
       <ProFormText
         x-if={props.kind === 'root'}
