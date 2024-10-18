@@ -1,4 +1,4 @@
-import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType, UserGender } from '@/generated/adminx/graphql';
+import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType, UserGender, OrgUserUserType } from '@/generated/adminx/graphql';
 import { getOrgInfo } from '@/services/adminx/org';
 import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/adminx/user';
 import store from '@/store';
@@ -34,6 +34,7 @@ export default (props: {
   id?: string | null;
   orgId?: string;
   userType: UserUserType;
+  orgUserType?: OrgUserUserType;
   recycleInfo?: User;
   scene: UpdateUserInfoScene;
   onClose: (isSuccess?: boolean, newInfo?: User | UserLoginProfile) => void;
@@ -170,7 +171,7 @@ export default (props: {
               verifyDevice: false,
             },
             password,
-          }, props.userType);
+          }, props.userType, props.orgUserType ?? OrgUserUserType.External);
           if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);

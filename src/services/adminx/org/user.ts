@@ -1,8 +1,12 @@
 import { gql } from '@/generated/adminx';
-import { CreateOrgUserInput, OrderDirection, UserOrder, UserOrderField, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOrgUserInput, OrderDirection, OrgUserUserType, UserOrder, UserOrderField, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
+export const EnumOrgUserType = {
+  [OrgUserUserType.External]: { text: '外部用户' },
+  [OrgUserUserType.Internal]: { text: '内部用户' },
+}
 
 const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
@@ -82,6 +86,53 @@ const mutationAllotOrgUser = gql(/* GraphQL */`mutation allotOrgUser($input:Crea
 const mutationRemoveOrgUser = gql(/* GraphQL */`mutation removeOrgUser($orgId:ID!,$userId:ID!){
   removeOrganizationUser(orgID: $orgId,userID: $userId)
 }`);
+
+const queryMemberList = gql(/* GraphQL */`query memberList($orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  userMembers(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        contact{email,mobile},userType,creationType,registerIP,status,comments,
+        orgUserType(orgID: $orgId)
+      }
+    }
+  }
+}`);
+
+const mutationChangeOrgUserType = gql(/* GraphQL */`mutation changeOrgUserType($userId:ID!,$userType:OrgUserUserType!){
+  changeOrgUserType(userID:$userId,userType:$userType)
+}`);
+
+/**
+ * 成员管理
+ * @param gather
+ * @returns
+ */
+export async function getMemberList(
+  orgId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: UserWhereInput;
+    orderBy?: UserOrder;
+  },
+) {
+  const result = await paging(
+    queryMemberList, {
+    orgId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    }
+  }, gather.current || 1)
+  if (result.data?.userMembers) {
+    return result.data.userMembers;
+  }
+  return null;
+}
 
 /**
  * 组织下的用户信息
@@ -231,4 +282,24 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
     return result?.data?.node.users.totalCount;
   }
   return 0;
+}
+
+/**
+ * 切换用户类型
+ * @param userId
+ * @param userType
+ * @returns
+ */
+export async function changeOrgUserType(userId: string, userType: OrgUserUserType) {
+  const
+    result = await mutation(
+      mutationChangeOrgUserType, {
+      userId,
+      userType,
+    });
+
+  if (result.data?.changeOrgUserType) {
+    return result?.data?.changeOrgUserType;
+  }
+  return null;
 }

@@ -170,6 +170,9 @@ export const initStoreData = (store: IMockStore) => {
     store.get('Region', 12),
     store.get('Region', 13),
   ]))
+  store.set('Query', 'ROOT', 'userMembers', listTemp([
+    store.get('User', 1),
+  ]))
   // -------------root-end------------------------
 
   // Org
@@ -271,6 +274,8 @@ export const initStoreData = (store: IMockStore) => {
   store.set('AppAction', 11, { id: 11, name: '/system/app', method: 'list', appID: 1, app: store.get('App', 1) })
   store.set('AppAction', 12, { id: 12, name: '/system/file/source', method: 'list', appID: 1, app: store.get('App', 1) })
   store.set('AppAction', 13, { id: 13, name: '/dict', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 14, { id: 14, name: '/system/country', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 15, { id: 15, name: '/org/members', method: 'list', appID: 1, app: store.get('App', 1) })
 
   // AppPolicy
   store.set('AppPolicy', 1, {
@@ -391,3 +396,4 @@ export const initStoreData = (store: IMockStore) => {
     id: 13, countryID: 1, parentID: 1, shortCode: 'xiamen', name: '厦门市', nameEn: 'xiamen', displaySort: 2,
   })
 }
+

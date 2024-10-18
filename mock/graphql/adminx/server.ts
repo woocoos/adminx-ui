@@ -67,6 +67,7 @@ const schemaWithMocks = addMocksToSchema({
     Query: {
       appAccess: () => true,
       apps: relayStylePaginationMock(store),
+      userMembers: relayStylePaginationMock(store),
       countries: relayStylePaginationMock(store),
       regions: relayStylePaginationMock(store),
       organizations: (_, { where }) => {

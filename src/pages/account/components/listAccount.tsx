@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
 import { EnumUserStatus, delUserInfo, getUserList, resetUserPasswordByEmail } from '@/services/adminx/user';
 import AccountCreate from '../list/components/create';
-import { getOrgRoleUserList, getOrgUserList, removeOrgUser } from '@/services/adminx/org/user';
+import { changeOrgUserType, EnumOrgUserType, getMemberList, getOrgRoleUserList, getOrgUserList, removeOrgUser } from '@/services/adminx/org/user';
 import { revokeOrgRoleUser } from '@/services/adminx/org/role';
 import DrawerUser from '@/pages/account/components/drawerUser';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/hooks/useItems';
 import store from '@/store';
-import { OrderDirection, Org, OrgRole, OrgRoleKind, User, UserAddrAddrType, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { OrderDirection, Org, OrgRole, OrgRoleKind, OrgUserUserType, User, UserAddrAddrType, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource } from '@/util';
 
 
@@ -23,7 +23,7 @@ export const UserList = (props: {
   orgId?: string;
   orgRole?: OrgRole;
   orgInfo?: Org;
-  scene?: 'user' | 'orgUser' | 'roleUser';
+  scene?: 'user' | 'orgUser' | 'roleUser' | 'orgMember';
   userType?: UserUserType;
   isFromSystem?: boolean;
 }) => {
@@ -96,6 +96,16 @@ export const UserList = (props: {
       scene: '',
     });
 
+  if (props.scene === 'orgMember') {
+    columns.push({
+      title: t('user_type'),
+      dataIndex: 'orgUserType',
+      width: 120,
+      search: false,
+      valueEnum: EnumOrgUserType,
+    });
+  }
+
   columns.push(
     {
       title: t('operation'),
@@ -141,6 +151,15 @@ export const UserList = (props: {
             { key: 'resetPwd', label: <a onClick={() => onResetPwd(record)}>{t('reset_pwd')}</a> },
           );
         }
+
+        if (props.scene === 'orgMember') {
+          if (checkAuth('changeOrgUserType', auth)) {
+            items.push(
+              { key: 'changeOrgUserType', label: <a onClick={() => onChangeOrgUserType(record)}>{t('change_org_user_type')}</a> },
+            );
+          }
+        }
+
         if (props.scene === 'orgUser') {
           if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
             if (checkAuth('removeOrganizationUser', auth)) {
@@ -239,7 +258,30 @@ export const UserList = (props: {
         onOk: async (close) => {
           if (props?.orgId) {
             const result = props.orgInfo?.kind === 'root' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id);
-            if (result === true) {
+            if (result) {
+              setDataSource(delDataSource(dataSource, record.id));
+              if (dataSource.length === 0) {
+                const pageInfo = { ...proTableRef.current?.pageInfo };
+                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
+                proTableRef.current?.setPageInfo?.(pageInfo);
+                proTableRef.current?.reload();
+              }
+              message.success(t('submit_success'));
+              close();
+            }
+          }
+        },
+      });
+    },
+    onChangeOrgUserType = (record: User) => {
+      const title = record.orgUserType === OrgUserUserType.Internal ? t('set_org_user_type_out') : t('set_org_user_type_inner');
+      Modal.confirm({
+        title: title,
+        content: `${record.displayName} ${title}`,
+        onOk: async (close) => {
+          if (props.orgRole) {
+            const result = await changeOrgUserType(record.id, record.orgUserType === OrgUserUserType.Internal ? OrgUserUserType.External : OrgUserUserType.Internal);
+            if (result) {
               setDataSource(delDataSource(dataSource, record.id));
               if (dataSource.length === 0) {
                 const pageInfo = { ...proTableRef.current?.pageInfo };
@@ -284,7 +326,7 @@ export const UserList = (props: {
   return (
     <>
       {
-        ['modal', 'orgUser', 'roleUser'].includes(props?.scene || '') ? (
+        ['modal', 'orgUser', 'orgMember', 'roleUser'].includes(props?.scene || '') ? (
           <ProTable
             actionRef={proTableRef}
             search={{
@@ -295,44 +337,57 @@ export const UserList = (props: {
             rowKey={'id'}
             toolbar={{
               title: props.title || (props.userType === 'account' ? t('account_list') : t('member_list')),
-              actions: props.scene === 'roleUser' ? [
-                <Auth authKey="assignRoleUser">
+              actions: props.scene === 'orgMember' ? [
+                <Auth authKey="createOrganizationUser">
                   <Button
                     type="primary"
                     onClick={() => {
-                      setModal({ open: true, title: t('add_member'), scene: 'add' });
+                      setModal({ open: true, title: t('create_user'), scene: 'create' });
                     }}
                   >
-                    {t('add_member')}
+                    {t('create_user')}
                   </Button>
-                </Auth>,
-              ] : props.scene === 'orgUser' ? [
-                props.orgInfo?.kind === 'root'
-                  ? <Auth authKey="createOrganizationUser">
+                </Auth>
+              ] :
+                props.scene === 'roleUser' ? [
+                  <Auth authKey="assignRoleUser">
                     <Button
                       type="primary"
                       onClick={() => {
-                        setModal({ open: true, title: t('create_user'), scene: 'create' });
+                        setModal({ open: true, title: t('add_member'), scene: 'add' });
                       }}
                     >
-                      {t('create_user')}
+                      {t('add_member')}
                     </Button>
-                  </Auth> : '',
-                props.orgInfo?.kind === 'root'
-                  ? <Button>
-                    <Link to={`${props.isFromSystem ? `/system/account/recycle?orgId=${props.orgId}` : '/account/recycle'}`}>{t('recycle_bin')}</Link>
-                  </Button> : '',
-                props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
-                  <Button
-                    type="primary"
-                    onClick={() => {
-                      setModal({ open: true, title: t('add_user'), scene: 'add' });
-                    }}
-                  >
-                    {t('add_user')}
-                  </Button>
-                </Auth> : '',
-              ] : [],
+                  </Auth>,
+                ] :
+                  props.scene === 'orgUser' ? [
+                    props.orgInfo?.kind === 'root'
+                      ? <Auth authKey="createOrganizationUser">
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            setModal({ open: true, title: t('create_user'), scene: 'create' });
+                          }}
+                        >
+                          {t('create_user')}
+                        </Button>
+                      </Auth> : '',
+                    props.orgInfo?.kind === 'root'
+                      ? <Button>
+                        <Link to={`${props.isFromSystem ? `/system/account/recycle?orgId=${props.orgId}` : '/account/recycle'}`}>{t('recycle_bin')}</Link>
+                      </Button> : '',
+                    props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          setModal({ open: true, title: t('add_user'), scene: 'add' });
+                        }}
+                      >
+                        {t('add_user')}
+                      </Button>
+                    </Auth> : '',
+                  ] : [],
             }}
             scroll={{ x: 'max-content' }}
             columns={columns}
@@ -355,7 +410,18 @@ export const UserList = (props: {
                   field: UserOrderField.CreatedAt,
                 };
               }
-              if (props.orgRole) {
+              if (props.scene === 'orgMember') {
+                const result = await getMemberList(props.orgId ?? userState.tenantId, {
+                  current: params.current,
+                  pageSize: params.pageSize,
+                  where: where,
+                  orderBy: orderBy,
+                });
+                if (result?.totalCount) {
+                  table.data = result.edges?.map(item => item?.node) as User[] || [];
+                  table.total = result.totalCount;
+                }
+              } else if (props.orgRole) {
                 const result = await getOrgRoleUserList(props.orgRole.id, {
                   current: params.current,
                   pageSize: params.pageSize,
@@ -510,6 +576,7 @@ export const UserList = (props: {
         title={modal.title}
         orgId={userState.tenantId}
         userType={props.userType || UserUserType.Member}
+        orgUserType={props.scene === 'orgMember' ? OrgUserUserType.Internal : OrgUserUserType.External}
         scene="create"
         onClose={(isSuccess, newInfo) => {
           if (isSuccess && newInfo) {

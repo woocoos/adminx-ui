@@ -1,6 +1,6 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, UpdateUserAddrInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, OrgUserUserType, UpdateUserAddrInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 // TODO 如何使用i18
@@ -110,8 +110,8 @@ const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GI
   }
 }`);
 
-const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
-  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){
+const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!,$orgUserType:OrgUserUserType){
+  createOrganizationUser(rootOrgID:$rootOrgID,input:$input,orgUserType:$orgUserType){
     id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
     contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
    }
@@ -314,7 +314,7 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
  * @param input
  * @returns
  */
-export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
+export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType, orgUserUserType?: OrgUserUserType) {
   if (userType === UserUserType.Account) {
     const result = await mutation(
       mutationCreateAccount, {
@@ -328,6 +328,7 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
     const result = await mutation(
       mutationCreateUser, {
       rootOrgID: rootOrgID,
+      orgUserType: orgUserUserType,
       input,
     });
     if (result.data?.createOrganizationUser?.id) {

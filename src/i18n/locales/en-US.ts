@@ -211,6 +211,7 @@ export default {
     set_default: 'Set Default',
     country_region_title: 'Country Region',
     zip_code: 'Postal code',
+    user_type: 'User Type',
 
     // 创建
     create_user: 'Create a user',
@@ -321,6 +322,9 @@ export default {
     department_manage: 'Department management',
     user_manage: 'User management',
     region_manage: 'Region management',
+    change_org_user_type: 'Change user type',
+    set_org_user_type_inner: 'Change user type',
+    set_org_user_type_out: 'Change user type',
 
     'file_size_<_{{str}}': 'File must smaller than {{str}}',
     '{{num}}_operations': '{{num}} operations',

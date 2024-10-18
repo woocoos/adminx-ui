@@ -211,6 +211,7 @@ export default {
     set_default: '设置默认',
     country_region_title: '国家地区',
     zip_code: '邮政编码',
+    user_type: '用户类型',
 
     // 创建
     create_user: '创建用户',
@@ -320,6 +321,9 @@ export default {
     department_manage: '部门管理',
     user_manage: '用户管理',
     region_manage: '地区管理',
+    change_org_user_type: '修改用户类型',
+    set_org_user_type_inner: '设置用户类型为内部用户',
+    set_org_user_type_out: '设置用户类型为外部用户',
 
     'file_size_<_{{str}}': '文件必须小于{{str}}',
     '{{num}}_operations': '{{num}}个操作',

@@ -218,6 +218,6 @@ export default () => {
 };
 
 
-// export const pageConfig = definePageConfig(() => ({
-//   auth: ['/system/country'],
-// }));
+export const pageConfig = definePageConfig(() => ({
+  auth: ['/system/country'],
+}));

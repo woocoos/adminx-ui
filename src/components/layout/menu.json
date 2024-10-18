@@ -27,6 +27,10 @@
         "path": "/org/departments"
       },
       {
+        "name": "成员管理",
+        "path": "/org/members"
+      },
+      {
         "name": "用户管理",
         "path": "/org/users"
       },
