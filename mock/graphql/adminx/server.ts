@@ -70,6 +70,7 @@ const schemaWithMocks = addMocksToSchema({
       userMembers: relayStylePaginationMock(store),
       countries: relayStylePaginationMock(store),
       regions: relayStylePaginationMock(store),
+      currencies: relayStylePaginationMock(store),
       organizations: (_, { where }) => {
         if (where.kind === 'org') {
           return listTemp([

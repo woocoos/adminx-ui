@@ -173,6 +173,10 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'userMembers', listTemp([
     store.get('User', 1),
   ]))
+  store.set('Query', 'ROOT', 'currencies', listTemp([
+    store.get('Currency', 1),
+    store.get('Currency', 2),
+  ]))
   // -------------root-end------------------------
 
   // Org
@@ -395,6 +399,14 @@ export const initStoreData = (store: IMockStore) => {
   })
   store.set('Region', 13, {
     id: 13, countryID: 1, parentID: 1, shortCode: 'xiamen', name: '厦门市', nameEn: 'xiamen', displaySort: 2,
+  })
+
+  // Currency
+  store.set('Currency', 1, {
+    id: 1, name: '人民币', code: 'CNY'
+  })
+  store.set('Currency', 2, {
+    id: 2, name: '港币', code: 'HKD'
   })
 }
 

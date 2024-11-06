@@ -62,6 +62,11 @@ const documents = {
     "mutation createRegion($input: CreateRegionInput!){\n  createRegion(input:$input){\n    id,countryID,parentID,name,nameEn,shortCode,zipCode,status,displaySort,createdAt\n  }\n}": types.CreateRegionDocument,
     "mutation delRegion($regionId:ID!){\n  deleteRegion(regionID: $regionId)\n}": types.DelRegionDocument,
     "mutation moveRegion($action:TreeAction!,$sourceId:ID!,$targetId:ID!){\n  moveRegion(action: $action,sourceID:$sourceId,targetId:$targetId)\n}": types.MoveRegionDocument,
+    "query currencyList($first: Int,$orderBy:CurrencyOrder,$where:CurrencyWhereInput){\n  currencies(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,sign,status,createdAt\n      }\n    }\n  }\n}": types.CurrencyListDocument,
+    "query currencyInfo($gid:GID!){\n  node(id:$gid){\n    ... on Currency{\n      id,name,code,sign,status,createdAt\n    }\n  }\n}": types.CurrencyInfoDocument,
+    "mutation updateCurrency($id:ID!,$input: UpdateCurrencyInput!){\n  updateCurrency(currencyID:$id,input:$input){\n    id,name,code,sign,status,createdAt\n  }\n}": types.UpdateCurrencyDocument,
+    "mutation createCurrency($input: CreateCurrencyInput!){\n  createCurrency(input:$input){\n    id,name,code,sign,status,createdAt\n  }\n}": types.CreateCurrencyDocument,
+    "mutation delCurrency($id:ID!){\n  deleteCurrency(currencyID: $id)\n}": types.DelCurrencyDocument,
     "query appDictList($first: Int,$orderBy:AppDictOrder,$where:AppDictWhereInput){\n  appDicts(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n        app{id,name}\n      }\n    }\n  }\n}": types.AppDictListDocument,
     "query appDictInfo($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       app{id,name}\n     }\n   }\n }": types.AppDictInfoDocument,
     "query appDictItemList($gid:GID!){\n  node(id:$gid){\n   ... on AppDict{\n       id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,\n       items{\n        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,\n        org{ id,name }\n       }\n     }\n   }\n }": types.AppDictItemListDocument,
@@ -377,6 +382,26 @@ export function gql(source: "mutation delRegion($regionId:ID!){\n  deleteRegion(
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation moveRegion($action:TreeAction!,$sourceId:ID!,$targetId:ID!){\n  moveRegion(action: $action,sourceID:$sourceId,targetId:$targetId)\n}"): (typeof documents)["mutation moveRegion($action:TreeAction!,$sourceId:ID!,$targetId:ID!){\n  moveRegion(action: $action,sourceID:$sourceId,targetId:$targetId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query currencyList($first: Int,$orderBy:CurrencyOrder,$where:CurrencyWhereInput){\n  currencies(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,sign,status,createdAt\n      }\n    }\n  }\n}"): (typeof documents)["query currencyList($first: Int,$orderBy:CurrencyOrder,$where:CurrencyWhereInput){\n  currencies(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,code,sign,status,createdAt\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query currencyInfo($gid:GID!){\n  node(id:$gid){\n    ... on Currency{\n      id,name,code,sign,status,createdAt\n    }\n  }\n}"): (typeof documents)["query currencyInfo($gid:GID!){\n  node(id:$gid){\n    ... on Currency{\n      id,name,code,sign,status,createdAt\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateCurrency($id:ID!,$input: UpdateCurrencyInput!){\n  updateCurrency(currencyID:$id,input:$input){\n    id,name,code,sign,status,createdAt\n  }\n}"): (typeof documents)["mutation updateCurrency($id:ID!,$input: UpdateCurrencyInput!){\n  updateCurrency(currencyID:$id,input:$input){\n    id,name,code,sign,status,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createCurrency($input: CreateCurrencyInput!){\n  createCurrency(input:$input){\n    id,name,code,sign,status,createdAt\n  }\n}"): (typeof documents)["mutation createCurrency($input: CreateCurrencyInput!){\n  createCurrency(input:$input){\n    id,name,code,sign,status,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delCurrency($id:ID!){\n  deleteCurrency(currencyID: $id)\n}"): (typeof documents)["mutation delCurrency($id:ID!){\n  deleteCurrency(currencyID: $id)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
