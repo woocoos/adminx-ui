@@ -89,6 +89,7 @@ export default {
     proof: 'proof',
     default: 'Default',
     region: 'Region',
+    sign: 'Sign',
     401: 'Login expiration',
     403: 'No access rights',
     404: "Can't find a way",
@@ -246,6 +247,9 @@ export default {
     file_source_identity_list: 'File source certificate list',
     country_list: 'List of countries',
     region_list: 'List of regions',
+    currency_list: 'List of currencies',
+    currency_title: 'Monetary data',
+
     // 详情
     account_detail: 'Account details',
     member_detail: 'Member details',

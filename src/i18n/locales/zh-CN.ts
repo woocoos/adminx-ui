@@ -89,6 +89,7 @@ export default {
     proof: '凭证',
     default: '默认',
     region: '地区',
+    sign: '标志',
     401: '登录过期',
     403: '无访问权限',
     404: '找不到方法',
@@ -245,6 +246,9 @@ export default {
     file_source_identity_list: '文件来源凭证列表',
     country_list: '国家列表',
     region_list: '地区列表',
+    currency_list: '货币列表',
+    currency_title: '货币资料',
+
     // 详情
     account_detail: '账户详情',
     member_detail: '成员详情',

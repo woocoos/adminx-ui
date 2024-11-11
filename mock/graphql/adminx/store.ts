@@ -218,9 +218,11 @@ export const initStoreData = (store: IMockStore) => {
   // User
   store.set('User', 1, {
     id: 1, displayName: 'admin', userType: "account", contact: { email: "admin@woocoo.com" },
-    avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg',
+    // avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg', 这是本地调试用的
+    avatar: '',
     loginProfile: { mfaEnabled: false }
   })
+
 
   // app
   store.set('App', 1, {
@@ -281,6 +283,7 @@ export const initStoreData = (store: IMockStore) => {
   store.set('AppAction', 13, { id: 13, name: '/dict', method: 'list', appID: 1, app: store.get('App', 1) })
   store.set('AppAction', 14, { id: 14, name: '/system/country', method: 'list', appID: 1, app: store.get('App', 1) })
   store.set('AppAction', 15, { id: 15, name: '/org/members', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 16, { id: 16, name: '/system/currency', method: 'list', appID: 1, app: store.get('App', 1) })
 
   // AppPolicy
   store.set('AppPolicy', 1, {
@@ -409,4 +412,3 @@ export const initStoreData = (store: IMockStore) => {
     id: 2, name: '港币', code: 'HKD'
   })
 }
-

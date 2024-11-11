@@ -153,7 +153,7 @@ export async function createCurrencyInfo(input: CreateCurrencyInput) {
 
 /**
  * 更新
- * @param CurrencyId
+ * @param id
  * @param input
  * @returns
  */
@@ -173,7 +173,7 @@ export async function updateCurrencyInfo(id: string, input: UpdateCurrencyInput)
 
 /**
  * 删除
- * @param CurrencyId
+ * @param id
  * @returns
  */
 export async function delCurrencyInfo(id: string) {

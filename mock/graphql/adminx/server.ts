@@ -133,6 +133,9 @@ const schemaWithMocks = addMocksToSchema({
         store.get('AppAction', 11),
         store.get('AppAction', 12),
         store.get('AppAction', 13),
+        store.get('AppAction', 14),
+        store.get('AppAction', 15),
+        store.get('AppAction', 16),
       ],
       checkPermission: (_, { permission }) => {
         // permission => appCode:action
@@ -265,4 +268,3 @@ const schemaWithMocks = addMocksToSchema({
 })
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)
-
