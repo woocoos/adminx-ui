@@ -7,6 +7,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { getCacheCountryList } from '@/services/adminx/country';
+import { getCacheCurrencyList } from '@/services/adminx/currency';
+import { getDictItems } from '@knockout-js/api';
 
 type SelectTreeData = {
   value: string;
@@ -21,6 +23,8 @@ type ProFormData = {
   domain?: string;
   countryCode?: string;
   owner?: User;
+  baseCurrency?: string;
+  timezone?: string;
   profile?: string;
 };
 
@@ -36,6 +40,8 @@ export default (props: {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
     [countryCodeOptions, setCountryCodeOptions] = useState<{ value: string, label: string }[]>([]),
+    [currencyOptions, setCurrencyOptions] = useState<{ value: string, label: string }[]>([]),
+    [timezoneOptions, setTimezoneOptions] = useState<{ value: string, label: string }[]>([]),
     [saveDisabled, setSaveDisabled] = useState(true),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [oldInfo, setOldInfo] = useState<Org>();
@@ -46,16 +52,30 @@ export default (props: {
 
   const
     getBase = async () => {
-      const result = await getCacheCountryList({ pageSize: 999 });
-      if (result) {
-        setCountryCodeOptions(result.edges?.map(item => {
-          return {
-            value: item?.node?.code ?? '',
-            label: item?.node?.name ?? '',
-          };
-        }) ?? []);
-
-      }
+      // 获取国家列表
+      const countryResult = await getCacheCountryList({ pageSize: 999 });
+      setCountryCodeOptions(countryResult?.edges?.map(item => {
+        return {
+          value: item?.node?.code ?? '',
+          label: item?.node?.name ?? '',
+        };
+      }) ?? []);
+      // 获取本位币列表
+      const currencyResult = await getCacheCurrencyList({ pageSize: 999 });
+      setCurrencyOptions(currencyResult?.edges?.map(item => {
+        return {
+          value: item?.node?.code ?? '',
+          label: item?.node?.name ?? '',
+        };
+      }) ?? []);
+      // 获取时区列表
+      const dictItemResult = await getDictItems(`resource:DLSH`);
+      setTimezoneOptions(dictItemResult?.map(item => {
+        return {
+          value: item.name,
+          label: item.name,
+        };
+      }) ?? [])
     },
     parentRequest = async () => {
       const list: SelectTreeData[] = [
@@ -127,6 +147,8 @@ export default (props: {
             domain: values.domain,
             countryCode: values.countryCode,
             profile: values.profile,
+            baseCurrency: values.timezone,
+            timezone: values.timezone,
           }, oldInfo || {}));
           if (result?.id) {
             setSaveDisabled(true);
@@ -140,6 +162,8 @@ export default (props: {
             domain: values.domain,
             countryCode: values.countryCode,
             profile: values.profile,
+            baseCurrency: values.timezone,
+            timezone: values.timezone,
           }, props.kind);
           if (result?.id) {
             setSaveDisabled(true);
@@ -154,6 +178,8 @@ export default (props: {
           domain: values.domain,
           countryCode: values.countryCode,
           profile: values.profile,
+          baseCurrency: values.timezone,
+          timezone: values.timezone,
         }, props.kind);
         if (result?.id) {
           setSaveDisabled(true);
@@ -167,6 +193,8 @@ export default (props: {
           domain: values.domain,
           countryCode: values.countryCode,
           profile: values.profile,
+          baseCurrency: values.timezone,
+          timezone: values.timezone,
         }, props.kind);
         if (result?.id) {
           setSaveDisabled(true);
@@ -245,6 +273,18 @@ export default (props: {
           userType={UserUserType.Account}
         />
       </ProFormText>
+      <ProFormSelect
+        x-if={props.kind === 'root'}
+        name="baseCurrency"
+        label={t('org_currency')}
+        options={currencyOptions}
+      />
+      <ProFormSelect
+        x-if={props.kind === 'root'}
+        name="timezone"
+        label={t('timezone')}
+        options={timezoneOptions}
+      />
       <ProFormTextArea
         name="profile"
         label={t('description')}

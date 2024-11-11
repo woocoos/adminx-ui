@@ -85,6 +85,7 @@ export default {
     validity: '有效期',
     authentication: '验证身份',
     custDomain: '自定义域名',
+    timezone: '时区',
     back: '返回',
     proof: '凭证',
     default: '默认',
@@ -213,6 +214,7 @@ export default {
     country_region_title: '国家地区',
     zip_code: '邮政编码',
     user_type: '用户类型',
+    org_currency: '本位币',
 
     // 创建
     create_user: '创建用户',

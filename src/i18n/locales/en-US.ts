@@ -85,6 +85,7 @@ export default {
     validity: 'validity',
     authentication: 'authentication',
     custDomain: 'Customize the domain name',
+    timezone: 'Time zone',
     back: 'Back',
     proof: 'proof',
     default: 'Default',
@@ -213,6 +214,7 @@ export default {
     country_region_title: 'Country Region',
     zip_code: 'Postal code',
     user_type: 'User Type',
+    org_currency: 'Standard money',
 
     // 创建
     create_user: 'Create a user',

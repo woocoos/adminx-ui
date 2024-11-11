@@ -121,7 +121,31 @@ export const getObject = (store: IMockStore, ref: Ref) => {
   return null
 }
 
-
+/**
+ * 字典数据获取
+ * @param store
+ * @param refCode
+ * @returns
+ */
+export const getAllDist = (store: IMockStore, refCode: string | string[]) => {
+  const result: any[] = [], codes: string[] = [];
+  if (Array.isArray(refCode)) {
+    codes.push(...refCode.map(item => item.split(':')[1]))
+  } else {
+    codes.push(refCode.split(':')[1]);
+  }
+  const dictList: any[] = [
+    store.get('AppDict', 1),
+    store.get('AppDict', 2),
+  ]
+  codes.forEach(code => {
+    const dRef = dictList.find(dictRef => store.get(dictRef, 'code') == code)
+    if (dRef) {
+      result.push(...store.get(dRef, 'items') as any[]);
+    }
+  })
+  return result;
+}
 
 /**
  * store内的基础数据
@@ -351,6 +375,12 @@ export const initStoreData = (store: IMockStore) => {
       store.get('AppDictItem', 3),
     ]
   })
+  store.set('AppDict', 2, {
+    id: 2, code: "DLSH", items: [
+      store.get('AppDictItem', 4),
+      store.get('AppDictItem', 5),
+    ]
+  })
 
   // AppDictItem
   store.set('AppDictItem', 1, {
@@ -361,6 +391,13 @@ export const initStoreData = (store: IMockStore) => {
   })
   store.set('AppDictItem', 3, {
     id: 3, code: "confidentiality", name: '保密', dictID: "1", refCode: "app1:sex", dict: store.get('AppDict', 1)
+  })
+
+  store.set('AppDictItem', 4, {
+    id: 4, code: "Asia/Hong_Kong", name: 'Asia/Hong_Kong', dictID: "2", refCode: "resource:DLSH", dict: store.get('AppDict', 2)
+  })
+  store.set('AppDictItem', 5, {
+    id: 5, code: "America/New_York", name: 'America/New_York', dictID: "2", refCode: "resource:DLSH", dict: store.get('AppDict', 2)
   })
 
   // OrgFileIdentity

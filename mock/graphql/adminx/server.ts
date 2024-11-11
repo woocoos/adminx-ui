@@ -3,7 +3,7 @@ import { addMocksToSchema, createMockStore, mockServer, Ref, relayStylePaginatio
 import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
-import { addListTemp, delListTemp, initStoreData, listTemp } from "./store";
+import { addListTemp, delListTemp, getAllDist, initStoreData, listTemp } from "./store";
 
 const preserveResolvers = true
 const typeDefs = readFileSync(join(process.cwd(), 'script', 'generated', "adminx.graphql"), 'utf-8');
@@ -155,16 +155,10 @@ const schemaWithMocks = addMocksToSchema({
       orgRecycleUsers: relayStylePaginationMock(store),
       globalID: (_, { type, id }) => btoa(`${type}:${id}`),
       appDictByRefCode: (_, { refCodes }) => {
-        return [
-          store.get('AppDict', 1),
-        ]
+        return getAllDist(store, refCodes)
       },
-      appDictItemByRefCode: (_, { refCodes }) => {
-        return [
-          store.get('AppDictItem', 1),
-          store.get('AppDictItem', 2),
-          store.get('AppDictItem', 3),
-        ]
+      appDictItemByRefCode: (_, { refCode }) => {
+        return getAllDist(store, refCode)
       },
       node: (root, args, context, info) => {
         const decoded = Buffer.from(args.id, 'base64').toString()
