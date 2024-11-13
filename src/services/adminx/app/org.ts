@@ -12,7 +12,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
         edges{
           cursor,node{
             id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-            domain,code,name,profile,status,path,displaySort,countryCode,timezone,baseCurrency
+            domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
             owner { id,displayName }
           }
         }
@@ -24,7 +24,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
 const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToOrgList($appRoleId:ID!,$where: OrgWhereInput){
   appRoleAssignedToOrgs(roleID:$appRoleId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone,baseCurrency
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
   }
 }`);
@@ -32,7 +32,7 @@ const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToO
 const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssignedToOrgList($appPolicyId:ID!,$where: OrgWhereInput){
   appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone,baseCurrency
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
   }
 }`);
@@ -40,7 +40,7 @@ const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssigne
 const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPolicyAssignedToOrgListAndIsGrant($appPolicyId:ID!,$appPolicyIdToIsAllow:ID!,$where: OrgWhereInput){
   appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone,baseCurrency
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
     isAllowRevokeAppPolicy(appPolicyID: $appPolicyIdToIsAllow)
   }

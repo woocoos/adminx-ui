@@ -23,7 +23,7 @@ type ProFormData = {
   domain?: string;
   countryCode?: string;
   owner?: User;
-  baseCurrency?: string;
+  localCurrency?: string;
   timezone?: string;
   profile?: string;
 };
@@ -147,7 +147,7 @@ export default (props: {
             domain: values.domain,
             countryCode: values.countryCode,
             profile: values.profile,
-            baseCurrency: values.timezone,
+            localCurrency: values.localCurrency,
             timezone: values.timezone,
           }, oldInfo || {}));
           if (result?.id) {
@@ -162,7 +162,7 @@ export default (props: {
             domain: values.domain,
             countryCode: values.countryCode,
             profile: values.profile,
-            baseCurrency: values.timezone,
+            localCurrency: values.localCurrency,
             timezone: values.timezone,
           }, props.kind);
           if (result?.id) {
@@ -178,7 +178,7 @@ export default (props: {
           domain: values.domain,
           countryCode: values.countryCode,
           profile: values.profile,
-          baseCurrency: values.timezone,
+          localCurrency: values.localCurrency,
           timezone: values.timezone,
         }, props.kind);
         if (result?.id) {
@@ -193,7 +193,7 @@ export default (props: {
           domain: values.domain,
           countryCode: values.countryCode,
           profile: values.profile,
-          baseCurrency: values.timezone,
+          localCurrency: values.localCurrency,
           timezone: values.timezone,
         }, props.kind);
         if (result?.id) {
