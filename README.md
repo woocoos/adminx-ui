@@ -11,11 +11,17 @@ adminx前端项目
 - urql [urql](https://formidable.com/open-source/urql/)
 
 ## 快速开始
+.env.local
+```
+# ice proxy target 指向到当前mock
+ICE_PROXY_ADMINX=http://localhost:3000/mock-api-adminx
+ICE_PROXY_AUTH=http://localhost:3000/mock-api-auth
+```
+运行启动
+
 ```shell
-# 启动开发环境,默认使用mock
+# 启动开发环境
 pnpm dev
-# 启动,使用proxy
-pnpm start
 ```
 
 ##  gqlgen与urql 
