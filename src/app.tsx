@@ -6,7 +6,7 @@ import { defineChildConfig } from '@ice/plugin-icestark/types';
 import { defineRequestConfig } from '@ice/plugin-request/esm/types';
 import { defineStoreConfig } from '@ice/plugin-store/esm/types';
 import { userPermissions } from '@knockout-js/api';
-import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/types";
 import { Result, message } from 'antd';
 import { defineAppConfig, defineDataLoader } from 'ice';
