@@ -9,7 +9,7 @@ import { Result, message } from 'antd';
 import ResetPassword from './components/resetPassword';
 import { useSearchParams } from 'ice';
 import { appAccess } from '@/services/adminx/app';
-import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/request';
+import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '';
