@@ -52,20 +52,7 @@ export default () => {
           setIsLoginSuccess(true);
           await userDispatcher.loginAfter(result);
           message.success(t('login_success'));
-          if (isInIcestark()) {
-            // 子应用加载登录成功处理
-            setItem('token', result.accessToken);
-            setItem('refreshToken', result.refreshToken);
-            setItem('tenantId', tenantId);
-            if (result.user) {
-              setItem('user', {
-                id: result.user.id,
-                displayName: result.user.displayName,
-                avatar: result.user.avatar,
-              });
-            }
-          }
-          location.replace(await urlSpm(redirect || `${ICE_ROUTER_BASENAME}/`.replaceAll('//', '/')));
+          location.replace(await urlSpm(redirect || `${ICE_ROUTER_BASENAME}/`.replaceAll('//', '/'), undefined, isInIcestark()));
         } else {
           message.error(t('login_not_app_access'));
           setRes(undefined);
