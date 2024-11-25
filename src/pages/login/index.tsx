@@ -12,6 +12,7 @@ import { appAccess } from '@/services/adminx/app';
 import { RequestHeaderAuthorizationMode, getRequestHeaderAuthorization } from '@knockout-js/ice-urql/requestInterceptor';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
+  ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '';
 
 export default () => {
@@ -49,7 +50,7 @@ export default () => {
           setIsLoginSuccess(true);
           await userDispatcher.loginAfter(result);
           message.success(t('login_success'));
-          location.replace(await urlSpm(redirect || '/'));
+          location.replace(await urlSpm(redirect || `${ICE_ROUTER_BASENAME}/`.replaceAll('//', '/')));
         } else {
           message.error(t('login_not_app_access'));
           setRes(undefined);
