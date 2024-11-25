@@ -68,7 +68,12 @@ export default () => {
     ]);
   }, []);
 
-  return [`${ICE_ROUTER_BASENAME}/login`.replaceAll('//', '/'), `${ICE_ROUTER_BASENAME}/login/retrievePassword`.replaceAll('//', '/')].includes(location.pathname) ?
+  return [
+    "/login",
+    "/login/retrievePassword",
+    `${ICE_ROUTER_BASENAME}/login`.replaceAll('//', '/'),
+    `${ICE_ROUTER_BASENAME}/login/retrievePassword`.replaceAll('//', '/')
+  ].includes(location.pathname) ?
     <Outlet />
     : <Layout
       appCode={ICE_APP_CODE}
