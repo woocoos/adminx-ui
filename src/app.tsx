@@ -16,12 +16,16 @@ import { User } from './generated/adminx/graphql';
 import { logout } from './services/auth';
 import { parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
+import { setLibraryName } from '@ice/stark-app';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
+  ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
+
+setLibraryName('adminx-ui')
 
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
@@ -50,6 +54,9 @@ export default defineAppConfig(() => ({
   app: {
     rootId: 'app',
   },
+  router: {
+    basename: ICE_ROUTER_BASENAME,
+  }
 }));
 
 // 用来做初始化数据

@@ -32,7 +32,7 @@ export default () => {
   }, [appState.locale]);
 
   useEffect(() => {
-    if (userState.user?.avatar) {
+    if (userState.token && userState.user?.avatar) {
       parseStorageUrl(userState.user.avatar).then(result => {
         if (result) {
           setAvatar(result);
