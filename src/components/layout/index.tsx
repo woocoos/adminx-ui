@@ -14,6 +14,7 @@ import { parseStorageUrl } from '@knockout-js/api';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   IconFont = createFromIconfontCN({
     scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
   })
@@ -67,7 +68,8 @@ export default () => {
     ]);
   }, []);
 
-  return ['/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
+  return [`${ICE_ROUTER_BASENAME}/login`.replaceAll('//', '/'), `${ICE_ROUTER_BASENAME}/login/retrievePassword`.replaceAll('//', '/')].includes(location.pathname) ?
+    <Outlet />
     : <Layout
       appCode={ICE_APP_CODE}
       pathname={location.pathname}
