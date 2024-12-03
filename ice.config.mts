@@ -33,23 +33,26 @@ export default defineConfig(() => ({
     ],
   },
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM',
-    'react-i18next': 'ReactI18next',
-    'i18next': 'i18next',
-    'antd': 'antd',
-    '@ant-design/pro-components': 'ProComponents',
+    // 先禁用cdn处理 由于子应用加载会找不到react问题
+    // Uncaught Error: Dynamic require of "react" is not supported
+    // 'react': 'React',
+    // 'react-dom': 'ReactDOM',
+    // 'react-i18next': 'ReactI18next',
+    // 'i18next': 'i18next',
+    // 'antd': 'antd',
+    // '@ant-design/pro-components': 'ProComponents',
   },
   plugins: [
-    icestark({ type: 'child' }),
-    urqlPlugin(),
-    request(),
-    store(),
-    auth(),
-    jsxPlus(),
-    antd({
-      importStyle: false,
-    }),
+
+    // icestark({ type: 'child' }),
+    // urqlPlugin(),
+    // request(),
+    // store(),
+    // auth(),
+    // jsxPlus(),
+    // antd({
+    //   importStyle: false,
+    // }),
   ],
   proxy: {
     [ICE_API_ADMINX_PREFIX]: {
