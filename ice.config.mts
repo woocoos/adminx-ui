@@ -43,16 +43,15 @@ export default defineConfig(() => ({
     // '@ant-design/pro-components': 'ProComponents',
   },
   plugins: [
-
-    // icestark({ type: 'child' }),
-    // urqlPlugin(),
-    // request(),
-    // store(),
-    // auth(),
-    // jsxPlus(),
-    // antd({
-    //   importStyle: false,
-    // }),
+    icestark({ type: 'child' }),
+    urqlPlugin(),
+    request(),
+    store(),
+    auth(),
+    jsxPlus(),
+    antd({
+      importStyle: false,
+    }),
   ],
   proxy: {
     [ICE_API_ADMINX_PREFIX]: {
