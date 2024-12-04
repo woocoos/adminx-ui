@@ -11,6 +11,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * 3. It does not support dead code elimination, so it will add unused operations.
  *
  * Therefore it is highly recommended to use the babel or swc plugin for production.
+ * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
     "query appActionList($gid: GID!,$first: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      actions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n          }\n        }\n      }\n    }\n  }\n}": types.AppActionListDocument,
