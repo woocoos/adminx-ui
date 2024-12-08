@@ -5,7 +5,7 @@ import { useRef, useState } from 'react';
 import { Link, useSearchParams } from '@ice/runtime';
 import ModalOrg from '@/pages/org/components/modalOrg';
 import { getAppRoleAssignedOrgList } from '@/services/adminx/app/org';
-import { getAppRoleInfo } from '@/services/adminx/app/role';
+import { getAppRoleInfo, syncAppRoleToOrg } from '@/services/adminx/app/role';
 import { assignOrgAppRole, revokeOrgAppRole } from '@/services/adminx/org/role';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
@@ -53,6 +53,14 @@ export default () => {
                 {t('disauthorization')}
               </a>
             </Auth>
+            <Auth authKey="syncAppRoleToOrg">
+              <a onClick={() => {
+                onSyncToOrg(record);
+              }}
+              >
+                {t('sync_permission')}
+              </a>
+            </Auth>
           </Space>);
         },
       },
@@ -93,6 +101,21 @@ export default () => {
             const result = await revokeOrgAppRole(record.id, appRoleInfo.id);
             if (result) {
               proTableRef.current?.reload();
+              message.success(t('submit_success'));
+              close();
+            }
+          },
+        });
+      }
+    },
+    onSyncToOrg = (record: Org) => {
+      if (appRoleInfo) {
+        Modal.confirm({
+          title: t('sync_permission'),
+          content: `${t('confirm_sync_permission_to_org')}：${record.name}?`,
+          onOk: async (close) => {
+            const result = await syncAppRoleToOrg(record.id, appRoleInfo.id);
+            if (result) {
               message.success(t('submit_success'));
               close();
             }

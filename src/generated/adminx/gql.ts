@@ -11,7 +11,6 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * 3. It does not support dead code elimination, so it will add unused operations.
  *
  * Therefore it is highly recommended to use the babel or swc plugin for production.
- * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
     "query appActionList($gid: GID!,$first: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      actions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n          }\n        }\n      }\n    }\n  }\n}": types.AppActionListDocument,
@@ -51,6 +50,7 @@ const documents = {
     "mutation delAppRole($appRoleId:ID!){\n  deleteAppRole(roleID: $appRoleId)\n}": types.DelAppRoleDocument,
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
+    "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}": types.SyncAppRoleToOrgDocument,
     "query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}": types.CountryListDocument,
     "query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}": types.CountryInfoDocument,
     "mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}": types.UpdateCountryDocument,
@@ -335,6 +335,10 @@ export function gql(source: "mutation assignAppRolePolicy($appId:ID!,$appRoleId:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"): (typeof documents)["mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}"): (typeof documents)["mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

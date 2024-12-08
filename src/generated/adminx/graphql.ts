@@ -2175,7 +2175,7 @@ export type CreateAppPolicyInput = {
   /** 描述 */
   comments?: InputMaybe<Scalars['String']['input']>;
   /** 分类：app-应用策略、view-策略视图 */
-  kind: AppPolicyKind;
+  kind?: InputMaybe<AppPolicyKind>;
   /** 策略名称 */
   name: Scalars['String']['input'];
   orgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -3362,6 +3362,8 @@ export type Mutation = {
   sendMFAToUserByEmail: Scalars['Boolean']['output'];
   /** 设置默认凭证 */
   setDefaultFileIdentity: Scalars['Boolean']['output'];
+  /** 同步角色权限策略到组织 */
+  syncAppRoleToOrg: Scalars['Boolean']['output'];
   /** 更新应用 */
   updateApp?: Maybe<App>;
   /** 更新应用操作 */
@@ -3421,14 +3423,16 @@ export type MutationAssignAppRolePolicyArgs = {
 
 export type MutationAssignAppRolePolicyViewArgs = {
   appID: Scalars['ID']['input'];
-  appPolicyIDs: Array<Scalars['ID']['input']>;
+  appPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  rmAppPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   roleID: Scalars['ID']['input'];
 };
 
 
 export type MutationAssignOrgRolePolicyViewArgs = {
   orgID: Scalars['ID']['input'];
-  orgPolicyIDs: Array<Scalars['ID']['input']>;
+  orgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  rmOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   roleID: Scalars['ID']['input'];
 };
 
@@ -3458,7 +3462,8 @@ export type MutationAssignRoleUserArgs = {
 
 export type MutationAssignUserPolicyViewArgs = {
   orgID: Scalars['ID']['input'];
-  orgPolicyIDs: Array<Scalars['ID']['input']>;
+  orgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  rmOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   userID: Scalars['ID']['input'];
 };
 
@@ -3852,6 +3857,12 @@ export type MutationSendMfaToUserByEmailArgs = {
 
 export type MutationSetDefaultFileIdentityArgs = {
   identityID: Scalars['ID']['input'];
+  orgID: Scalars['ID']['input'];
+};
+
+
+export type MutationSyncAppRoleToOrgArgs = {
+  appRoleID: Scalars['ID']['input'];
   orgID: Scalars['ID']['input'];
 };
 
@@ -8643,6 +8654,14 @@ export type RevokeAppRolePolicyMutationVariables = Exact<{
 
 export type RevokeAppRolePolicyMutation = { __typename?: 'Mutation', revokeAppRolePolicy: boolean };
 
+export type SyncAppRoleToOrgMutationVariables = Exact<{
+  orgId: Scalars['ID']['input'];
+  appRoleId: Scalars['ID']['input'];
+}>;
+
+
+export type SyncAppRoleToOrgMutation = { __typename?: 'Mutation', syncAppRoleToOrg: boolean };
+
 export type CountryListQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<CountryOrder>;
@@ -9647,6 +9666,7 @@ export const UpdateAppRoleDocument = {"kind":"Document","definitions":[{"kind":"
 export const DelAppRoleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delAppRole"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteAppRole"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"roleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}}]}]}}]} as unknown as DocumentNode<DelAppRoleMutation, DelAppRoleMutationVariables>;
 export const AssignAppRolePolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"assignAppRolePolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"policyIds"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"assignAppRolePolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appId"}}},{"kind":"Argument","name":{"kind":"Name","value":"roleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}},{"kind":"Argument","name":{"kind":"Name","value":"policyIDs"},"value":{"kind":"Variable","name":{"kind":"Name","value":"policyIds"}}}]}]}}]} as unknown as DocumentNode<AssignAppRolePolicyMutation, AssignAppRolePolicyMutationVariables>;
 export const RevokeAppRolePolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"revokeAppRolePolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"policyIds"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"revokeAppRolePolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appId"}}},{"kind":"Argument","name":{"kind":"Name","value":"roleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}},{"kind":"Argument","name":{"kind":"Name","value":"policyIDs"},"value":{"kind":"Variable","name":{"kind":"Name","value":"policyIds"}}}]}]}}]} as unknown as DocumentNode<RevokeAppRolePolicyMutation, RevokeAppRolePolicyMutationVariables>;
+export const SyncAppRoleToOrgDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"syncAppRoleToOrg"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"syncAppRoleToOrg"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orgID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}},{"kind":"Argument","name":{"kind":"Name","value":"appRoleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}}]}]}}]} as unknown as DocumentNode<SyncAppRoleToOrgMutation, SyncAppRoleToOrgMutationVariables>;
 export const CountryListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"countryList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CountryOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"CountryWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"countries"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nameEn"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]}}]} as unknown as DocumentNode<CountryListQuery, CountryListQueryVariables>;
 export const CountryInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"countryInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Country"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nameEn"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<CountryInfoQuery, CountryInfoQueryVariables>;
 export const UpdateCountryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateCountry"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"countryId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCountryInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCountry"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"countryID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"countryId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"nameEn"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<UpdateCountryMutation, UpdateCountryMutationVariables>;

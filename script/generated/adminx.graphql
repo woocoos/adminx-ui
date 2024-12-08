@@ -2136,7 +2136,7 @@ input CreateAppPolicyInput {
   """描述"""
   comments: String
   """分类：app-应用策略、view-策略视图"""
-  kind: AppPolicyKind!
+  kind: AppPolicyKind
   """策略名称"""
   name: String!
   orgPolicyIDs: [ID!]
@@ -3169,9 +3169,9 @@ type Mutation {
   """角色添加策略"""
   assignAppRolePolicy(appID: ID!, policyIDs: [ID!], roleID: ID!): Boolean!
   """应用角色添加策略视图权限"""
-  assignAppRolePolicyView(appID: ID!, appPolicyIDs: [ID!]!, roleID: ID!): Boolean!
+  assignAppRolePolicyView(appID: ID!, appPolicyIDs: [ID!], rmAppPolicyIDs: [ID!], roleID: ID!): Boolean!
   """组织角色添加策略视图权限"""
-  assignOrgRolePolicyView(orgID: ID!, orgPolicyIDs: [ID!]!, roleID: ID!): Boolean!
+  assignOrgRolePolicyView(orgID: ID!, orgPolicyIDs: [ID!], rmOrgPolicyIDs: [ID!], roleID: ID!): Boolean!
   """分配应用,将自动分配应用下的所有资源"""
   assignOrganizationApp(appID: ID!, orgID: ID!): Boolean!
   """分配应用策略到组织"""
@@ -3181,7 +3181,7 @@ type Mutation {
   """分配组用户"""
   assignRoleUser(input: AssignRoleUserInput!): Boolean!
   """组织用户添加策略视图权限"""
-  assignUserPolicyView(orgID: ID!, orgPolicyIDs: [ID!]!, userID: ID!): Boolean!
+  assignUserPolicyView(orgID: ID!, orgPolicyIDs: [ID!], rmOrgPolicyIDs: [ID!], userID: ID!): Boolean!
   """自动授权应用，系统开户、创建web交易用户使用"""
   autoGrantApp(appCode: String!, orgID: ID!, userID: ID!): Boolean!
   """绑定用户凭证(管理端使用)"""
@@ -3357,6 +3357,8 @@ type Mutation {
   sendMFAToUserByEmail(userID: ID!): Boolean!
   """设置默认凭证"""
   setDefaultFileIdentity(identityID: ID!, orgID: ID!): Boolean!
+  """同步角色权限策略到组织"""
+  syncAppRoleToOrg(appRoleID: ID!, orgID: ID!): Boolean!
   """更新应用"""
   updateApp(appID: ID!, input: UpdateAppInput!): App
   """更新应用操作"""

@@ -108,6 +108,7 @@ export default {
     confirm_enable_MFA: 'confirm enable MFA Multi-factor certification',
     confirm_close_MFA: 'confirm close MFA Multi-factor certification',
     'confirm_set_default_{{field}}': 'confirm {{field}} set default',
+    confirm_sync_permission_to_org: 'confirm that the synchronization application role permission is granted to the organization',
     submit_success: 'submit success',
     login_success: 'login success',
     go_login: 'go login',

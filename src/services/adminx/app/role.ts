@@ -60,6 +60,10 @@ const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePoli
   revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
 }`);
 
+const mutationSyncAppRoleToOrg = gql(/* GraphQL */`mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){
+  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)
+}`);
+
 
 /**
  * 获取应用角色
@@ -215,6 +219,20 @@ export async function revokeAppRolePolicy(appId: string, appRoleId: string, appP
 
   if (result.data?.revokeAppRolePolicy) {
     return result.data.revokeAppRolePolicy;
+  }
+  return null;
+}
+
+export async function syncAppRoleToOrg(orgId: string, appRoleId: string) {
+  const
+    result = await mutation(
+      mutationSyncAppRoleToOrg, {
+      orgId,
+      appRoleId,
+    });
+
+  if (result.data?.syncAppRoleToOrg) {
+    return result.data.syncAppRoleToOrg;
   }
   return null;
 }
