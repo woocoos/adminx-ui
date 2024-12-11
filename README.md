@@ -14,8 +14,9 @@ adminx前端项目
 ### .env.local
 ```
 # ice proxy target 指向到当前mock
-ICE_PROXY_ADMINX=http://localhost:3000/mock-api-adminx
-ICE_PROXY_AUTH=http://localhost:3000/mock-api-auth
+PORT=3001
+ICE_PROXY_ADMINX=http://127.0.0.1:3001/mock-api-adminx
+ICE_PROXY_AUTH=http://127.0.0.1:3001/mock-api-auth
 
 # 本地启动adminx则直接配置地址，其中8083、10070根据adminx的服务端口决定
 ICE_PROXY_ADMINX=http://127.0.0.1:8083/
