@@ -11,6 +11,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * 3. It does not support dead code elimination, so it will add unused operations.
  *
  * Therefore it is highly recommended to use the babel or swc plugin for production.
+ * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
     "query appActionList($gid: GID!,$first: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      actions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n          }\n        }\n      }\n    }\n  }\n}": types.AppActionListDocument,
@@ -36,9 +37,14 @@ const documents = {
     "query appPolicieList($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n      }\n    }\n  }\n}": types.AppPolicieListDocument,
     "query appPolicieListAndIsGrant($gid:GID!,$appRoleId:ID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n        isGrantAppRole(appRoleID: $appRoleId)\n      }\n    }\n  }\n}": types.AppPolicieListAndIsGrantDocument,
     "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppPolicy{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,\n      rules{ effect,actions,resources,conditions }\n      app{ id,name }\n    }\n  }\n}": types.AppPolicyInfoDocument,
+    "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id, name, parentID, comments\n    }\n  }\n}": types.AppPolicyViewDocument,
     "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}": types.CreateAppPolicyDocument,
     "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}": types.UpdateAppPolicyDocument,
     "mutation delAppPolicy($appPolicyId:ID!){\n  deleteAppPolicy(policyID: $appPolicyId)\n}": types.DelAppPolicyDocument,
+    "mutation createAppPolicyView($input: CreateAppPolicyViewInput!){\n  createAppPolicyView(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n  }\n}": types.CreateAppPolicyViewDocument,
+    "mutation updateAppPolicyView($appPolicyViewID:ID!, $input: UpdateAppPolicyViewInput!){\n  updateAppPolicyView(appPolicyViewID:$appPolicyViewID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n  }\n}": types.UpdateAppPolicyViewDocument,
+    "mutation delAppPolicyView($appPolicyViewID:ID!){\n  deleteAppPolicyView(appPolicyViewID: $appPolicyViewID)\n}": types.DelAppPolicyViewDocument,
+    "mutation moveAppPolicyView($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppPolicyView(sourceID:$sourceId,targetID:$targetId,action:$action)\n}": types.MoveAppPolicyViewDocument,
     "query appResList($gid: GID!,$first: Int,$orderBy:AppResOrder,$where:AppResWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      resources(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n          }\n        }\n      }\n    }\n  }\n}": types.AppResListDocument,
     "query appResInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppRes{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n    }\n  }\n}": types.AppResInfoDocument,
     "mutation updateAppRes($appResId:ID!,$input: UpdateAppResInput!){\n  updateAppRes(appResID:$appResId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,typeName,arnPattern\n  }\n}": types.UpdateAppResDocument,
@@ -281,6 +287,10 @@ export function gql(source: "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id, name, parentID, comments\n    }\n  }\n}"): (typeof documents)["query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id, name, parentID, comments\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}"): (typeof documents)["mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -290,6 +300,22 @@ export function gql(source: "mutation updateAppPolicy($appPolicyId:ID!,$input: U
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation delAppPolicy($appPolicyId:ID!){\n  deleteAppPolicy(policyID: $appPolicyId)\n}"): (typeof documents)["mutation delAppPolicy($appPolicyId:ID!){\n  deleteAppPolicy(policyID: $appPolicyId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createAppPolicyView($input: CreateAppPolicyViewInput!){\n  createAppPolicyView(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n  }\n}"): (typeof documents)["mutation createAppPolicyView($input: CreateAppPolicyViewInput!){\n  createAppPolicyView(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateAppPolicyView($appPolicyViewID:ID!, $input: UpdateAppPolicyViewInput!){\n  updateAppPolicyView(appPolicyViewID:$appPolicyViewID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n  }\n}"): (typeof documents)["mutation updateAppPolicyView($appPolicyViewID:ID!, $input: UpdateAppPolicyViewInput!){\n  updateAppPolicyView(appPolicyViewID:$appPolicyViewID,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation delAppPolicyView($appPolicyViewID:ID!){\n  deleteAppPolicyView(appPolicyViewID: $appPolicyViewID)\n}"): (typeof documents)["mutation delAppPolicyView($appPolicyViewID:ID!){\n  deleteAppPolicyView(appPolicyViewID: $appPolicyViewID)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation moveAppPolicyView($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppPolicyView(sourceID:$sourceId,targetID:$targetId,action:$action)\n}"): (typeof documents)["mutation moveAppPolicyView($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveAppPolicyView(sourceID:$sourceId,targetID:$targetId,action:$action)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

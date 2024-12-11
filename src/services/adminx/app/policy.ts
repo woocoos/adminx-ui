@@ -1,6 +1,11 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { CreateAppPolicyInput, UpdateAppPolicyInput } from '@/generated/adminx/graphql';
+import {
+  AppPolicyView,
+  CreateAppPolicyInput,
+  CreateAppPolicyViewInput,
+  UpdateAppPolicyInput, UpdateAppPolicyViewInput, TreeAction,
+} from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 export const EnumAppPolicyStatus = {
@@ -48,6 +53,14 @@ const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
   }
 }`);
 
+const queryAppPolicyView = gql(/* GraphQL */`query appPolicyView($appCode:String!){
+  appPolicyView(appCode:$appCode){
+    ... on AppPolicyView{
+      id, name, parentID, comments
+    }
+  }
+}`);
+
 const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){
   createAppPolicy(appID:$appId,input:$input){
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
@@ -62,6 +75,26 @@ const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appP
 
 const mutationDelAppPolicy = gql(/* GraphQL */`mutation delAppPolicy($appPolicyId:ID!){
   deleteAppPolicy(policyID: $appPolicyId)
+}`);
+
+const mutationCreateAppPolicyView = gql(/* GraphQL */`mutation createAppPolicyView($input: CreateAppPolicyViewInput!){
+  createAppPolicyView(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind
+  }
+}`);
+
+const mutationUpdateAppPolicyView = gql(/* GraphQL */`mutation updateAppPolicyView($appPolicyViewID:ID!, $input: UpdateAppPolicyViewInput!){
+  updateAppPolicyView(appPolicyViewID:$appPolicyViewID,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind
+  }
+}`);
+
+const mutationDelAppPolicyView = gql(/* GraphQL */`mutation delAppPolicyView($appPolicyViewID:ID!){
+  deleteAppPolicyView(appPolicyViewID: $appPolicyViewID)
+}`);
+
+const mutationMoveAppPolicyView = gql(/* GraphQL */`mutation moveAppPolicyView($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
+  moveAppPolicyView(sourceID:$sourceId,targetID:$targetId,action:$action)
 }`);
 
 /**
@@ -165,6 +198,99 @@ export async function delAppPolicy(appPolicyId: string) {
 
   if (result.data?.deleteAppPolicy) {
     return result.data.deleteAppPolicy;
+  }
+  return null;
+}
+
+/**
+ * 获取应用权限策略视图
+ * @param appCode
+ * @returns
+ */
+export async function getAppPolicyView(appCode: string): Promise<AppPolicyView[]> {
+  const
+    list: any[] = [],
+    result = await query(
+      queryAppPolicyView, {
+        appCode: appCode,
+      });
+
+  if (result.data?.appPolicyView) {
+    result.data.appPolicyView.forEach(item => {
+      if (item) {
+        list.push(item);
+      }
+    });
+  }
+  return list;
+}
+
+export async function createAppPolicyView(input: CreateAppPolicyViewInput) {
+  const
+    result = await mutation(mutationCreateAppPolicyView, {
+        input,
+      });
+
+  if (result.data?.createAppPolicyView?.id) {
+    return result.data.createAppPolicyView;
+  }
+  return null;
+}
+
+/**
+ * 更新
+ * @param appPolicyViewId
+ * @param input
+ * @returns
+ */
+export async function updateAppPolicyView(appPolicyViewID: string, input: UpdateAppPolicyViewInput) {
+  const
+    result = await mutation(
+      mutationUpdateAppPolicyView, {
+        appPolicyViewID,
+        input,
+      });
+
+  if (result.data?.updateAppPolicyView?.id) {
+    return result.data.updateAppPolicyView;
+  }
+  return null;
+}
+
+/**
+ * 删除
+ * @param appPolicyViewID
+ * @returns
+ */
+export async function delAppPolicyView(appPolicyViewID: string) {
+  const
+    result = await mutation(
+      mutationDelAppPolicyView, {
+        appPolicyViewID,
+      });
+
+  if (result.data?.deleteAppPolicyView) {
+    return result.data.deleteAppPolicyView;
+  }
+  return null;
+}
+
+/**
+ * 菜单位置移动
+ * @param input
+ * @returns
+ */
+export async function moveAppPolicyView(sourceId: string, targetId: string, action: TreeAction) {
+  const
+    result = await mutation(
+      mutationMoveAppPolicyView, {
+        sourceId,
+        targetId,
+        action,
+      });
+
+  if (result.data?.moveAppPolicyView) {
+    return result.data.moveAppPolicyView;
   }
   return null;
 }

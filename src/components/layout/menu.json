@@ -45,6 +45,10 @@
       {
         "name": "角色",
         "path": "/org/roles"
+      },
+      {
+        "name": "权限试图",
+        "path": "/org/permissiongroup"
       }
     ]
   },
@@ -64,6 +68,11 @@
         "name": "应用管理",
         "path": "/system/app"
       },
+      {
+        "name": "策略视图",
+        "path": "/app/policyview"
+      },
+
       {
         "name": "文件来源",
         "path": "/system/file/source"

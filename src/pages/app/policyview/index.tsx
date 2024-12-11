@@ -3,28 +3,38 @@ import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col }
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, saveTreeData } from '@/util';
-import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/interface';
 import { useAuth } from 'ice';
-import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/generated/adminx/graphql';
+import {
+  App,
+  AppMenu,
+  AppMenuKind, AppPolicyView,
+  AppPolicyViewKind,
+  CreateAppPolicyViewInput,
+  UpdateAppMenuInput,
+} from '@/generated/adminx/graphql';
 import { getAppInfo } from '@/services/adminx/app';
 import { useLeavePrompt } from '@knockout-js/layout';
+import {
+  createAppPolicyView, delAppPolicyView,
+  getAppPolicyView,
+  moveAppPolicyView,
+  updateAppPolicyView,
+} from '@/services/adminx/app/policy';
+import { ItemType } from 'antd/es/menu/interface';
 
 
 type TreeSelectedData = {
   keys: Array<string>;
   action: TreeEditorAction;
-  info?: AppMenu;
+  info?: AppPolicyView;
 };
 
 type ProFormData = {
   name: string;
-  kind: AppMenuKind;
-  icon?: string;
-  route?: string;
+  kind: AppPolicyViewKind;
   comments?: string;
 };
 
@@ -34,19 +44,19 @@ export default () => {
     { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
     [searchParams] = useSearchParams(),
-    id = searchParams.get('id'),
+    id = searchParams.get('id') || '3',
     [loading, setLoading] = useState(false),
     [treeDraggable, setTreeDraggable] = useState(false),
     [appInfo, setAppInfo] = useState<App>(),
-    [menus, setMenus] = useState<AppMenu[]>([]),
-    [treeData, setTreeData] = useState<TreeDataState<AppMenu>[]>([]),
+    [appPolicyViews, setAppPolicyViews] = useState<AppPolicyView[]>([]),
+    [treeData, setTreeData] = useState<TreeDataState<AppPolicyView>[]>([]),
     [selectedTree, setSelectedTree] = useState<TreeSelectedData>({
       keys: [],
       info: undefined,
       action: 'editor',
     }),
     [actionTitle, setActionTitle] = useState<string>(''),
-    [, setFormFieldsValue] = useState<AppMenu>(),
+    [, setFormFieldsValue] = useState<AppPolicyView>(),
     [, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -56,9 +66,9 @@ export default () => {
   }, [saveDisabled]);
 
   const
-    customerTitleRender = (nodeData: TreeDataState<AppMenu>) => {
+    customerTitleRender = (nodeData: TreeDataState<AppPolicyView>) => {
       const items: ItemType[] = [];
-      if (checkAuth('createAppMenus', auth)) {
+      if (checkAuth('createAppPolicyView', auth)) {
         items.push({
           key: 'create',
           label: t('created'),
@@ -86,7 +96,7 @@ export default () => {
           ],
         });
       }
-      if (checkAuth('deleteAppMenu', auth)) {
+      if (checkAuth('deleteAppPolicyView', auth)) {
         items.push({
           key: 'deo',
           label: <a onClick={() => {
@@ -111,7 +121,7 @@ export default () => {
         </Space>
       );
     },
-    getMenusRequest = async (isInit?: boolean) => {
+    getAppPolicyViewRequest = async (isInit?: boolean) => {
       if (id) {
         if (isInit) {
           setLoading(true);
@@ -119,29 +129,24 @@ export default () => {
         const appResult = await getAppInfo(id);
         if (appResult?.id) {
           setAppInfo(appResult as App);
-          const result = await getAppMenus(appResult.id, {
-            pageSize: 9999,
-          });
-          if (result?.totalCount) {
-            const menuList = result.edges?.map(item => item?.node) as AppMenu[];
-            setMenus(menuList);
-            setTreeData(
-              formatTreeData(
-                menuList.map(item => ({
-                  key: item.id,
-                  title: item.name,
-                  parentId: item.parentID,
-                  node: item,
-                })),
-              ),
-            );
-          }
+          const result = await getAppPolicyView(appResult.code);
+          setAppPolicyViews(result);
+          setTreeData(
+            formatTreeData(
+              result.map(item => ({
+                key: item.id,
+                title: item.name,
+                parentId: item.parentID,
+                node: item,
+              })),
+            ),
+          );
         }
         setLoading(false);
       }
     },
     onSearch = (keyword: string) => {
-      const menuInfo = menus.find(item => item.name.indexOf(keyword) > -1);
+      const menuInfo = appPolicyViews.find(item => item.name.indexOf(keyword) > -1);
       if (menuInfo) {
         editorMenuAction(menuInfo, 'editor');
       }
@@ -149,7 +154,7 @@ export default () => {
     onTreeSelect = (_selectedKeys, selectedEvent) => {
       editorMenuAction(selectedEvent.node.node, 'editor');
     },
-    editorMenuAction = (menuInfo: AppMenu | undefined, action: TreeEditorAction) => {
+    editorMenuAction = (menuInfo: AppPolicyView | undefined, action: TreeEditorAction) => {
       if (menuInfo) {
         let title = '';
         setSelectedTree({ keys: [menuInfo.id], info: menuInfo, action: action });
@@ -182,21 +187,21 @@ export default () => {
     onTreeDrop = async (dragInfo) => {
       const { sourceId, targetId, action } = getTreeDropData(treeData, dragInfo);
 
-      const result = await moveAppMenu(sourceId, targetId, action);
+      const result = await moveAppPolicyView(sourceId, targetId, action);
       if (result) {
-        await getMenusRequest();
+        await getAppPolicyViewRequest();
       }
     },
-    onDelMenu = (menuInfo: AppMenu) => {
+    onDelMenu = (menuInfo: AppPolicyView) => {
       Modal.confirm({
         title: t('delete'),
         content: `${t('confirm_delete')}：${menuInfo.name}`,
         onOk: async (close) => {
-          const result = await delAppMenu(menuInfo.id);
+          const result = await delAppPolicyView(menuInfo.id);
           if (result) {
             editorMenuAction(undefined, 'editor');
-            delTreeData(treeData, menuInfo.id, { id: 'key' })
-            setTreeData([...treeData])
+            delTreeData(treeData, menuInfo.id, { id: 'key' });
+            setTreeData([...treeData]);
             message.success(t('submit_success'));
             close();
           }
@@ -216,12 +221,10 @@ export default () => {
       if (appInfo) {
         if (selectedTree.action === 'editor') {
           if (selectedTree.info?.id) {
-            const result = await updateAppMenu(selectedTree.info.id, updateFormat<UpdateAppMenuInput>({
+            const result = await updateAppPolicyView(selectedTree.info.id, updateFormat<CreateAppPolicyViewInput>({
               comments: values.comments,
-              icon: values.icon,
               kind: values.kind,
               name: values.name,
-              route: values.kind === AppMenuKind.Menu ? values.route : null,
             }, selectedTree.info));
             if (result?.id) {
               message.success(t('submit_success'));
@@ -230,73 +233,69 @@ export default () => {
                 key: result.id,
                 title: result.name,
                 parentId: result.parentID,
-                node: result as AppMenu,
-              }, { id: 'key' })
-              setTreeData([...treeData])
+                node: result as AppPolicyView,
+              }, { id: 'key' });
+              setTreeData([...treeData]);
             }
           } else {
-            const result = await createAppMenu(appInfo.id, {
+            const result = await createAppPolicyView({
+              appID: id,
               comments: values.comments,
-              icon: values.icon,
               kind: values.kind,
               name: values.name,
               parentID: selectedTree.info?.parentID || 0,
-              route: values.route,
             });
-            if (result?.[0]?.id) {
+            if (result?.id) {
               message.success(t('submit_success'));
               setSaveDisabled(true);
-              editorMenuAction(result[0] as AppMenu, 'editor');
+              editorMenuAction(result as AppPolicyView, 'editor');
               saveTreeData(treeData, {
-                key: result[0].id,
-                title: result[0].name,
-                parentId: result[0].parentID,
-                node: result[0] as AppMenu,
-              }, { id: 'key' })
-              setTreeData([...treeData])
+                key: result.id,
+                title: result.name,
+                parentId: result.parentID,
+                node: result as AppPolicyView,
+              }, { id: 'key' });
+              setTreeData([...treeData]);
             }
           }
         } else if (selectedTree.action === 'child') {
-          const result = await createAppMenu(appInfo.id, {
+          const result = await createAppPolicyView({
+            appID: id,
             comments: values.comments,
-            icon: values.icon,
             kind: values.kind,
             name: values.name,
             parentID: Number(selectedTree.info?.id) || 0,
-            route: values.route,
           });
-          if (result?.[0]?.id) {
+          if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
-            editorMenuAction(result[0] as AppMenu, 'editor');
+            editorMenuAction(result as AppPolicyView, 'editor');
             saveTreeData(treeData, {
-              key: result[0].id,
-              title: result[0].name,
-              parentId: result[0].parentID,
-              node: result[0] as AppMenu,
-            }, { id: 'key' })
-            setTreeData([...treeData])
+              key: result.id,
+              title: result.name,
+              parentId: result.parentID,
+              node: result as AppPolicyView,
+            }, { id: 'key' });
+            setTreeData([...treeData]);
           }
         } else if (selectedTree.action === 'peer') {
-          const result = await createAppMenu(appInfo.id, {
+          const result = await createAppPolicyView({
             comments: values.comments,
-            icon: values.icon,
             kind: values.kind,
             name: values.name,
             parentID: selectedTree.info?.parentID || 0,
-            route: values.route,
           });
-          if (result?.[0]?.id) {
+          if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
-            editorMenuAction(result[0] as AppMenu, 'editor');
+            editorMenuAction(result as AppPolicyView, 'editor');
             saveTreeData(treeData, {
-              key: result[0].id,
-              title: result[0].name,
-              parentId: result[0].parentID,
-              node: result[0] as AppMenu,
-            }, { id: 'key' })
-            setTreeData([...treeData])
+              key: result.id,
+              title: result.name,
+              parentId: result.parentID,
+              node: result as AppPolicyView,
+            }, { id: 'key' });
+            setTreeData([...treeData]);
           }
         }
       }
@@ -305,7 +304,7 @@ export default () => {
     };
 
   useEffect(() => {
-    getMenusRequest(true);
+    getAppPolicyViewRequest(true);
   }, []);
 
 
@@ -330,7 +329,7 @@ export default () => {
               <Input.Search placeholder={`${t('search_keyword')}`} onSearch={onSearch} />
             </Col>
             <Col >
-              <Auth authKey="moveAppMenu">
+              <Auth authKey="moveAppPolicyView">
                 <Button
                   type="text"
                   onClick={() => {
@@ -359,7 +358,7 @@ export default () => {
           <ProForm
             formRef={formRef}
             style={{ maxWidth: 400 }}
-            submitter={checkAuth('createAppMenus') || checkAuth('updateAppMenu') ? {
+            submitter={checkAuth('createAppPolicyView') || checkAuth('updateAppPolicyView') ? {
               searchConfig: {
                 submitText: t('submit'),
                 resetText: t('reset'),
@@ -388,28 +387,12 @@ export default () => {
               placeholder={`${t('please_enter_type')}`}
               options={[
                 { value: 'dir', label: t('directory') },
-                { value: 'menu', label: t('menu') },
+                { value: 'policy', label: t('policy') },
               ]}
               rules={[
                 { required: true, message: `${t('please_enter_type')}` },
               ]}
             />
-            <ProFormText
-              name="icon"
-              label={t('icon')}
-              placeholder={`${t('please_enter_icon')}`}
-            />
-            <ProForm.Item noStyle shouldUpdate>
-              {(form) => (
-                form.getFieldValue('kind') == 'menu' ? <>
-                  <ProFormText
-                    name="route"
-                    label={t('route')}
-                    placeholder={`${t('please_enter_route')}`}
-                  />
-                </> : ''
-              )}
-            </ProForm.Item>
             <ProFormTextArea
               name="comments"
               label={t('remarks')}
