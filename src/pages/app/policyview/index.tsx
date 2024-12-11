@@ -326,9 +326,9 @@ export default () => {
         <ProCard colSpan="30%" loading={loading}>
           <Row wrap={false}>
             <Col flex="auto">
-              <Input.Search placeholder={`${t('search_keyword')}`} onSearch={onSearch} />
+              <Input.Search placeholder={`${t('search_keyword')}`} onSearch={onSearch}/>
             </Col>
-            <Col >
+            <Col>
               <Auth authKey="moveAppPolicyView">
                 <Button
                   type="text"
@@ -339,10 +339,10 @@ export default () => {
               </Auth>
             </Col>
           </Row>
-          <br />
+          <br/>
           <Tree
             x-if={treeData.length != 0}
-            draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
+            draggable={treeDraggable ? {icon: false, nodeDraggable: () => true} : false}
             treeData={treeData}
             onSelect={onTreeSelect}
             selectedKeys={selectedTree.keys}
@@ -351,54 +351,71 @@ export default () => {
             onDrop={onTreeDrop}
           />
           <div x-else>
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
           </div>
         </ProCard>
-        <ProCard title={actionTitle || `${t('created')}-${t('top_menu')}`} headerBordered>
-          <ProForm
-            formRef={formRef}
-            style={{ maxWidth: 400 }}
-            submitter={checkAuth('createAppPolicyView') || checkAuth('updateAppPolicyView') ? {
-              searchConfig: {
-                submitText: t('submit'),
-                resetText: t('reset'),
-              },
-              submitButtonProps: {
-                loading: saveLoading,
-                disabled: saveDisabled,
-              },
-            } : false}
-            onFinish={onFinish}
-            onReset={getRequest}
-            request={getRequest}
-            onValuesChange={onValuesChange}
-          >
-            <ProFormText
-              name="name"
-              label={t('name')}
-              placeholder={`${t('please_enter_name')}`}
-              rules={[
-                { required: true, message: `${t('please_enter_name')}` },
-              ]}
-            />
-            <ProFormSelect
-              name="kind"
-              label={t('type')}
-              placeholder={`${t('please_enter_type')}`}
-              options={[
-                { value: 'dir', label: t('directory') },
-                { value: 'policy', label: t('policy') },
-              ]}
-              rules={[
-                { required: true, message: `${t('please_enter_type')}` },
-              ]}
-            />
-            <ProFormTextArea
-              name="comments"
-              label={t('remarks')}
-              placeholder={`${t('please_enter_remarks')}`}
-            />
-          </ProForm>
+        <ProCard split="horizontal">
+          <ProCard title={actionTitle || `${t('created')}-${t('top_menu')}`} headerBordered>
+            <ProForm
+              formRef={formRef}
+              style={{maxWidth: 400}}
+              submitter={checkAuth('createAppPolicyView') || checkAuth('updateAppPolicyView') ? {
+                searchConfig: {
+                  submitText: t('submit'),
+                  resetText: t('reset'),
+                },
+                submitButtonProps: {
+                  loading: saveLoading,
+                  disabled: saveDisabled,
+                },
+              } : false}
+              onFinish={onFinish}
+              onReset={getRequest}
+              request={getRequest}
+              onValuesChange={onValuesChange}
+            >
+              <ProFormText
+                name="name"
+                label={t('name')}
+                placeholder={`${t('please_enter_name')}`}
+                rules={[
+                  {required: true, message: `${t('please_enter_name')}`},
+                ]}
+              />
+              <ProFormSelect
+                name="kind"
+                label={t('type')}
+                placeholder={`${t('please_enter_type')}`}
+                options={[
+                  {value: 'dir', label: t('directory')},
+                  {value: 'policy', label: t('policy')},
+                ]}
+                rules={[
+                  {required: true, message: `${t('please_enter_type')}`},
+                ]}
+              />
+              <ProFormTextArea
+                name="comments"
+                label={t('remarks')}
+                placeholder={`${t('please_enter_remarks')}`}
+              />
+            </ProForm>
+          </ProCard>
+          <Row wrap={false}>
+            <Col flex="auto">
+              <span style={{fontSize:16;marginLeft:20}}>关联权限</span>
+            </Col>
+            <Col>
+              <Auth authKey="moveAppPolicyView">
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setTreeDraggable(!treeDraggable);
+                  }}
+                >{treeDraggable ? t('cancel') : t('drag')}</Button>
+              </Auth>
+            </Col>
+          </Row>
         </ProCard>
       </ProCard>
     </PageContainer>

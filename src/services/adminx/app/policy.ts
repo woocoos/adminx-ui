@@ -56,7 +56,7 @@ const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
 const queryAppPolicyView = gql(/* GraphQL */`query appPolicyView($appCode:String!){
   appPolicyView(appCode:$appCode){
     ... on AppPolicyView{
-      id, name, parentID, comments
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind
     }
   }
 }`);
