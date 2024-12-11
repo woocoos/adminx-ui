@@ -448,4 +448,15 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Currency', 2, {
     id: 2, name: '港币', code: 'HKD'
   })
+
+  // AppPolicyView
+  store.set('AppPolicyView', 1, {
+    id: 1, name: '测试1', kind: 'dir', parentID: 0, appID: 1
+  })
+  store.set('AppPolicyView', 2, {
+    id: 2, name: '测试1-1', kind: 'policy', parentID: 1, appID: 1
+  })
+  store.set('AppPolicyView', 3, {
+    id: 3, name: '测试1-2', kind: 'policy', parentID: 1, appID: 1
+  })
 }

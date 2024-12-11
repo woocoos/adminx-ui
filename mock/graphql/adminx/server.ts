@@ -85,6 +85,13 @@ const schemaWithMocks = addMocksToSchema({
           ])
         }
       },
+      appPolicyView: () => {
+        return [
+          store.get('AppPolicyView', 1),
+          store.get('AppPolicyView', 2),
+          store.get('AppPolicyView', 3),
+        ]
+      },
       fileSources: relayStylePaginationMock(store),
       fileIdentities: relayStylePaginationMock(store),
       users: relayStylePaginationMock(store),
