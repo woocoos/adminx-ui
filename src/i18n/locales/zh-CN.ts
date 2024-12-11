@@ -108,6 +108,7 @@ export default {
     confirm_enable_MFA: '确认是否开启MFA多因素认证',
     confirm_close_MFA: '确认是否关闭MFA多因素认证',
     'confirm_set_default_{{field}}': '确认是否{{field}}设为默认',
+    confirm_sync_permission_to_org: '确认同步应用角色权限给组织',
     submit_success: '提交成功',
     login_success: '登录成功',
     go_login: '前往登录',

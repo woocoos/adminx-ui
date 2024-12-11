@@ -56,6 +56,7 @@ const documents = {
     "mutation delAppRole($appRoleId:ID!){\n  deleteAppRole(roleID: $appRoleId)\n}": types.DelAppRoleDocument,
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
+    "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}": types.SyncAppRoleToOrgDocument,
     "query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}": types.CountryListDocument,
     "query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}": types.CountryInfoDocument,
     "mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}": types.UpdateCountryDocument,
@@ -360,6 +361,10 @@ export function gql(source: "mutation assignAppRolePolicy($appId:ID!,$appRoleId:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"): (typeof documents)["mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}"): (typeof documents)["mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
