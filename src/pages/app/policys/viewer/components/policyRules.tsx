@@ -131,10 +131,11 @@ const RuleItem = (props: {
               />
             </div>
             {
-              props.rule.actions?.[0] == '*' ? <></> : <>
+              props.rule.actions?.[0] == `${props.appInfo?.code}:*` ? <></> : <>
                 <br />
                 <ActionsTransfer
                   readonly={props.readonly}
+                  appCode={props.appInfo?.code || ''}
                   targetKeys={props.rule.actions || []}
                   dataSource={props.appActions}
                   onChange={(values) => {
@@ -190,11 +191,12 @@ const RuleItem = (props: {
               />
             </div>
             {
-              props.rule.resources ? <>
+              props.rule.resources && props.appInfo ? <>
                 <br />
                 <AppPolicyRes
                   readonly={props.readonly}
                   appInfo={props.appInfo}
+                  isShowAppCode
                   values={props.rule.resources}
                   onChange={(values) => {
                     const nRule = { ...props.rule };
