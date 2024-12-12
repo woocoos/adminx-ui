@@ -326,7 +326,7 @@ export default () => {
         <ProCard colSpan="30%" loading={loading}>
           <Row wrap={false}>
             <Col flex="auto">
-              <Input.Search placeholder={`${t('search_keyword')}`} onSearch={onSearch}/>
+              <Input.Search placeholder={`${t('search_keyword')}`} onSearch={onSearch} />
             </Col>
             <Col>
               <Auth authKey="moveAppPolicyView">
@@ -339,10 +339,10 @@ export default () => {
               </Auth>
             </Col>
           </Row>
-          <br/>
+          <br />
           <Tree
             x-if={treeData.length != 0}
-            draggable={treeDraggable ? {icon: false, nodeDraggable: () => true} : false}
+            draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
             treeData={treeData}
             onSelect={onTreeSelect}
             selectedKeys={selectedTree.keys}
@@ -351,14 +351,14 @@ export default () => {
             onDrop={onTreeDrop}
           />
           <div x-else>
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE}/>
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           </div>
         </ProCard>
         <ProCard split="horizontal">
           <ProCard title={actionTitle || `${t('created')}-${t('top_menu')}`} headerBordered>
             <ProForm
               formRef={formRef}
-              style={{maxWidth: 400}}
+              style={{ maxWidth: 400 }}
               submitter={checkAuth('createAppPolicyView') || checkAuth('updateAppPolicyView') ? {
                 searchConfig: {
                   submitText: t('submit'),
@@ -379,7 +379,7 @@ export default () => {
                 label={t('name')}
                 placeholder={`${t('please_enter_name')}`}
                 rules={[
-                  {required: true, message: `${t('please_enter_name')}`},
+                  { required: true, message: `${t('please_enter_name')}` },
                 ]}
               />
               <ProFormSelect
@@ -387,11 +387,11 @@ export default () => {
                 label={t('type')}
                 placeholder={`${t('please_enter_type')}`}
                 options={[
-                  {value: 'dir', label: t('directory')},
-                  {value: 'policy', label: t('policy')},
+                  { value: 'dir', label: t('directory') },
+                  { value: 'policy', label: t('policy') },
                 ]}
                 rules={[
-                  {required: true, message: `${t('please_enter_type')}`},
+                  { required: true, message: `${t('please_enter_type')}` },
                 ]}
               />
               <ProFormTextArea
@@ -403,7 +403,7 @@ export default () => {
           </ProCard>
           <Row wrap={false}>
             <Col flex="auto">
-              <span style={{fontSize:16;marginLeft:20}}>关联权限</span>
+              <span style={{ fontSize: 16, marginLeft: 20 }}>关联权限</span>
             </Col>
             <Col>
               <Auth authKey="moveAppPolicyView">
