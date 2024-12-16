@@ -214,6 +214,7 @@ export default () => {
               comments: values.comments,
               kind: values.kind,
               name: values.name,
+              parentID: selectedTree.info.parentID
             }, selectedTree.info));
             if (result?.id) {
               message.success(t('submit_success'));
@@ -232,7 +233,7 @@ export default () => {
               comments: values.comments,
               kind: values.kind,
               name: values.name,
-              parentID: selectedTree.info?.parentID || 0,
+              parentID: selectedTree.info?.parentID || "0",
             });
             if (result?.id) {
               message.success(t('submit_success'));
@@ -253,7 +254,7 @@ export default () => {
             comments: values.comments,
             kind: values.kind,
             name: values.name,
-            parentID: Number(selectedTree.info?.id) || 0,
+            parentID: selectedTree.info?.id || "0",
           });
           if (result?.id) {
             message.success(t('submit_success'));
@@ -272,7 +273,7 @@ export default () => {
             comments: values.comments,
             kind: values.kind,
             name: values.name,
-            parentID: selectedTree.info?.parentID || 0,
+            parentID: selectedTree.info?.parentID || "0",
           });
           if (result?.id) {
             message.success(t('submit_success'));
@@ -390,7 +391,9 @@ export default () => {
               />
             </ProForm>
           </ProCard>
-          <RelevancyProlicy info={selectedTree.info} />
+          {selectedTree.info?.kind === AppPolicyViewKind.Policy ? <>
+            <RelevancyProlicy info={selectedTree.info} />
+          </> : <></>}
         </ProCard>
       </ProCard>
     </PageContainer>

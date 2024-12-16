@@ -1,16 +1,21 @@
 import { ProCard } from '@ant-design/pro-components';
 import { Divider, Radio, Tabs, Row, Col, Button, Popconfirm } from 'antd';
-import { CSSProperties, useState } from 'react';
+import { CSSProperties, useEffect, useState } from 'react';
 import { PlusCircleOutlined, CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
 import ActionsTransfer from '@/components/actionsTransfer';
 import { useTranslation } from 'react-i18next';
 import AppPolicyRes from '@/components/appPolicyRes';
-import { App, AppAction, PolicyEffect, PolicyRule } from '@/generated/adminx/graphql';
+import { App, AppAction, AppPolicyKind, PolicyEffect, PolicyRule } from '@/generated/adminx/graphql';
 import Editor from '@/components/editor';
+import InputApp from '@/pages/app/components/inputApp';
+import app from '@/app';
+import { getAppList } from '@/services/adminx/app';
+import { getAppActionList } from '@/services/adminx/app/action';
 
 const RuleItem = (props: {
   rule: PolicyRule;
   appActions: AppAction[];
+  kind: AppPolicyKind;
   appInfo: App;
   readonly?: boolean;
   onChange?: (rule: PolicyRule) => void;
@@ -18,6 +23,8 @@ const RuleItem = (props: {
   onDel?: () => void;
 }) => {
   const { t } = useTranslation(),
+    [appInfo, setAppInfo] = useState<App>(),
+    [appActions, setAppActions] = useState<AppAction[]>([]),
     [stretch1, setStretch1] = useState<boolean>(false),
     [stretch2, setStretch2] = useState<boolean>(false),
     [stretch3, setStretch3] = useState<boolean>(false);
@@ -25,7 +32,7 @@ const RuleItem = (props: {
   const
     getTitle = () => {
       const titles: string[] = [];
-      titles.push(props.appInfo.name);
+      titles.push(props.kind === AppPolicyKind.View ? `${appInfo?.name ?? ''}` : props.appInfo.name);
       if (props.rule?.actions?.[0] === '*') {
         titles.push(t('all_operation'));
       } else {
@@ -34,7 +41,52 @@ const RuleItem = (props: {
       return titles.join('/');
     };
 
-  const rowColStyle: CSSProperties = { width: '70px', paddingRight: '20px', textAlign: 'right' };
+  const rowColStyle: CSSProperties = { width: '70px', paddingRight: '20px', textAlign: 'right' },
+    // 适用于kind=view模式下
+    reqAppInfo = async () => {
+      const appCode = props.rule.actions?.[0]?.split(':')?.[0];
+      if (appCode) {
+        if (appCode === props.appInfo.code) {
+          setAppInfo(props.appInfo);
+        } else {
+          const result = await getAppList({
+            current: 1,
+            pageSize: 1,
+            where: {
+              code: appCode,
+            },
+          });
+          if (result?.totalCount) {
+            setAppInfo(result.edges?.[0]?.node as App);
+          }
+        }
+      }
+    },
+    reqAppActions = async () => {
+      debugger;
+      if (appInfo) {
+        const result = await getAppActionList(appInfo.id, {
+          pageSize: 9999,
+        });
+        if (result?.totalCount) {
+          setAppActions(result.edges?.map(item => item?.node) as AppAction[]);
+        }
+      } else {
+        setAppActions([]);
+      }
+    };
+
+  useEffect(() => {
+    if (props.kind === AppPolicyKind.View) {
+      reqAppInfo()
+    }
+  }, [props.kind])
+
+  useEffect(() => {
+    if (props.kind === AppPolicyKind.View) {
+      reqAppActions()
+    }
+  }, [appInfo])
 
   return (
     <ProCard
@@ -85,8 +137,21 @@ const RuleItem = (props: {
       <Divider style={{ margin: '10px 0' }} />
       <Row >
         <Col style={rowColStyle}>{t('app')}</Col>
-        <Col flex="auto">
-          {props.appInfo.name}
+        <Col flex="200px">
+          {
+            props.kind == AppPolicyKind.View ? <InputApp
+              value={appInfo}
+              disabled={props.readonly}
+              onChange={(data) => {
+                const nRule = { ...props.rule };
+                nRule.actions = [];
+                nRule.resources = [];
+                nRule.conditions = [];
+                props.onChange?.(nRule);
+                setAppInfo(data);
+              }}
+            /> : props.appInfo.name
+          }
         </Col>
       </Row>
       <Divider style={{ margin: '10px 0' }} />
@@ -131,13 +196,13 @@ const RuleItem = (props: {
               />
             </div>
             {
-              props.rule.actions?.[0] == `${props.appInfo?.code}:*` ? <></> : <>
+              props.rule.actions?.[0] == `${props.kind === AppPolicyKind.View ? appInfo?.code : props.appInfo?.code}:*` ? <></> : <>
                 <br />
                 <ActionsTransfer
                   readonly={props.readonly}
-                  appCode={props.appInfo?.code || ''}
+                  appCode={props.kind === AppPolicyKind.View ? appInfo?.code : props.appInfo?.code}
                   targetKeys={props.rule.actions || []}
-                  dataSource={props.appActions}
+                  dataSource={props.kind === AppPolicyKind.View ? appActions : props.appActions}
                   onChange={(values) => {
                     const nRule = { ...props.rule };
                     nRule.actions = values;
@@ -191,11 +256,11 @@ const RuleItem = (props: {
               />
             </div>
             {
-              props.rule.resources && props.appInfo ? <>
+              props.rule.resources && (props.kind === AppPolicyKind.View ? appInfo : props.appInfo) ? <>
                 <br />
                 <AppPolicyRes
                   readonly={props.readonly}
-                  appInfo={props.appInfo}
+                  appInfo={props.kind === AppPolicyKind.View ? appInfo as App : props.appInfo}
                   isShowAppCode
                   values={props.rule.resources}
                   onChange={(values) => {
@@ -237,6 +302,7 @@ const RuleItem = (props: {
 
 export default (props: {
   appInfo: App;
+  kind: AppPolicyKind;
   rules: PolicyRule[];
   appActions: AppAction[];
   readonly?: boolean;
@@ -260,6 +326,7 @@ export default (props: {
                   readonly={props.readonly}
                   rule={item}
                   appInfo={props.appInfo}
+                  kind={props.kind}
                   appActions={props.appActions}
                   onChange={(rule) => {
                     props.rules[index] = rule;

@@ -9,7 +9,7 @@ import { getAppInfo } from '@/services/adminx/app';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/auth';
 import { useAuth } from 'ice';
-import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/generated/adminx/graphql';
+import { App, AppAction, AppPolicy, AppPolicyKind, AppPolicySimpleStatus, PolicyRule } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
 import { useLeavePrompt } from '@knockout-js/layout';
 
@@ -32,7 +32,8 @@ export default () => {
     [rules, setRules] = useState<PolicyRule[]>([]),
     [appActions, setAppActions] = useState<AppAction[]>([]),
     [, setLeavePromptWhen] = useLeavePrompt(),
-    policyId = searchParams.get('id');
+    policyId = searchParams.get('id'),
+    policyviewId = searchParams.get('policyview_id');
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -129,9 +130,10 @@ export default () => {
             rules: rules,
             appID: appId,
             autoGrant: values.autoGrant,
+            kind: policyviewId ? AppPolicyKind.View : AppPolicyKind.App,
             comments: values.comments,
             status: AppPolicySimpleStatus.Active,
-          });
+          }, policyviewId ?? undefined);
           if (result?.id) {
             id = result.id;
           }
@@ -206,20 +208,21 @@ export default () => {
             name="autoGrant"
             label={t('auto_grant')}
           />
-          <ProFormText>
-            {appInfo ? <PolicyRules
-              rules={rules}
-              readonly={isReadonly()}
-              onChange={(rules) => {
-                setRules([...rules]);
-                onValuesChange();
-              }}
-              appInfo={appInfo}
-              appActions={appActions}
-            /> : ''}
-          </ProFormText>
-
-
+          {
+            appInfo ? <ProFormText>
+              <PolicyRules
+                kind={appPolicyInfo?.kind ?? (policyviewId ? AppPolicyKind.View : AppPolicyKind.App)}
+                rules={rules}
+                readonly={isReadonly()}
+                onChange={(rules) => {
+                  setRules([...rules]);
+                  onValuesChange();
+                }}
+                appInfo={appInfo}
+                appActions={appActions}
+              />
+            </ProFormText> : <></>
+          }
         </ProForm>
       </ProCard>
     </PageContainer>

@@ -1,10 +1,10 @@
 import Auth from "@/components/auth"
-import { App, AppAction, AppActionKind, AppActionMethod, AppPolicy, AppPolicyView } from "@/generated/adminx/graphql"
+import { App, AppAction, AppActionKind, AppActionMethod, AppPolicy, AppPolicyView, PolicyRule, PolicyRuleInput } from "@/generated/adminx/graphql"
 import { getAppList } from "@/services/adminx/app"
 import { getAppActionList } from "@/services/adminx/app/action"
-import { getAppPolicyInfo } from "@/services/adminx/app/policy"
+import { getAppPolicyInfo, updateAppPolicy } from "@/services/adminx/app/policy"
 import { ProCard, ProColumns, ProTable } from "@ant-design/pro-components"
-import { Button, Select, Space } from "antd"
+import { Button, message, Modal, Select, Space } from "antd"
 import { Key, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -112,7 +112,42 @@ export default (props: {
       setAppActionList([])
       setAppList([])
     }
-  }
+  },
+    updateAppPolicyAction = async () => {
+      if (selectedRowKeys.length) {
+        const delActions = appActionList.filter(item => selectedRowKeys.includes(item.id)).map(item => `${item.app?.code}:${item.name}`);
+        Modal.confirm({
+          title: t('delete'),
+          content: `${t('confirm_delete')}：${delActions.join(',')} ?`,
+          onOk: async (close) => {
+            if (props.info?.policyID) {
+              const appPolicyInfo = await getAppPolicyInfo(props.info.policyID)
+              if (appPolicyInfo) {
+                const rules: PolicyRuleInput[] = []
+                appPolicyInfo.rules?.forEach(item => {
+                  if (item) {
+                    delete item.__typename
+                    item.actions = item.actions?.filter(item => !delActions.includes(item))
+                    rules.push(item)
+                  }
+                })
+                const result = await updateAppPolicy(appPolicyInfo.id, {
+                  rules,
+                })
+                if (result?.id) {
+                  setDataSource(dataSource.filter(item => !selectedRowKeys.includes(item.id)))
+                  setAppActionList(appActionList.filter(item => !selectedRowKeys.includes(item.id)))
+                  message.success(t('submit_success'))
+                }
+              }
+            }
+            close()
+          },
+        });
+      } else {
+        message.warning(t('please_select_delete_data'))
+      }
+    }
 
   useEffect(() => {
     setDataSource(appActionList)
@@ -122,23 +157,27 @@ export default (props: {
     reqData()
   }, [props.info])
 
-  return props.info ? <>
-    <ProCard title={t('associated_authority')} headerBordered extra={<Space>
-      <Button
-        type="primary"
-        href={`/app/policys/viewer?policyview_id=${props.info.id}&${info?.id ? `id=${info.id}` : ``}`}
-        target="_blank"
-      >{info?.id ? t('amend_policys_viewer_policy') : t('create_policys_viewer_policy')}</Button>
-      <Auth authKey="moveAppPolicyView">
-        <Button
-          type="primary"
-          danger
-          onClick={() => {
-
-          }}
-        >{t('delete')}</Button>
-      </Auth>
-    </Space>}>
+  return (props.info ? <>
+    <ProCard title={t('associated_authority')} headerBordered extra={<>
+      <Space>
+        <Auth authKey={['createAppPolicy', "updateAppPolicy"]} keyAndOr="or">
+          <Button
+            type="primary"
+            href={`/app/policys/viewer?policyview_id=${props.info.id}&${info?.id ? `id=${info.id}` : ``}`}
+            target="_blank"
+          >{info?.id ? t('amend_policys_viewer_policy') : t('create_policys_viewer_policy')}</Button>
+        </Auth>
+        <Auth authKey="updateAppPolicy">
+          <Button
+            type="primary"
+            danger
+            onClick={() => {
+              updateAppPolicyAction()
+            }}
+          >{t('delete')}</Button>
+        </Auth>
+      </Space>
+    </>}>
       <ProTable
         rowKey={'id'}
         search={{
@@ -162,6 +201,7 @@ export default (props: {
           appId?: string
           name?: string
         }) => {
+          setSelectedRowKeys([])
           setDataSource(
             appActionList.filter(item => {
               let isTrue = true;
@@ -177,5 +217,6 @@ export default (props: {
         }}
       />
     </ProCard>
-  </> : <></>
+  </> : <>
+  </>)
 }

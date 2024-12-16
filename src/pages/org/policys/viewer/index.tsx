@@ -202,18 +202,19 @@ export default (props: {
             label={t('remarks')}
             placeholder={`${t('please_enter_remarks')}`}
           />
-          <ProFormText>
-            {orgInfo?.id ? <PolicyRules
-              orgId={orgInfo?.id}
-              rules={rules}
-              readonly={isReadonly()}
-              onChange={(rules) => {
-                setRules([...rules]);
-                onValuesChange();
-              }}
-            /> : ''}
-          </ProFormText>
-
+          {
+            orgInfo?.id ? <ProFormText>
+              <PolicyRules
+                orgId={orgInfo?.id}
+                rules={rules}
+                readonly={isReadonly()}
+                onChange={(rules) => {
+                  setRules([...rules]);
+                  onValuesChange();
+                }}
+              />
+            </ProFormText> : <></>
+          }
         </ProForm>
       </ProCard>
     </PageContainer>

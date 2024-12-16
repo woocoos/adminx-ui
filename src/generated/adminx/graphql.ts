@@ -636,6 +636,7 @@ export type AppMenu = Node & {
   app?: Maybe<App>;
   /** 所属应用 */
   appID?: Maybe<Scalars['ID']['output']>;
+  children?: Maybe<Array<AppMenu>>;
   /** 备注 */
   comments?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Time']['output'];
@@ -648,8 +649,9 @@ export type AppMenu = Node & {
   kind: AppMenuKind;
   /** 菜单名称 */
   name: Scalars['String']['output'];
+  parent: AppMenu;
   /** 父级ID */
-  parentID: Scalars['Int']['output'];
+  parentID: Scalars['ID']['output'];
   /** 菜单路由 */
   route?: Maybe<Scalars['String']['output']>;
   /** 状态 */
@@ -743,6 +745,12 @@ export type AppMenuWhereInput = {
   /** app edge predicates */
   hasApp?: InputMaybe<Scalars['Boolean']['input']>;
   hasAppWith?: InputMaybe<Array<AppWhereInput>>;
+  /** children edge predicates */
+  hasChildren?: InputMaybe<Scalars['Boolean']['input']>;
+  hasChildrenWith?: InputMaybe<Array<AppMenuWhereInput>>;
+  /** parent edge predicates */
+  hasParent?: InputMaybe<Scalars['Boolean']['input']>;
+  hasParentWith?: InputMaybe<Array<AppMenuWhereInput>>;
   /** icon field predicates */
   icon?: InputMaybe<Scalars['String']['input']>;
   iconContains?: InputMaybe<Scalars['String']['input']>;
@@ -790,14 +798,10 @@ export type AppMenuWhereInput = {
   not?: InputMaybe<AppMenuWhereInput>;
   or?: InputMaybe<Array<AppMenuWhereInput>>;
   /** parent_id field predicates */
-  parentID?: InputMaybe<Scalars['Int']['input']>;
-  parentIDGT?: InputMaybe<Scalars['Int']['input']>;
-  parentIDGTE?: InputMaybe<Scalars['Int']['input']>;
-  parentIDIn?: InputMaybe<Array<Scalars['Int']['input']>>;
-  parentIDLT?: InputMaybe<Scalars['Int']['input']>;
-  parentIDLTE?: InputMaybe<Scalars['Int']['input']>;
-  parentIDNEQ?: InputMaybe<Scalars['Int']['input']>;
-  parentIDNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  parentID?: InputMaybe<Scalars['ID']['input']>;
+  parentIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  parentIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  parentIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** route field predicates */
   route?: InputMaybe<Scalars['String']['input']>;
   routeContains?: InputMaybe<Scalars['String']['input']>;
@@ -949,6 +953,7 @@ export type AppPolicyView = Node & {
   appPolicy?: Maybe<AppPolicy>;
   /** 应用角色是否授权 */
   appRoleAssigned: Scalars['Boolean']['output'];
+  children?: Maybe<Array<AppPolicyView>>;
   /** 描述 */
   comments?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Time']['output'];
@@ -965,8 +970,11 @@ export type AppPolicyView = Node & {
   orgRoleAssigned: Scalars['Boolean']['output'];
   /** 组织用户是否授权 */
   orgUserAssigned: Scalars['Boolean']['output'];
+  parent: AppPolicyView;
   /** 父级ID,0为顶级 */
-  parentID: Scalars['Int']['output'];
+  parentID: Scalars['ID']['output'];
+  /** 路径编码 */
+  path?: Maybe<Scalars['String']['output']>;
   /** 关联的应用策略 */
   policyID?: Maybe<Scalars['ID']['output']>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
@@ -1065,6 +1073,12 @@ export type AppPolicyViewWhereInput = {
   hasAppPolicy?: InputMaybe<Scalars['Boolean']['input']>;
   hasAppPolicyWith?: InputMaybe<Array<AppPolicyWhereInput>>;
   hasAppWith?: InputMaybe<Array<AppWhereInput>>;
+  /** children edge predicates */
+  hasChildren?: InputMaybe<Scalars['Boolean']['input']>;
+  hasChildrenWith?: InputMaybe<Array<AppPolicyViewWhereInput>>;
+  /** parent edge predicates */
+  hasParent?: InputMaybe<Scalars['Boolean']['input']>;
+  hasParentWith?: InputMaybe<Array<AppPolicyViewWhereInput>>;
   /** id field predicates */
   id?: InputMaybe<Scalars['ID']['input']>;
   idGT?: InputMaybe<Scalars['ID']['input']>;
@@ -1096,14 +1110,26 @@ export type AppPolicyViewWhereInput = {
   not?: InputMaybe<AppPolicyViewWhereInput>;
   or?: InputMaybe<Array<AppPolicyViewWhereInput>>;
   /** parent_id field predicates */
-  parentID?: InputMaybe<Scalars['Int']['input']>;
-  parentIDGT?: InputMaybe<Scalars['Int']['input']>;
-  parentIDGTE?: InputMaybe<Scalars['Int']['input']>;
-  parentIDIn?: InputMaybe<Array<Scalars['Int']['input']>>;
-  parentIDLT?: InputMaybe<Scalars['Int']['input']>;
-  parentIDLTE?: InputMaybe<Scalars['Int']['input']>;
-  parentIDNEQ?: InputMaybe<Scalars['Int']['input']>;
-  parentIDNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  parentID?: InputMaybe<Scalars['ID']['input']>;
+  parentIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  parentIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  parentIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** path field predicates */
+  path?: InputMaybe<Scalars['String']['input']>;
+  pathContains?: InputMaybe<Scalars['String']['input']>;
+  pathContainsFold?: InputMaybe<Scalars['String']['input']>;
+  pathEqualFold?: InputMaybe<Scalars['String']['input']>;
+  pathGT?: InputMaybe<Scalars['String']['input']>;
+  pathGTE?: InputMaybe<Scalars['String']['input']>;
+  pathHasPrefix?: InputMaybe<Scalars['String']['input']>;
+  pathHasSuffix?: InputMaybe<Scalars['String']['input']>;
+  pathIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  pathIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  pathLT?: InputMaybe<Scalars['String']['input']>;
+  pathLTE?: InputMaybe<Scalars['String']['input']>;
+  pathNEQ?: InputMaybe<Scalars['String']['input']>;
+  pathNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
+  pathNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** policy_id field predicates */
   policyID?: InputMaybe<Scalars['ID']['input']>;
   policyIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -2148,6 +2174,7 @@ export type CreateAppInput = {
 export type CreateAppMenuInput = {
   actionID?: InputMaybe<Scalars['ID']['input']>;
   appID?: InputMaybe<Scalars['ID']['input']>;
+  childIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** 备注 */
   comments?: InputMaybe<Scalars['String']['input']>;
   /** 菜单图标 */
@@ -2156,8 +2183,7 @@ export type CreateAppMenuInput = {
   kind: AppMenuKind;
   /** 菜单名称 */
   name: Scalars['String']['input'];
-  /** 父级ID */
-  parentID: Scalars['Int']['input'];
+  parentID: Scalars['ID']['input'];
   /** 菜单路由 */
   route?: InputMaybe<Scalars['String']['input']>;
   /** 状态 */
@@ -2194,14 +2220,14 @@ export type CreateAppPolicyInput = {
 export type CreateAppPolicyViewInput = {
   appID?: InputMaybe<Scalars['ID']['input']>;
   appPolicyID?: InputMaybe<Scalars['ID']['input']>;
+  childIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** 描述 */
   comments?: InputMaybe<Scalars['String']['input']>;
   /** 分类：dir-目录、policy-权限策略 */
   kind: AppPolicyViewKind;
   /** 名称 */
   name: Scalars['String']['input'];
-  /** 父级ID,0为顶级 */
-  parentID?: InputMaybe<Scalars['Int']['input']>;
+  parentID: Scalars['ID']['input'];
 };
 
 /**
@@ -2331,6 +2357,8 @@ export type CreateOrgInput = {
   childIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** 国家或地区2字码 */
   countryCode?: InputMaybe<Scalars['String']['input']>;
+  /** 自定义域名 */
+  customDomain?: InputMaybe<Array<Scalars['String']['input']>>;
   /** 默认域名 */
   domain?: InputMaybe<Scalars['String']['input']>;
   fileIdentityIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
@@ -2352,6 +2380,7 @@ export type CreateOrgInput = {
   /** 时区 */
   timezone?: InputMaybe<Scalars['String']['input']>;
   userIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  userPasswordPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 /**
@@ -2513,6 +2542,30 @@ export type CreateUserAddrInput = {
 };
 
 /**
+ * CreateUserDeviceInput is used for create UserDevice object.
+ * Input was generated by ent.
+ */
+export type CreateUserDeviceInput = {
+  /** app版本 */
+  appVersion?: InputMaybe<Scalars['String']['input']>;
+  /** 备注 */
+  comments?: InputMaybe<Scalars['String']['input']>;
+  /** 设备型号 */
+  deviceModel?: InputMaybe<Scalars['String']['input']>;
+  /** 设备名称 */
+  deviceName?: InputMaybe<Scalars['String']['input']>;
+  /** 设备唯一ID */
+  deviceUID: Scalars['String']['input'];
+  /** 状态,可用或不可用及其他待确认状态 */
+  status?: InputMaybe<UserDeviceSimpleStatus>;
+  /** 系统名称 */
+  systemName?: InputMaybe<Scalars['String']['input']>;
+  /** 系统版本 */
+  systemVersion?: InputMaybe<Scalars['String']['input']>;
+  userID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+/**
  * CreateUserIdentityInput is used for create UserIdentity object.
  * Input was generated by ent.
  */
@@ -2595,6 +2648,30 @@ export type CreateUserPasswordInput = {
   /** 生效状态,默认生效 */
   status?: InputMaybe<UserPasswordSimpleStatus>;
   userID?: InputMaybe<Scalars['ID']['input']>;
+};
+
+/**
+ * CreateUserPasswordPolicyInput is used for create UserPasswordPolicy object.
+ * Input was generated by ent.
+ */
+export type CreateUserPasswordPolicyInput = {
+  /** 是否允许包含用户名 */
+  allowIncludeUserName?: InputMaybe<Scalars['Boolean']['input']>;
+  /** 密码错误多少次出现验证码，最大5次，0代表不出现验证码 */
+  captchaTimes?: InputMaybe<Scalars['Int']['input']>;
+  /** 最少包含的不同字符数，最多8个，0代表不限制 */
+  includeChar?: InputMaybe<Scalars['Int']['input']>;
+  /** 必须包含的元素，异或：1-小写字母，2-大写字母，4-数字，8-符号 */
+  includeElement?: InputMaybe<Scalars['Int']['input']>;
+  /** 有效天数，最大1095天，0代表不过期 */
+  invalidDay?: InputMaybe<Scalars['Int']['input']>;
+  /** 过期后是否限制登录 */
+  invalidLoginLimit?: InputMaybe<Scalars['Boolean']['input']>;
+  /** 密码最短长度，长度应在6-32位之间 */
+  length?: InputMaybe<Scalars['Int']['input']>;
+  orgID?: InputMaybe<Scalars['ID']['input']>;
+  /** 一小时内密码错误最多尝试次数，最大32次，0代表不限次数 */
+  retry?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type Currency = Node & {
@@ -3214,6 +3291,8 @@ export type Mutation = {
   assignAppRolePolicyView: Scalars['Boolean']['output'];
   /** 组织角色添加策略视图权限 */
   assignOrgRolePolicyView: Scalars['Boolean']['output'];
+  /** 组织用户添加策略视图权限 */
+  assignOrgUserPolicyView: Scalars['Boolean']['output'];
   /** 分配应用,将自动分配应用下的所有资源 */
   assignOrganizationApp: Scalars['Boolean']['output'];
   /** 分配应用策略到组织 */
@@ -3222,8 +3301,6 @@ export type Mutation = {
   assignOrganizationAppRole: Scalars['Boolean']['output'];
   /** 分配组用户 */
   assignRoleUser: Scalars['Boolean']['output'];
-  /** 组织用户添加策略视图权限 */
-  assignUserPolicyView: Scalars['Boolean']['output'];
   /** 自动授权应用，系统开户、创建web交易用户使用 */
   autoGrantApp: Scalars['Boolean']['output'];
   /** 绑定用户凭证(管理端使用) */
@@ -3266,7 +3343,9 @@ export type Mutation = {
   createOrganizationPolicy?: Maybe<OrgPolicy>;
   /** 创建组织用户 */
   createOrganizationUser?: Maybe<User>;
+  /** 设置配额 */
   createQuota: Quota;
+  /** 创建配额项 */
   createQuotaItem: QuotaItem;
   /** 创建地区 */
   createRegion?: Maybe<Region>;
@@ -3274,6 +3353,8 @@ export type Mutation = {
   createRole?: Maybe<OrgRole>;
   /** 创建组织根节点(管理端使用) */
   createRoot?: Maybe<Org>;
+  /** 设置密码策略 */
+  createUserPasswordPolicy?: Maybe<UserPasswordPolicy>;
   /** 删除应用 */
   deleteApp: Scalars['Boolean']['output'];
   /** 删除应用操作 */
@@ -3304,7 +3385,9 @@ export type Mutation = {
   deleteOrganization: Scalars['Boolean']['output'];
   /** 删除组织策略 */
   deleteOrganizationPolicy: Scalars['Boolean']['output'];
+  /** 删除配额 */
   deleteQuota: Scalars['Boolean']['output'];
+  /** 删除配额项 */
   deleteQuotaItem: Scalars['Boolean']['output'];
   /** 删除地区 */
   deleteRegion: Scalars['Boolean']['output'];
@@ -3312,8 +3395,12 @@ export type Mutation = {
   deleteRole: Scalars['Boolean']['output'];
   /** 删除用户 */
   deleteUser: Scalars['Boolean']['output'];
+  /** 删除用户设备 */
+  deleteUserDevice: Scalars['Boolean']['output'];
   /** 删除用户凭证 */
   deleteUserIdentity: Scalars['Boolean']['output'];
+  /** 删除密码策略 */
+  deleteUserPasswordPolicy: Scalars['Boolean']['output'];
   /** 禁用MFA */
   disableMFA: Scalars['Boolean']['output'];
   /** 禁用OauthClient */
@@ -3324,6 +3411,8 @@ export type Mutation = {
   enableMFA: Mfa;
   /** 启用OauthClient */
   enableOauthClient: OauthClient;
+  /** 开启用户设备验证 */
+  enableVerifyUserDevice: Scalars['Boolean']['output'];
   /** 授权 */
   grant?: Maybe<Permission>;
   /** 移动节点 */
@@ -3398,7 +3487,9 @@ export type Mutation = {
   updateOrganizationPolicy?: Maybe<OrgPolicy>;
   /** 更新授权 */
   updatePermission?: Maybe<Permission>;
+  /** 更新配额 */
   updateQuota: Quota;
+  /** 更新配额项 */
   updateQuotaItem: QuotaItem;
   /** 更新地区 */
   updateRegion?: Maybe<Region>;
@@ -3406,6 +3497,10 @@ export type Mutation = {
   updateRole?: Maybe<OrgRole>;
   /** 更新用户 */
   updateUser?: Maybe<User>;
+  /** 更新用户设备 */
+  updateUserDevice: UserDevice;
+  /** 更新密码策略 */
+  updateUserPasswordPolicy?: Maybe<UserPasswordPolicy>;
 };
 
 
@@ -3422,18 +3517,26 @@ export type MutationAssignAppRolePolicyArgs = {
 
 
 export type MutationAssignAppRolePolicyViewArgs = {
+  addAppPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   appID: Scalars['ID']['input'];
-  appPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   rmAppPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   roleID: Scalars['ID']['input'];
 };
 
 
 export type MutationAssignOrgRolePolicyViewArgs = {
+  addOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   orgID: Scalars['ID']['input'];
-  orgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   rmOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   roleID: Scalars['ID']['input'];
+};
+
+
+export type MutationAssignOrgUserPolicyViewArgs = {
+  addOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  orgID: Scalars['ID']['input'];
+  rmOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  userID: Scalars['ID']['input'];
 };
 
 
@@ -3457,14 +3560,6 @@ export type MutationAssignOrganizationAppRoleArgs = {
 
 export type MutationAssignRoleUserArgs = {
   input: AssignRoleUserInput;
-};
-
-
-export type MutationAssignUserPolicyViewArgs = {
-  orgID: Scalars['ID']['input'];
-  orgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
-  rmOrgPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
-  userID: Scalars['ID']['input'];
 };
 
 
@@ -3523,6 +3618,7 @@ export type MutationCreateAppMenusArgs = {
 
 export type MutationCreateAppPolicyArgs = {
   appID: Scalars['ID']['input'];
+  appPolicyViewID?: InputMaybe<Scalars['ID']['input']>;
   input: CreateAppPolicyInput;
 };
 
@@ -3608,6 +3704,11 @@ export type MutationCreateRoleArgs = {
 
 export type MutationCreateRootArgs = {
   input: CreateOrgInput;
+};
+
+
+export type MutationCreateUserPasswordPolicyArgs = {
+  input: CreateUserPasswordPolicyInput;
 };
 
 
@@ -3711,6 +3812,12 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationDeleteUserDeviceArgs = {
+  deviceID: Scalars['ID']['input'];
+  userID: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteUserIdentityArgs = {
   id: Scalars['ID']['input'];
 };
@@ -3738,6 +3845,13 @@ export type MutationEnableMfaArgs = {
 
 export type MutationEnableOauthClientArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableVerifyUserDeviceArgs = {
+  deviceInfoInput: CreateUserDeviceInput;
+  enable: Scalars['Boolean']['input'];
+  userID: Scalars['ID']['input'];
 };
 
 
@@ -3999,6 +4113,17 @@ export type MutationUpdateUserArgs = {
   userID: Scalars['ID']['input'];
 };
 
+
+export type MutationUpdateUserDeviceArgs = {
+  deviceID: Scalars['ID']['input'];
+  input: UpdateUserDeviceInput;
+};
+
+
+export type MutationUpdateUserPasswordPolicyArgs = {
+  input: UpdateUserPasswordPolicyInput;
+};
+
 /**
  * An object with an ID.
  * Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
@@ -4169,6 +4294,8 @@ export type Org = Node & {
   countryCode?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Time']['output'];
   createdBy: Scalars['Int']['output'];
+  /** 自定义域名 */
+  customDomain?: Maybe<Array<Scalars['String']['output']>>;
   deletedAt?: Maybe<Scalars['Time']['output']>;
   displaySort?: Maybe<Scalars['Int']['output']>;
   /** 默认域名 */
@@ -4205,6 +4332,8 @@ export type Org = Node & {
   timezone?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
+  /** 组织下密码策略 */
+  userPasswordPolicy?: Maybe<Array<UserPasswordPolicy>>;
   users: UserConnection;
 };
 
@@ -5105,6 +5234,9 @@ export type OrgWhereInput = {
   /** roles_and_groups edge predicates */
   hasRolesAndGroups?: InputMaybe<Scalars['Boolean']['input']>;
   hasRolesAndGroupsWith?: InputMaybe<Array<OrgRoleWhereInput>>;
+  /** user_password_policy edge predicates */
+  hasUserPasswordPolicy?: InputMaybe<Scalars['Boolean']['input']>;
+  hasUserPasswordPolicyWith?: InputMaybe<Array<UserPasswordPolicyWhereInput>>;
   /** users edge predicates */
   hasUsers?: InputMaybe<Scalars['Boolean']['input']>;
   hasUsersWith?: InputMaybe<Array<UserWhereInput>>;
@@ -5543,6 +5675,8 @@ export type Query = {
   regions: RegionConnection;
   /** 用户授权的应用列表 */
   userApps: Array<App>;
+  /** 用户设备查询 */
+  userDevices: UserDeviceConnection;
   /** 用户继承用户组的权限策略 */
   userExtendGroupPolicies: PermissionConnection;
   /** 用户加入的用户组 */
@@ -5551,6 +5685,8 @@ export type Query = {
   userMembers: UserConnection;
   /** 用户菜单 */
   userMenus: Array<AppMenu>;
+  /** 获取租户密码策略 */
+  userPasswordPolicy?: Maybe<UserPasswordPolicy>;
   /** 获取用户所有权限 */
   userPermissions: Array<AppAction>;
   /** 用户加入的root组织 */
@@ -5820,6 +5956,16 @@ export type QueryRegionsArgs = {
   last?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<RegionOrder>;
   where?: InputMaybe<RegionWhereInput>;
+};
+
+
+export type QueryUserDevicesArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<UserDeviceOrder>;
+  where?: InputMaybe<UserDeviceWhereInput>;
 };
 
 
@@ -6568,7 +6714,9 @@ export type UpdateAppInput = {
  */
 export type UpdateAppMenuInput = {
   actionID?: InputMaybe<Scalars['ID']['input']>;
+  addChildIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   clearAction?: InputMaybe<Scalars['Boolean']['input']>;
+  clearChildren?: InputMaybe<Scalars['Boolean']['input']>;
   clearComments?: InputMaybe<Scalars['Boolean']['input']>;
   clearIcon?: InputMaybe<Scalars['Boolean']['input']>;
   clearRoute?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6581,8 +6729,8 @@ export type UpdateAppMenuInput = {
   kind?: InputMaybe<AppMenuKind>;
   /** 菜单名称 */
   name?: InputMaybe<Scalars['String']['input']>;
-  /** 父级ID */
-  parentID?: InputMaybe<Scalars['Int']['input']>;
+  parentID?: InputMaybe<Scalars['ID']['input']>;
+  removeChildIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** 菜单路由 */
   route?: InputMaybe<Scalars['String']['input']>;
   /** 状态 */
@@ -6625,8 +6773,10 @@ export type UpdateAppPolicyInput = {
  * Input was generated by ent.
  */
 export type UpdateAppPolicyViewInput = {
+  addChildIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   appPolicyID?: InputMaybe<Scalars['ID']['input']>;
   clearAppPolicy?: InputMaybe<Scalars['Boolean']['input']>;
+  clearChildren?: InputMaybe<Scalars['Boolean']['input']>;
   clearComments?: InputMaybe<Scalars['Boolean']['input']>;
   /** 描述 */
   comments?: InputMaybe<Scalars['String']['input']>;
@@ -6634,8 +6784,8 @@ export type UpdateAppPolicyViewInput = {
   kind?: InputMaybe<AppPolicyViewKind>;
   /** 名称 */
   name?: InputMaybe<Scalars['String']['input']>;
-  /** 父级ID,0为顶级 */
-  parentID?: InputMaybe<Scalars['Int']['input']>;
+  parentID?: InputMaybe<Scalars['ID']['input']>;
+  removeChildIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 /**
@@ -6774,9 +6924,12 @@ export type UpdateOrgInput = {
   addPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   addRolesAndGroupIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   addUserIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  addUserPasswordPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  appendCustomDomain?: InputMaybe<Array<Scalars['String']['input']>>;
   clearApps?: InputMaybe<Scalars['Boolean']['input']>;
   clearChildren?: InputMaybe<Scalars['Boolean']['input']>;
   clearCountryCode?: InputMaybe<Scalars['Boolean']['input']>;
+  clearCustomDomain?: InputMaybe<Scalars['Boolean']['input']>;
   clearDomain?: InputMaybe<Scalars['Boolean']['input']>;
   clearFileIdentities?: InputMaybe<Scalars['Boolean']['input']>;
   clearLocalCurrency?: InputMaybe<Scalars['Boolean']['input']>;
@@ -6788,9 +6941,12 @@ export type UpdateOrgInput = {
   clearRolesAndGroups?: InputMaybe<Scalars['Boolean']['input']>;
   clearStatus?: InputMaybe<Scalars['Boolean']['input']>;
   clearTimezone?: InputMaybe<Scalars['Boolean']['input']>;
+  clearUserPasswordPolicy?: InputMaybe<Scalars['Boolean']['input']>;
   clearUsers?: InputMaybe<Scalars['Boolean']['input']>;
   /** 国家或地区2字码 */
   countryCode?: InputMaybe<Scalars['String']['input']>;
+  /** 自定义域名 */
+  customDomain?: InputMaybe<Array<Scalars['String']['input']>>;
   /** 默认域名 */
   domain?: InputMaybe<Scalars['String']['input']>;
   /** 组织本位币 */
@@ -6810,6 +6966,7 @@ export type UpdateOrgInput = {
   removePolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeRolesAndGroupIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   removeUserIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
+  removeUserPasswordPolicyIDs?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** 状态 */
   status?: InputMaybe<OrgSimpleStatus>;
   /** 时区 */
@@ -7005,6 +7162,36 @@ export type UpdateUserAddrInput = {
 };
 
 /**
+ * UpdateUserDeviceInput is used for update UserDevice object.
+ * Input was generated by ent.
+ */
+export type UpdateUserDeviceInput = {
+  /** app版本 */
+  appVersion?: InputMaybe<Scalars['String']['input']>;
+  clearAppVersion?: InputMaybe<Scalars['Boolean']['input']>;
+  clearComments?: InputMaybe<Scalars['Boolean']['input']>;
+  clearDeviceModel?: InputMaybe<Scalars['Boolean']['input']>;
+  clearDeviceName?: InputMaybe<Scalars['Boolean']['input']>;
+  clearStatus?: InputMaybe<Scalars['Boolean']['input']>;
+  clearSystemName?: InputMaybe<Scalars['Boolean']['input']>;
+  clearSystemVersion?: InputMaybe<Scalars['Boolean']['input']>;
+  /** 备注 */
+  comments?: InputMaybe<Scalars['String']['input']>;
+  /** 设备型号 */
+  deviceModel?: InputMaybe<Scalars['String']['input']>;
+  /** 设备名称 */
+  deviceName?: InputMaybe<Scalars['String']['input']>;
+  /** 设备唯一ID */
+  deviceUID?: InputMaybe<Scalars['String']['input']>;
+  /** 状态,可用或不可用及其他待确认状态 */
+  status?: InputMaybe<UserDeviceSimpleStatus>;
+  /** 系统名称 */
+  systemName?: InputMaybe<Scalars['String']['input']>;
+  /** 系统版本 */
+  systemVersion?: InputMaybe<Scalars['String']['input']>;
+};
+
+/**
  * UpdateUserIdentityInput is used for update UserIdentity object.
  * Input was generated by ent.
  */
@@ -7085,6 +7272,37 @@ export type UpdateUserPasswordInput = {
   scene?: InputMaybe<UserPasswordScene>;
   /** 生效状态,默认生效 */
   status?: InputMaybe<UserPasswordSimpleStatus>;
+};
+
+/**
+ * UpdateUserPasswordPolicyInput is used for update UserPasswordPolicy object.
+ * Input was generated by ent.
+ */
+export type UpdateUserPasswordPolicyInput = {
+  /** 是否允许包含用户名 */
+  allowIncludeUserName?: InputMaybe<Scalars['Boolean']['input']>;
+  /** 密码错误多少次出现验证码，最大5次，0代表不出现验证码 */
+  captchaTimes?: InputMaybe<Scalars['Int']['input']>;
+  clearAllowIncludeUserName?: InputMaybe<Scalars['Boolean']['input']>;
+  clearCaptchaTimes?: InputMaybe<Scalars['Boolean']['input']>;
+  clearIncludeChar?: InputMaybe<Scalars['Boolean']['input']>;
+  clearIncludeElement?: InputMaybe<Scalars['Boolean']['input']>;
+  clearInvalidDay?: InputMaybe<Scalars['Boolean']['input']>;
+  clearInvalidLoginLimit?: InputMaybe<Scalars['Boolean']['input']>;
+  clearLength?: InputMaybe<Scalars['Boolean']['input']>;
+  clearRetry?: InputMaybe<Scalars['Boolean']['input']>;
+  /** 最少包含的不同字符数，最多8个，0代表不限制 */
+  includeChar?: InputMaybe<Scalars['Int']['input']>;
+  /** 必须包含的元素，异或：1-小写字母，2-大写字母，4-数字，8-符号 */
+  includeElement?: InputMaybe<Scalars['Int']['input']>;
+  /** 有效天数，最大1095天，0代表不过期 */
+  invalidDay?: InputMaybe<Scalars['Int']['input']>;
+  /** 过期后是否限制登录 */
+  invalidLoginLimit?: InputMaybe<Scalars['Boolean']['input']>;
+  /** 密码最短长度，长度应在6-32位之间 */
+  length?: InputMaybe<Scalars['Int']['input']>;
+  /** 一小时内密码错误最多尝试次数，最大32次，0代表不限次数 */
+  retry?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type User = Node & {
@@ -7442,24 +7660,49 @@ export enum UserCreationType {
 
 export type UserDevice = Node & {
   __typename?: 'UserDevice';
+  /** app版本 */
   appVersion?: Maybe<Scalars['String']['output']>;
   /** 备注 */
   comments?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['Time']['output'];
   createdBy: Scalars['Int']['output'];
+  /** 设备型号 */
   deviceModel?: Maybe<Scalars['String']['output']>;
+  /** 设备名称 */
   deviceName?: Maybe<Scalars['String']['output']>;
   /** 设备唯一ID */
   deviceUID: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   /** 状态,可用或不可用及其他待确认状态 */
   status?: Maybe<UserDeviceSimpleStatus>;
+  /** 系统名称 */
   systemName?: Maybe<Scalars['String']['output']>;
+  /** 系统版本 */
   systemVersion?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
   user?: Maybe<User>;
   userID?: Maybe<Scalars['ID']['output']>;
+};
+
+/** A connection to a list of items. */
+export type UserDeviceConnection = {
+  __typename?: 'UserDeviceConnection';
+  /** A list of edges. */
+  edges?: Maybe<Array<Maybe<UserDeviceEdge>>>;
+  /** Information to aid in pagination. */
+  pageInfo: PageInfo;
+  /** Identifies the total count of items in the connection. */
+  totalCount: Scalars['Int']['output'];
+};
+
+/** An edge in a connection. */
+export type UserDeviceEdge = {
+  __typename?: 'UserDeviceEdge';
+  /** A cursor for use in pagination. */
+  cursor: Scalars['Cursor']['output'];
+  /** The item at the end of the edge. */
+  node?: Maybe<UserDevice>;
 };
 
 /** Ordering options for UserDevice connections */
@@ -8025,6 +8268,192 @@ export enum UserPasswordOrderField {
   CreatedAt = 'createdAt'
 }
 
+export type UserPasswordPolicy = Node & {
+  __typename?: 'UserPasswordPolicy';
+  /** 是否允许包含用户名 */
+  allowIncludeUserName?: Maybe<Scalars['Boolean']['output']>;
+  /** 密码错误多少次出现验证码，最大5次，0代表不出现验证码 */
+  captchaTimes?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['Time']['output'];
+  createdBy: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  /** 最少包含的不同字符数，最多8个，0代表不限制 */
+  includeChar?: Maybe<Scalars['Int']['output']>;
+  /** 必须包含的元素，异或：1-小写字母，2-大写字母，4-数字，8-符号 */
+  includeElement?: Maybe<Scalars['Int']['output']>;
+  /** 有效天数，最大1095天，0代表不过期 */
+  invalidDay?: Maybe<Scalars['Int']['output']>;
+  /** 过期后是否限制登录 */
+  invalidLoginLimit?: Maybe<Scalars['Boolean']['output']>;
+  /** 密码最短长度，长度应在6-32位之间 */
+  length?: Maybe<Scalars['Int']['output']>;
+  org?: Maybe<Org>;
+  /** 一小时内密码错误最多尝试次数，最大32次，0代表不限次数 */
+  retry?: Maybe<Scalars['Int']['output']>;
+  /** 租户id */
+  tenantID?: Maybe<Scalars['ID']['output']>;
+  updatedAt?: Maybe<Scalars['Time']['output']>;
+  updatedBy?: Maybe<Scalars['Int']['output']>;
+};
+
+/** Ordering options for UserPasswordPolicy connections */
+export type UserPasswordPolicyOrder = {
+  /** The ordering direction. */
+  direction?: OrderDirection;
+  /** The field by which to order UserPasswordPolicies. */
+  field: UserPasswordPolicyOrderField;
+};
+
+/** Properties by which UserPasswordPolicy connections can be ordered. */
+export enum UserPasswordPolicyOrderField {
+  CreatedAt = 'createdAt'
+}
+
+/**
+ * UserPasswordPolicyWhereInput is used for filtering UserPasswordPolicy objects.
+ * Input was generated by ent.
+ */
+export type UserPasswordPolicyWhereInput = {
+  /** allow_include_user_name field predicates */
+  allowIncludeUserName?: InputMaybe<Scalars['Boolean']['input']>;
+  allowIncludeUserNameIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  allowIncludeUserNameNEQ?: InputMaybe<Scalars['Boolean']['input']>;
+  allowIncludeUserNameNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  and?: InputMaybe<Array<UserPasswordPolicyWhereInput>>;
+  /** captcha_times field predicates */
+  captchaTimes?: InputMaybe<Scalars['Int']['input']>;
+  captchaTimesGT?: InputMaybe<Scalars['Int']['input']>;
+  captchaTimesGTE?: InputMaybe<Scalars['Int']['input']>;
+  captchaTimesIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  captchaTimesIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  captchaTimesLT?: InputMaybe<Scalars['Int']['input']>;
+  captchaTimesLTE?: InputMaybe<Scalars['Int']['input']>;
+  captchaTimesNEQ?: InputMaybe<Scalars['Int']['input']>;
+  captchaTimesNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  captchaTimesNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** created_at field predicates */
+  createdAt?: InputMaybe<Scalars['Time']['input']>;
+  createdAtGT?: InputMaybe<Scalars['Time']['input']>;
+  createdAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  createdAtIn?: InputMaybe<Array<Scalars['Time']['input']>>;
+  createdAtLT?: InputMaybe<Scalars['Time']['input']>;
+  createdAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  createdAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  createdAtNotIn?: InputMaybe<Array<Scalars['Time']['input']>>;
+  /** created_by field predicates */
+  createdBy?: InputMaybe<Scalars['Int']['input']>;
+  createdByGT?: InputMaybe<Scalars['Int']['input']>;
+  createdByGTE?: InputMaybe<Scalars['Int']['input']>;
+  createdByIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  createdByLT?: InputMaybe<Scalars['Int']['input']>;
+  createdByLTE?: InputMaybe<Scalars['Int']['input']>;
+  createdByNEQ?: InputMaybe<Scalars['Int']['input']>;
+  createdByNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** org edge predicates */
+  hasOrg?: InputMaybe<Scalars['Boolean']['input']>;
+  hasOrgWith?: InputMaybe<Array<OrgWhereInput>>;
+  /** id field predicates */
+  id?: InputMaybe<Scalars['ID']['input']>;
+  idGT?: InputMaybe<Scalars['ID']['input']>;
+  idGTE?: InputMaybe<Scalars['ID']['input']>;
+  idIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  idLT?: InputMaybe<Scalars['ID']['input']>;
+  idLTE?: InputMaybe<Scalars['ID']['input']>;
+  idNEQ?: InputMaybe<Scalars['ID']['input']>;
+  idNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  /** include_char field predicates */
+  includeChar?: InputMaybe<Scalars['Int']['input']>;
+  includeCharGT?: InputMaybe<Scalars['Int']['input']>;
+  includeCharGTE?: InputMaybe<Scalars['Int']['input']>;
+  includeCharIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  includeCharIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  includeCharLT?: InputMaybe<Scalars['Int']['input']>;
+  includeCharLTE?: InputMaybe<Scalars['Int']['input']>;
+  includeCharNEQ?: InputMaybe<Scalars['Int']['input']>;
+  includeCharNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  includeCharNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** include_element field predicates */
+  includeElement?: InputMaybe<Scalars['Int']['input']>;
+  includeElementGT?: InputMaybe<Scalars['Int']['input']>;
+  includeElementGTE?: InputMaybe<Scalars['Int']['input']>;
+  includeElementIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  includeElementIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  includeElementLT?: InputMaybe<Scalars['Int']['input']>;
+  includeElementLTE?: InputMaybe<Scalars['Int']['input']>;
+  includeElementNEQ?: InputMaybe<Scalars['Int']['input']>;
+  includeElementNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  includeElementNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** invalid_day field predicates */
+  invalidDay?: InputMaybe<Scalars['Int']['input']>;
+  invalidDayGT?: InputMaybe<Scalars['Int']['input']>;
+  invalidDayGTE?: InputMaybe<Scalars['Int']['input']>;
+  invalidDayIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  invalidDayIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  invalidDayLT?: InputMaybe<Scalars['Int']['input']>;
+  invalidDayLTE?: InputMaybe<Scalars['Int']['input']>;
+  invalidDayNEQ?: InputMaybe<Scalars['Int']['input']>;
+  invalidDayNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  invalidDayNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** invalid_login_limit field predicates */
+  invalidLoginLimit?: InputMaybe<Scalars['Boolean']['input']>;
+  invalidLoginLimitIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  invalidLoginLimitNEQ?: InputMaybe<Scalars['Boolean']['input']>;
+  invalidLoginLimitNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** length field predicates */
+  length?: InputMaybe<Scalars['Int']['input']>;
+  lengthGT?: InputMaybe<Scalars['Int']['input']>;
+  lengthGTE?: InputMaybe<Scalars['Int']['input']>;
+  lengthIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lengthIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  lengthLT?: InputMaybe<Scalars['Int']['input']>;
+  lengthLTE?: InputMaybe<Scalars['Int']['input']>;
+  lengthNEQ?: InputMaybe<Scalars['Int']['input']>;
+  lengthNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lengthNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  not?: InputMaybe<UserPasswordPolicyWhereInput>;
+  or?: InputMaybe<Array<UserPasswordPolicyWhereInput>>;
+  /** retry field predicates */
+  retry?: InputMaybe<Scalars['Int']['input']>;
+  retryGT?: InputMaybe<Scalars['Int']['input']>;
+  retryGTE?: InputMaybe<Scalars['Int']['input']>;
+  retryIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  retryIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  retryLT?: InputMaybe<Scalars['Int']['input']>;
+  retryLTE?: InputMaybe<Scalars['Int']['input']>;
+  retryNEQ?: InputMaybe<Scalars['Int']['input']>;
+  retryNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  retryNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** tenant_id field predicates */
+  tenantID?: InputMaybe<Scalars['ID']['input']>;
+  tenantIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  tenantIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  tenantIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** updated_at field predicates */
+  updatedAt?: InputMaybe<Scalars['Time']['input']>;
+  updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
+  updatedAtGTE?: InputMaybe<Scalars['Time']['input']>;
+  updatedAtIn?: InputMaybe<Array<Scalars['Time']['input']>>;
+  updatedAtIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  updatedAtLT?: InputMaybe<Scalars['Time']['input']>;
+  updatedAtLTE?: InputMaybe<Scalars['Time']['input']>;
+  updatedAtNEQ?: InputMaybe<Scalars['Time']['input']>;
+  updatedAtNotIn?: InputMaybe<Array<Scalars['Time']['input']>>;
+  updatedAtNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+  /** updated_by field predicates */
+  updatedBy?: InputMaybe<Scalars['Int']['input']>;
+  updatedByGT?: InputMaybe<Scalars['Int']['input']>;
+  updatedByGTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedByIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  updatedByIsNil?: InputMaybe<Scalars['Boolean']['input']>;
+  updatedByLT?: InputMaybe<Scalars['Int']['input']>;
+  updatedByLTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedByNEQ?: InputMaybe<Scalars['Int']['input']>;
+  updatedByNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  updatedByNotNil?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 /** UserPasswordScene is enum for the field scene */
 export enum UserPasswordScene {
   Login = 'login'
@@ -8370,14 +8799,14 @@ export type AppActionListQueryVariables = Exact<{
 }>;
 
 
-export type AppActionListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, actions: { __typename?: 'AppActionConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'AppActionEdge', cursor: any, node?: { __typename?: 'AppAction', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, kind: AppActionKind, method: AppActionMethod, comments?: string | null } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppActionListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, actions: { __typename?: 'AppActionConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'AppActionEdge', cursor: any, node?: { __typename?: 'AppAction', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, kind: AppActionKind, method: AppActionMethod, comments?: string | null } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppActionInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppActionInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, kind: AppActionKind, method: AppActionMethod, comments?: string | null } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppActionInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, kind: AppActionKind, method: AppActionMethod, comments?: string | null } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateAppActionMutationVariables = Exact<{
   appId: Scalars['ID']['input'];
@@ -8416,7 +8845,7 @@ export type AppInfoQueryVariables = Exact<{
 }>;
 
 
-export type AppInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, name: string, code: string, kind: AppKind, redirectURI?: string | null, appKey?: string | null, appSecret?: string | null, scopes?: string | null, tokenValidity?: number | null, refreshTokenValidity?: number | null, logo?: string | null, comments?: string | null, status?: AppSimpleStatus | null, createdAt: any } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, name: string, code: string, kind: AppKind, redirectURI?: string | null, appKey?: string | null, appSecret?: string | null, scopes?: string | null, tokenValidity?: number | null, refreshTokenValidity?: number | null, logo?: string | null, comments?: string | null, status?: AppSimpleStatus | null, createdAt: any } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateAppMutationVariables = Exact<{
   appId: Scalars['ID']['input'];
@@ -8455,7 +8884,7 @@ export type AppMenuListQueryVariables = Exact<{
 }>;
 
 
-export type AppMenuListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, menus: { __typename?: 'AppMenuConnection', totalCount: number, edges?: Array<{ __typename?: 'AppMenuEdge', cursor: any, node?: { __typename?: 'AppMenu', id: string, appID?: string | null, parentID: number, kind: AppMenuKind, name: string, actionID?: string | null, comments?: string | null, displaySort?: number | null, icon?: string | null, route?: string | null, action?: { __typename?: 'AppAction', id: string, name: string } | null } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppMenuListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, menus: { __typename?: 'AppMenuConnection', totalCount: number, edges?: Array<{ __typename?: 'AppMenuEdge', cursor: any, node?: { __typename?: 'AppMenu', id: string, appID?: string | null, parentID: string, kind: AppMenuKind, name: string, actionID?: string | null, comments?: string | null, displaySort?: number | null, icon?: string | null, route?: string | null, action?: { __typename?: 'AppAction', id: string, name: string } | null } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateAppMenuMutationVariables = Exact<{
   menuId: Scalars['ID']['input'];
@@ -8463,7 +8892,7 @@ export type UpdateAppMenuMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAppMenuMutation = { __typename?: 'Mutation', updateAppMenu?: { __typename?: 'AppMenu', id: string, appID?: string | null, parentID: number, kind: AppMenuKind, name: string, actionID?: string | null, comments?: string | null, displaySort?: number | null, icon?: string | null, route?: string | null, action?: { __typename?: 'AppAction', id: string, name: string } | null } | null };
+export type UpdateAppMenuMutation = { __typename?: 'Mutation', updateAppMenu?: { __typename?: 'AppMenu', id: string, appID?: string | null, parentID: string, kind: AppMenuKind, name: string, actionID?: string | null, comments?: string | null, displaySort?: number | null, icon?: string | null, route?: string | null, action?: { __typename?: 'AppAction', id: string, name: string } | null } | null };
 
 export type CreateAppMenuMutationVariables = Exact<{
   appId: Scalars['ID']['input'];
@@ -8471,7 +8900,7 @@ export type CreateAppMenuMutationVariables = Exact<{
 }>;
 
 
-export type CreateAppMenuMutation = { __typename?: 'Mutation', createAppMenus: Array<{ __typename?: 'AppMenu', id: string, appID?: string | null, parentID: number, kind: AppMenuKind, name: string, actionID?: string | null, comments?: string | null, displaySort?: number | null, icon?: string | null, route?: string | null, action?: { __typename?: 'AppAction', id: string, name: string } | null } | null> };
+export type CreateAppMenuMutation = { __typename?: 'Mutation', createAppMenus: Array<{ __typename?: 'AppMenu', id: string, appID?: string | null, parentID: string, kind: AppMenuKind, name: string, actionID?: string | null, comments?: string | null, displaySort?: number | null, icon?: string | null, route?: string | null, action?: { __typename?: 'AppAction', id: string, name: string } | null } | null> };
 
 export type DelAppMenuMutationVariables = Exact<{
   menuId: Scalars['ID']['input'];
@@ -8497,7 +8926,7 @@ export type AppOrgListQueryVariables = Exact<{
 }>;
 
 
-export type AppOrgListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, orgs: { __typename?: 'OrgConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgEdge', cursor: any, node?: { __typename?: 'Org', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, deletedAt?: any | null, ownerID?: string | null, parentID: string, kind: OrgKind, domain?: string | null, code?: string | null, name: string, profile?: string | null, status?: OrgSimpleStatus | null, path?: string | null, displaySort?: number | null, countryCode?: string | null, timezone?: string | null, localCurrency?: string | null, owner?: { __typename?: 'User', id: string, displayName: string } | null } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppOrgListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, orgs: { __typename?: 'OrgConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgEdge', cursor: any, node?: { __typename?: 'Org', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, deletedAt?: any | null, ownerID?: string | null, parentID: string, kind: OrgKind, domain?: string | null, code?: string | null, name: string, profile?: string | null, status?: OrgSimpleStatus | null, path?: string | null, displaySort?: number | null, countryCode?: string | null, timezone?: string | null, localCurrency?: string | null, owner?: { __typename?: 'User', id: string, displayName: string } | null } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppRoleAssignedToOrgListQueryVariables = Exact<{
   appRoleId: Scalars['ID']['input'];
@@ -8529,7 +8958,7 @@ export type AppPolicieListQueryVariables = Exact<{
 }>;
 
 
-export type AppPolicieListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, policies?: Array<{ __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null }> | null } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppPolicieListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, policies?: Array<{ __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, kind: AppPolicyKind }> | null } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppPolicieListAndIsGrantQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -8537,29 +8966,30 @@ export type AppPolicieListAndIsGrantQueryVariables = Exact<{
 }>;
 
 
-export type AppPolicieListAndIsGrantQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, policies?: Array<{ __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, isGrantAppRole: boolean }> | null } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppPolicieListAndIsGrantQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, policies?: Array<{ __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, kind: AppPolicyKind, isGrantAppRole: boolean }> | null } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppPolicyInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppPolicyInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, rules: Array<{ __typename?: 'PolicyRule', effect: PolicyEffect, actions?: Array<string> | null, resources?: Array<string> | null, conditions?: Array<string> | null } | null>, app?: { __typename?: 'App', id: string, name: string } | null } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppPolicyInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, kind: AppPolicyKind, rules: Array<{ __typename?: 'PolicyRule', effect: PolicyEffect, actions?: Array<string> | null, resources?: Array<string> | null, conditions?: Array<string> | null } | null>, app?: { __typename?: 'App', id: string, name: string } | null } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppPolicyViewQueryVariables = Exact<{
   appCode: Scalars['String']['input'];
 }>;
 
 
-export type AppPolicyViewQuery = { __typename?: 'Query', appPolicyView: Array<{ __typename?: 'AppPolicyView', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, parentID: number, displaySort?: number | null, kind: AppPolicyViewKind, policyID?: string | null }> };
+export type AppPolicyViewQuery = { __typename?: 'Query', appPolicyView: Array<{ __typename?: 'AppPolicyView', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, parentID: string, displaySort?: number | null, kind: AppPolicyViewKind, policyID?: string | null }> };
 
 export type CreateAppPolicyMutationVariables = Exact<{
   appId: Scalars['ID']['input'];
   input: CreateAppPolicyInput;
+  appPolicyViewID?: InputMaybe<Scalars['ID']['input']>;
 }>;
 
 
-export type CreateAppPolicyMutation = { __typename?: 'Mutation', createAppPolicy?: { __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null } | null };
+export type CreateAppPolicyMutation = { __typename?: 'Mutation', createAppPolicy?: { __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, kind: AppPolicyKind } | null };
 
 export type UpdateAppPolicyMutationVariables = Exact<{
   appPolicyId: Scalars['ID']['input'];
@@ -8567,7 +8997,7 @@ export type UpdateAppPolicyMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAppPolicyMutation = { __typename?: 'Mutation', updateAppPolicy?: { __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null } | null };
+export type UpdateAppPolicyMutation = { __typename?: 'Mutation', updateAppPolicy?: { __typename?: 'AppPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, kind: AppPolicyKind } | null };
 
 export type DelAppPolicyMutationVariables = Exact<{
   appPolicyId: Scalars['ID']['input'];
@@ -8581,7 +9011,7 @@ export type CreateAppPolicyViewMutationVariables = Exact<{
 }>;
 
 
-export type CreateAppPolicyViewMutation = { __typename?: 'Mutation', createAppPolicyView: { __typename?: 'AppPolicyView', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, parentID: number, displaySort?: number | null, kind: AppPolicyViewKind } };
+export type CreateAppPolicyViewMutation = { __typename?: 'Mutation', createAppPolicyView: { __typename?: 'AppPolicyView', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, parentID: string, displaySort?: number | null, kind: AppPolicyViewKind } };
 
 export type UpdateAppPolicyViewMutationVariables = Exact<{
   appPolicyViewID: Scalars['ID']['input'];
@@ -8589,7 +9019,7 @@ export type UpdateAppPolicyViewMutationVariables = Exact<{
 }>;
 
 
-export type UpdateAppPolicyViewMutation = { __typename?: 'Mutation', updateAppPolicyView: { __typename?: 'AppPolicyView', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, parentID: number, displaySort?: number | null, kind: AppPolicyViewKind } };
+export type UpdateAppPolicyViewMutation = { __typename?: 'Mutation', updateAppPolicyView: { __typename?: 'AppPolicyView', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, parentID: string, displaySort?: number | null, kind: AppPolicyViewKind } };
 
 export type DelAppPolicyViewMutationVariables = Exact<{
   appPolicyViewID: Scalars['ID']['input'];
@@ -8615,14 +9045,14 @@ export type AppResListQueryVariables = Exact<{
 }>;
 
 
-export type AppResListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, resources: { __typename?: 'AppResConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'AppResEdge', cursor: any, node?: { __typename?: 'AppRes', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, typeName: string, arnPattern: string } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppResListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, resources: { __typename?: 'AppResConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'AppResEdge', cursor: any, node?: { __typename?: 'AppRes', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, typeName: string, arnPattern: string } | null } | null> | null } } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppResInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppResInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, typeName: string, arnPattern: string } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppResInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, typeName: string, arnPattern: string } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateAppResMutationVariables = Exact<{
   appResId: Scalars['ID']['input'];
@@ -8637,21 +9067,21 @@ export type AppRoleListQueryVariables = Exact<{
 }>;
 
 
-export type AppRoleListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, roles?: Array<{ __typename?: 'AppRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, editable: boolean }> | null } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppRoleListQuery = { __typename?: 'Query', node?: { __typename?: 'App', id: string, roles?: Array<{ __typename?: 'AppRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, editable: boolean }> | null } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppRoleInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppRoleInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, editable: boolean, app?: { __typename?: 'App', id: string, name: string, code: string } | null } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppRoleInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, editable: boolean, app?: { __typename?: 'App', id: string, name: string, code: string } | null } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppRoleInfoPolicieListQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppRoleInfoPolicieListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, editable: boolean, app?: { __typename?: 'App', id: string, name: string, code: string } | null, policies?: Array<{ __typename?: 'AppPolicy', id: string, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, rules: Array<{ __typename?: 'PolicyRule', effect: PolicyEffect, actions?: Array<string> | null, resources?: Array<string> | null, conditions?: Array<string> | null } | null> }> | null } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppRoleInfoPolicieListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, editable: boolean, app?: { __typename?: 'App', id: string, name: string, code: string } | null, policies?: Array<{ __typename?: 'AppPolicy', id: string, appID?: string | null, name: string, comments?: string | null, autoGrant: boolean, status?: AppPolicySimpleStatus | null, rules: Array<{ __typename?: 'PolicyRule', effect: PolicyEffect, actions?: Array<string> | null, resources?: Array<string> | null, conditions?: Array<string> | null } | null> }> | null } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateAppRoleMutationVariables = Exact<{
   appId: Scalars['ID']['input'];
@@ -8716,7 +9146,7 @@ export type CountryInfoQueryVariables = Exact<{
 }>;
 
 
-export type CountryInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country', id: string, name?: string | null, nameEn?: string | null, code: string, status?: CountrySimpleStatus | null, displaySort?: number | null, createdAt: any } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type CountryInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country', id: string, name?: string | null, nameEn?: string | null, code: string, status?: CountrySimpleStatus | null, displaySort?: number | null, createdAt: any } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateCountryMutationVariables = Exact<{
   countryId: Scalars['ID']['input'];
@@ -8763,7 +9193,7 @@ export type RegionInfoQueryVariables = Exact<{
 }>;
 
 
-export type RegionInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region', id: string, countryID?: string | null, parentID?: string | null, name?: string | null, nameEn?: string | null, shortCode?: string | null, zipCode?: string | null, status?: RegionSimpleStatus | null, displaySort?: number | null, createdAt: any } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type RegionInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region', id: string, countryID?: string | null, parentID?: string | null, name?: string | null, nameEn?: string | null, shortCode?: string | null, zipCode?: string | null, status?: RegionSimpleStatus | null, displaySort?: number | null, createdAt: any } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateRegionMutationVariables = Exact<{
   regionId: Scalars['ID']['input'];
@@ -8810,7 +9240,7 @@ export type CurrencyInfoQueryVariables = Exact<{
 }>;
 
 
-export type CurrencyInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency', id: string, name: string, code: string, sign?: string | null, status: CurrencySimpleStatus, createdAt: any } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type CurrencyInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency', id: string, name: string, code: string, sign?: string | null, status: CurrencySimpleStatus, createdAt: any } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateCurrencyMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -8848,21 +9278,21 @@ export type AppDictInfoQueryVariables = Exact<{
 }>;
 
 
-export type AppDictInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, code: string, name: string, comments?: string | null, app?: { __typename?: 'App', id: string, name: string } | null } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppDictInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, code: string, name: string, comments?: string | null, app?: { __typename?: 'App', id: string, name: string } | null } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppDictItemListQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppDictItemListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, code: string, name: string, comments?: string | null, items?: Array<{ __typename?: 'AppDictItem', id: string, name: string, code: string, orgID?: string | null, createdBy: number, createdAt: any, dictID?: string | null, comments?: string | null, displaySort?: number | null, status?: AppDictItemSimpleStatus | null, org?: { __typename?: 'Org', id: string, name: string } | null }> | null } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppDictItemListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, appID?: string | null, code: string, name: string, comments?: string | null, items?: Array<{ __typename?: 'AppDictItem', id: string, name: string, code: string, orgID?: string | null, createdBy: number, createdAt: any, dictID?: string | null, comments?: string | null, displaySort?: number | null, status?: AppDictItemSimpleStatus | null, org?: { __typename?: 'Org', id: string, name: string } | null }> | null } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AppDictItemInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type AppDictItemInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem', id: string, name: string, code: string, orgID?: string | null, createdBy: number, createdAt: any, dictID?: string | null, comments?: string | null, displaySort?: number | null, status?: AppDictItemSimpleStatus | null, org?: { __typename?: 'Org', id: string, name: string } | null } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type AppDictItemInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem', id: string, name: string, code: string, orgID?: string | null, createdBy: number, createdAt: any, dictID?: string | null, comments?: string | null, displaySort?: number | null, status?: AppDictItemSimpleStatus | null, org?: { __typename?: 'Org', id: string, name: string } | null } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UpdateAppDictMutationVariables = Exact<{
   dictId: Scalars['ID']['input'];
@@ -8933,7 +9363,7 @@ export type FileIdentityInfoQueryVariables = Exact<{
 }>;
 
 
-export type FileIdentityInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, comments?: string | null, accessKeyID: string, durationSeconds?: number | null, fileSourceID: string, isDefault: boolean, policy?: string | null, roleArn: string, tenantID: string, org: { __typename?: 'Org', id: string, name: string } } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type FileIdentityInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, comments?: string | null, accessKeyID: string, durationSeconds?: number | null, fileSourceID: string, isDefault: boolean, policy?: string | null, roleArn: string, tenantID: string, org: { __typename?: 'Org', id: string, name: string } } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type FileIdentityAccessKeySecretQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -8986,7 +9416,7 @@ export type FileSourceInfoQueryVariables = Exact<{
 }>;
 
 
-export type FileSourceInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, kind: FileSourceKind, comments?: string | null, endpoint: string, region: string, bucket: string, bucketURL: string, stsEndpoint: string, endpointImmutable: boolean } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type FileSourceInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, kind: FileSourceKind, comments?: string | null, endpoint: string, region: string, bucket: string, bucketURL: string, stsEndpoint: string, endpointImmutable: boolean } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateFileSourceMutationVariables = Exact<{
   input: CreateFileSourceInput;
@@ -9018,7 +9448,7 @@ export type OrgAppListQueryVariables = Exact<{
 }>;
 
 
-export type OrgAppListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, apps: { __typename?: 'AppConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'AppEdge', cursor: any, node?: { __typename?: 'App', id: string, name: string, code: string, kind: AppKind, redirectURI?: string | null, appKey?: string | null, appSecret?: string | null, scopes?: string | null, tokenValidity?: number | null, refreshTokenValidity?: number | null, logo?: string | null, comments?: string | null, status?: AppSimpleStatus | null, createdAt: any } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgAppListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, apps: { __typename?: 'AppConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'AppEdge', cursor: any, node?: { __typename?: 'App', id: string, name: string, code: string, kind: AppKind, redirectURI?: string | null, appKey?: string | null, appSecret?: string | null, scopes?: string | null, tokenValidity?: number | null, refreshTokenValidity?: number | null, logo?: string | null, comments?: string | null, status?: AppSimpleStatus | null, createdAt: any } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AssignOrgAppMutationVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -9057,7 +9487,7 @@ export type OrgInfoQueryVariables = Exact<{
 }>;
 
 
-export type OrgInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, deletedAt?: any | null, ownerID?: string | null, parentID: string, kind: OrgKind, domain?: string | null, code?: string | null, name: string, profile?: string | null, status?: OrgSimpleStatus | null, path?: string | null, displaySort?: number | null, countryCode?: string | null, timezone?: string | null, localCurrency?: string | null, owner?: { __typename?: 'User', id: string, displayName: string } | null } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, deletedAt?: any | null, ownerID?: string | null, parentID: string, kind: OrgKind, domain?: string | null, code?: string | null, name: string, profile?: string | null, status?: OrgSimpleStatus | null, path?: string | null, displaySort?: number | null, countryCode?: string | null, timezone?: string | null, localCurrency?: string | null, owner?: { __typename?: 'User', id: string, displayName: string } | null } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateRootOrgMutationVariables = Exact<{
   input: CreateOrgInput;
@@ -9112,7 +9542,7 @@ export type OrgPolicyListQueryVariables = Exact<{
 }>;
 
 
-export type OrgPolicyListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgPolicyEdge', cursor: any, node?: { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgPolicyListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgPolicyEdge', cursor: any, node?: { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgPolicyListNumQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -9122,7 +9552,7 @@ export type OrgPolicyListNumQueryVariables = Exact<{
 }>;
 
 
-export type OrgPolicyListNumQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgPolicyListNumQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgPolicyListAndIsGrantUserQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -9133,7 +9563,7 @@ export type OrgPolicyListAndIsGrantUserQueryVariables = Exact<{
 }>;
 
 
-export type OrgPolicyListAndIsGrantUserQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgPolicyEdge', cursor: any, node?: { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null, isGrantUser: boolean } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgPolicyListAndIsGrantUserQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgPolicyEdge', cursor: any, node?: { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null, isGrantUser: boolean } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgPolicyListAndIsGrantRoleQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -9144,14 +9574,14 @@ export type OrgPolicyListAndIsGrantRoleQueryVariables = Exact<{
 }>;
 
 
-export type OrgPolicyListAndIsGrantRoleQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgPolicyEdge', cursor: any, node?: { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null, isGrantRole: boolean } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgPolicyListAndIsGrantRoleQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', policies: { __typename?: 'OrgPolicyConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'OrgPolicyEdge', cursor: any, node?: { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null, isGrantRole: boolean } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgPolicyInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type OrgPolicyInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null, rules: Array<{ __typename?: 'PolicyRule', effect: PolicyEffect, actions?: Array<string> | null, resources?: Array<string> | null, conditions?: Array<string> | null } | null> } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgPolicyInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, appPolicyID?: string | null, name: string, comments?: string | null, rules: Array<{ __typename?: 'PolicyRule', effect: PolicyEffect, actions?: Array<string> | null, resources?: Array<string> | null, conditions?: Array<string> | null } | null> } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateOrgPolicyMutationVariables = Exact<{
   input: CreateOrgPolicyInput;
@@ -9244,7 +9674,7 @@ export type OrgRoleInfoQueryVariables = Exact<{
 }>;
 
 
-export type OrgRoleInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, kind: OrgRoleKind, name: string, comments?: string | null, isAppRole: boolean } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgRoleInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID?: string | null, kind: OrgRoleKind, name: string, comments?: string | null, isAppRole: boolean } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateOrgRoleMutationVariables = Exact<{
   input: CreateOrgRoleInput;
@@ -9332,7 +9762,7 @@ export type OrgUserListQueryVariables = Exact<{
 }>;
 
 
-export type OrgUserListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgUserListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgUserListAndIsOrgRoleQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -9343,7 +9773,7 @@ export type OrgUserListAndIsOrgRoleQueryVariables = Exact<{
 }>;
 
 
-export type OrgUserListAndIsOrgRoleQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgUserListAndIsOrgRoleQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgRoleUserListQueryVariables = Exact<{
   roleId: Scalars['ID']['input'];
@@ -9373,7 +9803,7 @@ export type OrgUserNumQueryVariables = Exact<{
 }>;
 
 
-export type OrgUserNumQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgUserNumQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type AllotOrgUserMutationVariables = Exact<{
   input: CreateOrgUserInput;
@@ -9426,7 +9856,7 @@ export type OrgPrmissionListQueryVariables = Exact<{
 }>;
 
 
-export type OrgPrmissionListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', permissions: { __typename?: 'PermissionConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'PermissionEdge', cursor: any, node?: { __typename?: 'Permission', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID: string, principalKind: PermissionPrincipalKind, userID?: string | null, roleID?: string | null, orgPolicyID: string, startAt?: any | null, endAt?: any | null, status?: PermissionSimpleStatus | null, isAllowRevoke: boolean, role?: { __typename?: 'OrgRole', id: string, orgID?: string | null, kind: OrgRoleKind, name: string, isAppRole: boolean } | null, orgPolicy: { __typename?: 'OrgPolicy', id: string, orgID?: string | null, appPolicyID?: string | null, name: string }, user?: { __typename?: 'User', id: string, displayName: string } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type OrgPrmissionListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', permissions: { __typename?: 'PermissionConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'PermissionEdge', cursor: any, node?: { __typename?: 'Permission', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID: string, principalKind: PermissionPrincipalKind, userID?: string | null, roleID?: string | null, orgPolicyID: string, startAt?: any | null, endAt?: any | null, status?: PermissionSimpleStatus | null, isAllowRevoke: boolean, role?: { __typename?: 'OrgRole', id: string, orgID?: string | null, kind: OrgRoleKind, name: string, isAppRole: boolean } | null, orgPolicy: { __typename?: 'OrgPolicy', id: string, orgID?: string | null, appPolicyID?: string | null, name: string }, user?: { __typename?: 'User', id: string, displayName: string } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserPrmissionListQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -9436,7 +9866,7 @@ export type UserPrmissionListQueryVariables = Exact<{
 }>;
 
 
-export type UserPrmissionListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', permissions: { __typename?: 'PermissionConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'PermissionEdge', cursor: any, node?: { __typename?: 'Permission', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID: string, principalKind: PermissionPrincipalKind, userID?: string | null, roleID?: string | null, orgPolicyID: string, startAt?: any | null, endAt?: any | null, status?: PermissionSimpleStatus | null, isAllowRevoke: boolean, role?: { __typename?: 'OrgRole', id: string, orgID?: string | null, kind: OrgRoleKind, name: string, isAppRole: boolean } | null, orgPolicy: { __typename?: 'OrgPolicy', id: string, orgID?: string | null, appPolicyID?: string | null, name: string }, user?: { __typename?: 'User', id: string, displayName: string } | null } | null } | null> | null } } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type UserPrmissionListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', permissions: { __typename?: 'PermissionConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'PermissionEdge', cursor: any, node?: { __typename?: 'Permission', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID: string, principalKind: PermissionPrincipalKind, userID?: string | null, roleID?: string | null, orgPolicyID: string, startAt?: any | null, endAt?: any | null, status?: PermissionSimpleStatus | null, isAllowRevoke: boolean, role?: { __typename?: 'OrgRole', id: string, orgID?: string | null, kind: OrgRoleKind, name: string, isAppRole: boolean } | null, orgPolicy: { __typename?: 'OrgPolicy', id: string, orgID?: string | null, appPolicyID?: string | null, name: string }, user?: { __typename?: 'User', id: string, displayName: string } | null } | null } | null> | null } } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserExtendGroupPolicieListQueryVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -9453,7 +9883,7 @@ export type PermissionInfoQueryVariables = Exact<{
 }>;
 
 
-export type PermissionInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID: string, principalKind: PermissionPrincipalKind, userID?: string | null, roleID?: string | null, orgPolicyID: string, startAt?: any | null, endAt?: any | null, status?: PermissionSimpleStatus | null, isAllowRevoke: boolean, role?: { __typename?: 'OrgRole', id: string, orgID?: string | null, kind: OrgRoleKind, name: string, isAppRole: boolean } | null, orgPolicy: { __typename?: 'OrgPolicy', id: string, orgID?: string | null, appPolicyID?: string | null, name: string }, user?: { __typename?: 'User', id: string, displayName: string } | null } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type PermissionInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, orgID: string, principalKind: PermissionPrincipalKind, userID?: string | null, roleID?: string | null, orgPolicyID: string, startAt?: any | null, endAt?: any | null, status?: PermissionSimpleStatus | null, isAllowRevoke: boolean, role?: { __typename?: 'OrgRole', id: string, orgID?: string | null, kind: OrgRoleKind, name: string, isAppRole: boolean } | null, orgPolicy: { __typename?: 'OrgPolicy', id: string, orgID?: string | null, appPolicyID?: string | null, name: string }, user?: { __typename?: 'User', id: string, displayName: string } | null } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreatePermissionMutationVariables = Exact<{
   input: CreatePermissionInput;
@@ -9492,7 +9922,7 @@ export type QuotaItemInfoQueryVariables = Exact<{
 }>;
 
 
-export type QuotaItemInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem', id: string, createdAt: any, name: string, code: string, active: boolean, defaultLimit?: number | null, unit?: string | null, resourceType: QuotaItemResourceType } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type QuotaItemInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem', id: string, createdAt: any, name: string, code: string, active: boolean, defaultLimit?: number | null, unit?: string | null, resourceType: QuotaItemResourceType } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateQuotaItemMutationVariables = Exact<{
   input: CreateQuotaItemInput;
@@ -9530,7 +9960,7 @@ export type QuotaInfoQueryVariables = Exact<{
 }>;
 
 
-export type QuotaInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: number, tenantID: number } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type QuotaInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: number, tenantID: number } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateQuotaMutationVariables = Exact<{
   input: CreateQuotaInput;
@@ -9568,35 +9998,35 @@ export type UserInfoQueryVariables = Exact<{
 }>;
 
 
-export type UserInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type UserInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserInfoLoginProfileQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoLoginProfileQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type UserInfoLoginProfileQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserInfoLoginProfileIdentitiesQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoLoginProfileIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type UserInfoLoginProfileIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserInfoIdentitiesQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type UserInfoIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserAccessKeyListQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserAccessKeyListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, oauthClients?: Array<{ __typename?: 'OauthClient', id: string, name: string, clientID: string, clientSecret: string, grantTypes: OauthClientGrantTypes, lastAuthAt?: any | null, status: OauthClientSimpleStatus, createdAt: any }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | null };
+export type UserAccessKeyListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, oauthClients?: Array<{ __typename?: 'OauthClient', id: string, name: string, clientID: string, clientSecret: string, grantTypes: OauthClientGrantTypes, lastAuthAt?: any | null, status: OauthClientSimpleStatus, createdAt: any }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateUserMutationVariables = Exact<{
   rootOrgID: Scalars['ID']['input'];
@@ -9765,12 +10195,12 @@ export const AppOrgListDocument = {"kind":"Document","definitions":[{"kind":"Ope
 export const AppRoleAssignedToOrgListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appRoleAssignedToOrgList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrgWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"appRoleAssignedToOrgs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"roleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"deletedAt"}},{"kind":"Field","name":{"kind":"Name","value":"ownerID"}},{"kind":"Field","name":{"kind":"Name","value":"parentID"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"profile"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"path"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"countryCode"}},{"kind":"Field","name":{"kind":"Name","value":"timezone"}},{"kind":"Field","name":{"kind":"Name","value":"localCurrency"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}}]}}]}}]} as unknown as DocumentNode<AppRoleAssignedToOrgListQuery, AppRoleAssignedToOrgListQueryVariables>;
 export const AppPolicyAssignedToOrgListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicyAssignedToOrgList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrgWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"appPolicyAssignedToOrgs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"policyID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"deletedAt"}},{"kind":"Field","name":{"kind":"Name","value":"ownerID"}},{"kind":"Field","name":{"kind":"Name","value":"parentID"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"profile"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"path"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"countryCode"}},{"kind":"Field","name":{"kind":"Name","value":"timezone"}},{"kind":"Field","name":{"kind":"Name","value":"localCurrency"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicyAssignedToOrgListQuery, AppPolicyAssignedToOrgListQueryVariables>;
 export const AppPolicyAssignedToOrgListAndIsGrantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicyAssignedToOrgListAndIsGrant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyIdToIsAllow"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"OrgWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"appPolicyAssignedToOrgs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"policyID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"deletedAt"}},{"kind":"Field","name":{"kind":"Name","value":"ownerID"}},{"kind":"Field","name":{"kind":"Name","value":"parentID"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"domain"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"profile"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"path"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"countryCode"}},{"kind":"Field","name":{"kind":"Name","value":"timezone"}},{"kind":"Field","name":{"kind":"Name","value":"localCurrency"}},{"kind":"Field","name":{"kind":"Name","value":"owner"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"isAllowRevokeAppPolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appPolicyID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyIdToIsAllow"}}}]}]}}]}}]} as unknown as DocumentNode<AppPolicyAssignedToOrgListAndIsGrantQuery, AppPolicyAssignedToOrgListAndIsGrantQueryVariables>;
-export const AppPolicieListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicieList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"App"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicieListQuery, AppPolicieListQueryVariables>;
-export const AppPolicieListAndIsGrantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicieListAndIsGrant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"App"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"isGrantAppRole"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appRoleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}}]}]}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicieListAndIsGrantQuery, AppPolicieListAndIsGrantQueryVariables>;
-export const AppPolicyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicyInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AppPolicy"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"rules"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effect"}},{"kind":"Field","name":{"kind":"Name","value":"actions"}},{"kind":"Field","name":{"kind":"Name","value":"resources"}},{"kind":"Field","name":{"kind":"Name","value":"conditions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"app"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicyInfoQuery, AppPolicyInfoQueryVariables>;
+export const AppPolicieListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicieList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"App"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicieListQuery, AppPolicieListQueryVariables>;
+export const AppPolicieListAndIsGrantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicieListAndIsGrant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"App"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"policies"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"isGrantAppRole"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appRoleID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appRoleId"}}}]}]}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicieListAndIsGrantQuery, AppPolicieListAndIsGrantQueryVariables>;
+export const AppPolicyInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicyInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AppPolicy"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"rules"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effect"}},{"kind":"Field","name":{"kind":"Name","value":"actions"}},{"kind":"Field","name":{"kind":"Name","value":"resources"}},{"kind":"Field","name":{"kind":"Name","value":"conditions"}}]}},{"kind":"Field","name":{"kind":"Name","value":"app"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicyInfoQuery, AppPolicyInfoQueryVariables>;
 export const AppPolicyViewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"appPolicyView"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appCode"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"appPolicyView"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appCode"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appCode"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"AppPolicyView"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"parentID"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"policyID"}}]}}]}}]}}]} as unknown as DocumentNode<AppPolicyViewQuery, AppPolicyViewQueryVariables>;
-export const CreateAppPolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createAppPolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateAppPolicyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAppPolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<CreateAppPolicyMutation, CreateAppPolicyMutationVariables>;
-export const UpdateAppPolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateAppPolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateAppPolicyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateAppPolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"policyID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}}]}}]}}]} as unknown as DocumentNode<UpdateAppPolicyMutation, UpdateAppPolicyMutationVariables>;
+export const CreateAppPolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createAppPolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateAppPolicyInput"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyViewID"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAppPolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}},{"kind":"Argument","name":{"kind":"Name","value":"appPolicyViewID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyViewID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}}]}}]}}]} as unknown as DocumentNode<CreateAppPolicyMutation, CreateAppPolicyMutationVariables>;
+export const UpdateAppPolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateAppPolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateAppPolicyInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateAppPolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"policyID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"autoGrant"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}}]}}]}}]} as unknown as DocumentNode<UpdateAppPolicyMutation, UpdateAppPolicyMutationVariables>;
 export const DelAppPolicyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delAppPolicy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteAppPolicy"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"policyID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyId"}}}]}]}}]} as unknown as DocumentNode<DelAppPolicyMutation, DelAppPolicyMutationVariables>;
 export const CreateAppPolicyViewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createAppPolicyView"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateAppPolicyViewInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAppPolicyView"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"parentID"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}}]}}]}}]} as unknown as DocumentNode<CreateAppPolicyViewMutation, CreateAppPolicyViewMutationVariables>;
 export const UpdateAppPolicyViewDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateAppPolicyView"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyViewID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateAppPolicyViewInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateAppPolicyView"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"appPolicyViewID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"appPolicyViewID"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"appID"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"parentID"}},{"kind":"Field","name":{"kind":"Name","value":"displaySort"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}}]}}]}}]} as unknown as DocumentNode<UpdateAppPolicyViewMutation, UpdateAppPolicyViewMutationVariables>;

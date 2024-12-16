@@ -19,7 +19,7 @@ export default (props: {
   const { t } = useTranslation(),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true
-      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
+      // { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
       {
         title: t('name'),
         dataIndex: 'name',
@@ -98,14 +98,14 @@ export default (props: {
             if (result?.totalCount && result.edges) {
               for (const item of result.edges) {
                 if (item?.node) {
-                  let logo: string = defaultApp;
-                  if (item.node?.logo) {
-                    const logoRes = await parseStorageUrl(item.node.logo);
-                    if (logoRes) {
-                      logo = logoRes;
-                    }
-                  }
-                  item.node.logo = logo;
+                  // let logo: string = defaultApp;
+                  // if (item.node?.logo) {
+                  //   const logoRes = await parseStorageUrl(item.node.logo);
+                  //   if (logoRes) {
+                  //     logo = logoRes;
+                  //   }
+                  // }
+                  // item.node.logo = logo;
                   table.data.push(item.node as App);
                 }
               }
@@ -120,14 +120,14 @@ export default (props: {
             if (result?.totalCount && result.edges) {
               for (const item of result.edges) {
                 if (item?.node) {
-                  let logo: string = defaultApp;
-                  if (item.node?.logo) {
-                    const logoRes = await parseStorageUrl(item.node.logo);
-                    if (logoRes) {
-                      logo = logoRes;
-                    }
-                  }
-                  item.node.logo = logo;
+                  // let logo: string = defaultApp;
+                  // if (item.node?.logo) {
+                  //   const logoRes = await parseStorageUrl(item.node.logo);
+                  //   if (logoRes) {
+                  //     logo = logoRes;
+                  //   }
+                  // }
+                  // item.node.logo = logo;
                   table.data.push(item.node as App);
                 }
               }

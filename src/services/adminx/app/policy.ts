@@ -25,7 +25,7 @@ const queryAppPolicieList = gql(/* GraphQL */`query appPolicieList($gid:GID!){
     ... on App{
       id,
       policies{
-        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind
       }
     }
   }
@@ -36,7 +36,7 @@ const queryAppPolicieListAndIsGrant = gql(/* GraphQL */`query appPolicieListAndI
     ... on App{
       id,
       policies{
-        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind
         isGrantAppRole(appRoleID: $appRoleId)
       }
     }
@@ -46,7 +46,7 @@ const queryAppPolicieListAndIsGrant = gql(/* GraphQL */`query appPolicieListAndI
 const queryAppPolicyInfo = gql(/* GraphQL */`query appPolicyInfo($gid:GID!){
   node(id:$gid){
     ... on AppPolicy{
-      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind,
       rules{ effect,actions,resources,conditions }
       app{ id,name }
     }
@@ -62,15 +62,15 @@ const queryAppPolicyView = gql(/* GraphQL */`query appPolicyView($appCode:String
   }
 }`);
 
-const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){
-  createAppPolicy(appID:$appId,input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!,$appPolicyViewID:ID){
+  createAppPolicy(appID:$appId,input:$input,appPolicyViewID:$appPolicyViewID){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind
   }
 }`);
 
 const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){
   updateAppPolicy(policyID:$appPolicyId,input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind
   }
 }`);
 
@@ -150,12 +150,13 @@ export async function getAppPolicyInfo(appPolicyId: string) {
  * @param input
  * @returns
  */
-export async function createAppPolicy(appId: string, input: CreateAppPolicyInput) {
+export async function createAppPolicy(appId: string, input: CreateAppPolicyInput, appPolicyViewID?: string) {
   const
     result = await mutation(
       mutationCreateAppPolicy, {
       appId,
       input,
+      appPolicyViewID,
     });
 
   if (result.data?.createAppPolicy?.id) {
@@ -213,8 +214,8 @@ export async function getAppPolicyView(appCode: string): Promise<AppPolicyView[]
     list: any[] = [],
     result = await query(
       queryAppPolicyView, {
-        appCode: appCode,
-      });
+      appCode: appCode,
+    });
 
   if (result.data?.appPolicyView) {
     result.data.appPolicyView.forEach(item => {
@@ -229,8 +230,8 @@ export async function getAppPolicyView(appCode: string): Promise<AppPolicyView[]
 export async function createAppPolicyView(input: CreateAppPolicyViewInput) {
   const
     result = await mutation(mutationCreateAppPolicyView, {
-        input,
-      });
+      input,
+    });
 
   if (result.data?.createAppPolicyView?.id) {
     return result.data.createAppPolicyView;
@@ -248,9 +249,9 @@ export async function updateAppPolicyView(appPolicyViewID: string, input: Update
   const
     result = await mutation(
       mutationUpdateAppPolicyView, {
-        appPolicyViewID,
-        input,
-      });
+      appPolicyViewID,
+      input,
+    });
 
   if (result.data?.updateAppPolicyView?.id) {
     return result.data.updateAppPolicyView;
@@ -267,8 +268,8 @@ export async function delAppPolicyView(appPolicyViewID: string) {
   const
     result = await mutation(
       mutationDelAppPolicyView, {
-        appPolicyViewID,
-      });
+      appPolicyViewID,
+    });
 
   if (result.data?.deleteAppPolicyView) {
     return result.data.deleteAppPolicyView;
@@ -285,10 +286,10 @@ export async function moveAppPolicyView(sourceId: string, targetId: string, acti
   const
     result = await mutation(
       mutationMoveAppPolicyView, {
-        sourceId,
-        targetId,
-        action,
-      });
+      sourceId,
+      targetId,
+      action,
+    });
 
   if (result.data?.moveAppPolicyView) {
     return result.data.moveAppPolicyView;

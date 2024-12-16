@@ -319,7 +319,7 @@ export const initStoreData = (store: IMockStore) => {
 
   // AppPolicy
   store.set('AppPolicy', 1, {
-    id: 1, name: 'app1Policy1', appID: 1, app: store.get('App', 1), rules: [
+    id: 1, name: 'app1Policy1', appID: 1, app: store.get('App', 1), kind: 'app', rules: [
       {
         effect: 'allow',
         actions: ['app1:*'],
@@ -328,9 +328,9 @@ export const initStoreData = (store: IMockStore) => {
       }
     ]
   })
-  // AppPolicy
+  // AppPolicy 权限试图用的
   store.set('AppPolicy', 2, {
-    id: 2, name: 'app1Policy1', appID: 1, app: store.get('App', 1), rules: [
+    id: 2, name: 'app1Policy1', appID: 1, app: store.get('App', 1), kind: 'view', rules: [
       {
         effect: 'allow',
         actions: ['app1:xxxxx1', 'app1:xxxxx2'],

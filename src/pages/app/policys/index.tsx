@@ -6,7 +6,7 @@ import { EnumAppPolicyStatus, delAppPolicy, getAppPolicyList } from '@/services/
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
-import { App, AppPolicy } from '@/generated/adminx/graphql';
+import { App, AppPolicy, AppPolicyKind } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 
 
@@ -148,8 +148,8 @@ const PageAppPolicys = (props: {
             if (result) {
               // 前端过滤
               table.data = result.filter(item => {
-                let isTrue = true;
-                if (params.name) {
+                let isTrue = item.kind === AppPolicyKind.App;
+                if (isTrue && params.name) {
                   isTrue = item.name.indexOf(params.name) > -1;
                 }
                 if (isTrue && params.status) {
