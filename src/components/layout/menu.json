@@ -88,6 +88,10 @@
       {
         "name": "币别资料",
         "path": "system/currency"
+      },
+      {
+        "name": "配额管理",
+        "path": "system/quotaItem"
       }
     ]
   }

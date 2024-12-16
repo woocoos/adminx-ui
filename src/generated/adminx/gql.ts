@@ -152,6 +152,16 @@ const documents = {
     "mutation createPermission($input: CreatePermissionInput!){\n  grant(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}": types.CreatePermissionDocument,
     "mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){\n  updatePermission(permissionID:$permissionId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n    role{ id,orgID,kind,name,isAppRole }\n    orgPolicy{ id,orgID,appPolicyID,name }\n    user{ id,displayName }\n  }\n}": types.UpdatePermissionDocument,
     "mutation revoke($permissionId:ID!,$orgId:ID!){\n  revoke(permissionID:$permissionId,orgID:$orgId)\n}": types.RevokeDocument,
+    "query quotaItems($first: Int,$where:QuotaItemWhereInput,$orderBy:QuotaItemOrder){\n    quotaItems(first:$first,where: $where,orderBy: $orderBy){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n            cursor,node{\n                id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n            }\n        }\n    }\n}": types.QuotaItemsDocument,
+    "query quotaItemInfo($gid:GID!){\n    node(id:$gid){\n        ... on QuotaItem{\n            id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n        }\n    }\n}": types.QuotaItemInfoDocument,
+    "mutation createQuotaItem($input: CreateQuotaItemInput!){\n    createQuotaItem(input:$input){\n        id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n    }\n}": types.CreateQuotaItemDocument,
+    "mutation updateQuotaItem($itemId:ID!,$input: UpdateQuotaItemInput!){\n    updateQuotaItem(id:$itemId,input:$input){\n        id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n    }\n}": types.UpdateQuotaItemDocument,
+    "mutation deleteQuotaItem($itemId:ID!){\n    deleteQuotaItem(id: $itemId)\n}": types.DeleteQuotaItemDocument,
+    "query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){\n    quotas(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n            cursor,node{\n                id,createdAt,limit,used,startAt,endAt,userID,tenantID\n            }\n        }\n    }\n}": types.QuotaListDocument,
+    "query quotaInfo($gid:GID!){\n    node(id:$gid){\n        ... on Quota{\n            id,createdAt,limit,used,startAt,endAt,userID,tenantID\n        }\n    }\n}": types.QuotaInfoDocument,
+    "mutation createQuota($input: CreateQuotaInput!){\n    createQuota(input:$input){\n        id,createdAt,limit,used,startAt,endAt,userID,tenantID\n    }\n}": types.CreateQuotaDocument,
+    "mutation updateQuota($quotaId:ID!,$input: UpdateQuotaInput!){\n    updateQuota(id:$quotaId,input:$input){\n        id,createdAt,limit,used,startAt,endAt,userID,tenantID\n    }\n}": types.UpdateQuotaDocument,
+    "mutation deleteQuota($quotaId:ID!){\n    deleteQuota(id: $quotaId)\n}": types.DeleteQuotaDocument,
     "query userList($first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  users(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        contact{email,mobile},userType,creationType,registerIP,status,comments,avatar\n      }\n    }\n  }\n}": types.UserListDocument,
     "query userInfo($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,\n      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar\n    }\n  }\n}": types.UserInfoDocument,
     "query userInfoLoginProfile($gid:GID!){\n  node(id:$gid){\n    ... on User {\n      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,\n      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar\n      loginProfile{\n        id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,\n        canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus\n      }\n    }\n  }\n}": types.UserInfoLoginProfileDocument,
@@ -745,6 +755,46 @@ export function gql(source: "mutation updatePermission($permissionId:ID!,$input:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation revoke($permissionId:ID!,$orgId:ID!){\n  revoke(permissionID:$permissionId,orgID:$orgId)\n}"): (typeof documents)["mutation revoke($permissionId:ID!,$orgId:ID!){\n  revoke(permissionID:$permissionId,orgID:$orgId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query quotaItems($first: Int,$where:QuotaItemWhereInput,$orderBy:QuotaItemOrder){\n    quotaItems(first:$first,where: $where,orderBy: $orderBy){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n            cursor,node{\n                id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n            }\n        }\n    }\n}"): (typeof documents)["query quotaItems($first: Int,$where:QuotaItemWhereInput,$orderBy:QuotaItemOrder){\n    quotaItems(first:$first,where: $where,orderBy: $orderBy){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n            cursor,node{\n                id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n            }\n        }\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query quotaItemInfo($gid:GID!){\n    node(id:$gid){\n        ... on QuotaItem{\n            id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n        }\n    }\n}"): (typeof documents)["query quotaItemInfo($gid:GID!){\n    node(id:$gid){\n        ... on QuotaItem{\n            id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n        }\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createQuotaItem($input: CreateQuotaItemInput!){\n    createQuotaItem(input:$input){\n        id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n    }\n}"): (typeof documents)["mutation createQuotaItem($input: CreateQuotaItemInput!){\n    createQuotaItem(input:$input){\n        id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateQuotaItem($itemId:ID!,$input: UpdateQuotaItemInput!){\n    updateQuotaItem(id:$itemId,input:$input){\n        id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n    }\n}"): (typeof documents)["mutation updateQuotaItem($itemId:ID!,$input: UpdateQuotaItemInput!){\n    updateQuotaItem(id:$itemId,input:$input){\n        id,createdAt,name,code,active,defaultLimit,unit,defaultLimit,resourceType\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteQuotaItem($itemId:ID!){\n    deleteQuotaItem(id: $itemId)\n}"): (typeof documents)["mutation deleteQuotaItem($itemId:ID!){\n    deleteQuotaItem(id: $itemId)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){\n    quotas(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n            cursor,node{\n                id,createdAt,limit,used,startAt,endAt,userID,tenantID\n            }\n        }\n    }\n}"): (typeof documents)["query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){\n    quotas(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n            cursor,node{\n                id,createdAt,limit,used,startAt,endAt,userID,tenantID\n            }\n        }\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query quotaInfo($gid:GID!){\n    node(id:$gid){\n        ... on Quota{\n            id,createdAt,limit,used,startAt,endAt,userID,tenantID\n        }\n    }\n}"): (typeof documents)["query quotaInfo($gid:GID!){\n    node(id:$gid){\n        ... on Quota{\n            id,createdAt,limit,used,startAt,endAt,userID,tenantID\n        }\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createQuota($input: CreateQuotaInput!){\n    createQuota(input:$input){\n        id,createdAt,limit,used,startAt,endAt,userID,tenantID\n    }\n}"): (typeof documents)["mutation createQuota($input: CreateQuotaInput!){\n    createQuota(input:$input){\n        id,createdAt,limit,used,startAt,endAt,userID,tenantID\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateQuota($quotaId:ID!,$input: UpdateQuotaInput!){\n    updateQuota(id:$quotaId,input:$input){\n        id,createdAt,limit,used,startAt,endAt,userID,tenantID\n    }\n}"): (typeof documents)["mutation updateQuota($quotaId:ID!,$input: UpdateQuotaInput!){\n    updateQuota(id:$quotaId,input:$input){\n        id,createdAt,limit,used,startAt,endAt,userID,tenantID\n    }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteQuota($quotaId:ID!){\n    deleteQuota(id: $quotaId)\n}"): (typeof documents)["mutation deleteQuota($quotaId:ID!){\n    deleteQuota(id: $quotaId)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

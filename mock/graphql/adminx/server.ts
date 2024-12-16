@@ -143,6 +143,7 @@ const schemaWithMocks = addMocksToSchema({
         store.get('AppAction', 14),
         store.get('AppAction', 15),
         store.get('AppAction', 16),
+        store.get('AppAction', 17),
       ],
       checkPermission: (_, { permission }) => {
         // permission => appCode:action
@@ -167,6 +168,7 @@ const schemaWithMocks = addMocksToSchema({
       appDictItemByRefCode: (_, { refCode }) => {
         return getAllDist(store, refCode)
       },
+      quotaItems: relayStylePaginationMock(store),
       node: (root, args, context, info) => {
         const decoded = Buffer.from(args.id, 'base64').toString()
         const [type, did] = decoded?.split(':', 2)
@@ -263,6 +265,28 @@ const schemaWithMocks = addMocksToSchema({
       updateRegion: (_, { regionID, input }) => {
         store.set('Region', regionID, input)
         return store.get('Region', regionID)
+      },
+      createQuotaItem: (_, { input }) => {
+        const data = input
+        data.id = `${Date.now()}`
+        store.set('QuotaItem', data.id, data)
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'quotaItems') as Ref,
+          store.get('QuotaItem', data.id) as Ref
+        )
+      },
+      updateQuotaItem: (_, { quotaItemID, input }) => {
+        store.set('QuotaItem', quotaItemID, input)
+        return store.get('QuotaItem', quotaItemID)
+      },
+      deleteQuotaItem: (_, { quotaItemID }) => {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'quotaItems') as Ref,
+          quotaItemID,
+        )
+        return true
       },
     }
   }
