@@ -37,7 +37,7 @@ const documents = {
     "query appPolicieList($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n      }\n    }\n  }\n}": types.AppPolicieListDocument,
     "query appPolicieListAndIsGrant($gid:GID!,$appRoleId:ID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n        isGrantAppRole(appRoleID: $appRoleId)\n      }\n    }\n  }\n}": types.AppPolicieListAndIsGrantDocument,
     "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppPolicy{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,\n      rules{ effect,actions,resources,conditions }\n      app{ id,name }\n    }\n  }\n}": types.AppPolicyInfoDocument,
-    "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n    }\n  }\n}": types.AppPolicyViewDocument,
+    "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID\n    }\n  }\n}": types.AppPolicyViewDocument,
     "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!){\n  createAppPolicy(appID:$appId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}": types.CreateAppPolicyDocument,
     "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status\n  }\n}": types.UpdateAppPolicyDocument,
     "mutation delAppPolicy($appPolicyId:ID!){\n  deleteAppPolicy(policyID: $appPolicyId)\n}": types.DelAppPolicyDocument,
@@ -298,7 +298,7 @@ export function gql(source: "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n    }\n  }\n}"): (typeof documents)["query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind\n    }\n  }\n}"];
+export function gql(source: "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID\n    }\n  }\n}"): (typeof documents)["query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

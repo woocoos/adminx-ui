@@ -69,11 +69,6 @@
         "path": "/system/app"
       },
       {
-        "name": "策略视图",
-        "path": "/app/policyview"
-      },
-
-      {
         "name": "文件来源",
         "path": "/system/file/source"
       },

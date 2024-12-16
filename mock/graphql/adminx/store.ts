@@ -322,7 +322,18 @@ export const initStoreData = (store: IMockStore) => {
     id: 1, name: 'app1Policy1', appID: 1, app: store.get('App', 1), rules: [
       {
         effect: 'allow',
-        actions: ['*'],
+        actions: ['app1:*'],
+        resources: ['*'],
+        conditions: [],
+      }
+    ]
+  })
+  // AppPolicy
+  store.set('AppPolicy', 2, {
+    id: 2, name: 'app1Policy1', appID: 1, app: store.get('App', 1), rules: [
+      {
+        effect: 'allow',
+        actions: ['app1:xxxxx1', 'app1:xxxxx2'],
         resources: ['*'],
         conditions: [],
       }
@@ -462,10 +473,10 @@ export const initStoreData = (store: IMockStore) => {
     id: 1, name: '测试1', kind: 'dir', parentID: 0, appID: 1
   })
   store.set('AppPolicyView', 2, {
-    id: 2, name: '测试1-1', kind: 'policy', parentID: 1, appID: 1
+    id: 2, name: '测试1-1', kind: 'policy', parentID: 1, appID: 1, policyID: 1
   })
   store.set('AppPolicyView', 3, {
-    id: 3, name: '测试1-2', kind: 'policy', parentID: 1, appID: 1
+    id: 3, name: '测试1-2', kind: 'policy', parentID: 1, appID: 1, policyID: 2
   })
 
   store.set('QuotaItem', 1, { id: 1, name: '设备数限制', code: 'deviceLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, })

@@ -216,6 +216,9 @@ export default {
     zip_code: 'Postal code',
     user_type: 'User Type',
     org_currency: 'Standard money',
+    policy_view: "Permission view",
+    top_policy_view: 'Top-level Permission view',
+    associated_authority: "Associated authority",
 
     // 创建
     create_user: 'Create a user',
@@ -229,6 +232,7 @@ export default {
     create_user_group: 'Creating a User Group',
     create_file_source: 'Creating a File source',
     create_country: 'Creating Country',
+    create_policys_viewer_policy: "Create Permission policy",
 
     // 修改
     'amend_{{field}}': 'Modifying {{field}}',
@@ -237,6 +241,7 @@ export default {
     amend_login_settings: 'Modify login Settings',
     amend_app_config: 'Modifying Application Configuration',
     amend_file_source: 'Modifying File Source',
+    amend_policys_viewer_policy: "Modifying Permission policy",
     // 列表
     account_list: 'Account list',
     member_list: 'Member list',

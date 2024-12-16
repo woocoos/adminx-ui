@@ -10,10 +10,10 @@ import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/adminx/org
 import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
 import { parseStorageUrl } from '@knockout-js/api';
 import { delDataSource, saveDataSource } from '@/util';
+import { ItemType } from 'antd/lib/menu/interface';
 
 export const PageAppList = (props: {
   title?: string;
@@ -81,6 +81,7 @@ export const PageAppList = (props: {
       render: (text, record) => {
         const items: ItemType[] = [
           { key: 'policys', label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
+          { key: 'policy-view', label: <Link to={`/app/policyview?id=${record.id}`} >{t('policy_view')}</Link> },
           { key: 'menu', label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
           { key: 'roles', label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
           { key: 'resource', label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },

@@ -216,6 +216,9 @@ export default {
     zip_code: '邮政编码',
     user_type: '用户类型',
     org_currency: '本位币',
+    policy_view: "权限视图",
+    top_policy_view: '顶级权限视图',
+    associated_authority: "关联权限",
 
     // 创建
     create_user: '创建用户',
@@ -229,6 +232,7 @@ export default {
     create_user_group: '创建用户组',
     create_file_source: '创建文件来源',
     create_country: '创建国家',
+    create_policys_viewer_policy: "创建权限策略",
     // 修改
     'amend_{{field}}': '修改{{field}}',
     amend_basic_info: '修改基本信息',
@@ -236,6 +240,7 @@ export default {
     amend_login_settings: '修改登陆设置',
     amend_app_config: '修改应用配置',
     amend_file_source: '修改文件来源',
+    amend_policys_viewer_policy: "编辑权限策略",
     // 列表
     account_list: '账户列表',
     member_list: '成员列表',

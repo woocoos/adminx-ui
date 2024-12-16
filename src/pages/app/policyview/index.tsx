@@ -7,23 +7,12 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/auth';
 import { useAuth } from 'ice';
-import {
-  App,
-  AppMenu,
-  AppMenuKind, AppPolicyView,
-  AppPolicyViewKind,
-  CreateAppPolicyViewInput,
-  UpdateAppMenuInput,
-} from '@/generated/adminx/graphql';
+import { App, AppPolicyView, AppPolicyViewKind, CreateAppPolicyViewInput, } from '@/generated/adminx/graphql';
 import { getAppInfo } from '@/services/adminx/app';
 import { useLeavePrompt } from '@knockout-js/layout';
-import {
-  createAppPolicyView, delAppPolicyView,
-  getAppPolicyView,
-  moveAppPolicyView,
-  updateAppPolicyView,
-} from '@/services/adminx/app/policy';
+import { createAppPolicyView, delAppPolicyView, getAppPolicyView, moveAppPolicyView, updateAppPolicyView } from '@/services/adminx/app/policy';
 import { ItemType } from 'antd/es/menu/interface';
+import RelevancyProlicy from './components/relevancyProlicy';
 
 
 type TreeSelectedData = {
@@ -44,7 +33,7 @@ export default () => {
     { t } = useTranslation(),
     formRef = useRef<ProFormInstance>(),
     [searchParams] = useSearchParams(),
-    id = searchParams.get('id') || '3',
+    id = searchParams.get('id'),
     [loading, setLoading] = useState(false),
     [treeDraggable, setTreeDraggable] = useState(false),
     [appInfo, setAppInfo] = useState<App>(),
@@ -239,7 +228,7 @@ export default () => {
             }
           } else {
             const result = await createAppPolicyView({
-              appID: id,
+              appID: appInfo.id,
               comments: values.comments,
               kind: values.kind,
               name: values.name,
@@ -260,7 +249,7 @@ export default () => {
           }
         } else if (selectedTree.action === 'child') {
           const result = await createAppPolicyView({
-            appID: id,
+            appID: appInfo.id,
             comments: values.comments,
             kind: values.kind,
             name: values.name,
@@ -311,13 +300,13 @@ export default () => {
   return (
     <PageContainer
       header={{
-        title: `${appInfo?.name} - ${t('menu_manage')}`,
+        title: `${appInfo?.name} - ${t('policy_view')}`,
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('system_conf') },
             { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
-            { title: t('menu_manage') },
+            { title: t('policy_view') },
           ],
         },
       }}
@@ -355,7 +344,7 @@ export default () => {
           </div>
         </ProCard>
         <ProCard split="horizontal">
-          <ProCard title={actionTitle || `${t('created')}-${t('top_menu')}`} headerBordered>
+          <ProCard title={actionTitle || `${t('created')}-${t('top_policy_view')}`} headerBordered >
             <ProForm
               formRef={formRef}
               style={{ maxWidth: 400 }}
@@ -401,21 +390,7 @@ export default () => {
               />
             </ProForm>
           </ProCard>
-          <Row wrap={false}>
-            <Col flex="auto">
-              <span style={{ fontSize: 16, marginLeft: 20 }}>关联权限</span>
-            </Col>
-            <Col>
-              <Auth authKey="moveAppPolicyView">
-                <Button
-                  type="primary"
-                  onClick={() => {
-                    setTreeDraggable(!treeDraggable);
-                  }}
-                >{treeDraggable ? t('cancel') : t('drag')}</Button>
-              </Auth>
-            </Col>
-          </Row>
+          <RelevancyProlicy info={selectedTree.info} />
         </ProCard>
       </ProCard>
     </PageContainer>
