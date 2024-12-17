@@ -14,7 +14,6 @@ import { createAppPolicyView, delAppPolicyView, getAppPolicyView, moveAppPolicyV
 import { ItemType } from 'antd/es/menu/interface';
 import RelevancyProlicy from './components/relevancyProlicy';
 
-
 type TreeSelectedData = {
   keys: Array<string>;
   action: TreeEditorAction;
@@ -58,32 +57,37 @@ export default () => {
     customerTitleRender = (nodeData: TreeDataState<AppPolicyView>) => {
       const items: ItemType[] = [];
       if (checkAuth('createAppPolicyView', auth)) {
+        const children = [
+          {
+            key: 'peer',
+            label: <a onClick={(event) => {
+              event.stopPropagation();
+              editorMenuAction(nodeData.node, 'peer');
+            }}
+            >
+              {t('same_level')}
+            </a>,
+          }
+        ]
+        if (nodeData.node?.kind === AppPolicyViewKind.Dir) {
+          children.push({
+            key: 'child',
+            label: <a onClick={(event) => {
+              event.stopPropagation();
+              editorMenuAction(nodeData.node, 'child');
+            }}
+            >
+              {t('sublayer')}
+            </a>,
+          })
+        }
+
         items.push({
           key: 'create',
           label: t('created'),
-          children: [
-            {
-              key: 'peer',
-              label: <a onClick={(event) => {
-                event.stopPropagation();
-                editorMenuAction(nodeData.node, 'peer');
-              }}
-              >
-                {t('same_level')}
-              </a>,
-            },
-            {
-              key: 'child',
-              label: <a onClick={(event) => {
-                event.stopPropagation();
-                editorMenuAction(nodeData.node, 'child');
-              }}
-              >
-                {t('sublayer')}
-              </a>,
-            },
-          ],
+          children,
         });
+
       }
       if (checkAuth('deleteAppPolicyView', auth)) {
         items.push({

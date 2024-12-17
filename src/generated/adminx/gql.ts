@@ -57,6 +57,8 @@ const documents = {
     "mutation assignAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  assignAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.AssignAppRolePolicyDocument,
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
     "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}": types.SyncAppRoleToOrgDocument,
+    "mutation assignAppRolePolicyView($appID: ID!, $roleID: ID!,$rmAppPolicyIDs: [ID!],$addAppPolicyIDs: [ID!]){\n  assignAppRolePolicyView(appID: $appID, roleID: $roleID,rmAppPolicyIDs: $rmAppPolicyIDs,addAppPolicyIDs: $addAppPolicyIDs)\n}": types.AssignAppRolePolicyViewDocument,
+    "query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}": types.AppRolePolicyViewAssignedDocument,
     "query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}": types.CountryListDocument,
     "query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}": types.CountryInfoDocument,
     "mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}": types.UpdateCountryDocument,
@@ -375,6 +377,14 @@ export function gql(source: "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}"): (typeof documents)["mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation assignAppRolePolicyView($appID: ID!, $roleID: ID!,$rmAppPolicyIDs: [ID!],$addAppPolicyIDs: [ID!]){\n  assignAppRolePolicyView(appID: $appID, roleID: $roleID,rmAppPolicyIDs: $rmAppPolicyIDs,addAppPolicyIDs: $addAppPolicyIDs)\n}"): (typeof documents)["mutation assignAppRolePolicyView($appID: ID!, $roleID: ID!,$rmAppPolicyIDs: [ID!],$addAppPolicyIDs: [ID!]){\n  assignAppRolePolicyView(appID: $appID, roleID: $roleID,rmAppPolicyIDs: $rmAppPolicyIDs,addAppPolicyIDs: $addAppPolicyIDs)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}"): (typeof documents)["query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

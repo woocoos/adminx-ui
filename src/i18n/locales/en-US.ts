@@ -219,6 +219,7 @@ export default {
     policy_view: "Permission view",
     top_policy_view: 'Top-level Permission view',
     associated_authority: "Associated authority",
+    fun_authority: "Functional authority",
 
     // 创建
     create_user: 'Create a user',

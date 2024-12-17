@@ -478,6 +478,15 @@ export const initStoreData = (store: IMockStore) => {
   store.set('AppPolicyView', 3, {
     id: 3, name: '测试1-2', kind: 'policy', parentID: 1, appID: 1, policyID: 2
   })
+  store.set('AppPolicyView', 4, {
+    id: 4, name: '测试2', kind: 'dir', parentID: 0, appID: 1,
+  })
+  store.set('AppPolicyView', 5, {
+    id: 5, name: '测试2-1', kind: 'dir', parentID: 4, appID: 1,
+  })
+  store.set('AppPolicyView', 6, {
+    id: 6, name: '测试2-1-1', kind: 'policy', parentID: 5, appID: 1, policyID: null
+  })
 
   store.set('QuotaItem', 1, { id: 1, name: '设备数限制', code: 'deviceLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, })
   store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false, })

@@ -236,3 +236,61 @@ export async function syncAppRoleToOrg(orgId: string, appRoleId: string) {
   }
   return null;
 }
+
+
+const mutationAssignAppRolePolicyView = gql(/* GraphQL */`mutation assignAppRolePolicyView($appID: ID!, $roleID: ID!,$rmAppPolicyIDs: [ID!],$addAppPolicyIDs: [ID!]){
+  assignAppRolePolicyView(appID: $appID, roleID: $roleID,rmAppPolicyIDs: $rmAppPolicyIDs,addAppPolicyIDs: $addAppPolicyIDs)
+}`);
+
+
+/**
+ * 角色权限试图授权保存
+ * @param appID
+ * @param roleID
+ * @param addAppPolicyIDs
+ * @param rmAppPolicyIDs
+ * @returns
+ */
+export async function assignAppRolePolicyView(appID: string, roleID: string, addAppPolicyIDs: string[], rmAppPolicyIDs: string[]) {
+  const
+    result = await mutation(
+      mutationAssignAppRolePolicyView, {
+      appID,
+      roleID,
+      addAppPolicyIDs,
+      rmAppPolicyIDs,
+    });
+
+  if (result.data?.assignAppRolePolicyView) {
+    return result.data.assignAppRolePolicyView;
+  }
+  return false;
+}
+
+
+const queryAppRoleAssigned = gql(/* GraphQL */`query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){
+  appPolicyView(appCode:$appCode){
+    id,name,kind,
+    appRoleAssigned(appRoleID: $appRoleID)
+  }
+}`);
+
+/**
+ * 获取应用角色已授权的策略试图
+ * @param appCode
+ * @param appRoleID
+ * @returns
+ */
+export async function getAppRoleAssignedPolicyView(appCode: string, appRoleID: string) {
+  const
+    result = await query(
+      queryAppRoleAssigned, {
+      appCode,
+      appRoleID,
+    });
+
+  if (result.data?.appPolicyView) {
+    return result.data.appPolicyView.filter(item => item.appRoleAssigned);
+  }
+  return [];
+}

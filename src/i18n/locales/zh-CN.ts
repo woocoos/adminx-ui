@@ -219,6 +219,7 @@ export default {
     policy_view: "权限视图",
     top_policy_view: '顶级权限视图',
     associated_authority: "关联权限",
+    fun_authority: "功能权限",
 
     // 创建
     create_user: '创建用户',

@@ -9,11 +9,11 @@ import { delAppRole, getAppRoleList } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { App, AppRole } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 import { delDataSource, saveDataSource } from '@/util';
+import { ItemType } from 'antd/es/menu/interface';
 
 
 export default () => {
@@ -56,7 +56,9 @@ export default () => {
         search: false,
         width: 120,
         render: (text, record) => {
-          const items: ItemType[] = [];
+          const items: ItemType[] = [
+            { key: 'fun_authority', label: <Link to={`/app/roles/funauth?role_id=${record.id}`} >{t('fun_authority')}</Link> }
+          ];
           if (checkAuth('assignAppRolePolicy', auth)) {
             items.push(
               {
