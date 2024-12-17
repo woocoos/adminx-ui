@@ -81,6 +81,9 @@ export const PageOrgRoleList = (props: {
             <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/viewer?id=${record.id}`}>
               {t('view')}
             </Link>
+            <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/funauth?id=${record.id}`}>
+              {t('fun_authority')}
+            </Link>
             <Auth authKey="assignRoleUser">
               <a onClick={() => {
                 setModal({ open: true, title: t('add_member'), id: '', data: record, scene: 'addUser' });
@@ -93,6 +96,9 @@ export const PageOrgRoleList = (props: {
             : <>
               <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/viewer?id=${record.id}`}>
                 {t('view')}
+              </Link>
+              <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/funauth?id=${record.id}`}>
+                {t('fun_authority')}
               </Link>
               <Auth authKey="assignRoleUser">
                 <a onClick={() => {

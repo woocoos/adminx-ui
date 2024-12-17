@@ -447,3 +447,63 @@ export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
   }
   return 0;
 }
+
+
+
+const queryOrgRoleAssigned = gql(/* GraphQL */`query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){
+  orgPolicyView(appCode:$appCode){
+    id,name,kind,
+    orgRoleAssigned(orgRoleID: $orgRoleID)
+  }
+}`);
+
+/**
+ * 获取组织角色已授权的策略试图
+ * @param appCode
+ * @param orgRoleID
+ * @returns
+ */
+export async function getOrgRoleAssignedPolicyView(appCode: string, orgRoleID: string) {
+  const
+    result = await query(
+      queryOrgRoleAssigned, {
+      appCode,
+      orgRoleID,
+    });
+
+  if (result.data?.orgPolicyView) {
+    return result.data.orgPolicyView.filter(item => item.orgRoleAssigned);
+  }
+  return [];
+}
+
+
+
+const mutationAssignOrgRolePolicyView = gql(/* GraphQL */`mutation assignOrgRolePolicyView($orgID: ID!, $roleID: ID!,$rmOrgPolicyIDs: [ID!],$addOrgPolicyIDs: [ID!]){
+  assignOrgRolePolicyView(orgID: $orgID, roleID: $roleID,rmOrgPolicyIDs: $rmOrgPolicyIDs,addOrgPolicyIDs: $addOrgPolicyIDs)
+}`);
+
+
+/**
+ * 组织角色权限试图授权保存
+ * @param orgID
+ * @param roleID
+ * @param addOrgPolicyIDs
+ * @param rmOrgPolicyIDs
+ * @returns
+ */
+export async function assignOrgRolePolicyView(orgID: string, roleID: string, addOrgPolicyIDs: string[], rmOrgPolicyIDs: string[]) {
+  const
+    result = await mutation(
+      mutationAssignOrgRolePolicyView, {
+      orgID,
+      roleID,
+      addOrgPolicyIDs,
+      rmOrgPolicyIDs,
+    });
+
+  if (result.data?.assignOrgRolePolicyView) {
+    return result.data.assignOrgRolePolicyView;
+  }
+  return false;
+}

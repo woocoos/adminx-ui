@@ -209,22 +209,16 @@ export async function delAppPolicy(appPolicyId: string) {
  * @param appCode
  * @returns
  */
-export async function getAppPolicyView(appCode: string): Promise<AppPolicyView[]> {
-  const
-    list: any[] = [],
-    result = await query(
-      queryAppPolicyView, {
-      appCode: appCode,
-    });
+export async function getAppPolicyView(appCode: string) {
+  const result = await query(
+    queryAppPolicyView, {
+    appCode: appCode,
+  });
 
   if (result.data?.appPolicyView) {
-    result.data.appPolicyView.forEach(item => {
-      if (item) {
-        list.push(item);
-      }
-    });
+    return result.data.appPolicyView
   }
-  return list;
+  return [];
 }
 
 export async function createAppPolicyView(input: CreateAppPolicyViewInput) {

@@ -6,10 +6,10 @@ import { Link, useAuth, useSearchParams } from "ice"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import CheckPolicyView from "./components/checkPolicyView"
+import Auth from "@/components/auth"
 
 export default () => {
   const { token } = useToken(),
-    [auth] = useAuth(),
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
     [saveLoading, setSaveLoading] = useState(false),
@@ -70,13 +70,15 @@ export default () => {
     }}
   >
     {roleInfo ?
-      <ProCard title={`角色:${roleInfo.name}`} headerBordered extra={
-        <Button
-          type="primary"
-          disabled={saveDisabled}
-          loading={saveLoading}
-          onClick={onSave}
-        >{t('save')}</Button>
+      <ProCard title={`${t('role')}:${roleInfo.name}`} headerBordered extra={
+        <Auth authKey={"assignAppRolePolicyView"}>
+          <Button
+            type="primary"
+            disabled={saveDisabled}
+            loading={saveLoading}
+            onClick={onSave}
+          >{t('save')}</Button>
+        </Auth>
       }>
         <CheckPolicyView
           appInfo={roleInfo.app as App}

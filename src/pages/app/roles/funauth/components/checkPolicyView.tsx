@@ -1,26 +1,28 @@
-import { App, AppPolicyView, AppPolicyViewKind } from "@/generated/adminx/graphql"
+import { App, AppPolicyView, AppPolicyViewKind, OrgRole } from "@/generated/adminx/graphql"
 import { getAppPolicyView } from "@/services/adminx/app/policy"
 import { formatTreeData, TreeDataState } from "@/util"
-import { Checkbox, Flex, Space } from "antd"
+import { Checkbox, Empty, Flex, Space } from "antd"
 import { ReactNode, useEffect, useState } from "react"
 import style from "./checkPolicyView.module.css"
+import { getOrgPolicyView } from "@/services/adminx/org/policy"
 
 export default (props: {
   appInfo: App
+  isOrg?: boolean
   value?: string[]
   onChange?: (value: string[]) => void
 }) => {
   const [treeData, setTreeData] = useState<TreeDataState<AppPolicyView>[]>([])
 
   const reqAppPolicyView = async () => {
-    const result = await getAppPolicyView(props.appInfo.code)
+    const result = props.isOrg ? await getOrgPolicyView(props.appInfo.code) : await getAppPolicyView(props.appInfo.code)
     setTreeData(
       formatTreeData(
         result.map(item => ({
           key: item.id,
           title: item.name,
           parentId: item.parentID,
-          node: item,
+          node: item as AppPolicyView,
         })),
       ),
     );
@@ -90,6 +92,7 @@ export default (props: {
 
   return <>
     <div className={style.header}>应用：{props.appInfo.name}</div>
+    {treeData.length === 0 ? <Empty /> : <></>}
     {
       treeData.map(item => <Flex key={`row${item.key}`} className={style.row}>
         {treeItemRender(item)}

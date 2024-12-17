@@ -396,6 +396,7 @@ export default {
     login_force_domains: "You are not yet a system tenant and cannot access the system!",
     login_not_app_access: "You do not have access to the application system",
     page_403: "Sorry, you are not authorized to access this page",
+    save_failure: "Save failure",
 
   },
 };

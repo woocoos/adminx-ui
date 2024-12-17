@@ -285,3 +285,28 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
   }
   return 0;
 }
+
+
+const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: String!){
+  orgPolicyView(appCode: $appCode){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,
+  }
+}`);
+
+/**
+ * 组织下的应用权限试图
+ * @param appCode
+ * @returns
+ */
+export async function getOrgPolicyView(appCode: string) {
+  const
+    result = await query(
+      queryOrgPolicyView, {
+      appCode
+    });
+
+  if (result.data?.orgPolicyView) {
+    return result.data.orgPolicyView;
+  }
+  return [];
+}

@@ -218,7 +218,8 @@ export const initStoreData = (store: IMockStore) => {
       store.get('User', 1)
     ]),
     apps: listTemp([
-      store.get('App', 1)
+      store.get('App', 1),
+      store.get('App', 2)
     ]),
     permissions: listTemp([
       store.get("AppPolicy", 1)
