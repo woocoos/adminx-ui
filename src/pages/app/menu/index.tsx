@@ -240,7 +240,7 @@ export default () => {
               icon: values.icon,
               kind: values.kind,
               name: values.name,
-              parentID: selectedTree.info?.parentID || 0,
+              parentID: selectedTree.info?.parentID || "0",
               route: values.route,
             });
             if (result?.[0]?.id) {
@@ -262,7 +262,7 @@ export default () => {
             icon: values.icon,
             kind: values.kind,
             name: values.name,
-            parentID: Number(selectedTree.info?.id) || 0,
+            parentID: selectedTree.info?.id || "0",
             route: values.route,
           });
           if (result?.[0]?.id) {
@@ -283,7 +283,7 @@ export default () => {
             icon: values.icon,
             kind: values.kind,
             name: values.name,
-            parentID: selectedTree.info?.parentID || 0,
+            parentID: selectedTree.info?.parentID || "0",
             route: values.route,
           });
           if (result?.[0]?.id) {

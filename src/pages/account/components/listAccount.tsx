@@ -12,10 +12,10 @@ import { useTranslation } from 'react-i18next';
 import DrawerRole from '@/pages/org/components/drawerRole';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import store from '@/store';
 import { OrderDirection, Org, OrgRole, OrgRoleKind, OrgUserUserType, User, UserAddrAddrType, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource } from '@/util';
+import { ItemType } from 'antd/es/menu/interface';
 
 
 export const UserList = (props: {
@@ -116,7 +116,16 @@ export const UserList = (props: {
       width: 100,
       render: (text, record) => {
         const items: ItemType[] = [];
-
+        if (props.scene === 'orgUser') {
+          items.push(
+            { key: 'fun_authority', label: <Link to={`/org/users/funauth?id=${record.id}`} >{t('fun_authority')}</Link> },
+          );
+        }
+        if (props.scene === 'orgMember') {
+          items.push(
+            { key: 'fun_authority', label: <Link to={`/org/members/funauth?id=${record.id}`} >{t('fun_authority')}</Link> },
+          );
+        }
         if (props.scene === 'orgUser' && props.orgInfo?.kind === 'root') {
           if (checkAuth('assignRoleUser', auth)) {
             items.push(

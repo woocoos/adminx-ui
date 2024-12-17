@@ -9,9 +9,9 @@ import { TreeEditorAction, delTreeData, formatTreeData, saveDataSource } from '@
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { Country, Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
 import { getCacheCountryList } from '@/services/adminx/country';
+import { ItemType } from 'antd/es/menu/interface';
 
 type OrgTree = Org & { children?: Org[] }
 

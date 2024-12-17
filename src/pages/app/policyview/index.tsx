@@ -123,14 +123,14 @@ export default () => {
         if (appResult?.id) {
           setAppInfo(appResult as App);
           const result = await getAppPolicyView(appResult.code);
-          setAppPolicyViews(result);
+          setAppPolicyViews(result as AppPolicyView[]);
           setTreeData(
             formatTreeData(
               result.map(item => ({
                 key: item.id,
                 title: item.name,
                 parentId: item.parentID,
-                node: item,
+                node: item as AppPolicyView,
               })),
             ),
           );

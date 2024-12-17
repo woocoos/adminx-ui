@@ -7,12 +7,12 @@ import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDr
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { Country, Region, RegionSimpleStatus, UpdateRegionInput } from '@/generated/adminx/graphql';
 import { getCountryInfo } from '@/services/adminx/country';
 import { createRegionInfo, delRegionInfo, getRegionList, moveRegionInfo, updateRegionInfo } from '@/services/adminx/country/region';
+import { ItemType } from 'antd/es/menu/interface';
 
 type TreeSelectedData = {
   keys: Array<string>;

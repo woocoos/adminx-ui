@@ -1,13 +1,15 @@
-import { App, OrgRole, OrgRoleKind } from "@/generated/adminx/graphql"
+import { App, User } from "@/generated/adminx/graphql"
 import { PageContainer, ProCard, useToken } from "@ant-design/pro-components"
 import { Button, Empty, message } from "antd"
 import { Link, useAuth, useSearchParams } from "ice"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { assignOrgRolePolicyView, getOrgRoleAssignedPolicyView, getOrgRoleInfo } from "@/services/adminx/org/role"
 import { getOrgAppList } from "@/services/adminx/org/app"
 import CheckPolicyView from "@/pages/app/roles/funauth/components/checkPolicyView"
 import Auth from "@/components/auth"
+import { getUserInfo } from "@/services/adminx/user"
+import store from "@/store"
+import { assignOrgUserPolicyView, getOrgUserAssignedPolicyView } from "@/services/adminx/org/user"
 
 type CheckedsType = {
   appInfo: App
@@ -16,41 +18,38 @@ type CheckedsType = {
 }
 
 export default (props: {
-  isFromSystem?: boolean;
+  isFromMember?: boolean;
 }) => {
   const { token } = useToken(),
+    [userState] = store.useModel('user'),
     [auth] = useAuth(),
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [dataSource, setDataSource] = useState<CheckedsType[]>([]),
-    [roleInfo, setRoleInfo] = useState<OrgRole>()
+    [userInfo, setUserInfo] = useState<User>()
 
-  const reqRoleInfo = async () => {
-    const roleId = searchParams.get('id')
-    if (roleInfo?.id == roleId) {
-      return roleInfo;
-    }
-    if (roleId) {
-      const result = await getOrgRoleInfo(roleId);
+  const reqUserInfo = async () => {
+    const userId = searchParams.get('id')
+    if (userId) {
+      const result = await getUserInfo(userId);
       if (result?.id) {
-        setRoleInfo(result as OrgRole);
-        return result;
+        setUserInfo(result as User);
       }
     }
     return null
   }, reqCheckedsData = async () => {
     const list: CheckedsType[] = []
-    if (roleInfo) {
-      const appResult = await getOrgAppList(`${roleInfo.orgID}`, {
+    if (userInfo) {
+      const appResult = await getOrgAppList(`${userState.tenantId}`, {
         current: 1,
         pageSize: 9999,
       })
       if (appResult?.edges) {
         for await (const edge of appResult?.edges) {
           if (edge?.node) {
-            const result = await getOrgRoleAssignedPolicyView(edge.node.code, roleInfo.id)
+            const result = await getOrgUserAssignedPolicyView(edge.node.code, userInfo.id)
             list.push({
               appInfo: edge.node as App,
               checked: result.map(item => item.id),
@@ -62,7 +61,7 @@ export default (props: {
     }
     setDataSource(list)
   }, onSave = async () => {
-    if (roleInfo) {
+    if (userInfo) {
       setSaveLoading(true)
       const errors: {
         appInfo: App,
@@ -72,7 +71,7 @@ export default (props: {
         const add: string[] = dsImte.checked.filter(key => !dsImte.oldChecked.includes(key)),
           del: string[] = dsImte.oldChecked.filter(key => !dsImte.checked.includes(key));
         if (add.length > 0 || del.length > 0) {
-          const result = await assignOrgRolePolicyView(`${roleInfo.orgID}`, roleInfo.id, add, del)
+          const result = await assignOrgUserPolicyView(userState.tenantId, userInfo.id, add, del)
           if (!result) {
             errors.push({
               appInfo: dsImte.appInfo,
@@ -99,10 +98,10 @@ export default (props: {
 
   useEffect(() => {
     reqCheckedsData()
-  }, [roleInfo])
+  }, [userInfo])
 
   useEffect(() => {
-    reqRoleInfo()
+    reqUserInfo()
   }, [])
 
   return <PageContainer
@@ -110,23 +109,22 @@ export default (props: {
       title: t('fun_authority'),
       style: { background: token.colorBgContainer },
       breadcrumb: {
-        items: props.isFromSystem ? [
-          { title: t('system_conf') },
-          { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
-          { title: roleInfo?.kind == OrgRoleKind.Role ? <Link to={`/system/org/roles?id=${roleInfo?.orgID}`}>{t('role')}</Link> : <Link to={`/system/org/groups?id=${roleInfo?.orgID}`}>{t('user_group')}</Link> },
+        items: props.isFromMember ? [
+          { title: t('org_cooperation') },
+          { title: <Link to={`/org/members`} >{t('member_manage')}</Link> },
           { title: t('fun_authority') },
         ] : [
           { title: t('org_cooperation') },
-          { title: roleInfo?.kind == OrgRoleKind.Role ? <Link to={'/org/roles'}>{t('role')}</Link> : <Link to={'/org/groups'}>{t('user_group')}</Link> },
+          { title: <Link to={`/org/users`} >{t('user_manage')}</Link> },
           { title: t('fun_authority') },
         ],
       },
       extra: <></>,
     }}
   >
-    {roleInfo ?
-      <ProCard title={`${roleInfo.kind === OrgRoleKind.Group ? t('user_group') : t('role')}:${roleInfo.name}`} headerBordered extra={
-        <Auth authKey={"assignOrgRolePolicyView"}>
+    {userInfo ?
+      <ProCard title={`${t('user')}:${userInfo.displayName}`} headerBordered extra={
+        <Auth authKey={"assignOrgUserPolicyView"}>
           <Button
             type="primary"
             disabled={saveDisabled}
