@@ -1,13 +1,13 @@
 import { CreateQuotaItemInput, OrderDirection, QuotaItemOrder, QuotaItemOrderField, QuotaItemResourceType, QuotaItemWhereInput } from "@/generated/adminx/graphql";
-import { mutation, paging, query } from '@knockout-js/ice-urql/request';
-import { gql } from '@/generated/adminx';
-import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from "@knockout-js/ice-urql/request";
+import { gql } from "@/generated/adminx";
+import { gid } from "@knockout-js/api";
 
 const EnumResourceType = {
-  [QuotaItemResourceType.Network]: {text: '网络类型'},
-  [QuotaItemResourceType.Number]: {text: '数值类型'},
-  [QuotaItemResourceType.Storage]: {text: '存储类型'},
-};
+  [QuotaItemResourceType.Network]: { text: '网络类型' },
+  [QuotaItemResourceType.Number]: { text: '数值类型' },
+  [QuotaItemResourceType.Storage]: { text: '存储类型' },
+}
 
 const queryQuotaItemList = gql(/* GraphQL */`query quotaItems($first: Int,$where:QuotaItemWhereInput,$orderBy:QuotaItemOrder){
     quotaItems(first:$first,where: $where,orderBy: $orderBy){
@@ -50,70 +50,67 @@ const mutationDelQuotaItem = gql(/* GraphQL */`mutation deleteQuotaItem($itemId:
  * @returns
  */
 export async function getQuotaItemList(
-    gather:{
-        current?: number,
-        pageSize?: number,
-        where?: QuotaItemWhereInput,
-        orderBy?: QuotaItemOrder;
-    },
+  gather: {
+    current?: number,
+    pageSize?: number,
+    where?: QuotaItemWhereInput,
+    orderBy?: QuotaItemOrder;
+  },
 ) {
-    const result = await paging(
-        queryQuotaItemList, {
-            first: gather.pageSize || 20,
-            where: gather.where,
-            orderBy: gather.orderBy ?? {
-                direction: OrderDirection.Desc,
-                field: QuotaItemOrderField.CreatedAt
-            },
-        }, gather.current || 1
-    )
-    if (result.data?.quotaItems) {
-        return result.data.quotaItems;
-    }
-    return null;
+  const result = await paging(
+    queryQuotaItemList, {
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: QuotaItemOrderField.CreatedAt
+    },
+  }, gather.current || 1
+  )
+  if (result.data?.quotaItems) {
+    return result.data.quotaItems;
+  }
+  return null;
 }
 
 export async function getQuotaItemInfo(id: string) {
-    const result = await query(
-        queryQuotaItemInfo, {
-            gid: gid('quotaItem', id),
-        }
-    )
-    if (result.data?.node?.__typename === 'QuotaItem') {
-        return result.data.node;
-    }
-    return null;
+  const result = await query(
+    queryQuotaItemInfo, {
+    gid: gid('quota_item', id),
+  }
+  )
+  if (result.data?.node?.__typename === 'QuotaItem') {
+    return result.data.node;
+  }
+  return null;
 }
 
 export async function createQuotaItem(input: CreateQuotaItemInput) {
-    const result = await mutation(
-        mutationCreateQuotaItem, {
-        input
-    })
-    if (result.data?.createQuotaItem?.id) {
-        return result.data.createQuotaItem;
-    }
-    return null;
+  const result = await mutation(
+    mutationCreateQuotaItem, {
+    input
+  })
+  if (result.data?.createQuotaItem?.id) {
+    return result.data.createQuotaItem;
+  }
+  return null;
 }
 
 export async function updateQuotaItem(itemId: string, input: any) {
-    const result = await mutation(
-        mutationUpdateQuotaItem, {
-        itemId,
-        input
-    })
-    if (result.data?.updateQuotaItem?.id) {
-        return result.data.updateQuotaItem;
-    }
-    return null;
+  const result = await mutation(
+    mutationUpdateQuotaItem, {
+    itemId,
+    input
+  })
+  if (result.data?.updateQuotaItem?.id) {
+    return result.data.updateQuotaItem;
+  }
+  return null;
 }
 
 export async function delQuotaItem(itemId: string) {
-    const result = await mutation(mutationDelQuotaItem, {
-        itemId
-    })
-    if (result.data?.deleteQuotaItem?.id) {
-        return result.data.deleteQuotaItem;
-    }
-    return null;
+  const result = await mutation(mutationDelQuotaItem, {
+    itemId
+  })
+  return result.data?.deleteQuotaItem;
 }

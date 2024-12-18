@@ -1,7 +1,7 @@
-import { gid } from '@knockout-js/api';
-import { mutation, paging, query } from '@knockout-js/ice-urql/request';
-import { gql } from '@/generated/adminx';
-import { OrderDirection, QuotaOrder, QuotaOrderField, QuotaWhereInput } from '@/generated/adminx/graphql';
+import { gid } from "@knockout-js/api";
+import { mutation, paging, query } from "@knockout-js/ice-urql/request";
+import { gql } from "@/generated/adminx";
+import { OrderDirection, Quota, QuotaOrder, QuotaOrderField, QuotaWhereInput } from "@/generated/adminx/graphql";
 
 
 const queryQuotaList = gql(/* GraphQL */`query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){
@@ -41,69 +41,62 @@ const mutationDelQuota = gql(/* GraphQL */`mutation deleteQuota($quotaId:ID!){
 }`);
 
 
-export async function getQuotaList(
-    gather: {
-        current?: number,
-        pageSize?: number,
-        where?: QuotaWhereInput,
-        orderBy?: QuotaOrder;
-    },
-) {
-    const result = await paging(
-        queryQuotaList, {
-            first: gather.pageSize,
-            where: gather.where,
-            orderBy: gather.orderBy ?? {
-              direction: OrderDirection.Desc,
-              field: QuotaOrderField.CreatedAt,
-            },
-        }, gather.current || 1,
-    );
-    if (result.data?.quotas) {
-        return result.data.quotas;
-    }
-    return null;
+export async function getQuotaList(gather: {
+  current?: number;
+  pageSize?: number;
+  where?: QuotaWhereInput;
+  orderBy?: QuotaOrder;
+}) {
+  const result = await paging(queryQuotaList, {
+    first: gather.pageSize,
+    orderBy: gather.orderBy,
+    where: gather.where,
+  }, gather.current || 1)
+  if (result.data?.quotas) {
+    return result.data.quotas;
+  }
+  return null;
 }
 
 export async function getQuotaInfo(id: string) {
-    const result = await query(queryQuotaInfo, {
-        gid: gid('quota', id),
-    })
-    if (result.data?.node?.__typename === 'Quota') {
-        return result.data.node;
-    }
-    return null;
+  const result = await query(queryQuotaInfo, {
+    gid: gid('quota', id),
+  })
+  if (result.data?.node?.__typename === 'Quota') {
+    return result.data.node;
+  }
+  return null;
 }
 
 export async function createQuota(input: any) {
-    const result = await mutation(mutationCreateQuota, {
-        input,
-    })
-    if (result.data?.createQuota) {
-        return result.data.createQuota;
-    }
-    return null;
+  const result = await mutation(mutationCreateQuota, {
+    input,
+  })
+  if (result.data?.createQuota) {
+    return result.data.createQuota;
+  }
+  return null;
 }
 
 export async function updateQuota(quotaId: string, input: any) {
-    const result = await mutation(mutationUpdateQuota, {
-        quotaId,
-        input,
-    })
-    if (result.data?.updateQuota) {
-        return result.data.updateQuota;
-    }
-    return null;
+  const result = await mutation(mutationUpdateQuota, {
+    quotaId,
+    input,
+  })
+  if (result.data?.updateQuota) {
+    return result.data.updateQuota;
+  }
+  return null;
 }
 
 export async function delQuota(quotaId: string) {
-    const result = await mutation(mutationDelQuota, {
-        quotaId,
-    })
-    if (result.data?.deleteQuota) {
-        return result.data.deleteQuota;
-    }
-    return null;
+  const result = await mutation(mutationDelQuota, {
+    quotaId,
+  })
+  if (result.data?.deleteQuota) {
+    return result.data.deleteQuota;
+  }
+  return null;
 }
 
 
