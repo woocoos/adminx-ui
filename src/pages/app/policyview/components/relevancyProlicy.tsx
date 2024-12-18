@@ -160,13 +160,15 @@ export default (props: {
   return (props.info ? <>
     <ProCard title={t('associated_authority')} headerBordered extra={<>
       <Space>
-        <Auth authKey={['createAppPolicy', "updateAppPolicy"]} keyAndOr="or">
-          <Button
-            type="primary"
-            href={`/app/policys/viewer?policyview_id=${props.info.id}&${info?.id ? `id=${info.id}` : ``}`}
-            target="_blank"
-          >{info?.id ? t('amend_policys_viewer_policy') : t('create_policys_viewer_policy')}</Button>
-        </Auth>
+        {
+          info?.id ? <Auth authKey={['createAppPolicy', "updateAppPolicy"]} keyAndOr="or">
+            <Button
+              type="primary"
+              href={`/app/policys/viewer?id=${info.id}`}
+              target="_blank"
+            >{t('amend_policys_viewer_policy')}</Button>
+          </Auth> : <></>
+        }
         <Auth authKey="updateAppPolicy">
           <Button
             type="primary"

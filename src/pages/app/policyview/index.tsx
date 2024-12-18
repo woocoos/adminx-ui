@@ -350,20 +350,24 @@ export default () => {
           </div>
         </ProCard>
         <ProCard split="horizontal">
-          <ProCard title={actionTitle || `${t('created')}-${t('top_policy_view')}`} headerBordered >
+          <ProCard
+            title={actionTitle || `${t('created')}-${t('top_policy_view')}`}
+            headerBordered
+            extra={checkAuth('createAppPolicyView') || checkAuth('updateAppPolicyView') ? <>
+              <Button
+                type='primary'
+                loading={saveLoading}
+                disabled={saveDisabled}
+                onClick={() => {
+                  formRef.current?.submit();
+                }}
+              >{t('save')}</Button>
+            </> : <></>}
+          >
             <ProForm
               formRef={formRef}
               style={{ maxWidth: 400 }}
-              submitter={checkAuth('createAppPolicyView') || checkAuth('updateAppPolicyView') ? {
-                searchConfig: {
-                  submitText: t('submit'),
-                  resetText: t('reset'),
-                },
-                submitButtonProps: {
-                  loading: saveLoading,
-                  disabled: saveDisabled,
-                },
-              } : false}
+              submitter={false}
               onFinish={onFinish}
               onReset={getRequest}
               request={getRequest}
@@ -381,6 +385,7 @@ export default () => {
                 name="kind"
                 label={t('type')}
                 placeholder={`${t('please_enter_type')}`}
+                disabled={selectedTree.action === 'editor' && selectedTree.info?.kind === AppPolicyViewKind.Policy}
                 options={[
                   { value: 'dir', label: t('directory') },
                   { value: 'policy', label: t('policy') },
