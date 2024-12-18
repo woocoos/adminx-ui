@@ -4,6 +4,8 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import * as casual from "casual";
 import { addListTemp, delListTemp, getAllDist, initStoreData, listTemp } from "./store";
+import { QuotaItem } from "../../../src/generated/adminx/graphql";
+import quota from "../../../src/pages/system/quotaItem/quota";
 
 const preserveResolvers = true
 const typeDefs = readFileSync(join(process.cwd(), 'script', 'generated', "adminx.graphql"), 'utf-8');
@@ -182,6 +184,10 @@ const schemaWithMocks = addMocksToSchema({
         return getAllDist(store, refCode)
       },
       quotaItems: relayStylePaginationMock(store),
+      quotas: (_, { quotaItemId }) => {
+        const quotaItem = store.get('QuotaItem', quotaItemId) as QuotaItem;
+        return quotaItem.quota;
+      },
       node: (root, args, context, info) => {
         const decoded = Buffer.from(args.id, 'base64').toString()
         const [type, did] = decoded?.split(':', 2)
@@ -280,29 +286,51 @@ const schemaWithMocks = addMocksToSchema({
         return store.get('Region', regionID)
       },
       createQuotaItem: (_, { input }) => {
-        const data = input
-        data.id = `${Date.now()}`
-        store.set('QuotaItem', data.id, data)
+        const data = input;
+        data.id = `${Date.now()}`;
+        store.set('QuotaItem', data.id, data);
         return addListTemp(
           store,
           store.get('Query', 'ROOT', 'quotaItems') as Ref,
-          store.get('QuotaItem', data.id) as Ref
-        )
+          store.get('QuotaItem', data.id) as Ref,
+        );
       },
       updateQuotaItem: (_, { quotaItemID, input }) => {
-        store.set('QuotaItem', quotaItemID, input)
-        return store.get('QuotaItem', quotaItemID)
+        store.set('QuotaItem', quotaItemID, input);
+        return store.get('QuotaItem', quotaItemID);
       },
       deleteQuotaItem: (_, { quotaItemID }) => {
         delListTemp(
           store,
           store.get('Query', 'ROOT', 'quotaItems') as Ref,
           quotaItemID,
-        )
-        return true
+        );
+        return true;
       },
-    }
-  }
+      createQuota: (_, { input }) => {
+        const data = input;
+        data.id = `${Date.now()}`;
+        store.set('Quota', data.id, data);
+        return addListTemp(
+          store,
+          store.get('Query', 'ROOT', 'quotas') as Ref,
+          store.get('Quota', data.id) as Ref,
+        );
+      },
+      updateQuota: (_, { quotaID, input }) => {
+        store.set('Quota', quotaID, input);
+        return store.get('Quota', quotaID);
+      },
+      deleteQuota: (_, { quotaID }) => {
+        delListTemp(
+          store,
+          store.get('Query', 'ROOT', 'quotas') as Ref,
+          quotaID,
+        );
+        return true;
+      },
+    },
+  },
 })
 
 export default mockServer(schemaWithMocks, mocks, preserveResolvers)

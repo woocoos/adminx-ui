@@ -1,5 +1,4 @@
 import { IMockStore, Ref } from "@graphql-tools/mock"
-import { useId } from "react"
 
 /**
  * 展示列表的模板
@@ -206,6 +205,12 @@ export const initStoreData = (store: IMockStore) => {
     store.get('QuotaItem', 1),
     store.get('QuotaItem', 2),
     store.get('QuotaItem', 3),
+  ]))
+  store.set('Query', 'ROOT', 'quotas', listTemp([
+    store.get('Quota', 1),
+    store.get('Quota', 2),
+    store.get('Quota', 3),
+
   ]))
 
   // -------------root-end------------------------
@@ -489,14 +494,35 @@ export const initStoreData = (store: IMockStore) => {
     id: 6, name: '测试2-1-1', kind: 'policy', parentID: 5, appID: 1, policyID: null
   })
 
-  store.set('QuotaItem', 1, { id: 1, name: '设备数限制', code: 'deviceLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, })
-  store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false, })
-  store.set('QuotaItem', 3, { id: 3, name: '账户数限制', code: 'accountLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, })
-
-  // store.set('Quota', 1, { id: 1, quotaItemID: 1, tenantId: 1, org: store.get('Org', 1), quotaItem: store.get('QuotaItem', 1), limit: 10, used: 0, })
-  // store.set('Quota', 2, { id: 2, quotaItemID: 1, useId: 1, user: store.get('User', 1), quotaItem: store.get('QuotaItem', 1), limit: 10, used: 3, })
-  // store.set('Quota', 3, { id: 3, quotaItemID: 2, tenantId: 1, org: store.get('Org', 1), quotaItem: store.get('QuotaItem', 2), limit: 10, used: 0, })
-  // store.set('Quota', 4, { id: 4, quotaItemID: 2, useId: 1, user: store.get('User', 1), quotaItem: store.get('QuotaItem', 2), limit: 10, used: 3, })
-  // store.set('Quota', 5, { id: 5, quotaItemID: 3, tenantId: 1, org: store.get('Org', 1), quotaItem: store.get('QuotaItem', 3), limit: 10, used: 0, })
-  // store.set('Quota', 6, { id: 6, quotaItemID: 3, useId: 1, user: store.get('User', 1), quotaItem: store.get('QuotaItem', 3), limit: 10, used: 3, })
-}
+  // QuotaItem
+  store.set('QuotaItem', 1, {
+    id: 1,
+    name: '设备数限制',
+    code: 'deviceLimit',
+    resourceType: 'number',
+    defaultLimit: 10,
+    unit: '个',
+    description: '描述',
+    active: true,
+    quota: {
+      edges: [
+        { node: store.get('Quota', 1) },
+        { node: store.get('Quota', 2) },
+      ],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+      totalCount: 2,
+    },
+  });
+  store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false,});
+  store.set('QuotaItem', 3, { id: 3, name: '账户数限制', code: 'accountLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true,});
+  // Quota
+  store.set('Quota', 1, { id: 1, quotaItemID: 1, tenantID: 1, quotaItem: store.get('QuotaItem', 1), limit: 10, used: 0, })
+  store.set('Quota', 2, { id: 2, quotaItemID: 1, userID: 1, quotaItem: store.get('QuotaItem', 1), limit: 10, used: 3, })
+  store.set('Quota', 3, { id: 3, quotaItemID: 2, tenantID: 1, quotaItem: store.get('QuotaItem', 2), limit: 10, used: 0, })
+  store.set('Quota', 4, { id: 4, quotaItemID: 2, userID: 1, quotaItem: store.get('QuotaItem', 2), limit: 10, used: 3, })
+  store.set('Quota', 5, { id: 5, quotaItemID: 3, tenantID: 1, quotaItem: store.get('QuotaItem', 3), limit: 10, used: 0, })
+  store.set('Quota', 6, { id: 6, quotaItemID: 3, userID: 1, quotaItem: store.get('QuotaItem', 3), limit: 10, used: 3, })
+};

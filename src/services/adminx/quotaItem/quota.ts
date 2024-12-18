@@ -1,6 +1,7 @@
-import { gid } from "@knockout-js/api";
-import { mutation, paging, query } from "@knockout-js/ice-urql/request";
-import { gql } from "@/generated/adminx";
+import { gid } from '@knockout-js/api';
+import { mutation, paging, query } from '@knockout-js/ice-urql/request';
+import { gql } from '@/generated/adminx';
+import { OrderDirection, QuotaOrder, QuotaOrderField, QuotaWhereInput } from '@/generated/adminx/graphql';
 
 
 const queryQuotaList = gql(/* GraphQL */`query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){
@@ -40,12 +41,24 @@ const mutationDelQuota = gql(/* GraphQL */`mutation deleteQuota($quotaId:ID!){
 }`);
 
 
-export async function getQuotaList(first: number, orderBy: any, where: any) {
-    const result = await paging(queryQuotaList, {
-        first,
-        orderBy,
-        where,
-    })
+export async function getQuotaList(
+    gather: {
+        current?: number,
+        pageSize?: number,
+        where?: QuotaWhereInput,
+        orderBy?: QuotaOrder;
+    },
+) {
+    const result = await paging(
+        queryQuotaList, {
+            first: gather.pageSize,
+            where: gather.where,
+            orderBy: gather.orderBy ?? {
+              direction: OrderDirection.Desc,
+              field: QuotaOrderField.CreatedAt,
+            },
+        }, gather.current || 1,
+    );
     if (result.data?.quotas) {
         return result.data.quotas;
     }

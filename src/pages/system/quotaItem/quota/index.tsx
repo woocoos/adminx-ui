@@ -19,39 +19,33 @@ const PageQuotaList = () => {
     columns: ProColumns<Quota>[] = [
       // 有需要排序配置  sorter: true
       {
-        title: 'ID',
-        dataIndex: 'id',
-        width: 80,
-
-      },
-      {
-        title: '租户',
+        title: t('tenant'),
         dataIndex: 'tenant',
         width: 120,
       },
       {
-        title: '用户',
+        title: t('user'),
         dataIndex: 'user',
         width: 120,
       },
       {
-        title: '限制值',
+        title: t('limit'),
         dataIndex: 'limit',
         width: 120,
 
       },
       {
-        title: '已用值',
+        title: t('used'),
         dataIndex: 'used',
         width: 120,
       },
       {
-        title: '生效时间',
+        title: t('start_at'),
         dataIndex: 'startAt',
         width: 120,
       },
       {
-        title: '过期时间',
+        title: t('end_at'),
         dataIndex: 'endAt',
         width: 120,
       },
@@ -73,7 +67,7 @@ const PageQuotaList = () => {
     render: (_, record) => {
       return (
         <Space>
-          <Auth authKey="updateQuotaItem">
+          <Auth authKey="updateQuota">
             <a
               key="viewer"
               onClick={() => {
@@ -83,10 +77,7 @@ const PageQuotaList = () => {
               {t('edit')}
             </a>
           </Auth>
-          <Link key="quotaItem" to={`/quotaItem/quota?id=${record.id}`}>
-            {t('detail')}
-          </Link>
-          <Auth authKey="deleteQuotaItem">
+          <Auth authKey="deleteQuota">
             <a key="del" onClick={() => {
               Modal.confirm({
                 title: t('delete'),
@@ -115,12 +106,13 @@ const PageQuotaList = () => {
   return (
     <>
       <PageContainer header={{
-        title: '配额管理',
+        title: t('quota_manage'),
         style: {background: token.colorBgContainer},
         breadcrumb: {
           items: [
             {title: t('system_conf')},
-            {title: '配额管理'},
+            {title: t('quota_item_manage')},
+            {title: t('quota_manage')},
           ],
         }
       }}
@@ -134,7 +126,7 @@ const PageQuotaList = () => {
             labelWidth: 'auto',
           }}
           toolbar={{
-            title: '配额管理',
+            title: t('quota_manage'),
             actions: [
               <Auth authKey="createQuota">
                 <Button
@@ -142,11 +134,11 @@ const PageQuotaList = () => {
                   type="primary"
                   onClick={
                     () => {
-                      setModal({open: true, title: '创建配额', id: ''});
+                      setModal({open: true, title: t('add_quota'), id: ''});
                     }
                   }
                 >
-                  创建配额
+                  {t('add_quota')}
                 </Button>
               </Auth>,
             ],
@@ -197,11 +189,8 @@ const PageQuotaList = () => {
 export default () => {
   return (
     <KeepAlive clearAlive>
-      <PageQuotaList/>
+      <PageQuotaList />
     </KeepAlive>
   );
 };
 
-export const pageConfig = definePageConfig(() => ({
-  auth: ['/system/quotaItem/quota'],
-}));

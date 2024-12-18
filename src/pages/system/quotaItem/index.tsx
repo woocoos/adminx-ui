@@ -1,8 +1,8 @@
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig, Link } from 'ice';
-import { ActionType, PageContainer, ProColumns, ProTable, useToken } from "@ant-design/pro-components";
-import { useRef, useState } from "react";
-import { Quota, QuotaItem, QuotaItemWhereInput } from "@/generated/adminx/graphql";
+import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
+import { useRef, useState } from 'react';
+import { Quota, QuotaItem, QuotaItemResourceType, QuotaItemWhereInput } from '@/generated/adminx/graphql';
 import { useTranslation } from 'react-i18next';
 import { Space, Modal, Button} from 'antd';
 import { delQuotaItem, getQuotaItemList } from '@/services/adminx/quotaItem';
@@ -15,55 +15,53 @@ const PageQuotaItemList = () => {
   const { token } = useToken(),
   { t } = useTranslation(),
   // 表格相关
-  proTableRef = useRef<ActionType>(), 
+  proTableRef = useRef<ActionType>(),
   columns: ProColumns<QuotaItem>[] = [
     // 有需要排序配置  sorter: true
-    {
-      title: 'ID',
-      dataIndex: 'id',
-      width: 80,
-    
-    },
     {
       title: t('name'),
       dataIndex: 'name',
       width: 120,
     },
     {
-      title: 'Code',
+      title: t('code'),
       dataIndex: 'code',
       width: 120,
     },
     {
-      title: '资源类型',
+      title: t('resource_type'),
       dataIndex: 'resourceType',
       width: 120,
-      
+      valueEnum: {
+        number: { text: t('resource_type_number') },
+        network: { text: t('resource_type_network') },
+        storage: { text: t('resource_type_storage') },
+      },
     },
     {
-      title:'默认限制值',
+      title: t('default_limit'),
       dataIndex: 'defaultLimit',
       width: 120,
     },
     {
-      title:'单位',
+      title: t('unit'),
       dataIndex: 'unit',
       width: 120,
     },
     {
-      title: '描述',
+      title: t('description'),
       dataIndex: 'description',
       width: 120,
     },
     {
-      title: '是否启用',
+      title: t('active_status'),
       dataIndex: 'active',
       width: 120,
       valueEnum: {
-        true: { text: '是' },
-        false: { text: '否' },
+        true: { text: t('enable') },
+        false: { text: t('disable') },
       },
-    }
+    },
   ],
   [dataSource, setDataSource] = useState<QuotaItem[]>([]),
   [modal, setModal] = useState({
@@ -124,14 +122,14 @@ const PageQuotaItemList = () => {
   return (
     <>
       <PageContainer header={{
-        title: '配额定义管理',
+        title: t('quota_item_manage'),
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
             { title: t('system_conf') },
-            { title: '配额定义管理' },
+            { title: t('quota_item_manage') },
           ],
-        }
+        },
       }}
       >
         <ProTable
@@ -143,7 +141,7 @@ const PageQuotaItemList = () => {
             labelWidth: 'auto',
           }}
           toolbar={{
-            title: '配额定义管理',
+            title: t('quota_item_manage'),
             actions: [
               <Auth authKey="createQuotaItem">
                 <Button
@@ -151,11 +149,11 @@ const PageQuotaItemList = () => {
                   type="primary"
                   onClick={
                     () => {
-                      setModal({ open: true, title: '创建配额定义', id: '' });
+                      setModal({ open: true, title: t('add_quota_item'), id: '' });
                     }
                   }
                 >
-                  创建配额定义
+                  {t('add_quota_item')}
                 </Button >
               </Auth>,
             ],

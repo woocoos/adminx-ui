@@ -1,6 +1,13 @@
 import { Quota, QuotaItemResourceType } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
-import { DrawerForm, ProFormDigit, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
+import {
+  DrawerForm, ProFormDateTimePicker,
+  ProFormDateTimeRangePicker,
+  ProFormDigit,
+  ProFormSelect,
+  ProFormText,
+  ProFormTextArea
+} from '@ant-design/pro-components';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -72,7 +79,7 @@ export default (props: {
           tenantId: values.tenantId,
           userId: values.userId,
           limit: values.limit,
-          used: values.used,
+          used: values.used ?? 0,
           startAt: values.startAt,
           endAt: values.endAt,
         });
@@ -109,53 +116,48 @@ export default (props: {
       onOpenChange={onOpenChange}
     >
       <ProFormText
-        name="name"
-        label={t('name')}
-        disabled={!!props.id}
+        name="tenantId"
+        label={t('organization')}
         rules={[
-          {required: true, message: `${t('please_enter_name')}`},
+          {required: false, message: `${t('please_enter_org')}`},
         ]}
       />
 
       <ProFormText
-        name="code"
-        label={t('code')}
-        disabled={!!props.id}
+        name="userId"
+        label={t('user')}
         rules={[
-          {required: true, message: `${t('please_enter_code')}`},
+          {required: false, message: `${t('please_enter_user')}`},
         ]}
       />
       <ProFormDigit
-        name="defaultLimit"
-        label={t('default_limit')}
+        name="limit"
+        label={t('limit')}
         rules={[
-          {required: true, message: `${t('please_enter_default_limit')}`},
+          {required: true, message: `${t('please_enter_limit')}`},
         ]}
       />
-      <ProFormText
-        name="unit"
-        label={t('unit')}
+      <ProFormDigit
+        name="used"
+        label={t('used')}
+        disabled
+        initialValue={0}
+      />
+      <ProFormDateTimePicker
+        name="startAt"
+        label={t('start_at')}
         rules={[
-          {required: true, message: `${t('please_enter_unit')}`},
+          {required: true, message: `${t('please_select_start_at')}`},
         ]}
       />
-      <ProFormSelect
-        name="resourceType"
-        label={t('resource_type')}
+      <ProFormDateTimePicker
+        name="entAt"
+        label={t('end_at')}
         rules={[
-          {required: true, message: `${t('please_select_resource_type')}`},
-        ]}
-        options={[
-          {label: QuotaItemResourceType.Number, value: QuotaItemResourceType.Number},
-          {label: QuotaItemResourceType.Network, value: QuotaItemResourceType.Network},
-          {label: QuotaItemResourceType.Storage, value: QuotaItemResourceType.Storage},
+          {required: true, message: `${t('please_select_end_at')}`},
         ]}
       />
-      <ProFormTextArea
-        name="description"
-        label={t('description')}
-        placeholder={`${t('please_enter_description')}`}
-      />
+
     </DrawerForm>
   );
 };

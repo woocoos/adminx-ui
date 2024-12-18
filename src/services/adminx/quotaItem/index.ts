@@ -1,13 +1,13 @@
 import { CreateQuotaItemInput, OrderDirection, QuotaItemOrder, QuotaItemOrderField, QuotaItemResourceType, QuotaItemWhereInput } from "@/generated/adminx/graphql";
-import { mutation, paging, query } from "@knockout-js/ice-urql/request";
-import { gql } from "@/generated/adminx";
-import { gid } from "@knockout-js/api";
+import { mutation, paging, query } from '@knockout-js/ice-urql/request';
+import { gql } from '@/generated/adminx';
+import { gid } from '@knockout-js/api';
 
 const EnumResourceType = {
-    [QuotaItemResourceType.Network]: { text: '网络类型' },
-    [QuotaItemResourceType.Number]: { text: '数值类型' },
-    [QuotaItemResourceType.Storage]: { text: '存储类型' },
-}
+  [QuotaItemResourceType.Network]: {text: '网络类型'},
+  [QuotaItemResourceType.Number]: {text: '数值类型'},
+  [QuotaItemResourceType.Storage]: {text: '存储类型'},
+};
 
 const queryQuotaItemList = gql(/* GraphQL */`query quotaItems($first: Int,$where:QuotaItemWhereInput,$orderBy:QuotaItemOrder){
     quotaItems(first:$first,where: $where,orderBy: $orderBy){
