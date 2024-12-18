@@ -476,7 +476,7 @@ export const initStoreData = (store: IMockStore) => {
 
   // AppPolicyView
   store.set('AppPolicyView', 1, {
-    id: 1, name: '测试1', kind: 'dir', parentID: 0, appID: 1
+    id: 1, name: '测试1', kind: 'dir', parentID: 0, appID: 1, policyID: null,
   })
   store.set('AppPolicyView', 2, {
     id: 2, name: '测试1-1', kind: 'policy', parentID: 1, appID: 1, policyID: 1
@@ -485,13 +485,13 @@ export const initStoreData = (store: IMockStore) => {
     id: 3, name: '测试1-2', kind: 'policy', parentID: 1, appID: 1, policyID: 2
   })
   store.set('AppPolicyView', 4, {
-    id: 4, name: '测试2', kind: 'dir', parentID: 0, appID: 1,
+    id: 4, name: '测试2', kind: 'dir', parentID: 0, appID: 1, policyID: null,
   })
   store.set('AppPolicyView', 5, {
-    id: 5, name: '测试2-1', kind: 'dir', parentID: 4, appID: 1,
+    id: 5, name: '测试2-1', kind: 'dir', parentID: 4, appID: 1, policyID: null,
   })
   store.set('AppPolicyView', 6, {
-    id: 6, name: '测试2-1-1', kind: 'policy', parentID: 5, appID: 1, policyID: null
+    id: 6, name: '测试2-1-1', kind: 'policy', parentID: 5, appID: 1, policyID: 3
   })
 
   // QuotaItem
@@ -516,8 +516,8 @@ export const initStoreData = (store: IMockStore) => {
       totalCount: 2,
     },
   });
-  store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false,});
-  store.set('QuotaItem', 3, { id: 3, name: '账户数限制', code: 'accountLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true,});
+  store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false, });
+  store.set('QuotaItem', 3, { id: 3, name: '账户数限制', code: 'accountLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, });
   // Quota
   store.set('Quota', 1, { id: 1, quotaItemID: 1, tenantID: 1, quotaItem: store.get('QuotaItem', 1), limit: 10, used: 0, })
   store.set('Quota', 2, { id: 2, quotaItemID: 1, userID: 1, quotaItem: store.get('QuotaItem', 1), limit: 10, used: 3, })

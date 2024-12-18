@@ -26,10 +26,12 @@ export default (props: {
         })),
       ),
     );
+  }, getRealkey = (data: TreeDataState<AppPolicyView>) => {
+    return props.isOrg ? (data.node?.orgPolicy?.id as string) : (data.node?.policyID as string)
   }, checkboxDirChangeKeys = (data: TreeDataState<AppPolicyView>) => {
     const keys: string[] = []
     if (data.node?.kind === AppPolicyViewKind.Policy) {
-      keys.push(data.key)
+      keys.push(getRealkey(data))
     }
     data.children?.forEach(item => {
       keys.push(...checkboxDirChangeKeys(item))
@@ -70,10 +72,10 @@ export default (props: {
               value={props.value}
               options={data.children.map(item => ({
                 label: `${item.title}`,
-                value: item.key,
+                value: getRealkey(item),
               }))}
               onChange={(value) => {
-                const currentKeys = data.children?.map(item => item.key) ?? []
+                const currentKeys = data.children?.map(item => getRealkey(item)) ?? []
                 const valueKeys = [...(props.value ?? [])].filter(key => !currentKeys.includes(key))
                 valueKeys.push(...value)
                 props.onChange?.(valueKeys)

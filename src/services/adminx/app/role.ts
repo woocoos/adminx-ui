@@ -270,7 +270,7 @@ export async function assignAppRolePolicyView(appID: string, roleID: string, add
 
 const queryAppRoleAssigned = gql(/* GraphQL */`query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){
   appPolicyView(appCode:$appCode){
-    id,name,kind,
+    id,name,kind,policyID
     appRoleAssigned(appRoleID: $appRoleID)
   }
 }`);

@@ -53,8 +53,8 @@ export default (props: {
             const result = await getOrgRoleAssignedPolicyView(edge.node.code, roleInfo.id)
             list.push({
               appInfo: edge.node as App,
-              checked: result.map(item => item.id),
-              oldChecked: result.map(item => item.id)
+              checked: result.map(item => item.orgPolicy?.id as string),
+              oldChecked: result.map(item => item.orgPolicy?.id as string)
             })
           }
         }

@@ -11,6 +11,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * 3. It does not support dead code elimination, so it will add unused operations.
  *
  * Therefore it is highly recommended to use the babel or swc plugin for production.
+ * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 const documents = {
     "query appActionList($gid: GID!,$first: Int,$orderBy:AppActionOrder,$where:AppActionWhereInput){\n  node(id:$gid){\n    ... on App{\n      id,\n      actions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments\n          }\n        }\n      }\n    }\n  }\n}": types.AppActionListDocument,
@@ -36,7 +37,7 @@ const documents = {
     "query appPolicieList($gid:GID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind\n      }\n    }\n  }\n}": types.AppPolicieListDocument,
     "query appPolicieListAndIsGrant($gid:GID!,$appRoleId:ID!){\n  node(id:$gid){\n    ... on App{\n      id,\n      policies{\n        id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind\n        isGrantAppRole(appRoleID: $appRoleId)\n      }\n    }\n  }\n}": types.AppPolicieListAndIsGrantDocument,
     "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n    ... on AppPolicy{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind,\n      rules{ effect,actions,resources,conditions }\n      app{ id,name }\n    }\n  }\n}": types.AppPolicyInfoDocument,
-    "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID\n    }\n  }\n}": types.AppPolicyViewDocument,
+    "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID,orgPolicy{id}\n    }\n  }\n}": types.AppPolicyViewDocument,
     "mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!,$appPolicyViewID:ID){\n  createAppPolicy(appID:$appId,input:$input,appPolicyViewID:$appPolicyViewID){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind,\n      rules{ effect,actions,resources,conditions }\n      app{ id,name }\n  }\n}": types.CreateAppPolicyDocument,
     "mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){\n  updateAppPolicy(policyID:$appPolicyId,input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind,\n      rules{ effect,actions,resources,conditions }\n      app{ id,name }\n  }\n}": types.UpdateAppPolicyDocument,
     "mutation delAppPolicy($appPolicyId:ID!){\n  deleteAppPolicy(policyID: $appPolicyId)\n}": types.DelAppPolicyDocument,
@@ -57,7 +58,7 @@ const documents = {
     "mutation revokeAppRolePolicy($appId:ID!,$appRoleId:ID!,$policyIds:[ID!]){\n  revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)\n}": types.RevokeAppRolePolicyDocument,
     "mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){\n  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)\n}": types.SyncAppRoleToOrgDocument,
     "mutation assignAppRolePolicyView($appID: ID!, $roleID: ID!,$rmAppPolicyIDs: [ID!],$addAppPolicyIDs: [ID!]){\n  assignAppRolePolicyView(appID: $appID, roleID: $roleID,rmAppPolicyIDs: $rmAppPolicyIDs,addAppPolicyIDs: $addAppPolicyIDs)\n}": types.AssignAppRolePolicyViewDocument,
-    "query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}": types.AppRolePolicyViewAssignedDocument,
+    "query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,policyID\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}": types.AppRolePolicyViewAssignedDocument,
     "query countryList($first: Int,$orderBy:CountryOrder,$where:CountryWhereInput){\n  countries(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,name,nameEn,code,status,displaySort,createdAt\n      }\n    }\n  }\n}": types.CountryListDocument,
     "query countryInfo($gid:GID!){\n  node(id:$gid){\n    ... on Country{\n      id,name,nameEn,code,status,displaySort,createdAt\n    }\n  }\n}": types.CountryInfoDocument,
     "mutation updateCountry($countryId:ID!,$input: UpdateCountryInput!){\n  updateCountry(countryID:$countryId,input:$input){\n    id,name,nameEn,code,status,displaySort,createdAt\n  }\n}": types.UpdateCountryDocument,
@@ -120,7 +121,7 @@ const documents = {
     "mutation deleteOrgPolicy($orgPolicyId:ID!){\n  deleteOrganizationPolicy(orgPolicyID:$orgPolicyId)\n}": types.DeleteOrgPolicyDocument,
     "mutation assignOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){\n  assignOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)\n}": types.AssignOrgAppPolicyDocument,
     "mutation revokeOrgAppPolicy($orgId:ID!,$appPolicyId:ID!){\n  revokeOrganizationAppPolicy(orgID: $orgId,appPolicyID: $appPolicyId)\n}": types.RevokeOrgAppPolicyDocument,
-    "query orgPolicyView($appCode: String!){\n  orgPolicyView(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n  }\n}": types.OrgPolicyViewDocument,
+    "query orgPolicyView($appCode: String!){\n  orgPolicyView(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n    policyID,orgPolicy{id}\n  }\n}": types.OrgPolicyViewDocument,
     "query orgGroupList($first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){\n  orgGroups(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n      }\n    }\n  }\n}": types.OrgGroupListDocument,
     "query orgGroupListAndIsGrant($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){\n  orgGroups(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n        isGrantUser(userID: $userId)\n      }\n    }\n  }\n}": types.OrgGroupListAndIsGrantDocument,
     "query userGroupList($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){\n  userGroups(userID:$userId,first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n      }\n    }\n  }\n}": types.UserGroupListDocument,
@@ -137,7 +138,7 @@ const documents = {
     "query orgGroupListNum($first:Int,$where:OrgRoleWhereInput){\n  orgGroups(first:$first,where: $where){ totalCount }\n}": types.OrgGroupListNumDocument,
     "query userGroupListNum($userId:ID!,$first:Int,$where:OrgRoleWhereInput){\n  userGroups(userID:$userId,first:$first,where: $where){ totalCount }\n}": types.UserGroupListNumDocument,
     "query orgRoleListNum($first:Int,$where:OrgRoleWhereInput){\n  orgRoles(first:$first,where: $where){ totalCount }\n}": types.OrgRoleListNumDocument,
-    "query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,\n    orgRoleAssigned(orgRoleID: $orgRoleID)\n  }\n}": types.OrgRolePolicyViewAssignedDocument,
+    "query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,orgPolicy{id}\n    orgRoleAssigned(orgRoleID: $orgRoleID)\n  }\n}": types.OrgRolePolicyViewAssignedDocument,
     "mutation assignOrgRolePolicyView($orgID: ID!, $roleID: ID!,$rmOrgPolicyIDs: [ID!],$addOrgPolicyIDs: [ID!]){\n  assignOrgRolePolicyView(orgID: $orgID, roleID: $roleID,rmOrgPolicyIDs: $rmOrgPolicyIDs,addOrgPolicyIDs: $addOrgPolicyIDs)\n}": types.AssignOrgRolePolicyViewDocument,
     "query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      users(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n            contact{email,mobile},userType,creationType,registerIP,status,comments\n          }\n        }\n      }\n    }\n  }\n}": types.OrgUserListDocument,
     "query orgUserListAndIsOrgRole($gid: GID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  node(id:$gid){\n    ... on Org{\n      id,\n      users(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n            contact{email,mobile},userType,creationType,registerIP,status,comments\n            isAssignOrgRole(orgRoleID: $orgRoleId)\n            isAllowRevokeRole(orgRoleID: $orgRoleId)\n          }\n        }\n      }\n    }\n  }\n}": types.OrgUserListAndIsOrgRoleDocument,
@@ -148,7 +149,7 @@ const documents = {
     "mutation removeOrgUser($orgId:ID!,$userId:ID!){\n  removeOrganizationUser(orgID: $orgId,userID: $userId)\n}": types.RemoveOrgUserDocument,
     "query memberList($orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  userMembers(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        contact{email,mobile},userType,creationType,registerIP,status,comments,\n        orgUserType(orgID: $orgId)\n      }\n    }\n  }\n}": types.MemberListDocument,
     "mutation changeOrgUserType($userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType)\n}": types.ChangeOrgUserTypeDocument,
-    "query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,\n    orgUserAssigned(userID: $userID)\n  }\n}": types.OrgUserPolicyViewAssignedDocument,
+    "query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,orgPolicy{id}\n    orgUserAssigned(userID: $userID)\n  }\n}": types.OrgUserPolicyViewAssignedDocument,
     "mutation assignOrgUserPolicyView($orgID: ID!, $userID: ID!,$rmOrgPolicyIDs: [ID!],$addOrgPolicyIDs: [ID!]){\n  assignOrgUserPolicyView(orgID: $orgID, userID: $userID,rmOrgPolicyIDs: $rmOrgPolicyIDs,addOrgPolicyIDs: $addOrgPolicyIDs)\n}": types.AssignOrgUserPolicyViewDocument,
     "query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){\n  orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n        role{ id,orgID,kind,name,isAppRole }\n        orgPolicy{ id,orgID,appPolicyID,name }\n        user{ id,displayName }\n      }\n    }\n  }\n}": types.OrgPolicyReferencesDocument,
     "query orgPrmissionList($gid: GID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){\n  node(id:$gid){\n    ... on Org{\n      permissions(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,\n            userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,\n            role{ id,orgID,kind,name,isAppRole }\n            orgPolicy{ id,orgID,appPolicyID,name }\n            user{ id,displayName }\n          }\n        }\n      }\n    }\n  }\n}": types.OrgPrmissionListDocument,
@@ -304,7 +305,7 @@ export function gql(source: "query appPolicyInfo($gid:GID!){\n  node(id:$gid){\n
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID\n    }\n  }\n}"): (typeof documents)["query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID\n    }\n  }\n}"];
+export function gql(source: "query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID,orgPolicy{id}\n    }\n  }\n}"): (typeof documents)["query appPolicyView($appCode:String!){\n  appPolicyView(appCode:$appCode){\n    ... on AppPolicyView{\n      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n      policyID,orgPolicy{id}\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -388,7 +389,7 @@ export function gql(source: "mutation assignAppRolePolicyView($appID: ID!, $role
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}"): (typeof documents)["query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}"];
+export function gql(source: "query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,policyID\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}"): (typeof documents)["query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){\n  appPolicyView(appCode:$appCode){\n    id,name,kind,policyID\n    appRoleAssigned(appRoleID: $appRoleID)\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -640,7 +641,7 @@ export function gql(source: "mutation revokeOrgAppPolicy($orgId:ID!,$appPolicyId
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query orgPolicyView($appCode: String!){\n  orgPolicyView(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n  }\n}"): (typeof documents)["query orgPolicyView($appCode: String!){\n  orgPolicyView(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n  }\n}"];
+export function gql(source: "query orgPolicyView($appCode: String!){\n  orgPolicyView(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n    policyID,orgPolicy{id}\n  }\n}"): (typeof documents)["query orgPolicyView($appCode: String!){\n  orgPolicyView(appCode: $appCode){\n    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,\n    policyID,orgPolicy{id}\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -708,7 +709,7 @@ export function gql(source: "query orgRoleListNum($first:Int,$where:OrgRoleWhere
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,\n    orgRoleAssigned(orgRoleID: $orgRoleID)\n  }\n}"): (typeof documents)["query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,\n    orgRoleAssigned(orgRoleID: $orgRoleID)\n  }\n}"];
+export function gql(source: "query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,orgPolicy{id}\n    orgRoleAssigned(orgRoleID: $orgRoleID)\n  }\n}"): (typeof documents)["query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,orgPolicy{id}\n    orgRoleAssigned(orgRoleID: $orgRoleID)\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -752,7 +753,7 @@ export function gql(source: "mutation changeOrgUserType($userId:ID!,$userType:Or
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,\n    orgUserAssigned(userID: $userID)\n  }\n}"): (typeof documents)["query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,\n    orgUserAssigned(userID: $userID)\n  }\n}"];
+export function gql(source: "query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,orgPolicy{id}\n    orgUserAssigned(userID: $userID)\n  }\n}"): (typeof documents)["query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){\n  orgPolicyView(appCode:$appCode){\n    id,name,kind,orgPolicy{id}\n    orgUserAssigned(userID: $userID)\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

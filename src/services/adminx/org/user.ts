@@ -307,7 +307,7 @@ export async function changeOrgUserType(userId: string, userType: OrgUserUserTyp
 
 const queryOrgUserAssigned = gql(/* GraphQL */`query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){
   orgPolicyView(appCode:$appCode){
-    id,name,kind,
+    id,name,kind,orgPolicy{id}
     orgUserAssigned(userID: $userID)
   }
 }`);

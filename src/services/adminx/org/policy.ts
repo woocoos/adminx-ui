@@ -290,6 +290,7 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
 const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: String!){
   orgPolicyView(appCode: $appCode){
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,
+    policyID,orgPolicy{id}
   }
 }`);
 
