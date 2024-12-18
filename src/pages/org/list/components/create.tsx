@@ -1,7 +1,7 @@
 import { Org, OrgKind, User, UserUserType } from '@/generated/adminx/graphql';
 import InputAccount from '@/pages/account/components/inputAccount';
 import { createOrgInfo, getOrgInfo, updateOrgInfo } from '@/services/adminx/org';
-import { TreeEditorAction, formatTreeData, updateFormat } from '@/util';
+import { TreeEditorAction, formatTreeData, isValidDomain, updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { useLeavePrompt } from '@knockout-js/layout';
 import { getCacheCountryList } from '@/services/adminx/country';
 import { getCacheCurrencyList } from '@/services/adminx/currency';
 import { getDictItems } from '@knockout-js/api';
+import StringsInput from './stringsInput';
 
 type SelectTreeData = {
   value: string;
@@ -22,6 +23,7 @@ type ProFormData = {
   parentID: string;
   domain?: string;
   countryCode?: string;
+  customDomain?: string[];
   owner?: User;
   localCurrency?: string;
   timezone?: string;
@@ -145,6 +147,7 @@ export default (props: {
             parentID: values.parentID,
             ownerID: values.owner?.id,
             domain: values.domain,
+            customDomain: values.customDomain,
             countryCode: values.countryCode,
             profile: values.profile,
             localCurrency: values.localCurrency,
@@ -160,6 +163,7 @@ export default (props: {
             parentID: values.parentID,
             ownerID: values.owner?.id,
             domain: values.domain,
+            customDomain: values.customDomain,
             countryCode: values.countryCode,
             profile: values.profile,
             localCurrency: values.localCurrency,
@@ -176,6 +180,7 @@ export default (props: {
           parentID: values.parentID,
           ownerID: values.owner?.id,
           domain: values.domain,
+          customDomain: values.customDomain,
           countryCode: values.countryCode,
           profile: values.profile,
           localCurrency: values.localCurrency,
@@ -191,6 +196,7 @@ export default (props: {
           parentID: values.parentID,
           ownerID: values.owner?.id,
           domain: values.domain,
+          customDomain: values.customDomain,
           countryCode: values.countryCode,
           profile: values.profile,
           localCurrency: values.localCurrency,
@@ -256,6 +262,32 @@ export default (props: {
         label={t('domain')}
         tooltip={t('domain_tooltip')}
       />
+      <ProFormText
+        x-if={props.kind === 'root'}
+        name="customDomain"
+        label={t('custom_domain')}
+        rules={[
+          {
+            validator(rule, value) {
+              let isTrue = true;
+              if (Array.isArray(value)) {
+                value.forEach(item => {
+                  if (!isValidDomain(item)) {
+                    isTrue = false;
+                  }
+                })
+              }
+              if (isTrue) {
+                return Promise.resolve();
+              } else {
+                return Promise.reject(t('domain_format_error'));
+              }
+            },
+          },
+        ]}
+      >
+        <StringsInput />
+      </ProFormText>
       <ProFormSelect
         x-if={props.kind === 'root'}
         name="countryCode"

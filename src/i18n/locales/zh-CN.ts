@@ -114,6 +114,7 @@ export default {
     go_login: '前往登录',
     pwd_reset_success: '密码重置成功',
     format_error: '格式错误',
+    domain_format_error: '域名格式错误',
     app_code: '应用编码',
     app_role: '应用角色',
     user_group: '用户组',
@@ -220,6 +221,7 @@ export default {
     top_policy_view: '顶级权限视图',
     associated_authority: "关联权限",
     fun_authority: "功能权限",
+    custom_domain: "自定义域名",
 
     // 创建
     create_user: '创建用户',
@@ -396,6 +398,7 @@ export default {
     login_not_app_access: "您还无进入应用系统的权限",
     page_403: "对不起，您没有权限访问此页面",
     save_failure: "保存失败",
+    input_enter: "输入完成后回车",
     // "": "",
   },
 };

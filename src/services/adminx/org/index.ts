@@ -30,7 +30,7 @@ const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrd
 const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
   node(id: $gid){
     ... on Org{
-      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,customDomain,
       domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
       owner { id,displayName }
     }

@@ -435,3 +435,14 @@ export const searchMoveList = <T extends Object>(sourceList: T[], newSourceList:
 
   return null
 }
+
+
+/**
+ * 验证域名是否输入正确
+ * @param domain
+ * @returns
+ */
+export const isValidDomain = (domain: string) => {
+  const regex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
+  return regex.test(domain);
+}

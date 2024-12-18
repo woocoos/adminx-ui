@@ -114,6 +114,7 @@ export default {
     go_login: 'go login',
     pwd_reset_success: 'Password reset succeeded',
     format_error: 'Formatting error',
+    domain_format_error: 'Domain formatting error',
     app_code: 'Application code',
     app_role: 'Application role',
     user_group: 'User group',
@@ -220,6 +221,7 @@ export default {
     top_policy_view: 'Top-level Permission view',
     associated_authority: "Associated authority",
     fun_authority: "Functional authority",
+    custom_domain: "Custom Domain",
 
     // 创建
     create_user: 'Create a user',
@@ -397,6 +399,6 @@ export default {
     login_not_app_access: "You do not have access to the application system",
     page_403: "Sorry, you are not authorized to access this page",
     save_failure: "Save failure",
-
+    input_enter: "Enter and press enter",
   },
 };
