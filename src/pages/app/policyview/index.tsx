@@ -274,6 +274,7 @@ export default () => {
           }
         } else if (selectedTree.action === 'peer') {
           const result = await createAppPolicyView({
+            appID: appInfo.id,
             comments: values.comments,
             kind: values.kind,
             name: values.name,
