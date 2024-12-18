@@ -80,7 +80,7 @@ const mutationDelAppPolicy = gql(/* GraphQL */`mutation delAppPolicy($appPolicyI
 
 const mutationCreateAppPolicyView = gql(/* GraphQL */`mutation createAppPolicyView($input: CreateAppPolicyViewInput!){
   createAppPolicyView(input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,policyID
   }
 }`);
 

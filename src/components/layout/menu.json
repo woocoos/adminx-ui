@@ -74,15 +74,15 @@
       },
       {
         "name": "国家地区",
-        "path": "system/country"
+        "path": "/system/country"
       },
       {
         "name": "币别资料",
-        "path": "system/currency"
+        "path": "/system/currency"
       },
       {
         "name": "配额管理",
-        "path": "system/quotaItem"
+        "path": "/system/quotaItem"
       }
     ]
   }

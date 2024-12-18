@@ -11,41 +11,47 @@ import Create from './components/create';
 import { delQuota, getQuotaList } from '@/services/adminx/quotaItem/quota';
 
 const PageQuotaList = () => {
-  const {token} = useToken(),
-    {t} = useTranslation(),
+  const { token } = useToken(),
+    { t } = useTranslation(),
     [searchParams] = useSearchParams(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<Quota>[] = [
       // 有需要排序配置  sorter: true
       {
-        title: t('tenant'),
+        title: 'ID',
+        dataIndex: 'id',
+        width: 80,
+
+      },
+      {
+        title: '租户',
         dataIndex: 'tenant',
         width: 120,
       },
       {
-        title: t('user'),
+        title: '用户',
         dataIndex: 'user',
         width: 120,
       },
       {
-        title: t('limit'),
+        title: '限制值',
         dataIndex: 'limit',
         width: 120,
 
       },
       {
-        title: t('used'),
+        title: '已用值',
         dataIndex: 'used',
         width: 120,
       },
       {
-        title: t('start_at'),
+        title: '生效时间',
         dataIndex: 'startAt',
         width: 120,
       },
       {
-        title: t('end_at'),
+        title: '过期时间',
         dataIndex: 'endAt',
         width: 120,
       },
@@ -67,17 +73,20 @@ const PageQuotaList = () => {
     render: (_, record) => {
       return (
         <Space>
-          <Auth authKey="updateQuota">
+          <Auth authKey="updateQuotaItem">
             <a
               key="viewer"
               onClick={() => {
-                setModal({open: true, title: `${t('edit_quota')}:${record.id}`, id: record.id});
+                setModal({ open: true, title: `${t('edit_quota')}:${record.id}`, id: record.id });
               }}
             >
               {t('edit')}
             </a>
           </Auth>
-          <Auth authKey="deleteQuota">
+          <Link key="quotaItem" to={`/quotaItem/quota?id=${record.id}`}>
+            {t('detail')}
+          </Link>
+          <Auth authKey="deleteQuotaItem">
             <a key="del" onClick={() => {
               Modal.confirm({
                 title: t('delete'),
@@ -87,9 +96,10 @@ const PageQuotaList = () => {
                   if (result === true) {
                     setDataSource(delDataSource(dataSource, record.id));
                     if (dataSource.length === 0) {
-                      const pageInfo = {...proTableRef.current?.pageInfo};
+                      const pageInfo = { ...proTableRef.current?.pageInfo };
                       pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
-                      proTableRef.current?.reload({...pageInfo});
+                      proTableRef.current?.setPageInfo?.(pageInfo);
+                      proTableRef.current?.reload();
                     }
                   }
                   close();
@@ -106,13 +116,12 @@ const PageQuotaList = () => {
   return (
     <>
       <PageContainer header={{
-        title: t('quota_manage'),
-        style: {background: token.colorBgContainer},
+        title: '配额管理',
+        style: { background: token.colorBgContainer },
         breadcrumb: {
           items: [
-            {title: t('system_conf')},
-            {title: t('quota_item_manage')},
-            {title: t('quota_manage')},
+            { title: t('system_conf') },
+            { title: '配额管理' },
           ],
         }
       }}
@@ -126,7 +135,7 @@ const PageQuotaList = () => {
             labelWidth: 'auto',
           }}
           toolbar={{
-            title: t('quota_manage'),
+            title: '配额管理',
             actions: [
               <Auth authKey="createQuota">
                 <Button
@@ -134,20 +143,20 @@ const PageQuotaList = () => {
                   type="primary"
                   onClick={
                     () => {
-                      setModal({open: true, title: t('add_quota'), id: ''});
+                      setModal({ open: true, title: '创建配额', id: '' });
                     }
                   }
                 >
-                  {t('add_quota')}
+                  创建配额
                 </Button>
               </Auth>,
             ],
           }}
-          scroll={{x: 'max-content'}}
+          scroll={{ x: 'max-content' }}
           columns={columns}
           dataSource={dataSource}
           request={async (params) => {
-            const table = {data: [] as Quota[], success: true, total: 0},
+            const table = { data: [] as Quota[], success: true, total: 0 },
               where: QuotaWhereInput = {};
             where.quotaItemID = searchParams.get('id');
             where.tenantID = params.tenantID;
@@ -168,7 +177,7 @@ const PageQuotaList = () => {
             setDataSource(table.data);
             return table;
           }}
-          pagination={{showSizeChanger: true}}
+          pagination={{ showSizeChanger: true }}
         />
         <Create
           open={modal.open}
@@ -178,7 +187,7 @@ const PageQuotaList = () => {
             if (isSuccess && newInfo) {
               setDataSource(saveDataSource(dataSource, newInfo));
             }
-            setModal({open: false, title: '', id: ''});
+            setModal({ open: false, title: '', id: '' });
           }}
         />
       </PageContainer>
@@ -194,3 +203,6 @@ export default () => {
   );
 };
 
+// export const pageConfig = definePageConfig(() => ({
+//   auth: ['/system/quotaItem/quota'],
+// }));
