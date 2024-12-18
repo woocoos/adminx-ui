@@ -64,13 +64,17 @@ const queryAppPolicyView = gql(/* GraphQL */`query appPolicyView($appCode:String
 
 const mutationCreateAppPolicy = gql(/* GraphQL */`mutation createAppPolicy($appId:ID!,$input: CreateAppPolicyInput!,$appPolicyViewID:ID){
   createAppPolicy(appID:$appId,input:$input,appPolicyViewID:$appPolicyViewID){
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind,
+      rules{ effect,actions,resources,conditions }
+      app{ id,name }
   }
 }`);
 
 const mutationUpdateAppPolicy = gql(/* GraphQL */`mutation updateAppPolicy($appPolicyId:ID!,$input: UpdateAppPolicyInput!){
   updateAppPolicy(policyID:$appPolicyId,input:$input){
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,status,kind,
+      rules{ effect,actions,resources,conditions }
+      app{ id,name }
   }
 }`);
 

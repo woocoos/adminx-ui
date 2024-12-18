@@ -110,7 +110,6 @@ export default () => {
       if (verifyRules()) {
         return;
       }
-      let id: string | null = null;
       setSaveLoading(true);
       if (policyId) {
         const result = await updateAppPolicy(policyId, updateFormat({
@@ -120,7 +119,9 @@ export default () => {
           rules: rules,
         }, appPolicyInfo || {}));
         if (result?.id) {
-          id = result.id;
+          message.success(t('submit_success'));
+          setRules(result.rules as PolicyRule[] || []);
+          setAppPolicyInfo(result as AppPolicy);
         }
       } else {
         const appId = searchParams.get('appId');
@@ -135,17 +136,14 @@ export default () => {
             status: AppPolicySimpleStatus.Active,
           }, policyviewId ?? undefined);
           if (result?.id) {
-            id = result.id;
+            message.success(t('submit_success'));
+            setRules(result.rules as PolicyRule[] || []);
+            setAppPolicyInfo(result as AppPolicy);
+            if (!policyId) {
+              setSearchParams({ id: result.id });
+            }
           }
         }
-      }
-
-      if (id) {
-        message.success(t('submit_success'));
-        if (!policyId) {
-          setSearchParams({ id: id });
-        }
-        await getRequest();
       }
       setSaveLoading(false);
     };
