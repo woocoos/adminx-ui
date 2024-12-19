@@ -60,7 +60,7 @@ const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: G
             id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
             userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
             role{ id,orgID,kind,name,isAppRole }
-            orgPolicy{ id,orgID,appPolicyID,name }
+            orgPolicy{ id,orgID,appPolicyID,name,comments }
             user{ id,displayName }
           }
         }
@@ -77,7 +77,7 @@ const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupP
         id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
         userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
         role{ id,orgID,kind,name,isAppRole }
-        orgPolicy{ id,orgID,appPolicyID,name }
+        orgPolicy{ id,orgID,appPolicyID,name,comments}
         user{ id,displayName }
       }
     }

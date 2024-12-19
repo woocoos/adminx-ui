@@ -169,7 +169,7 @@ export default (props: {
             >{t('amend_policys_viewer_policy')}</Button>
           </Auth> : <></>
         }
-        <Auth authKey="updateAppPolicy">
+        {/* <Auth authKey="updateAppPolicy">
           <Button
             type="primary"
             danger
@@ -177,7 +177,7 @@ export default (props: {
               updateAppPolicyAction()
             }}
           >{t('delete')}</Button>
-        </Auth>
+        </Auth> */}
       </Space>
     </>}>
       <ProTable

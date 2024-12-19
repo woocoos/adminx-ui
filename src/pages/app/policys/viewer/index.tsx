@@ -86,18 +86,19 @@ export default () => {
     verifyRules = () => {
       let errMsg = '';
       if (appInfo) {
+        // 支持空规则 只验证应用必须填写
         // const appCode = appInfo.code;
-        if (rules.length) {
-          for (let idx in rules) {
-            const item = rules[idx];
-            if (!item.actions?.length) {
-              errMsg = t('required_operation');
-            }
-            if (errMsg.length) {
-              break;
-            }
-          }
-        }
+        // if (rules.length) {
+        //   for (let idx in rules) {
+        //     const item = rules[idx];
+        //     if (!item.actions?.length) {
+        //       errMsg = t('required_operation');
+        //     }
+        //     if (errMsg.length) {
+        //       break;
+        //     }
+        //   }
+        // }
       } else {
         errMsg = t('required_app');
       }

@@ -126,7 +126,7 @@ export default (props: {
   >
     {roleInfo ?
       <ProCard title={`${roleInfo.kind === OrgRoleKind.Group ? t('user_group') : t('role')}:${roleInfo.name}`} headerBordered extra={
-        <Auth authKey={"assignOrgRolePolicyView"}>
+        roleInfo.isAppRole ? <></> : <Auth authKey={"assignOrgRolePolicyView"}>
           <Button
             type="primary"
             disabled={saveDisabled}
@@ -139,6 +139,7 @@ export default (props: {
           <CheckPolicyView
             key={item.appInfo.id}
             isOrg
+            disabled={roleInfo.isAppRole}
             appInfo={item.appInfo}
             value={item.checked}
             onChange={(value) => {

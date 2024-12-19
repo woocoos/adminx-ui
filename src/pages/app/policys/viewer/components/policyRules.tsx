@@ -173,13 +173,17 @@ const RuleItem = (props: {
         </Col>
         <Col flex="auto">
           <div>
-            <a>{props.rule.actions?.[0] === '*' ? t('all_operation') : t('{{num}}_operations', { num: props.rule.actions?.length || 0 })}</a>
+            <a>{
+              props.rule.actions?.[0]?.includes(':*') ?
+                t('all_operation') :
+                t('{{num}}_operations', { num: props.rule.actions?.length || 0 })
+            }</a>
           </div>
           <div x-if={stretch1}>
             <div>
               <Radio.Group
                 disabled={props.readonly}
-                value={props.rule.actions?.[0] === '*'}
+                value={props.rule.actions?.[0]?.includes(':*')}
                 options={[
                   { label: `${t('all_operation')}(*)`, value: true },
                   { label: t('specify'), value: false },
@@ -187,7 +191,7 @@ const RuleItem = (props: {
                 onChange={(event) => {
                   const nRule = { ...props.rule };
                   if (event.target.value) {
-                    nRule.actions = ['*'];
+                    nRule.actions = [`${props.kind == AppPolicyKind.View ? appInfo?.code : props.appInfo.code}:*`];
                   } else {
                     nRule.actions = [];
                   }

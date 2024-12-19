@@ -161,7 +161,7 @@ export const UserList = (props: {
           );
         }
 
-        if (props.scene === 'orgMember') {
+        if (['orgUser', 'orgMember'].includes(props.scene ?? '') && record.userType === 'member') {
           if (checkAuth('changeOrgUserType', auth)) {
             items.push(
               { key: 'changeOrgUserType', label: <a onClick={() => onChangeOrgUserType(record)}>{t('change_org_user_type')}</a> },

@@ -10,6 +10,7 @@ export default (props: {
   appInfo: App
   isOrg?: boolean
   value?: string[]
+  disabled?: boolean
   onChange?: (value: string[]) => void
 }) => {
   const [treeData, setTreeData] = useState<TreeDataState<AppPolicyView>[]>([])
@@ -48,6 +49,7 @@ export default (props: {
       list.push(
         <Flex key={data.key} className={style.dir}>
           <Checkbox
+            disabled={props.disabled}
             checked={value}
             indeterminate={indeterminate}
             onChange={(e) => {
@@ -70,6 +72,7 @@ export default (props: {
           <Space>
             <Checkbox.Group
               value={props.value}
+              disabled={props.disabled}
               options={data.children.map(item => ({
                 label: `${item.title}`,
                 value: getRealkey(item),

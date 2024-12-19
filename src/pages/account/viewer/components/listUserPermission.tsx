@@ -10,6 +10,7 @@ import { getUserJoinGroupList } from '@/services/adminx/org/role';
 import Auth from '@/components/auth';
 import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource } from '@/util';
+import { Link } from 'ice';
 
 
 export default (props: {
@@ -166,6 +167,11 @@ export default (props: {
         toolbar={{
           title: t('policy_list'),
           actions: props.principalKind === 'user' ? [
+            <Button>
+              <Link to={`/org/users/funauth?id=${props.userInfo.id}`} target='_blank'>
+                {t('fun_authority')}
+              </Link>
+            </Button>,
             <Auth authKey="grant">
               <Button
                 type="primary"
