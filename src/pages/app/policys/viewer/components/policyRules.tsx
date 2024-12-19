@@ -63,7 +63,6 @@ const RuleItem = (props: {
       }
     },
     reqAppActions = async () => {
-      debugger;
       if (appInfo) {
         const result = await getAppActionList(appInfo.id, {
           pageSize: 9999,
