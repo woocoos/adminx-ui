@@ -122,7 +122,7 @@ export async function getCurrencyInfo(id: string) {
   const
     result = await query(
       queryInfo, {
-      gid: gid('currency', id),
+      gid: gid('Currency', id),
     });
 
   if (result.data?.node?.__typename === "Currency") {

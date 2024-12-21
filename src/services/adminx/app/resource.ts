@@ -50,7 +50,7 @@ export async function getAppResList(
   const
     result = await paging(
       queryAppResList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy ?? {
@@ -75,7 +75,7 @@ export async function getAppResInfo(appResId: string) {
   const
     result = await query(
       queryAppResInfo, {
-      gid: gid('app_res', appResId),
+      gid: gid('AppRes', appResId),
     });
 
   if (result.data?.node?.__typename === 'AppRes') {

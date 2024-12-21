@@ -127,7 +127,7 @@ export async function getCountryInfo(id: string) {
   const
     result = await query(
       queryCountryInfo, {
-      gid: gid('country', id),
+      gid: gid('Country', id),
     });
 
   if (result.data?.node?.__typename === "Country") {

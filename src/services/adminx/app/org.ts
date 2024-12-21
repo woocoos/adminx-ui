@@ -63,7 +63,7 @@ export async function getAppOrgList(
   const
     result = await paging(
       queryAppOrgList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy ?? {

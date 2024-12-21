@@ -87,7 +87,7 @@ export async function getRegionInfo(id: string) {
   const
     result = await query(
       queryRegionInfo, {
-      gid: gid('region', id),
+      gid: gid('Region', id),
     });
 
   if (result.data?.node?.__typename === "Region") {

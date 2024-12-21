@@ -116,11 +116,11 @@ export async function getAppPolicyList(
   const
     result = isGrant?.appRoleId ? await query(
       queryAppPolicieListAndIsGrant, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       appRoleId: isGrant.appRoleId,
     }) : await query(
       queryAppPolicieList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
     });
 
   if (result.data?.node?.__typename === 'App') {
@@ -139,7 +139,7 @@ export async function getAppPolicyInfo(appPolicyId: string) {
   const
     result = await query(
       queryAppPolicyInfo, {
-      gid: gid('app_policy', appPolicyId),
+      gid: gid('AppPolicy', appPolicyId),
     });
 
   if (result.data?.node?.__typename === 'AppPolicy') {

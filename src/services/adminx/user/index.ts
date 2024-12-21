@@ -251,7 +251,7 @@ export async function getUserList(gather: {
  */
 export async function getUserInfo(userId: string) {
   const result = await query(queryUserInfo, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename === 'User') {
@@ -267,7 +267,7 @@ export async function getUserInfo(userId: string) {
  */
 export async function getUserInfoLoginProfile(userId: string) {
   const result = await query(queryUserInfoLoginProfile, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   })
 
   if (result.data?.node?.__typename === 'User') {
@@ -283,7 +283,7 @@ export async function getUserInfoLoginProfile(userId: string) {
  */
 export async function getUserInfoIdentities(userId: string) {
   const result = await query(queryUserInfoIdentities, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename === 'User') {
@@ -299,7 +299,7 @@ export async function getUserInfoIdentities(userId: string) {
  */
 export async function getUserInfoLoginProfileIdentities(userId: string) {
   const result = await query(queryUserInfoLoginProfileIdentities, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename === 'User') {
@@ -598,7 +598,7 @@ export async function restoreRecycleUser(
  */
 export async function getAccessKeyList(userId: string) {
   const result = await query(queryUserAccessKeyList, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename == "User") {

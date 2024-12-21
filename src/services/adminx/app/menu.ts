@@ -58,7 +58,7 @@ export async function getAppMenus(
   const
     result = await paging(
       queryAppMenuList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       first: gather.pageSize,
       where: gather.where,
       orderBy: gather.orderBy || {

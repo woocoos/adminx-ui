@@ -89,7 +89,7 @@ export async function getFileSourceInfo(fsId: string) {
   const
     result = await query(
       fileSourceInfoQuery, {
-      gid: gid('file_source', fsId),
+      gid: gid('FileSource', fsId),
     });
 
   if (result.data?.node?.__typename === "FileSource") {

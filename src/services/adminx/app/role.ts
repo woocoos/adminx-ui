@@ -74,7 +74,7 @@ export async function getAppRoleList(appId: string) {
   const
     result = await query(
       queryAppRoleList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
     });
 
   if (result.data?.node?.__typename === 'App') {
@@ -93,7 +93,7 @@ export async function getAppRoleInfo(appRoleId: string) {
   const
     result = await query(
       queryAppRoleInfo, {
-      gid: gid('app_role', appRoleId),
+      gid: gid('AppRole', appRoleId),
     });
 
   if (result.data?.node?.__typename === 'AppRole') {
@@ -111,7 +111,7 @@ export async function getAppRoleInfoPolicieList(appRoleId: string) {
   const
     result = await query(
       queryAppRoleInfoPolicieList, {
-      gid: gid('app_role', appRoleId),
+      gid: gid('AppRole', appRoleId),
     });
 
   if (result.data?.node?.__typename === 'AppRole') {

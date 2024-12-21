@@ -101,7 +101,7 @@ export async function getFileIdentityInfo(fsId: string) {
   const
     result = await query(
       fileIdentityInfoQuery, {
-      gid: gid('file_identity', fsId),
+      gid: gid('FileIdentity', fsId),
     });
 
   if (result.data?.node?.__typename === "FileIdentity") {

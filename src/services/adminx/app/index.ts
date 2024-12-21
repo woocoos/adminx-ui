@@ -101,7 +101,7 @@ export async function getAppInfo(appId: string) {
   const
     result = await query(
       queryAppInfo, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
     });
 
   if (result.data?.node?.__typename === 'App') {

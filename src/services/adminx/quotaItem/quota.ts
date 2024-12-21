@@ -60,7 +60,7 @@ export async function getQuotaList(gather: {
 
 export async function getQuotaInfo(id: string) {
   const result = await query(queryQuotaInfo, {
-    gid: gid('quota', id),
+    gid: gid('Quota', id),
   })
   if (result.data?.node?.__typename === 'Quota') {
     return result.data.node;

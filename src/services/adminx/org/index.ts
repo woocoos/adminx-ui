@@ -138,7 +138,7 @@ export async function getOrgPathList(orgId: string, kind: OrgKind) {
 export async function getOrgInfo(orgId: string) {
   const
     result = await query(queryOrgInfo, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
     });
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node;

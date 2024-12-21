@@ -164,7 +164,7 @@ export async function getOrgPermissionList(
     orderBy?: PermissionOrder;
   }) {
   const result = await paging(queryOrgPrmissionList, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
@@ -192,7 +192,7 @@ export async function getUserPermissionList(
     orderBy?: PermissionOrder;
   }) {
   const result = await paging(queryUserPrmissionList, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
@@ -248,7 +248,7 @@ export async function getUserExtendGroupPolicyList(
  */
 export async function getPermissionInfo(permissionId: string) {
   const result = await query(queryPermissionInfo, {
-    gid: gid('permission', permissionId),
+    gid: gid('Permission', permissionId),
   });
   if (result.data?.node?.__typename === 'Permission') {
     return result.data.node;

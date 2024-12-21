@@ -154,7 +154,7 @@ export async function getOrgUserList(
   const result = isGrant?.orgRoleId ? await paging(
     queryOrgUserListAndIsOrgRole, {
     orgRoleId: isGrant.orgRoleId,
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
@@ -163,7 +163,7 @@ export async function getOrgUserList(
     },
   }, gather.current || 1) : await paging(
     queryOrgUserList, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
@@ -273,7 +273,7 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
   const
     result = await query(
       queryOrgUserNum, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       where,
       first: 9999,
     });

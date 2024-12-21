@@ -134,7 +134,7 @@ export async function getAppDictInfo(appDictId: string) {
   const
     result = await query(
       appDictInfoQuery, {
-      gid: gid('app_dict', appDictId),
+      gid: gid('AppDict', appDictId),
     });
 
   if (result.data?.node?.__typename === "AppDict") {
@@ -217,7 +217,7 @@ export async function getAppDictItemList(
   const
     result = await query(
       appDictItemListQuery, {
-      gid: gid('app_dict', appDictId)
+      gid: gid('AppDict', appDictId)
     });
 
   if (result.data?.node?.__typename === 'AppDict') {
@@ -235,7 +235,7 @@ export async function getAppDictItemInfo(appDictItemId: string) {
   const
     result = await query(
       appDictItemInfoQuery, {
-      gid: gid('app_dict_item', appDictItemId),
+      gid: gid('AppDictItem', appDictItemId),
     });
 
   if (result.data?.node?.__typename === "AppDictItem") {

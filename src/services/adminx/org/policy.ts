@@ -111,7 +111,7 @@ export async function getOrgPolicyList(
 ) {
   const result = isGrant?.roleId ? await paging(
     queryOrgPolicyListAndIsGrantRole, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     roleId: isGrant.roleId,
     first: gather.pageSize || 20,
     where: gather.where,
@@ -122,7 +122,7 @@ export async function getOrgPolicyList(
   }, gather.current || 1) :
     isGrant?.userId ? await paging(
       queryOrgPolicyListAndIsGrantUser, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       userId: isGrant.userId,
       first: gather.pageSize || 20,
       where: gather.where,
@@ -132,7 +132,7 @@ export async function getOrgPolicyList(
       },
     }, gather.current || 1) : await paging(
       queryOrgPolicyList, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy ?? {
@@ -157,7 +157,7 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
   const
     result = await query(
       queryOrgPolicyInfo, {
-      gid: gid('org_policy', orgPolicyId),
+      gid: gid('OrgPolicy', orgPolicyId),
     });
 
   if (result.data?.node?.__typename === 'OrgPolicy') {
@@ -275,7 +275,7 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
   const
     result = await query(
       queryOrgPolicyListNum, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       first: 9999,
       where,
     });

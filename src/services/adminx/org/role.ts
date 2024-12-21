@@ -241,7 +241,7 @@ export async function getOrgRoleInfo(orgRoleId: string) {
   const
     result = await query(
       queryOrgRoleInfo, {
-      gid: gid('org_role', orgRoleId),
+      gid: gid('OrgRole', orgRoleId),
     });
 
   if (result.data?.node?.__typename === 'OrgRole') {

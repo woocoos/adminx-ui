@@ -73,7 +73,7 @@ export async function getAppActionList(
   const
     result = await paging(
       queryAppActionList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy ?? {
@@ -98,7 +98,7 @@ export async function getAppActionInfo(appActionId: string) {
   const
     result = await query(
       queryAppActionInfo, {
-      gid: gid('app_action', appActionId),
+      gid: gid('AppAction', appActionId),
     });
 
   if (result.data?.node?.__typename === 'AppAction') {
