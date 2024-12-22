@@ -2466,12 +2466,10 @@ export type CreateQuotaInput = {
   /** 限制值 */
   limit: Scalars['Int']['input'];
   quotaItemID: Scalars['ID']['input'];
+  quotaOrgID: Scalars['ID']['input'];
+  quotaUserID: Scalars['ID']['input'];
   /** 生效时间 */
   startAt?: InputMaybe<Scalars['Time']['input']>;
-  /** 租户ID,来源于root的组织ID. */
-  tenantID: Scalars['Int']['input'];
-  /** 来源于用户ID */
-  userID: Scalars['Int']['input'];
 };
 
 /**
@@ -2867,6 +2865,7 @@ export type FileIdentity = Node & {
   /** 角色的资源名称(ARN)，用于STS */
   roleArn: Scalars['String']['output'];
   source: FileSource;
+  /** 租户ID */
   tenantID: Scalars['ID']['output'];
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
@@ -4313,6 +4312,8 @@ export type Org = Node & {
   logo?: Maybe<OrgLogo>;
   /** 组织名称 */
   name: Scalars['String']['output'];
+  /** 组织下登录策略 */
+  orgQuota?: Maybe<Array<Quota>>;
   /** 管理账户 */
   owner?: Maybe<User>;
   /** 管理账户ID,如果设置则该组织将升级为根组织 */
@@ -5216,6 +5217,9 @@ export type OrgWhereInput = {
   /** file_identities edge predicates */
   hasFileIdentities?: InputMaybe<Scalars['Boolean']['input']>;
   hasFileIdentitiesWith?: InputMaybe<Array<FileIdentityWhereInput>>;
+  /** org_quota edge predicates */
+  hasOrgQuota?: InputMaybe<Scalars['Boolean']['input']>;
+  hasOrgQuotaWith?: InputMaybe<Array<QuotaWhereInput>>;
   /** org_user edge predicates */
   hasOrgUser?: InputMaybe<Scalars['Boolean']['input']>;
   hasOrgUserWith?: InputMaybe<Array<OrgUserWhereInput>>;
@@ -6033,16 +6037,20 @@ export type Quota = Node & {
   quotaItem: QuotaItem;
   /** 配额项ID */
   quotaItemID: Scalars['ID']['output'];
+  /** 配额关联租户 */
+  quotaOrg: Org;
+  /** 配额关联用户 */
+  quotaUser: User;
   /** 生效时间 */
   startAt?: Maybe<Scalars['Time']['output']>;
   /** 租户ID,来源于root的组织ID. */
-  tenantID: Scalars['Int']['output'];
+  tenantID: Scalars['ID']['output'];
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
   /** 已使用值 */
   used: Scalars['Int']['output'];
   /** 来源于用户ID */
-  userID: Scalars['Int']['output'];
+  userID: Scalars['ID']['output'];
 };
 
 /** A connection to a list of items. */
@@ -6299,6 +6307,12 @@ export type QuotaWhereInput = {
   /** quota_item edge predicates */
   hasQuotaItem?: InputMaybe<Scalars['Boolean']['input']>;
   hasQuotaItemWith?: InputMaybe<Array<QuotaItemWhereInput>>;
+  /** quota_org edge predicates */
+  hasQuotaOrg?: InputMaybe<Scalars['Boolean']['input']>;
+  hasQuotaOrgWith?: InputMaybe<Array<OrgWhereInput>>;
+  /** quota_user edge predicates */
+  hasQuotaUser?: InputMaybe<Scalars['Boolean']['input']>;
+  hasQuotaUserWith?: InputMaybe<Array<UserWhereInput>>;
   /** id field predicates */
   id?: InputMaybe<Scalars['ID']['input']>;
   idGT?: InputMaybe<Scalars['ID']['input']>;
@@ -6327,14 +6341,10 @@ export type QuotaWhereInput = {
   startAtNotIn?: InputMaybe<Array<Scalars['Time']['input']>>;
   startAtNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** tenant_id field predicates */
-  tenantID?: InputMaybe<Scalars['Int']['input']>;
-  tenantIDGT?: InputMaybe<Scalars['Int']['input']>;
-  tenantIDGTE?: InputMaybe<Scalars['Int']['input']>;
-  tenantIDIn?: InputMaybe<Array<Scalars['Int']['input']>>;
-  tenantIDLT?: InputMaybe<Scalars['Int']['input']>;
-  tenantIDLTE?: InputMaybe<Scalars['Int']['input']>;
-  tenantIDNEQ?: InputMaybe<Scalars['Int']['input']>;
-  tenantIDNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  tenantID?: InputMaybe<Scalars['ID']['input']>;
+  tenantIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  tenantIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
   /** updated_at field predicates */
   updatedAt?: InputMaybe<Scalars['Time']['input']>;
   updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -6358,14 +6368,10 @@ export type QuotaWhereInput = {
   updatedByNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
   updatedByNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** user_id field predicates */
-  userID?: InputMaybe<Scalars['Int']['input']>;
-  userIDGT?: InputMaybe<Scalars['Int']['input']>;
-  userIDGTE?: InputMaybe<Scalars['Int']['input']>;
-  userIDIn?: InputMaybe<Array<Scalars['Int']['input']>>;
-  userIDLT?: InputMaybe<Scalars['Int']['input']>;
-  userIDLTE?: InputMaybe<Scalars['Int']['input']>;
-  userIDNEQ?: InputMaybe<Scalars['Int']['input']>;
-  userIDNotIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+  userID?: InputMaybe<Scalars['ID']['input']>;
+  userIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  userIDNEQ?: InputMaybe<Scalars['ID']['input']>;
+  userIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
 };
 
 export type Region = Node & {
@@ -7065,12 +7071,10 @@ export type UpdateQuotaInput = {
   /** 限制值 */
   limit?: InputMaybe<Scalars['Int']['input']>;
   quotaItemID?: InputMaybe<Scalars['ID']['input']>;
+  quotaOrgID?: InputMaybe<Scalars['ID']['input']>;
+  quotaUserID?: InputMaybe<Scalars['ID']['input']>;
   /** 生效时间 */
   startAt?: InputMaybe<Scalars['Time']['input']>;
-  /** 租户ID,来源于root的组织ID. */
-  tenantID?: InputMaybe<Scalars['Int']['input']>;
-  /** 来源于用户ID */
-  userID?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /**
@@ -7360,6 +7364,8 @@ export type User = Node & {
   status?: Maybe<UserSimpleStatus>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
+  /** 用户配额 */
+  userQuota?: Maybe<Array<Quota>>;
   /** 用户类型 */
   userType: UserUserType;
 };
@@ -8668,6 +8674,9 @@ export type UserWhereInput = {
   /** permissions edge predicates */
   hasPermissions?: InputMaybe<Scalars['Boolean']['input']>;
   hasPermissionsWith?: InputMaybe<Array<PermissionWhereInput>>;
+  /** user_quota edge predicates */
+  hasUserQuota?: InputMaybe<Scalars['Boolean']['input']>;
+  hasUserQuotaWith?: InputMaybe<Array<QuotaWhereInput>>;
   /** id field predicates */
   id?: InputMaybe<Scalars['ID']['input']>;
   idGT?: InputMaybe<Scalars['ID']['input']>;
@@ -10014,21 +10023,21 @@ export type QuotaListQueryVariables = Exact<{
 }>;
 
 
-export type QuotaListQuery = { __typename?: 'Query', quotas: { __typename?: 'QuotaConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'QuotaEdge', cursor: any, node?: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: number, tenantID: number } | null } | null> | null } };
+export type QuotaListQuery = { __typename?: 'Query', quotas: { __typename?: 'QuotaConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'QuotaEdge', cursor: any, node?: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string, quotaOrg: { __typename?: 'Org', id: string, name: string }, quotaUser: { __typename?: 'User', id: string, displayName: string }, quotaItem: { __typename?: 'QuotaItem', id: string, name: string } } | null } | null> | null } };
 
 export type QuotaInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type QuotaInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: number, tenantID: number } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type QuotaInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string, quotaOrg: { __typename?: 'Org', id: string, name: string }, quotaUser: { __typename?: 'User', id: string, displayName: string }, quotaItem: { __typename?: 'QuotaItem', id: string, name: string } } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateQuotaMutationVariables = Exact<{
   input: CreateQuotaInput;
 }>;
 
 
-export type CreateQuotaMutation = { __typename?: 'Mutation', createQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: number, tenantID: number } };
+export type CreateQuotaMutation = { __typename?: 'Mutation', createQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string } };
 
 export type UpdateQuotaMutationVariables = Exact<{
   quotaId: Scalars['ID']['input'];
@@ -10036,7 +10045,7 @@ export type UpdateQuotaMutationVariables = Exact<{
 }>;
 
 
-export type UpdateQuotaMutation = { __typename?: 'Mutation', updateQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: number, tenantID: number } };
+export type UpdateQuotaMutation = { __typename?: 'Mutation', updateQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string } };
 
 export type DeleteQuotaMutationVariables = Exact<{
   quotaId: Scalars['ID']['input'];
@@ -10386,8 +10395,8 @@ export const QuotaItemInfoDocument = {"kind":"Document","definitions":[{"kind":"
 export const CreateQuotaItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createQuotaItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuotaItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuotaItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"defaultLimit"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"defaultLimit"}},{"kind":"Field","name":{"kind":"Name","value":"resourceType"}}]}}]}}]} as unknown as DocumentNode<CreateQuotaItemMutation, CreateQuotaItemMutationVariables>;
 export const UpdateQuotaItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateQuotaItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"itemId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuotaItemInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuotaItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"itemId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"defaultLimit"}},{"kind":"Field","name":{"kind":"Name","value":"unit"}},{"kind":"Field","name":{"kind":"Name","value":"defaultLimit"}},{"kind":"Field","name":{"kind":"Name","value":"resourceType"}}]}}]}}]} as unknown as DocumentNode<UpdateQuotaItemMutation, UpdateQuotaItemMutationVariables>;
 export const DeleteQuotaItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteQuotaItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"itemId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuotaItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"itemId"}}}]}]}}]} as unknown as DocumentNode<DeleteQuotaItemMutation, DeleteQuotaItemMutationVariables>;
-export const QuotaListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"quotaList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"QuotaOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"QuotaWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"quotas"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"used"}},{"kind":"Field","name":{"kind":"Name","value":"startAt"}},{"kind":"Field","name":{"kind":"Name","value":"endAt"}},{"kind":"Field","name":{"kind":"Name","value":"userID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}}]}}]}}]}}]}}]} as unknown as DocumentNode<QuotaListQuery, QuotaListQueryVariables>;
-export const QuotaInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"quotaInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Quota"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"used"}},{"kind":"Field","name":{"kind":"Name","value":"startAt"}},{"kind":"Field","name":{"kind":"Name","value":"endAt"}},{"kind":"Field","name":{"kind":"Name","value":"userID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}}]}}]}}]}}]} as unknown as DocumentNode<QuotaInfoQuery, QuotaInfoQueryVariables>;
+export const QuotaListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"quotaList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"QuotaOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"QuotaWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"quotas"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"used"}},{"kind":"Field","name":{"kind":"Name","value":"startAt"}},{"kind":"Field","name":{"kind":"Name","value":"endAt"}},{"kind":"Field","name":{"kind":"Name","value":"userID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"quotaOrg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"quotaUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"quotaItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<QuotaListQuery, QuotaListQueryVariables>;
+export const QuotaInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"quotaInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Quota"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"used"}},{"kind":"Field","name":{"kind":"Name","value":"startAt"}},{"kind":"Field","name":{"kind":"Name","value":"endAt"}},{"kind":"Field","name":{"kind":"Name","value":"userID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}},{"kind":"Field","name":{"kind":"Name","value":"quotaOrg"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"quotaUser"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"quotaItem"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]}}]} as unknown as DocumentNode<QuotaInfoQuery, QuotaInfoQueryVariables>;
 export const CreateQuotaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"createQuota"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuotaInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuota"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"used"}},{"kind":"Field","name":{"kind":"Name","value":"startAt"}},{"kind":"Field","name":{"kind":"Name","value":"endAt"}},{"kind":"Field","name":{"kind":"Name","value":"userID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}}]}}]}}]} as unknown as DocumentNode<CreateQuotaMutation, CreateQuotaMutationVariables>;
 export const UpdateQuotaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"updateQuota"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"quotaId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuotaInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuota"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"quotaId"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"limit"}},{"kind":"Field","name":{"kind":"Name","value":"used"}},{"kind":"Field","name":{"kind":"Name","value":"startAt"}},{"kind":"Field","name":{"kind":"Name","value":"endAt"}},{"kind":"Field","name":{"kind":"Name","value":"userID"}},{"kind":"Field","name":{"kind":"Name","value":"tenantID"}}]}}]}}]} as unknown as DocumentNode<UpdateQuotaMutation, UpdateQuotaMutationVariables>;
 export const DeleteQuotaDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteQuota"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"quotaId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuota"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"quotaId"}}}]}]}}]} as unknown as DocumentNode<DeleteQuotaMutation, DeleteQuotaMutationVariables>;

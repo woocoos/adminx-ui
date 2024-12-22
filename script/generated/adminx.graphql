@@ -2427,12 +2427,10 @@ input CreateQuotaInput {
   """限制值"""
   limit: Int!
   quotaItemID: ID!
+  quotaOrgID: ID!
+  quotaUserID: ID!
   """生效时间"""
   startAt: Time
-  """租户ID,来源于root的组织ID."""
-  tenantID: Int!
-  """来源于用户ID"""
-  userID: Int!
 }
 
 """
@@ -2830,6 +2828,7 @@ type FileIdentity implements Node {
   """角色的资源名称(ARN)，用于STS"""
   roleArn: String!
   source: FileSource!
+  """租户ID"""
   tenantID: ID!
   updatedAt: Time
   updatedBy: Int
@@ -3707,6 +3706,8 @@ type Org implements Node {
   logo: OrgLogo
   """组织名称"""
   name: String!
+  """组织下登录策略"""
+  orgQuota: [Quota!]
   """管理账户"""
   owner: User
   """管理账户ID,如果设置则该组织将升级为根组织"""
@@ -4582,6 +4583,9 @@ input OrgWhereInput {
   """file_identities edge predicates"""
   hasFileIdentities: Boolean
   hasFileIdentitiesWith: [FileIdentityWhereInput!]
+  """org_quota edge predicates"""
+  hasOrgQuota: Boolean
+  hasOrgQuotaWith: [QuotaWhereInput!]
   """org_user edge predicates"""
   hasOrgUser: Boolean
   hasOrgUserWith: [OrgUserWhereInput!]
@@ -5263,16 +5267,20 @@ type Quota implements Node {
   quotaItem: QuotaItem!
   """配额项ID"""
   quotaItemID: ID!
+  """配额关联租户"""
+  quotaOrg: Org!
+  """配额关联用户"""
+  quotaUser: User!
   """生效时间"""
   startAt: Time
   """租户ID,来源于root的组织ID."""
-  tenantID: Int!
+  tenantID: ID!
   updatedAt: Time
   updatedBy: Int
   """已使用值"""
   used: Int!
   """来源于用户ID"""
-  userID: Int!
+  userID: ID!
 }
 
 """A connection to a list of items."""
@@ -5529,6 +5537,12 @@ input QuotaWhereInput {
   """quota_item edge predicates"""
   hasQuotaItem: Boolean
   hasQuotaItemWith: [QuotaItemWhereInput!]
+  """quota_org edge predicates"""
+  hasQuotaOrg: Boolean
+  hasQuotaOrgWith: [OrgWhereInput!]
+  """quota_user edge predicates"""
+  hasQuotaUser: Boolean
+  hasQuotaUserWith: [UserWhereInput!]
   """id field predicates"""
   id: ID
   idGT: ID
@@ -5557,14 +5571,10 @@ input QuotaWhereInput {
   startAtNotIn: [Time!]
   startAtNotNil: Boolean
   """tenant_id field predicates"""
-  tenantID: Int
-  tenantIDGT: Int
-  tenantIDGTE: Int
-  tenantIDIn: [Int!]
-  tenantIDLT: Int
-  tenantIDLTE: Int
-  tenantIDNEQ: Int
-  tenantIDNotIn: [Int!]
+  tenantID: ID
+  tenantIDIn: [ID!]
+  tenantIDNEQ: ID
+  tenantIDNotIn: [ID!]
   """updated_at field predicates"""
   updatedAt: Time
   updatedAtGT: Time
@@ -5588,14 +5598,10 @@ input QuotaWhereInput {
   updatedByNotIn: [Int!]
   updatedByNotNil: Boolean
   """user_id field predicates"""
-  userID: Int
-  userIDGT: Int
-  userIDGTE: Int
-  userIDIn: [Int!]
-  userIDLT: Int
-  userIDLTE: Int
-  userIDNEQ: Int
-  userIDNotIn: [Int!]
+  userID: ID
+  userIDIn: [ID!]
+  userIDNEQ: ID
+  userIDNotIn: [ID!]
 }
 
 type Region implements Node {
@@ -6295,12 +6301,10 @@ input UpdateQuotaInput {
   """限制值"""
   limit: Int
   quotaItemID: ID
+  quotaOrgID: ID
+  quotaUserID: ID
   """生效时间"""
   startAt: Time
-  """租户ID,来源于root的组织ID."""
-  tenantID: Int
-  """来源于用户ID"""
-  userID: Int
 }
 
 """
@@ -6604,6 +6608,8 @@ type User implements Node {
   status: UserSimpleStatus
   updatedAt: Time
   updatedBy: Int
+  """用户配额"""
+  userQuota: [Quota!]
   """用户类型"""
   userType: UserUserType!
 }
@@ -7877,6 +7883,9 @@ input UserWhereInput {
   """permissions edge predicates"""
   hasPermissions: Boolean
   hasPermissionsWith: [PermissionWhereInput!]
+  """user_quota edge predicates"""
+  hasUserQuota: Boolean
+  hasUserQuotaWith: [QuotaWhereInput!]
   """id field predicates"""
   id: ID
   idGT: ID

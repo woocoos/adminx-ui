@@ -1,4 +1,4 @@
-import { Quota, QuotaItemResourceType } from '@/generated/adminx/graphql';
+import { OrgKind, Quota, QuotaItemResourceType, UserUserType } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
 import {
   DrawerForm, ProFormDateTimePicker,
@@ -12,6 +12,8 @@ import { useLeavePrompt } from '@knockout-js/layout';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createQuota, getQuotaInfo, updateQuota } from '@/services/adminx/quotaItem/quota';
+import InputOrg from "@/pages/org/components/inputOrg";
+import InputAccount from "@/pages/account/components/inputAccount";
 
 type ProFormData = {
   tenantId: number;
@@ -119,17 +121,20 @@ export default (props: {
         name="tenantId"
         label={t('organization')}
         rules={[
-          {required: false, message: `${t('please_enter_org')}`},
-        ]}
-      />
+          {required: true, message: `${t('please_enter_org')}`},
+        ]}>
+      <InputOrg orgId={OrgKind.Root} />
+      </ProFormText>
 
       <ProFormText
         name="userId"
         label={t('user')}
         rules={[
-          {required: false, message: `${t('please_enter_user')}`},
+          {required: true, message: `${t('please_enter_user')}`},
         ]}
-      />
+      >
+        <InputAccount userType={UserUserType.Account} />
+      </ProFormText>
       <ProFormDigit
         name="limit"
         label={t('limit')}

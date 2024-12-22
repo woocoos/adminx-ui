@@ -5,20 +5,44 @@ import { OrderDirection, Quota, QuotaOrder, QuotaOrderField, QuotaWhereInput } f
 
 
 const queryQuotaList = gql(/* GraphQL */`query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){
-    quotas(first:$first,orderBy: $orderBy,where: $where){
-        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-        edges{
-            cursor,node{
-                id,createdAt,limit,used,startAt,endAt,userID,tenantID
-            }
+  quotas(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdAt,limit,used,startAt,endAt,userID,tenantID
+        quotaOrg {
+          id
+          name
         }
+        quotaUser {
+          id
+          displayName
+        }
+        quotaItem {
+          id
+          name
+        }
+      }
     }
+  }
 }`);
 
 const queryQuotaInfo = gql(/* GraphQL */`query quotaInfo($gid:GID!){
     node(id:$gid){
         ... on Quota{
             id,createdAt,limit,used,startAt,endAt,userID,tenantID
+          quotaOrg {
+            id
+            name
+          }
+          quotaUser {
+            id
+            displayName
+          }
+          quotaItem {
+            id
+            name
+          }
         }
     }
 }`);

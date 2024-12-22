@@ -26,13 +26,19 @@ const PageQuotaList = () => {
       },
       {
         title: '租户',
-        dataIndex: 'tenant',
+        dataIndex: 'quotaOrg',
         width: 120,
+        renderText: (text, record) => {
+          return record?.quotaOrg?.name ?? '-';
+        },
       },
       {
         title: '用户',
-        dataIndex: 'user',
+        dataIndex: 'quotaUser',
         width: 120,
+        renderText: (text, record) => {
+          return record?.quotaUser?.displayName ?? '-';
+        },
       },
       {
         title: '限制值',
@@ -73,7 +79,7 @@ const PageQuotaList = () => {
     render: (_, record) => {
       return (
         <Space>
-          <Auth authKey="updateQuotaItem">
+          <Auth authKey="updateQuota">
             <a
               key="viewer"
               onClick={() => {
@@ -83,10 +89,7 @@ const PageQuotaList = () => {
               {t('edit')}
             </a>
           </Auth>
-          <Link key="quotaItem" to={`/quotaItem/quota?id=${record.id}`}>
-            {t('detail')}
-          </Link>
-          <Auth authKey="deleteQuotaItem">
+          <Auth authKey="deleteQuota">
             <a key="del" onClick={() => {
               Modal.confirm({
                 title: t('delete'),

@@ -209,8 +209,6 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'quotas', listTemp([
     store.get('Quota', 1),
     store.get('Quota', 2),
-    store.get('Quota', 3),
-
   ]))
 
   // -------------root-end------------------------
@@ -519,10 +517,26 @@ export const initStoreData = (store: IMockStore) => {
   store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false, });
   store.set('QuotaItem', 3, { id: 3, name: '账户数限制', code: 'accountLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, });
   // Quota
-  store.set('Quota', 1, { id: 1, quotaItemID: 1, tenantID: 1, quotaItem: store.get('QuotaItem', 1), limit: 10, used: 0, })
-  store.set('Quota', 2, { id: 2, quotaItemID: 1, userID: 1, quotaItem: store.get('QuotaItem', 1), limit: 10, used: 3, })
-  store.set('Quota', 3, { id: 3, quotaItemID: 2, tenantID: 1, quotaItem: store.get('QuotaItem', 2), limit: 10, used: 0, })
-  store.set('Quota', 4, { id: 4, quotaItemID: 2, userID: 1, quotaItem: store.get('QuotaItem', 2), limit: 10, used: 3, })
-  store.set('Quota', 5, { id: 5, quotaItemID: 3, tenantID: 1, quotaItem: store.get('QuotaItem', 3), limit: 10, used: 0, })
-  store.set('Quota', 6, { id: 6, quotaItemID: 3, userID: 1, quotaItem: store.get('QuotaItem', 3), limit: 10, used: 3, })
+  store.set('Quota', 1, {
+    id: 1,
+    tenantID: 1,
+    quotaOrg: store.get('Org', 1),
+    userID: 1,
+    quotaUser: store.get('User', 1),
+    quotaItemID: 1,
+    quotaItem: store.get('QuotaItem', 1),
+    limit: 10,
+    used: 0,
+  });
+  store.set('Quota', 2, {
+    id: 2,
+    tenantID: 5,
+    quotaOrg: store.get('Org', 5),
+    userID: 1,
+    quotaUser: store.get('User', 1),
+    quotaItemID: 1,
+    quotaItem: store.get('QuotaItem', 1),
+    limit: 10,
+    used: 3,
+  });
 };

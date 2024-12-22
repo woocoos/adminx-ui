@@ -184,10 +184,7 @@ const schemaWithMocks = addMocksToSchema({
         return getAllDist(store, refCode)
       },
       quotaItems: relayStylePaginationMock(store),
-      quotas: (_, { quotaItemId }) => {
-        const quotaItem = store.get('QuotaItem', quotaItemId) as QuotaItem;
-        return quotaItem.quota;
-      },
+      quotas: relayStylePaginationMock(store),
       node: (root, args, context, info) => {
         const decoded = Buffer.from(args.id, 'base64').toString()
         const [type, did] = decoded?.split(':', 2)
