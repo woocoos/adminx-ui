@@ -106,6 +106,7 @@ export const OrgList = (props: {
             { key: 'app', label: <Link to={`/system/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
             { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('department_manage')}</Link> },
             { key: 'orgUser', label: <Link to={`/system/org/users?id=${record.id}`}>{t('user_manage')}</Link> },
+            { key: 'pwdPolicy', label: <Link to={`/system/org/pwdPolicy?id=${record.id}`}>{t('password_policy')}</Link> },
           );
         } else {
           if (checkAuth('createOrganization', auth)) {

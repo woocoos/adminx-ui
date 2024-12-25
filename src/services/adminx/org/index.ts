@@ -1,6 +1,7 @@
 import { gql } from '@/generated/adminx';
-import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/generated/adminx/graphql';
+import { CreateOrgInput, CreateUserPasswordPolicyInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput, UpdateUserPasswordPolicyInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
+import { CreateUserPasswordInput } from '@knockout-js/api/ucenter';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumOrgStatus = {
@@ -75,6 +76,29 @@ const mutationDelOrg = gql(/* GraphQL */`mutation delOrg($orgId:ID!){
 
 const mutationMoveOrg = gql(/* GraphQL */`mutation moveOrg($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
   moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)
+}`);
+
+const queryUserPasswordPolicy = gql(/* GraphQL */`query userPasswordPolicy($gid: GID!){
+  node(id:$gid){
+    ... on Org{
+      id
+      userPasswordPolicy{
+        id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes
+      }
+    }
+  }
+}`);
+
+const mutationUpdatePwdPolicy = gql(/* GraphQL */`mutation updateUserPasswordPolicy($orgId:ID!,$input: UpdateUserPasswordPolicyInput!){
+  updateUserPasswordPolicy(orgID:$orgId,input:$input){
+    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID
+  }
+}`);
+
+const mutationCreatePwdPolicy = gql(/* GraphQL */`mutation createUserPasswordPolicy($orgId:ID!,$input: CreateUserPasswordPolicyInput!){
+  createUserPasswordPolicy(orgID:$orgId,input:$input){
+    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID
+  }
 }`);
 
 /**
@@ -229,6 +253,57 @@ export async function moveOrg(sourceId: string, targetId: string, action: TreeAc
     });
   if (result.data?.moveOrganization) {
     return result.data.moveOrganization;
+  }
+  return null;
+}
+
+/**
+ * 组织下的密码策略
+ * @param orgId
+ * @returns
+ */
+export async function getPwdPolicy(orgId: string) {
+  const result = await query(queryUserPasswordPolicy, {
+    gid: gid('Org', orgId),
+  });
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node.userPasswordPolicy;
+  }
+  return null;
+}
+
+/**
+ * 更新密码策略
+ * @param orgId
+ * @param input
+ * @returns
+ */
+export async function updatePwdPolicy(orgId: string, input: UpdateUserPasswordPolicyInput) {
+  const
+    result = await mutation(mutationUpdatePwdPolicy, {
+      orgId,
+      input,
+    });
+  if (result.data?.updateUserPasswordPolicy?.id) {
+    return result.data.updateUserPasswordPolicy;
+  }
+  return null;
+}
+
+/**
+ * 创建密码策略
+ * @param orgId
+ * @param input
+ * @returns
+ */
+export async function createPwdPolicy(orgId: string, input: CreateUserPasswordPolicyInput) {
+  const
+    result = await mutation(mutationCreatePwdPolicy, {
+      orgId,
+      input,
+    });
+  if (result.data?.createUserPasswordPolicy?.id) {
+    return result.data.createUserPasswordPolicy;
   }
   return null;
 }

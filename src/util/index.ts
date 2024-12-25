@@ -446,3 +446,47 @@ export const isValidDomain = (domain: string) => {
   const regex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
   return regex.test(domain);
 }
+
+/**
+ * 与运算处理，多选要赋值展现出来的数组值
+ * @param list
+ * @param value
+ * @returns
+ */
+export const getANDResult = <T extends number | string>(list: T[], value: T): T[] => {
+  // 将字符串转换为整数
+  const intValue = typeof value === 'string' ? parseInt(value, 10) : value;
+  // 如果转换后的值为 NaN 或 0，则返回空数组
+  if (isNaN(intValue as number) || intValue === 0) {
+    return [];
+  }
+  const val: T[] = [];
+  list.forEach((item) => {
+    // 将列表中的每个元素转换为整数进行位运算
+    const itemIntValue = typeof item === 'string' ? parseInt(item, 10) : item;
+    if (typeof itemIntValue === 'number' && typeof intValue === 'number') {
+      if ((itemIntValue & intValue) > 0) {
+        val.push(item);
+      }
+    }
+  });
+  return val;
+}
+/**
+ * 或运算处理，多选要存储的时候获取结果值
+ * @param list
+ * @returns
+ */
+export const getORResult = <T extends number | string>(list: T[]): T => {
+  let val: number = 0;
+
+  list.forEach((item) => {
+    const intValue = typeof item === 'string' ? parseInt(item, 10) : item;
+    // 确保 intValue 是数字类型
+    if (typeof intValue === 'number') {
+      val = val ^ intValue;
+    }
+  });
+  // 返回原始类型
+  return (typeof list[0] === 'string' ? val.toString() : val) as T;
+}

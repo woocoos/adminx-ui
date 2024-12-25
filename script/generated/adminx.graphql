@@ -2341,7 +2341,7 @@ input CreateOrgInput {
   """时区"""
   timezone: String
   userIDs: [ID!]
-  userPasswordPolicyIDs: [ID!]
+  userPasswordPolicyID: ID
 }
 
 """
@@ -3326,7 +3326,7 @@ type Mutation {
   """创建组织根节点(管理端使用)"""
   createRoot(input: CreateOrgInput!): Org
   """设置密码策略"""
-  createUserPasswordPolicy(input: CreateUserPasswordPolicyInput!): UserPasswordPolicy
+  createUserPasswordPolicy(input: CreateUserPasswordPolicyInput!, orgID: ID!): UserPasswordPolicy
   """删除应用"""
   deleteApp(appID: ID!): Boolean!
   """删除应用操作"""
@@ -3499,7 +3499,7 @@ type Mutation {
   """更新用户设备"""
   updateUserDevice(deviceID: ID!, input: UpdateUserDeviceInput!): UserDevice!
   """更新密码策略"""
-  updateUserPasswordPolicy(input: UpdateUserPasswordPolicyInput!): UserPasswordPolicy
+  updateUserPasswordPolicy(input: UpdateUserPasswordPolicyInput!, orgID: ID!): UserPasswordPolicy
 }
 
 """
@@ -3758,7 +3758,7 @@ type Org implements Node {
   updatedAt: Time
   updatedBy: Int
   """组织下密码策略"""
-  userPasswordPolicy: [UserPasswordPolicy!]
+  userPasswordPolicy: UserPasswordPolicy
   users(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -6160,7 +6160,6 @@ input UpdateOrgInput {
   addPolicyIDs: [ID!]
   addRolesAndGroupIDs: [ID!]
   addUserIDs: [ID!]
-  addUserPasswordPolicyIDs: [ID!]
   appendCustomDomain: [String!]
   clearApps: Boolean
   clearChildren: Boolean
@@ -6202,11 +6201,11 @@ input UpdateOrgInput {
   removePolicyIDs: [ID!]
   removeRolesAndGroupIDs: [ID!]
   removeUserIDs: [ID!]
-  removeUserPasswordPolicyIDs: [ID!]
   """状态"""
   status: OrgSimpleStatus
   """时区"""
   timezone: String
+  userPasswordPolicyID: ID
 }
 
 """

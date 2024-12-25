@@ -1,7 +1,9 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, OrgUserUserType, UpdateUserAddrInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, OrgUserUserType, UpdateUserAddrInput, UpdateUserInput, UpdateUserLoginProfileInput, UserDeviceWhereInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
+import { UserDeviceOrder } from '@knockout-js/api/ucenter';
+import { UserDeviceOrderField } from '@knockout-js/api/ucenter';
 
 // TODO 如何使用i18
 export const EnumUserIdentityKind = {
@@ -13,6 +15,13 @@ export const EnumUserIdentityKind = {
 };
 
 export const EnumUserStatus = {
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
+};
+
+export const EnumUserDeviceStatus = {
   active: { text: 'active', status: 'success' },
   inactive: { text: 'inactive', status: 'default' },
   disabled: { text: 'disabled', status: 'default' },
@@ -215,6 +224,21 @@ const mutationDisableOauthClient = gql(/* GraphQL */`mutation disableOauthClient
 
 const mutationDelOauthClient = gql(/* GraphQL */`mutation delOauthClient($id: ID!){
   deleteOauthClient( id: $id )
+}`);
+
+const queryUserDevices = gql(/* GraphQL */`query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){
+  userDevices(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,
+      }
+    }
+  }
+}`);
+
+const mutationDeleteUserDevice = gql(/* GraphQL */`mutation deleteUserDevice($userID: ID!,$deviceID: ID!){
+  deleteUserDevice( userID: $userID,deviceID: $deviceID)
 }`);
 
 
@@ -664,6 +688,47 @@ export async function delAccessKey(accessKeyId: string) {
   })
   if (result.data?.deleteOauthClient) {
     return result.data.deleteOauthClient
+  }
+  return null
+}
+
+/**
+ * 获取用户设备
+ * @param userId
+ * @returns
+ */
+export async function getUserDevices(gather: {
+  current?: number;
+  pageSize?: number;
+  where?: UserDeviceWhereInput;
+  orderBy?: UserDeviceOrder;
+}) {
+  const result = await paging(queryUserDevices, {
+    first: gather.pageSize,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserDeviceOrderField.CreatedAt
+    },
+  }, gather.current || 1);
+  if (result.data?.userDevices) {
+    return result?.data?.userDevices;
+  }
+  return null;
+}
+
+/**
+ * 删除设备
+ * @param accessKeyId
+ * @returns
+ */
+export async function delUserDevice(userID: string, deviceID: string) {
+  const result = await mutation(mutationDeleteUserDevice, {
+    userID: userID,
+    deviceID: deviceID,
+  })
+  if (result.data?.deleteUserDevice) {
+    return result.data.deleteUserDevice
   }
   return null
 }

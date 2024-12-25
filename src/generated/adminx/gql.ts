@@ -111,6 +111,9 @@ const documents = {
     "mutation enableDirectory($input: EnableDirectoryInput!){\n  enableDirectory(input:$input){\n    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,\n    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency\n    owner { id,displayName }\n  }\n}": types.EnableDirectoryDocument,
     "mutation delOrg($orgId:ID!){\n  deleteOrganization(orgID: $orgId)\n}": types.DelOrgDocument,
     "mutation moveOrg($sourceId:ID!,$targetId:ID!,$action:TreeAction!){\n  moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)\n}": types.MoveOrgDocument,
+    "query userPasswordPolicy($gid: GID!){\n  node(id:$gid){\n    ... on Org{\n      id\n      userPasswordPolicy{\n        id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes\n      }\n    }\n  }\n}": types.UserPasswordPolicyDocument,
+    "mutation updateUserPasswordPolicy($orgId:ID!,$input: UpdateUserPasswordPolicyInput!){\n  updateUserPasswordPolicy(orgID:$orgId,input:$input){\n    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID\n  }\n}": types.UpdateUserPasswordPolicyDocument,
+    "mutation createUserPasswordPolicy($orgId:ID!,$input: CreateUserPasswordPolicyInput!){\n  createUserPasswordPolicy(orgID:$orgId,input:$input){\n    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID\n  }\n}": types.CreateUserPasswordPolicyDocument,
     "query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n          }\n        }\n      }\n    }\n  }\n}": types.OrgPolicyListDocument,
     "query orgPolicyListNum($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){ totalCount }\n    }\n  }\n}": types.OrgPolicyListNumDocument,
     "query orgPolicyListAndIsGrantUser($gid: GID!,$userId:ID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n            isGrantUser(userID: $userId)\n          }\n        }\n      }\n    }\n  }\n}": types.OrgPolicyListAndIsGrantUserDocument,
@@ -194,6 +197,8 @@ const documents = {
     "mutation enableOauthClient($id: ID!){\n  enableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}": types.EnableOauthClientDocument,
     "mutation disableOauthClient($id: ID!){\n  disableOauthClient( id: $id ){\n    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt\n  }\n}": types.DisableOauthClientDocument,
     "mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}": types.DelOauthClientDocument,
+    "query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){\n  userDevices(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,\n      }\n    }\n  }\n}": types.UserDevicesDocument,
+    "mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}": types.DeleteUserDeviceDocument,
 };
 
 /**
@@ -601,6 +606,18 @@ export function gql(source: "mutation moveOrg($sourceId:ID!,$targetId:ID!,$actio
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
+export function gql(source: "query userPasswordPolicy($gid: GID!){\n  node(id:$gid){\n    ... on Org{\n      id\n      userPasswordPolicy{\n        id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes\n      }\n    }\n  }\n}"): (typeof documents)["query userPasswordPolicy($gid: GID!){\n  node(id:$gid){\n    ... on Org{\n      id\n      userPasswordPolicy{\n        id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation updateUserPasswordPolicy($orgId:ID!,$input: UpdateUserPasswordPolicyInput!){\n  updateUserPasswordPolicy(orgID:$orgId,input:$input){\n    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID\n  }\n}"): (typeof documents)["mutation updateUserPasswordPolicy($orgId:ID!,$input: UpdateUserPasswordPolicyInput!){\n  updateUserPasswordPolicy(orgID:$orgId,input:$input){\n    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation createUserPasswordPolicy($orgId:ID!,$input: CreateUserPasswordPolicyInput!){\n  createUserPasswordPolicy(orgID:$orgId,input:$input){\n    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID\n  }\n}"): (typeof documents)["mutation createUserPasswordPolicy($orgId:ID!,$input: CreateUserPasswordPolicyInput!){\n  createUserPasswordPolicy(orgID:$orgId,input:$input){\n    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
 export function gql(source: "query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n          }\n        }\n      }\n    }\n  }\n}"): (typeof documents)["query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){\n  node(id:$gid){\n    ... on Org{\n      policies(first:$first,orderBy: $orderBy,where: $where){\n        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n        edges{\n          cursor,node{\n            id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments\n          }\n        }\n      }\n    }\n  }\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
@@ -930,6 +947,14 @@ export function gql(source: "mutation disableOauthClient($id: ID!){\n  disableOa
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}"): (typeof documents)["mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){\n  userDevices(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,\n      }\n    }\n  }\n}"): (typeof documents)["query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){\n  userDevices(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,\n      }\n    }\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}"): (typeof documents)["mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

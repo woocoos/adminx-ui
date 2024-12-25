@@ -170,6 +170,11 @@ export const UserList = (props: {
         }
 
         if (props.scene === 'orgUser') {
+          if (checkAuth('userDevices', auth)) {
+            items.push(
+              { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}`} >{t('user_devices')}</Link> },
+            );
+          }
           if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
             if (checkAuth('removeOrganizationUser', auth)) {
               items.push(
