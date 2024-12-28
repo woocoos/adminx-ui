@@ -195,8 +195,13 @@ export const requestConfig = defineRequestConfig(() => {
     interceptors: requestInterceptor({
       store: {
         getState: () => {
-          const token = getItem<string>('token') as string,
+          let token = getItem<string>('token') as string,
             tenantId = getItem<string>('tenantId') as string;
+          if (isInIcestark()) {
+            const iceStore = starkStore.get('iceStore')
+            token = iceStore?.user?.token
+            tenantId = iceStore?.user?.tenantId
+          }
           return {
             token: token,
             tenantId: tenantId,
