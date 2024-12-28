@@ -62,31 +62,6 @@ export default createModel({
   },
   effects: () => ({
     /**
-     * 登录
-     * @param payload
-     */
-    async loginAfter(payload: LoginRes) {
-      if (payload.accessToken) {
-        this.updateToken(payload.accessToken);
-        if (payload.user) {
-          this.saveUser({
-            id: payload.user.id,
-            displayName: payload.user.displayName,
-            avatar: payload.user?.avatar || '',
-          } as User)
-          if (payload.user.domains?.length) {
-            const tenantId = getItem<string>('tenantId')
-            if (!payload.user.domains.find(item => item.id == tenantId)) {
-              this.updateTenantId(payload.user.domains[0].id);
-            }
-          } else {
-            this.updateTenantId('');
-          }
-        }
-        this.updateRefreshToken(payload.refreshToken || '');
-      }
-    },
-    /**
      * 退出
      * @param isHistory
      */

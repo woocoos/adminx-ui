@@ -1,5 +1,5 @@
 import '@/assets/styles/index.css';
-import { getItem, removeItem, setItem } from '@/pkg/localStore';
+import { getItem, removeItem } from '@/pkg/localStore';
 import store from '@/store';
 import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
@@ -207,7 +207,7 @@ export const requestConfig = defineRequestConfig(() => {
       login: ICE_LOGIN_URL,
       error: (err, str) => {
         if (str) {
-          window.antd.message.error(str)
+          message.error(str)
         }
       }
     })

@@ -342,24 +342,22 @@ export async function forgetPwdReset(stateToken: string, newPassword: string) {
  * 处理url是否需要创建spm
  * @returns
  */
-export async function urlSpm(url: string, tenantId?: string, isForceSpm?: boolean) {
+export async function urlSpm(url: string, tenantId?: string, headers?: Record<string, string>) {
   if (url.toLowerCase().startsWith("http")) {
     const u = new URL(url);
-    if (u.origin != location.origin || isForceSpm) {
-      try {
-        const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
-        if (typeof result === 'string') {
-          u.searchParams.set('spm', result)
-          if (tenantId || userState.tenantId) {
-            u.searchParams.set('tid', tenantId || userState.tenantId)
-          }
+    try {
+      const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`, undefined, {
+        headers,
+      }), userState = store.getModelState("user");
+      if (typeof result === 'string') {
+        u.searchParams.set('spm', result)
+        if (tenantId || userState.tenantId) {
+          u.searchParams.set('tid', tenantId || userState.tenantId)
         }
-      } catch (error) {
       }
-      return u.href
-    } else {
-      return u.href.replace(u.origin, '')
+    } catch (error) {
     }
+    return u.href
   }
   return url
 }
