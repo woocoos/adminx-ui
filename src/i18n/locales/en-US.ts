@@ -100,6 +100,9 @@ export default {
     uppercase: 'uppercase',
     digit: 'digit',
     symbol: 'symbol',
+    logo: 'logo',
+    thumb_logo: 'thumb logo',
+    favicon: 'favicon',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -119,6 +122,7 @@ export default {
     go_login: 'go login',
     pwd_reset_success: 'Password reset succeeded',
     format_error: 'Formatting error',
+    url_format_error: 'URL Formatting error',
     domain_format_error: 'Domain formatting error',
     app_code: 'Application code',
     app_role: 'Application role',

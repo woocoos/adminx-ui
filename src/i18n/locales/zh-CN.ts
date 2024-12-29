@@ -100,6 +100,9 @@ export default {
     uppercase: '大写字母',
     digit: '数字',
     symbol: '符号',
+    logo: 'logo',
+    thumb_logo: '缩小logo',
+    favicon: 'favicon',
 
     // 多个字符组成
     confirm_copy: '确定是否复制',
@@ -119,6 +122,7 @@ export default {
     go_login: '前往登录',
     pwd_reset_success: '密码重置成功',
     format_error: '格式错误',
+    url_format_error: 'URL格式错误',
     domain_format_error: '域名格式错误',
     app_code: '应用编码',
     app_role: '应用角色',

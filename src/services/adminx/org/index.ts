@@ -34,6 +34,7 @@ const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
       id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,customDomain,
       domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
       owner { id,displayName }
+      logo{ favicon, logo, thumbLogo}
     }
   }
 }`);
@@ -43,6 +44,7 @@ const mutationCreateRootOrg = gql(/* GraphQL */`mutation createRootOrg($input: C
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
   }
 }`);
 
@@ -51,6 +53,7 @@ const mutationUpdateOrg = gql(/* GraphQL */`mutation updateOrg($orgId:ID!,$input
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
   }
 }`);
 
@@ -59,6 +62,7 @@ const mutationCreateOrg = gql(/* GraphQL */`mutation createOrg($input: CreateOrg
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
   }
 }`);
 
@@ -67,6 +71,7 @@ const mutationEnableDirectory = gql(/* GraphQL */`mutation enableDirectory($inpu
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
     domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
   }
 }`);
 

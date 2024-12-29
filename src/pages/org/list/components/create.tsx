@@ -19,8 +19,8 @@ type SelectTreeData = {
 };
 
 type ProFormData = {
-  name: string;
-  parentID: string;
+  name?: string;
+  parentID?: string;
   domain?: string;
   countryCode?: string;
   customDomain?: string[];
@@ -28,6 +28,9 @@ type ProFormData = {
   localCurrency?: string;
   timezone?: string;
   profile?: string;
+  logo?: string;
+  favicon?: string;
+  thumbLogo?: string;
 };
 
 export default (props: {
@@ -113,13 +116,25 @@ export default (props: {
     getRequest = async () => {
       setSaveLoading(false);
       setSaveDisabled(true);
-      let result = {};
+      let result: ProFormData = {};
       if (props.id) {
         const orgInfo = await getOrgInfo(props.id);
         if (orgInfo?.id) {
+          setOldInfo(orgInfo as Org);
           switch (props.scene) {
             case 'editor':
-              result = orgInfo;
+              result.countryCode = orgInfo.countryCode ?? undefined;
+              result.name = orgInfo.name ?? undefined
+              result.parentID = orgInfo.parentID ?? undefined
+              result.domain = orgInfo.domain ?? undefined
+              result.customDomain = orgInfo.customDomain ?? undefined
+              result.owner = (orgInfo.owner as User) ?? undefined
+              result.localCurrency = orgInfo.localCurrency ?? undefined
+              result.timezone = orgInfo.timezone ?? undefined
+              result.profile = orgInfo.profile ?? undefined
+              result.logo = orgInfo.logo?.logo ?? undefined
+              result.favicon = orgInfo.logo?.favicon ?? undefined
+              result.thumbLogo = orgInfo.logo?.thumbLogo ?? undefined
               break;
             case 'peer':
               result = { parentID: orgInfo.parentID };
@@ -132,7 +147,6 @@ export default (props: {
           }
         }
       }
-      setOldInfo(result as Org);
       return result;
     },
     onValuesChange = () => {
@@ -152,6 +166,11 @@ export default (props: {
             profile: values.profile,
             localCurrency: values.localCurrency,
             timezone: values.timezone,
+            logo: {
+              logo: values.logo,
+              favicon: values.favicon,
+              thumbLogo: values.thumbLogo,
+            }
           }, oldInfo || {}));
           if (result?.id) {
             setSaveDisabled(true);
@@ -159,8 +178,8 @@ export default (props: {
           }
         } else {
           const result = await createOrgInfo({
-            name: values.name,
-            parentID: values.parentID,
+            name: values.name as string,
+            parentID: values.parentID as string,
             ownerID: values.owner?.id,
             domain: values.domain,
             customDomain: values.customDomain,
@@ -168,6 +187,11 @@ export default (props: {
             profile: values.profile,
             localCurrency: values.localCurrency,
             timezone: values.timezone,
+            logo: {
+              logo: values.logo,
+              favicon: values.favicon,
+              thumbLogo: values.thumbLogo,
+            }
           }, props.kind);
           if (result?.id) {
             setSaveDisabled(true);
@@ -176,8 +200,8 @@ export default (props: {
         }
       } else if (props.scene === 'peer') {
         const result = await createOrgInfo({
-          name: values.name,
-          parentID: values.parentID,
+          name: values.name as string,
+          parentID: values.parentID as string,
           ownerID: values.owner?.id,
           domain: values.domain,
           customDomain: values.customDomain,
@@ -185,6 +209,11 @@ export default (props: {
           profile: values.profile,
           localCurrency: values.localCurrency,
           timezone: values.timezone,
+          logo: {
+            logo: values.logo,
+            favicon: values.favicon,
+            thumbLogo: values.thumbLogo,
+          }
         }, props.kind);
         if (result?.id) {
           setSaveDisabled(true);
@@ -192,8 +221,8 @@ export default (props: {
         }
       } else if (props.scene === 'child') {
         const result = await createOrgInfo({
-          name: values.name,
-          parentID: values.parentID,
+          name: values.name as string,
+          parentID: values.parentID as string,
           ownerID: values.owner?.id,
           domain: values.domain,
           customDomain: values.customDomain,
@@ -201,6 +230,11 @@ export default (props: {
           profile: values.profile,
           localCurrency: values.localCurrency,
           timezone: values.timezone,
+          logo: {
+            logo: values.logo,
+            favicon: values.favicon,
+            thumbLogo: values.thumbLogo,
+          },
         }, props.kind);
         if (result?.id) {
           setSaveDisabled(true);
@@ -316,6 +350,30 @@ export default (props: {
         name="timezone"
         label={t('timezone')}
         options={timezoneOptions}
+      />
+      <ProFormText
+        x-if={props.kind === 'root'}
+        name="logo"
+        label={t('logo')}
+        rules={[
+          { type: 'url', message: `${t('url_format_error')}` }
+        ]}
+      />
+      <ProFormText
+        x-if={props.kind === 'root'}
+        name="favicon"
+        label={t('favicon')}
+        rules={[
+          { type: 'url', message: `${t('url_format_error')}` }
+        ]}
+      />
+      <ProFormText
+        x-if={props.kind === 'root'}
+        name="thumbLogo"
+        label={t('thumb_logo')}
+        rules={[
+          { type: 'url', message: `${t('url_format_error')}` }
+        ]}
       />
       <ProFormTextArea
         name="profile"
