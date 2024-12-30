@@ -139,7 +139,7 @@ export async function getOrgList(gather: {
  * @param orgId
  * @returns
  */
-export async function getOrgPathList(orgId: string, kind: OrgKind) {
+export async function getOrgPathList(orgId: string, kind?: OrgKind) {
   const topOrg = await getOrgInfo(orgId),
     orgList: Org[] = [];
   if (topOrg?.id) {

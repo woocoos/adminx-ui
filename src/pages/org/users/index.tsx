@@ -31,7 +31,7 @@ export const PageOrgUsers = (props: {
   const
     getRequest = async () => {
       setLoading(true);
-      const orgList = await getOrgPathList(props.orgId, OrgKind.Org),
+      const orgList = await getOrgPathList(props.orgId),
         topData = orgList[0];
       if (topData?.id) {
         setSelectedData(topData);
