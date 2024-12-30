@@ -199,6 +199,7 @@ const documents = {
     "mutation delOauthClient($id: ID!){\n  deleteOauthClient( id: $id )\n}": types.DelOauthClientDocument,
     "query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){\n  userDevices(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,\n      }\n    }\n  }\n}": types.UserDevicesDocument,
     "mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}": types.DeleteUserDeviceDocument,
+    "query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}": types.UserAppDocument,
 };
 
 /**
@@ -955,6 +956,10 @@ export function gql(source: "query userDevices($first: Int,$orderBy:UserDeviceOr
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}"): (typeof documents)["mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"): (typeof documents)["query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

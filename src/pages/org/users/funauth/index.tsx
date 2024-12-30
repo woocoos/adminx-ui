@@ -4,10 +4,9 @@ import { Button, Empty, message } from "antd"
 import { Link, useAuth, useSearchParams } from "ice"
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { getOrgAppList } from "@/services/adminx/org/app"
 import CheckPolicyView from "@/pages/app/roles/funauth/components/checkPolicyView"
 import Auth from "@/components/auth"
-import { getUserInfo } from "@/services/adminx/user"
+import { getUserAppList, getUserInfo } from "@/services/adminx/user"
 import store from "@/store"
 import { assignOrgUserPolicyView, getOrgUserAssignedPolicyView } from "@/services/adminx/org/user"
 
@@ -42,16 +41,13 @@ export default (props: {
   }, reqCheckedsData = async () => {
     const list: CheckedsType[] = []
     if (userInfo) {
-      const appResult = await getOrgAppList(`${userState.tenantId}`, {
-        current: 1,
-        pageSize: 9999,
-      })
-      if (appResult?.edges) {
-        for await (const edge of appResult?.edges) {
-          if (edge?.node) {
-            const result = await getOrgUserAssignedPolicyView(edge.node.code, userInfo.id)
+      const appResult = await getUserAppList()
+      if (appResult) {
+        for await (const app of appResult) {
+          if (app) {
+            const result = await getOrgUserAssignedPolicyView(app.code, userInfo.id)
             list.push({
-              appInfo: edge.node as App,
+              appInfo: app as App,
               checked: result.map(item => item.orgPolicy?.id as string),
               oldChecked: result.map(item => item.orgPolicy?.id as string)
             })

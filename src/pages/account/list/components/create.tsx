@@ -46,7 +46,7 @@ export default (props: {
     [initValues, setInitValues] = useState<FormUser | UserLoginProfile | null>(null),
     [domain, setDomain] = useState<string>(''),
     [setKind, setSetKind] = useState<UserLoginProfileSetKind>(UserLoginProfileSetKind.Auto),
-    [userState] = store.useModel('user');
+    [userState, userDispatcher] = store.useModel('user');
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -111,6 +111,9 @@ export default (props: {
           if (result?.id) {
             message.success(t('submit_success'));
             setSaveDisabled(true);
+            if (userState.user?.id == result.id) {
+              userDispatcher.saveUser(result as User)
+            }
             props.onClose(true, result as User);
           }
         } else if (props.scene === 'loginProfile') {

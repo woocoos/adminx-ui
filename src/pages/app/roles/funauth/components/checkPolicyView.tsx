@@ -95,7 +95,7 @@ export default (props: {
     reqAppPolicyView()
   }, [props.appInfo])
 
-  return <>
+  return treeData.length != 0 ? <>
     <div className={style.header}>应用：{props.appInfo.name}</div>
     {treeData.length === 0 ? <Empty /> : <></>}
     {
@@ -103,5 +103,5 @@ export default (props: {
         {treeItemRender(item)}
       </Flex>)
     }
-  </>
+  </> : <></>
 }

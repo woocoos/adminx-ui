@@ -732,3 +732,23 @@ export async function delUserDevice(userID: string, deviceID: string) {
   }
   return null
 }
+
+
+const queryUserAppList = gql(/* GraphQL */`query userApp{
+  userApps{
+    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+    refreshTokenValidity,logo,comments,status,createdAt
+  }
+}`);
+
+/**
+ * 用户授权应用列表
+ * @returns
+ */
+export async function getUserAppList() {
+  const result = await query(queryUserAppList, {});
+  if (result.data?.userApps) {
+    return result.data.userApps;
+  }
+  return null;
+}

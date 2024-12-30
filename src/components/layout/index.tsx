@@ -40,6 +40,9 @@ export default () => {
         }
       })
     }
+  }, [userState.user]);
+
+  useEffect(() => {
     monitorKeyChange([
       {
         key: 'tenantId',
