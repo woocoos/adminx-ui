@@ -279,7 +279,7 @@ export const OrgList = (props: {
               let list: OrgTree[] = [];
               if (kind === 'org') {
                 if (props.tenantId) {
-                  const restul = await getOrgPathList(props.tenantId, kind);
+                  const restul = await getOrgPathList(props.tenantId);
                   list = restul.map(item => item) as OrgTree[] || [];
                   table.total = list.length;
                 }
