@@ -348,6 +348,7 @@ export default {
     please_enter_resource_type: 'Please select the resource type',
     please_select_start_at: 'Please select the start time',
     please_select_end_at: 'Please select the end time',
+    please_select_status: 'Please select the status',
     // 添加
     add: 'Append',
     add_resources: 'Add resource',

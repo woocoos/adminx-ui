@@ -3,6 +3,13 @@ import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { AppMenuOrder, AppMenuOrderField, AppMenuWhereInput, CreateAppMenuInput, OrderDirection, TreeAction, UpdateAppMenuInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
+export const EnumAppMenuStatus = {
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
+};
+
 const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: Int,$where: AppMenuWhereInput,$orderBy: AppMenuOrder){
   node(id:$gid){
     ... on App{
@@ -11,7 +18,7 @@ const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: I
         totalCount,
         edges{
           cursor,node{
-            id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
+            id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route,status
             action{ id,name }
           }
         }
@@ -22,14 +29,14 @@ const queryAppMenuList = gql(/* GraphQL */`query appMenuList($gid:GID!,$first: I
 
 const mutationUpdateAppMenu = gql(/* GraphQL */`mutation updateAppMenu($menuId:ID!,$input: UpdateAppMenuInput!){
   updateAppMenu(menuID:$menuId,input:$input){
-    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
+    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route,status
     action{ id,name }
   }
 }`);
 
 const mutationCreateAppMenu = gql(/* GraphQL */`mutation createAppMenu($appId:ID!,$input: [CreateAppMenuInput!]){
   createAppMenus(appID:$appId,input:$input){
-    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route
+    id,appID,parentID,kind,name,actionID,comments,displaySort,icon,route,status
     action{ id,name }
   }
 }`);

@@ -279,41 +279,43 @@ export const saveTreeData = <T extends { children?: T[] }>(
     id: 'id', parentId: 'parentId', sort: 'ASC',
     ...defaultKeys
   }
-  const idx = treeList.findIndex(item => item[keys.id] === updateData[keys.id])
+  const idx = treeList.findIndex(item => item[keys.id] == updateData[keys.id])
   if (idx === -1) {
-    const pIdx = treeList.findIndex(item => item[keys.id] === updateData[keys.parentId])
-    if (updateData[keys.parentId] === treeList[0][keys.parentId]) {
-      // 属于这一层
-      if (keys.sort === 'ASC') {
-        treeList.push(updateData)
-      } else {
-        treeList.unshift(updateData)
+    const pIdx = treeList.findIndex(item => item[keys.id] == updateData[keys.parentId])
+    if (pIdx === -1) {
+      // 继续在children寻找位置
+      for (let i = 0; i < treeList.length; i++) {
+        const childList = treeList[i].children;
+        if (childList) {
+          saveTreeData(childList, updateData, defaultKeys)
+        }
       }
     } else {
-      if (pIdx === -1) {
-        // 继续在children寻找位置
-        for (let i = 0; i < treeList.length; i++) {
-          const childList = treeList[i].children;
-          if (childList) {
-            saveTreeData(childList, updateData, defaultKeys)
-          }
-        }
-      } else {
-        // 父节点在这一层
-        if (treeList[pIdx].children) {
+      // 父节点在这一层
+      if (treeList[pIdx].children) {
+        const pcIdx = treeList[pIdx].children.findIndex(item => item[keys.id] == updateData[keys.id])
+        if (pcIdx === -1) {
           if (keys.sort === 'ASC') {
             treeList[pIdx].children.push(updateData)
           } else {
             treeList[pIdx].children.unshift(updateData)
           }
         } else {
-          treeList[pIdx].children = [updateData]
+          treeList[pIdx].children[pcIdx] = {
+            ...treeList[pIdx].children[pcIdx],
+            ...updateData
+          }
         }
+      } else {
+        treeList[pIdx].children = [updateData]
       }
     }
   } else {
     // 更新
-    treeList[idx] = updateData
+    treeList[idx] = {
+      ...treeList[idx],
+      ...updateData
+    }
   }
 }
 

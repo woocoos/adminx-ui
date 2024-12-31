@@ -3,13 +3,13 @@ import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col }
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, saveTreeData } from '@/util';
-import { createAppMenu, delAppMenu, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
+import { createAppMenu, delAppMenu, EnumAppMenuStatus, getAppMenus, moveAppMenu, updateAppMenu } from '@/services/adminx/app/menu';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth, { checkAuth } from '@/components/auth';
 import { ItemType } from 'antd/es/menu/interface';
 import { useAuth } from 'ice';
-import { App, AppMenu, AppMenuKind, UpdateAppMenuInput } from '@/generated/adminx/graphql';
+import { App, AppMenu, AppMenuKind, AppMenuSimpleStatus, UpdateAppMenuInput } from '@/generated/adminx/graphql';
 import { getAppInfo } from '@/services/adminx/app';
 import { useLeavePrompt } from '@knockout-js/layout';
 
@@ -25,6 +25,7 @@ type ProFormData = {
   kind: AppMenuKind;
   icon?: string;
   route?: string;
+  status?: AppMenuSimpleStatus;
   comments?: string;
 };
 
@@ -221,6 +222,7 @@ export default () => {
               icon: values.icon,
               kind: values.kind,
               name: values.name,
+              status: values.status,
               route: values.kind === AppMenuKind.Menu ? values.route : null,
             }, selectedTree.info));
             if (result?.id) {
@@ -240,6 +242,7 @@ export default () => {
               icon: values.icon,
               kind: values.kind,
               name: values.name,
+              status: values.status,
               parentID: selectedTree.info?.parentID || "0",
               route: values.route,
             });
@@ -262,6 +265,7 @@ export default () => {
             icon: values.icon,
             kind: values.kind,
             name: values.name,
+            status: values.status,
             parentID: selectedTree.info?.id || "0",
             route: values.route,
           });
@@ -283,6 +287,7 @@ export default () => {
             icon: values.icon,
             kind: values.kind,
             name: values.name,
+            status: values.status,
             parentID: selectedTree.info?.parentID || "0",
             route: values.route,
           });
@@ -341,18 +346,20 @@ export default () => {
             </Col>
           </Row>
           <br />
-          <Tree
-            x-if={treeData.length != 0}
-            draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
-            treeData={treeData}
-            onSelect={onTreeSelect}
-            selectedKeys={selectedTree.keys}
-            defaultExpandAll
-            titleRender={customerTitleRender}
-            onDrop={onTreeDrop}
-          />
-          <div x-else>
-            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          <div style={{ height: 'calc(100vh - 300px)', overflow: 'auto' }}>
+            <Tree
+              x-if={treeData.length != 0}
+              draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
+              treeData={treeData}
+              onSelect={onTreeSelect}
+              selectedKeys={selectedTree.keys}
+              defaultExpandAll
+              titleRender={customerTitleRender}
+              onDrop={onTreeDrop}
+            />
+            <div x-else>
+              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+            </div>
           </div>
         </ProCard>
         <ProCard title={actionTitle || `${t('created')}-${t('top_menu')}`} headerBordered>
@@ -410,6 +417,15 @@ export default () => {
                 </> : ''
               )}
             </ProForm.Item>
+            <ProFormSelect
+              name="status"
+              label={t('status')}
+              placeholder={`${t('please_select_status')}`}
+              valueEnum={EnumAppMenuStatus}
+              rules={[
+                { required: true, message: `${t('please_select_status')}` },
+              ]}
+            />
             <ProFormTextArea
               name="comments"
               label={t('remarks')}

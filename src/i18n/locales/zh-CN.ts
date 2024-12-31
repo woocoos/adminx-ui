@@ -347,6 +347,8 @@ export default {
     please_enter_resource_type: '请选择资源类型',
     please_select_start_at: '请选择生效时间',
     please_select_end_at: '请选择过期时间',
+    please_select_status: '请选择状态',
+
     // 添加
     add: '添加',
     add_resources: '添加资源',
