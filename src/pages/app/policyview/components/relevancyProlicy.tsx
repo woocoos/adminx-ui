@@ -5,6 +5,7 @@ import { getAppActionList } from "@/services/adminx/app/action"
 import { getAppPolicyInfo, updateAppPolicy } from "@/services/adminx/app/policy"
 import { ProCard, ProColumns, ProTable } from "@ant-design/pro-components"
 import { Button, message, Modal, Select, Space } from "antd"
+import { Link } from "ice"
 import { Key, useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 
@@ -162,11 +163,11 @@ export default (props: {
       <Space>
         {
           info?.id ? <Auth authKey={['createAppPolicy', "updateAppPolicy"]} keyAndOr="or">
-            <Button
-              type="primary"
-              href={`/app/policys/viewer?id=${info.id}`}
-              target="_blank"
-            >{t('amend_policys_viewer_policy')}</Button>
+            <Link to={`/app/policys/editor?id=${info.id}`} target="_blank">
+              <Button
+                type="primary"
+              >{t('amend_policys_viewer_policy')}</Button>
+            </Link>
           </Auth> : <></>
         }
         {/* <Auth authKey="updateAppPolicy">
