@@ -163,7 +163,7 @@ export default (props: {
       <Space>
         {
           info?.id ? <Auth authKey={['createAppPolicy', "updateAppPolicy"]} keyAndOr="or">
-            <Link to={`/app/policys/editor?id=${info.id}`} target="_blank">
+            <Link to={`/app/policys/viewer?id=${info.id}`} target="_blank">
               <Button
                 type="primary"
               >{t('amend_policys_viewer_policy')}</Button>
