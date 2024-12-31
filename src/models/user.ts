@@ -1,7 +1,7 @@
 import { createModel } from 'ice';
-import { LoginRes } from '@/services/auth';
 import { setItem, removeItem, getItem } from '@/pkg/localStore';
 import { User } from '@/generated/adminx/graphql';
+import { event as starkEvent } from '@ice/stark-data';
 
 type UserState = {
   id: string;
@@ -78,6 +78,7 @@ export default createModel({
         displayName: user.displayName,
         avatar: user.avatar || undefined,
       });
+      starkEvent.emit('set-user', user);
     },
     /**
      * 更新租户id
