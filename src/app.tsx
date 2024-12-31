@@ -110,11 +110,16 @@ export const urqlConfig = defineUrqlConfig([
       authOpts: {
         store: {
           getState: () => {
-            const userState = store.getModelState('user'),
-              token = userState.token ? userState.token : getItem<string>('token') as string,
-              tenantId = userState.tenantId ? userState.tenantId : getItem<string>('tenantId') as string,
-              refreshToken = userState.refreshToken ? userState.refreshToken : getItem<string>('refreshToken') as string;
-
+            const userState = store.getModelState('user')
+            let token = userState.token ?? getItem<string>('token'),
+              tenantId = userState.tenantId ?? getItem<string>('tenantId'),
+              refreshToken = userState.refreshToken ?? getItem<string>('refreshToken');
+            if (isInIcestark()) {
+              const iceStore = starkStore.get('iceStore')
+              token = iceStore?.user?.token
+              tenantId = iceStore?.user?.tenantId
+              refreshToken = iceStore?.user?.refreshToken
+            }
             return {
               token: token,
               tenantId: tenantId,
@@ -122,8 +127,11 @@ export const urqlConfig = defineUrqlConfig([
             }
           },
           setStateToken: (newToken) => {
-            store.dispatch.user.updateToken(newToken)
-            starkEvent.emit('set-token', newToken);
+            if (isInIcestark()) {
+              starkEvent.emit('set-token', newToken);
+            } else {
+              store.dispatch.user.updateToken(newToken)
+            }
           }
         },
         error: (err, errstr) => {
@@ -144,13 +152,17 @@ export const urqlConfig = defineUrqlConfig([
 
 // 权限
 export const authConfig = defineAuthConfig(async (appData) => {
-  const initialAuth = getMenuAppActions(),
-    token = appData?.user?.token ?? getItem<string>('token'),
+  const initialAuth = getMenuAppActions()
+  let token = appData?.user?.token ?? getItem<string>('token'),
     tenantId = appData?.user?.tenantId ?? getItem<string>('tenantId');
-
+  if (isInIcestark()) {
+    const iceStore = starkStore.get('iceStore')
+    token = iceStore?.user?.token
+    tenantId = iceStore?.user?.tenantId
+  }
   // 判断路由权限
   if (!['/login', '/login/retrievePassword'].includes(location.pathname)) {
-    if (token) {
+    if (token && tenantId) {
       const ups = await userPermissions(ICE_APP_CODE, {
         Authorization: getRequestHeaderAuthorization(token, ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined),
         'X-Tenant-ID': tenantId,
