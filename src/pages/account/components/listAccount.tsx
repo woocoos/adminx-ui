@@ -82,7 +82,7 @@ export const UserList = (props: {
         width: 100,
         valueEnum: EnumUserStatus,
       },
-      { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', sorter: true },
+      { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', search: false, sorter: true },
     ],
     // 弹出层处理
     [modal, setModal] = useState<{
