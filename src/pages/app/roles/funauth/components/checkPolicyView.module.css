@@ -8,6 +8,10 @@
   border-bottom: 1px solid #ddd;
 }
 
+.dir :global(.ant-checkbox-wrapper>span) {
+  align-self: center
+}
+
 .dir {
   padding         : 10px;
   min-width       : 200px;

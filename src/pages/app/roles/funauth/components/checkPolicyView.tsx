@@ -66,7 +66,7 @@ export default (props: {
     if (data.children?.length) {
       const kind = data.children[0].node?.kind
       if (kind === AppPolicyViewKind.Dir) {
-        list.push(...data.children.map(item => treeItemRender(item)))
+        list.push(<Flex flex={1} vertical>{...data.children.map(item => treeItemRender(item))}</Flex>)
       } else {
         list.push(<Flex key={`child${data.key}`} className={style.policy} flex={1}>
           <Space>
@@ -88,7 +88,9 @@ export default (props: {
         </Flex>)
       }
     }
-    return list
+    return <Flex>
+      {list}
+    </Flex>
   }
 
   useEffect(() => {
