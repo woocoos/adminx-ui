@@ -1,7 +1,7 @@
 import store from '@/store';
 import { useEffect, useState } from 'react';
 import menuList from './menu.json';
-import { history } from 'ice';
+import { useNavigate } from 'ice';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { Outlet, useLocation } from '@ice/runtime';
 import i18n from '@/i18n';
@@ -21,6 +21,7 @@ const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
 
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
+    navigate = useNavigate(),
     [appState, appDispatcher] = store.useModel('app'),
     [open, setOpen] = useState(false),
     [checkLeave] = useLeavePrompt(),
@@ -88,7 +89,7 @@ export default () => {
           if (isOpen) {
             window.open(await urlSpm(url));
           } else {
-            history?.push(await urlSpm(url));
+            navigate(await urlSpm(url));
           }
         }
       }}
@@ -139,7 +140,7 @@ export default () => {
                 if (url.toLowerCase().startsWith("http")) {
                   window.location.href = url;
                 } else {
-                  history?.push(url);
+                  navigate(url);
                 }
               }
             }

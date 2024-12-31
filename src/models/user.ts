@@ -63,7 +63,6 @@ export default createModel({
   effects: () => ({
     /**
      * 退出
-     * @param isHistory
      */
     async logout() {
       this.updateToken('');

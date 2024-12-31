@@ -8,7 +8,7 @@ import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUs
 import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
-import { Link, history, useSearchParams } from '@ice/runtime';
+import { Link, useNavigate, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
 import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGender } from '@/generated/adminx/graphql';
@@ -21,6 +21,7 @@ export default (props: {
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    navigate = useNavigate(),
     [searchParams] = useSearchParams(),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
@@ -139,7 +140,7 @@ export default (props: {
             { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
             {
               title: <a onClick={() => {
-                history?.go(-1);
+                navigate(-1);
               }}
               >{t('user_manage')}</a>,
             },
