@@ -66,8 +66,13 @@ export default (props: {
     if (data.children?.length) {
       const kind = data.children[0].node?.kind
       if (kind === AppPolicyViewKind.Dir) {
-        list.push(<Flex flex={1} vertical>{...data.children.map(item => treeItemRender(item))}</Flex>)
+        list.push(<Flex key={`dir-list${data.key}`} flex={1} vertical>{...data.children.map(item => treeItemRender(item))}</Flex>)
       } else {
+        // 检测id不存的情况 后续遇到问题可以用这个方法定位
+        // const noIds = data.children.filter(child => !child.node?.orgPolicy?.id)
+        // if (noIds.length) {
+        //   console.log(noIds)
+        // }
         list.push(<Flex key={`child${data.key}`} className={style.policy} flex={1}>
           <Space>
             <Checkbox.Group
@@ -88,7 +93,7 @@ export default (props: {
         </Flex>)
       }
     }
-    return <Flex>
+    return <Flex key={`wrap${data.key}`}>
       {list}
     </Flex>
   }
