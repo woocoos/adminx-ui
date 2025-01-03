@@ -1,5 +1,5 @@
 import '@/assets/styles/index.css';
-import { getItem, removeItem } from '@/pkg/localStore';
+import { getItem, removeItem, setItem } from '@/pkg/localStore';
 import store from '@/store';
 import { defineAuthConfig } from '@ice/plugin-auth/esm/types';
 import { defineChildConfig } from '@ice/plugin-icestark/types';
@@ -25,6 +25,9 @@ const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_HTTP_SIGN = process.env.ICE_HTTP_SIGN ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '',
+  NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_DEV_TOKEN = process.env.ICE_DEV_TOKEN ?? '',
+  ICE_DEV_TID = process.env.ICE_DEV_TID ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '';
 
 setLibraryName('adminx-ui')
@@ -60,6 +63,10 @@ export const dataLoader = defineDataLoader(async () => {
     removeItem('refreshToken');
   }
   document.cookie = `${sign}; path=/`;
+  if (NODE_ENV === 'development' && ICE_DEV_TOKEN && ICE_DEV_TID) {
+    setItem('token', ICE_DEV_TOKEN)
+    setItem('tenantId', ICE_DEV_TID)
+  }
   await parseSpm();
   let locale = getItem<string>('locale'),
     token = getItem<string>('token'),
