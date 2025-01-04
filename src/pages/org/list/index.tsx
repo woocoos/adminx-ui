@@ -31,10 +31,10 @@ export const OrgList = (props: {
     [countryList, setCountryList] = useState<Country[]>([]),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
-      { title: t('name'), dataIndex: 'name', width: 120 },
-      { title: t('code'), dataIndex: 'code', width: 120 },
+      { title: t('name'), dataIndex: 'name', },
+      { title: t('code'), dataIndex: 'code', width: 200 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
-      { title: t('domain'), dataIndex: 'domain', width: 120, search: false },
+      { title: t('domain'), dataIndex: 'domain', width: 200, search: false },
       {
         title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false,
         render: (text) => {
@@ -44,13 +44,12 @@ export const OrgList = (props: {
       {
         title: t('manage_account'),
         dataIndex: 'owner',
-        width: 120,
+        width: 200,
         search: false,
         render: (text, record) => {
           return <div>{record?.owner?.displayName || '-'}</div>;
         },
       },
-      { title: t('description'), dataIndex: 'profile', width: 120, search: false },
     ],
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     [dataSource, setDataSource] = useState<OrgTree[]>([]),
