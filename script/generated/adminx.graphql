@@ -5130,11 +5130,9 @@ type Query {
   """用户组"""
   orgGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """权限策略引用列表"""
-  orgPolicyReferences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, policyID: ID!, where: PermissionWhereInput): PermissionConnection!
+  orgPolicyReferences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, orgID: ID, policyID: ID!, where: PermissionWhereInput): PermissionConnection!
   """登录用户策略视图"""
-  orgPolicyView(appCode: String!, orgID: ID): [AppPolicyView!]!
-  """组织策略视图对应的orgPolicy"""
-  orgPolicyViewOrgPolicies(appCode: String!, orgID: ID): [AppPolicyViewOrgPolicy!]!
+  orgPolicyView(appCode: String!, orgID: ID): [AppPolicyViewOrgPolicy!]!
   """组织策略视图角色/用户组选中项"""
   orgPolicyViewRoleAssigned(appCode: String!, orgID: ID, orgRoleID: ID!): [AppPolicyView!]!
   """组织策略视图用户选择项"""
@@ -5147,6 +5145,17 @@ type Query {
   orgRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """获取组织用户偏好"""
   orgUserPreference: OrgUserPreference
+  """获取组织用户"""
+  orgUsers(
+    after: Cursor
+    before: Cursor
+    first: Int
+    last: Int
+    orderBy: UserOrder
+    """组织ID或者部门ID"""
+    orgID: ID!
+    where: UserWhereInput
+  ): UserConnection!
   organizations(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -5234,9 +5243,11 @@ type Query {
     where: UserDeviceWhereInput
   ): UserDeviceConnection!
   """用户继承用户组的权限策略"""
-  userExtendGroupPolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, userID: ID!, where: PermissionWhereInput): PermissionConnection!
+  userExtendGroupPolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, orgID: ID, userID: ID!, where: PermissionWhereInput): PermissionConnection!
+  """用户继承角色的权限策略"""
+  userExtendRolePolicies(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, orgID: ID, userID: ID!, where: PermissionWhereInput): PermissionConnection!
   """用户加入的用户组"""
-  userGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, userID: ID!, where: OrgRoleWhereInput): OrgRoleConnection!
+  userGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, orgID: ID, userID: ID!, where: OrgRoleWhereInput): OrgRoleConnection!
   """成员列表"""
   userMembers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户菜单"""
@@ -5245,6 +5256,8 @@ type Query {
   userPasswordPolicy: UserPasswordPolicy
   """获取用户所有权限"""
   userPermissions(where: AppActionWhereInput): [AppAction!]!
+  """用户加入的角色"""
+  userRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, orgID: ID, userID: ID!, where: OrgRoleWhereInput): OrgRoleConnection!
   """用户加入的root组织"""
   userRootOrgs: [Org!]!
   users(

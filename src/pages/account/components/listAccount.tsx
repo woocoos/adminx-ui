@@ -207,7 +207,20 @@ export const UserList = (props: {
               <a><EllipsisOutlined /></a>
             </Dropdown> : ''
           }
-
+        </Space> : props.scene === 'orgMember' ? <Space>
+          <Link key="editor" to={`/org/members/viewer?id=${record.id}&${orgIdParameter}`}>
+            {t('detail')}
+          </Link>
+          {
+            items.length ? <Dropdown
+              trigger={['click']}
+              menu={{
+                items,
+              }}
+            >
+              <a><EllipsisOutlined /></a>
+            </Dropdown> : ''
+          }
         </Space> : <Space>
           <Link key="editor" to={`/account/viewer?id=${record.id}`}>
             {t('detail')}
@@ -222,7 +235,6 @@ export const UserList = (props: {
               <a><EllipsisOutlined /></a>
             </Dropdown> : ''
           }
-
         </Space>;
       },
     },

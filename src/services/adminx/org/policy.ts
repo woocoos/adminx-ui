@@ -288,7 +288,7 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
 
 
 const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: String!,$orgID: ID){
-  orgPolicyViewOrgPolicies(appCode: $appCode,orgID: $orgID){
+  orgPolicyView(appCode: $appCode,orgID: $orgID){
     appPolicyView{
       id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,
       policyID
@@ -310,8 +310,8 @@ export async function getOrgPolicyView(appCode: string, orgID?: string) {
       orgID,
     });
 
-  if (result.data?.orgPolicyViewOrgPolicies) {
-    return result.data.orgPolicyViewOrgPolicies;
+  if (result.data?.orgPolicyView) {
+    return result.data.orgPolicyView;
   }
   return [];
 }

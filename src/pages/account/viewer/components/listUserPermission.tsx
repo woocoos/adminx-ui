@@ -10,7 +10,7 @@ import { getUserJoinGroupList } from '@/services/adminx/org/role';
 import Auth from '@/components/auth';
 import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource } from '@/util';
-import { Link } from 'ice';
+import { Link, useSearchParams } from 'ice';
 
 
 export default (props: {
@@ -20,6 +20,7 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
+    [searchParams] = useSearchParams(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<Permission>[] = [
@@ -189,9 +190,9 @@ export default (props: {
         dataSource={dataSource}
         request={async (params) => {
           const table = { data: [] as Permission[], success: true, total: 0 },
+            orgId = searchParams.get('org_id') ?? userState.tenantId,
             where: PermissionWhereInput = {};
           where.principalKind = props.principalKind;
-          where.orgID = userState.tenantId;
           if (params.orgRoleId) {
             where.hasRoleWith = [{
               id: params.orgRoleId || undefined,
@@ -206,11 +207,15 @@ export default (props: {
             }];
           }
 
+          if (!props.isExtendGroup) {
+            where.orgID = orgId
+          }
+
           const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, {
             current: params.current,
             pageSize: params.pageSize,
             where,
-          }) : await getUserPermissionList(props.userInfo.id, {
+          }, orgId) : await getUserPermissionList(props.userInfo.id, {
             current: params.current,
             pageSize: params.pageSize,
             where,

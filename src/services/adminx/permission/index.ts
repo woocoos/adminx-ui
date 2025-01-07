@@ -16,8 +16,8 @@ export const EnumPermissionStatus = {
 };
 
 
-const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){
+const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgID:ID,$orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  orgPolicyReferences(policyID:$orgPolicyId,orgID: $orgID, first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -69,8 +69,8 @@ const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: G
   }
 }`);
 
-const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$orgID:ID,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  userExtendGroupPolicies(userID:$userId,orgID:$orgID,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -133,9 +133,10 @@ export async function getOrgPolicyReferenceList(
     pageSize?: number;
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
-  }) {
+  }, orgID?: string) {
   const result = await paging(queryOrgPolicyReferences, {
     orgPolicyId,
+    orgID,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
@@ -223,9 +224,11 @@ export async function getUserExtendGroupPolicyList(
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
   },
+  orgID?: string,
 ) {
   const result = await paging(queryUserExtendGroupPolicieList, {
     userId: userId,
+    orgID,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {

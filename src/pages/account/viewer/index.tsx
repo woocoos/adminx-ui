@@ -17,6 +17,7 @@ import { parseStorageUrl } from '@knockout-js/api';
 
 export default (props: {
   isFromOrg?: boolean;
+  isFromOrgMember?: boolean;
   isFromSystem?: boolean;
 }) => {
   const { token } = useToken(),
@@ -148,6 +149,10 @@ export default (props: {
           ] : props.isFromOrg ? [
             { title: t('org_cooperation') },
             { title: <Link to={'/org/users'}>{t('user_manage')}</Link> },
+            { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
+          ] : props.isFromOrgMember ? [
+            { title: t('org_cooperation') },
+            { title: <Link to={'/org/members'}>{t('member_manage')}</Link> },
             { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
           ] : [
             { title: t('system_conf') },

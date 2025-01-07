@@ -9,6 +9,7 @@ import DrawerRole from '@/pages/org/components/drawerRole';
 import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
 import { delDataSource } from '@/util';
+import { useSearchParams } from 'ice';
 
 
 export default (props: {
@@ -16,6 +17,7 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
+    [searchParams] = useSearchParams(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<OrgRole>[] = [
@@ -118,9 +120,13 @@ export default (props: {
         dataSource={dataSource}
         request={async (params) => {
           const table = { data: [] as OrgRole[], success: true, total: 0 },
+            orgId = searchParams.get('org_id'),
             where: OrgRoleWhereInput = {};
           where.nameContains = params.nameContains;
           where.createdAt = params.createdAt;
+          if (orgId) {
+            where.orgID = orgId;
+          }
           const result = await getUserJoinGroupList(props.userInfo.id, {
             current: params.current,
             pageSize: params.pageSize,
