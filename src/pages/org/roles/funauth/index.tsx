@@ -50,11 +50,11 @@ export default (props: {
       if (appResult?.edges) {
         for await (const edge of appResult?.edges) {
           if (edge?.node) {
-            const result = await getOrgRoleAssignedPolicyView(edge.node.code, roleInfo.id)
+            const result = await getOrgRoleAssignedPolicyView(edge.node.code, roleInfo.id, roleInfo.orgID as string)
             list.push({
               appInfo: edge.node as App,
-              checked: result.map(item => item.orgPolicy?.id as string),
-              oldChecked: result.map(item => item.orgPolicy?.id as string)
+              checked: result.map(item => item.policyID as string),
+              oldChecked: result.map(item => item.policyID as string)
             })
           }
         }
@@ -138,7 +138,7 @@ export default (props: {
         {dataSource.length ? dataSource.map(item => (
           <CheckPolicyView
             key={item.appInfo.id}
-            isOrg
+            orgId={roleInfo.orgID as string}
             disabled={roleInfo.isAppRole}
             appInfo={item.appInfo}
             value={item.checked}

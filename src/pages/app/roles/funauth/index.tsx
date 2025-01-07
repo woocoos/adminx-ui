@@ -26,7 +26,7 @@ export default () => {
     if (roleId) {
       const result = await getAppRoleInfo(roleId);
       if (result?.id) {
-        const assignedPolicyView = await getAppRoleAssignedPolicyView(`${result.app?.code}`, result.id)
+        const assignedPolicyView = await getAppRoleAssignedPolicyView(result.id)
         setChecked(assignedPolicyView.map(item => item.policyID as string))
         setOldChecked(assignedPolicyView.map(item => item.policyID as string))
         setRoleInfo(result as AppRole);

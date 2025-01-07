@@ -287,10 +287,13 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
 }
 
 
-const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: String!){
-  orgPolicyView(appCode: $appCode){
-    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,
-    policyID,orgPolicy{id}
+const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: String!,$orgID: ID){
+  orgPolicyViewOrgPolicies(appCode: $appCode,orgID: $orgID){
+    appPolicyView{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,
+      policyID
+    }
+    orgPolicy{id}
   }
 }`);
 
@@ -299,15 +302,16 @@ const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: Strin
  * @param appCode
  * @returns
  */
-export async function getOrgPolicyView(appCode: string) {
+export async function getOrgPolicyView(appCode: string, orgID?: string) {
   const
     result = await query(
       queryOrgPolicyView, {
-      appCode
+      appCode,
+      orgID,
     });
 
-  if (result.data?.orgPolicyView) {
-    return result.data.orgPolicyView;
+  if (result.data?.orgPolicyViewOrgPolicies) {
+    return result.data.orgPolicyViewOrgPolicies;
   }
   return [];
 }

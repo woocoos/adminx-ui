@@ -305,10 +305,9 @@ export async function changeOrgUserType(userId: string, userType: OrgUserUserTyp
 }
 
 
-const queryOrgUserAssigned = gql(/* GraphQL */`query OrgUserPolicyViewAssigned($appCode: String!,$userID:ID!){
-  orgPolicyView(appCode:$appCode){
-    id,name,kind,orgPolicy{id}
-    orgUserAssigned(userID: $userID)
+const queryOrgUserAssigned = gql(/* GraphQL */`query orgPolicyViewUserAssigned($appCode: String!,$userID:ID!,$orgID:ID!){
+  orgPolicyViewUserAssigned(appCode:$appCode,orgID:$orgID,userID: $userID){
+    id,name,kind,policyID
   }
 }`);
 
@@ -318,16 +317,17 @@ const queryOrgUserAssigned = gql(/* GraphQL */`query OrgUserPolicyViewAssigned($
  * @param userID
  * @returns
  */
-export async function getOrgUserAssignedPolicyView(appCode: string, userID: string) {
+export async function getOrgUserAssignedPolicyView(appCode: string, userID: string, orgID: string) {
   const
     result = await query(
       queryOrgUserAssigned, {
       appCode,
       userID,
+      orgID,
     });
 
-  if (result.data?.orgPolicyView) {
-    return result.data.orgPolicyView.filter(item => item.orgUserAssigned);
+  if (result.data?.orgPolicyViewUserAssigned) {
+    return result.data.orgPolicyViewUserAssigned;
   }
   return [];
 }

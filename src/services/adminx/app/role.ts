@@ -268,10 +268,9 @@ export async function assignAppRolePolicyView(appID: string, roleID: string, add
 }
 
 
-const queryAppRoleAssigned = gql(/* GraphQL */`query AppRolePolicyViewAssigned($appCode: String!,$appRoleID:ID!){
-  appPolicyView(appCode:$appCode){
+const queryAppRoleAssigned = gql(/* GraphQL */`query appPolicyViewRoleAssigned($appRoleID:ID!){
+  appPolicyViewRoleAssigned(appRoleID:$appRoleID){
     id,name,kind,policyID
-    appRoleAssigned(appRoleID: $appRoleID)
   }
 }`);
 
@@ -281,16 +280,15 @@ const queryAppRoleAssigned = gql(/* GraphQL */`query AppRolePolicyViewAssigned($
  * @param appRoleID
  * @returns
  */
-export async function getAppRoleAssignedPolicyView(appCode: string, appRoleID: string) {
+export async function getAppRoleAssignedPolicyView(appRoleID: string) {
   const
     result = await query(
       queryAppRoleAssigned, {
-      appCode,
       appRoleID,
     });
 
-  if (result.data?.appPolicyView) {
-    return result.data.appPolicyView.filter(item => item.appRoleAssigned);
+  if (result.data?.appPolicyViewRoleAssigned) {
+    return result.data.appPolicyViewRoleAssigned;
   }
   return [];
 }

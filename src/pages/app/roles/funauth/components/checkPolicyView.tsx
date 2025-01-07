@@ -6,30 +6,47 @@ import { ReactNode, useEffect, useState } from "react"
 import style from "./checkPolicyView.module.css"
 import { getOrgPolicyView } from "@/services/adminx/org/policy"
 
+type OrgAppPolicyViewOrAppPolicyView = AppPolicyView & {
+  orgPolicy?: { id?: string }
+}
+
 export default (props: {
   appInfo: App
-  isOrg?: boolean
+  orgId?: string
   value?: string[]
   disabled?: boolean
   onChange?: (value: string[]) => void
 }) => {
-  const [treeData, setTreeData] = useState<TreeDataState<AppPolicyView>[]>([])
+  const [treeData, setTreeData] = useState<TreeDataState<OrgAppPolicyViewOrAppPolicyView>[]>([])
 
   const reqAppPolicyView = async () => {
-    const result = props.isOrg ? await getOrgPolicyView(props.appInfo.code) : await getAppPolicyView(props.appInfo.code)
+    let result: OrgAppPolicyViewOrAppPolicyView[] = []
+    if (props.orgId) {
+      const opvResult = await getOrgPolicyView(props.appInfo.code, props.orgId)
+      result = opvResult.map(item => {
+        return {
+          ...item.appPolicyView as AppPolicyView,
+          orgPolicy: {
+            id: item.orgPolicy?.id
+          },
+        }
+      })
+    } else {
+      result = await getAppPolicyView(props.appInfo.code) as AppPolicyView[]
+    }
     setTreeData(
       formatTreeData(
         result.map(item => ({
           key: item.id,
           title: item.name,
           parentId: item.parentID,
-          node: item as AppPolicyView,
+          node: item,
         })),
       ),
     );
-  }, getRealkey = (data: TreeDataState<AppPolicyView>) => {
-    return props.isOrg ? (data.node?.orgPolicy?.id as string) : (data.node?.policyID as string)
-  }, checkboxDirChangeKeys = (data: TreeDataState<AppPolicyView>) => {
+  }, getRealkey = (data: TreeDataState<OrgAppPolicyViewOrAppPolicyView>) => {
+    return props.orgId ? (data.node?.orgPolicy?.id as string) : (data.node?.policyID as string)
+  }, checkboxDirChangeKeys = (data: TreeDataState<OrgAppPolicyViewOrAppPolicyView>) => {
     const keys: string[] = []
     if (data.node?.kind === AppPolicyViewKind.Policy) {
       keys.push(getRealkey(data))
@@ -38,7 +55,7 @@ export default (props: {
       keys.push(...checkboxDirChangeKeys(item))
     })
     return keys
-  }, treeItemRender = (data: TreeDataState<AppPolicyView>) => {
+  }, treeItemRender = (data: TreeDataState<OrgAppPolicyViewOrAppPolicyView>) => {
     const list: ReactNode[] = []
     if (data.node?.kind === AppPolicyViewKind.Dir) {
       const keys = checkboxDirChangeKeys(data),

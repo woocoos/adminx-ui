@@ -20,10 +20,11 @@ export default (props: {
   isFromMember?: boolean;
 }) => {
   const { token } = useToken(),
-    [userState] = store.useModel('user'),
     [auth] = useAuth(),
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
+    [userState] = store.useModel('user'),
+    [orgId] = useState(searchParams.get('org_id') ?? userState.tenantId),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [dataSource, setDataSource] = useState<CheckedsType[]>([]),
@@ -40,16 +41,17 @@ export default (props: {
     return null
   }, reqCheckedsData = async () => {
     const list: CheckedsType[] = []
+
     if (userInfo) {
       const appResult = await getUserAppList()
       if (appResult) {
         for await (const app of appResult) {
           if (app) {
-            const result = await getOrgUserAssignedPolicyView(app.code, userInfo.id)
+            const result = await getOrgUserAssignedPolicyView(app.code, userInfo.id, orgId)
             list.push({
               appInfo: app as App,
-              checked: result.map(item => item.orgPolicy?.id as string),
-              oldChecked: result.map(item => item.orgPolicy?.id as string)
+              checked: result.map(item => item.policyID as string),
+              oldChecked: result.map(item => item.policyID as string)
             })
           }
         }
@@ -132,7 +134,7 @@ export default (props: {
         {dataSource.length ? dataSource.map(item => (
           <CheckPolicyView
             key={item.appInfo.id}
-            isOrg
+            orgId={orgId}
             appInfo={item.appInfo}
             value={item.checked}
             onChange={(value) => {

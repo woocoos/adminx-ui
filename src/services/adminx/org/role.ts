@@ -450,10 +450,9 @@ export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
 
 
 
-const queryOrgRoleAssigned = gql(/* GraphQL */`query OrgRolePolicyViewAssigned($appCode: String!,$orgRoleID:ID!){
-  orgPolicyView(appCode:$appCode){
-    id,name,kind,orgPolicy{id}
-    orgRoleAssigned(orgRoleID: $orgRoleID)
+const queryOrgRoleAssigned = gql(/* GraphQL */`query orgPolicyViewRoleAssigned($appCode: String!,$orgRoleID:ID!,$orgID: ID){
+  orgPolicyViewRoleAssigned(appCode:$appCode,orgID:$orgID,orgRoleID:$orgRoleID){
+    id,name,kind,policyID
   }
 }`);
 
@@ -463,16 +462,17 @@ const queryOrgRoleAssigned = gql(/* GraphQL */`query OrgRolePolicyViewAssigned($
  * @param orgRoleID
  * @returns
  */
-export async function getOrgRoleAssignedPolicyView(appCode: string, orgRoleID: string) {
+export async function getOrgRoleAssignedPolicyView(appCode: string, orgRoleID: string, orgID: string) {
   const
     result = await query(
       queryOrgRoleAssigned, {
       appCode,
       orgRoleID,
+      orgID,
     });
 
-  if (result.data?.orgPolicyView) {
-    return result.data.orgPolicyView.filter(item => item.orgRoleAssigned);
+  if (result.data?.orgPolicyViewRoleAssigned) {
+    return result.data.orgPolicyViewRoleAssigned;
   }
   return [];
 }
