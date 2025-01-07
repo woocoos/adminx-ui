@@ -23,7 +23,7 @@
     "icon": "icon-icon_zuzhi2",
     "children": [
       {
-        "name": "部门管理",
+        "name": "组织管理",
         "path": "/org/departments"
       },
       {

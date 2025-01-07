@@ -110,18 +110,20 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <ProFormText
-        name="name"
-        label={t('name')}
-        rules={[
-          { required: true, message: `${t('please_enter_name')}` },
-        ]}
-      />
-      <ProFormTextArea
-        name="comments"
-        label={t('remarks')}
-        placeholder={`${t('please_enter_remarks')}`}
-      />
+      <div>
+        <ProFormText
+          name="name"
+          label={t('name')}
+          rules={[
+            { required: true, message: `${t('please_enter_name')}` },
+          ]}
+        />
+        <ProFormTextArea
+          name="comments"
+          label={t('remarks')}
+          placeholder={`${t('please_enter_remarks')}`}
+        />
+      </div>
     </DrawerForm>
   );
 };

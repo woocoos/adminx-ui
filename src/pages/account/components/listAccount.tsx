@@ -115,15 +115,15 @@ export const UserList = (props: {
       search: false,
       width: 100,
       render: (text, record) => {
-        const items: ItemType[] = [];
+        const items: ItemType[] = [], orgIdParameter = props.orgId ? `org_id=${props.orgId}` : '';
         if (props.scene === 'orgUser') {
           items.push(
-            { key: 'fun_authority', label: <Link to={`/org/users/funauth?id=${record.id}`} >{t('fun_authority')}</Link> },
+            { key: 'fun_authority', label: <Link to={`/org/users/funauth?id=${record.id}&${orgIdParameter}`} >{t('fun_authority')}</Link> },
           );
         }
         if (props.scene === 'orgMember') {
           items.push(
-            { key: 'fun_authority', label: <Link to={`/org/members/funauth?id=${record.id}`} >{t('fun_authority')}</Link> },
+            { key: 'fun_authority', label: <Link to={`/org/members/funauth?id=${record.id}&${orgIdParameter}`} >{t('fun_authority')}</Link> },
           );
         }
         if (props.scene === 'orgUser' && props.orgInfo?.kind === 'root') {
@@ -172,7 +172,7 @@ export const UserList = (props: {
         if (props.scene === 'orgUser') {
           if (checkAuth('userDevices', auth)) {
             items.push(
-              { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}`} >{t('user_devices')}</Link> },
+              { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}&${orgIdParameter}`} >{t('user_devices')}</Link> },
             );
           }
           if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
@@ -194,7 +194,7 @@ export const UserList = (props: {
             {record.isAllowRevokeRole ? <a onClick={() => onRemoveRole(record)}>{t('remove')}</a> : ''}
           </Auth>
         </Space> : props.scene === 'orgUser' ? <Space>
-          <Link key="editor" to={`${props.isFromSystem ? '/system' : ''}/org/users/viewer?id=${record.id}`}>
+          <Link key="editor" to={`${props.isFromSystem ? '/system' : ''}/org/users/viewer?id=${record.id}&${orgIdParameter}`}>
             {t('detail')}
           </Link>
           {

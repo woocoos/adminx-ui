@@ -24,7 +24,7 @@ export default (props: {
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
     [userState] = store.useModel('user'),
-    [orgId] = useState(searchParams.get('org_id') ?? userState.tenantId),
+    [orgId] = useState(searchParams.get('org_id') ? searchParams.get('org_id') ?? '' : userState.tenantId),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [dataSource, setDataSource] = useState<CheckedsType[]>([]),

@@ -18,6 +18,7 @@ import { delDataSource, saveDataSource } from '@/util';
 
 export const PageOrgRoleList = (props: {
   isFromSystem?: boolean;
+  isFromOrg?: boolean;
   kind?: OrgRoleKind;
   orgId: string;
   title?: string;
@@ -168,6 +169,10 @@ export const PageOrgRoleList = (props: {
             items: props.isFromSystem ? [
               { title: t('system_conf') },
               { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+              { title: kind == 'role' ? t('role') : t('user_group') },
+            ] : props.isFromOrg ? [
+              { title: t('org_cooperation') },
+              { title: <Link to={'/org/departments'}>{t('org_manage')}</Link> },
               { title: kind == 'role' ? t('role') : t('user_group') },
             ] : [
               { title: t('org_cooperation') },

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
-import { TreeEditorAction, delTreeData, formatTreeData, saveDataSource } from '@/util';
+import { TreeEditorAction, delTreeData, formatTreeData, saveTreeData } from '@/util';
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
@@ -99,7 +99,7 @@ export const OrgList = (props: {
           });
         }
         const items: ItemType[] = [];
-        if (kind == 'root') {
+        if (kind == OrgKind.Root) {
           items.push(
             { key: 'policy', label: <Link to={`/system/org/policys?id=${record.id}`}>{t('policy')}</Link> },
             { key: 'app', label: <Link to={`/system/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
@@ -118,10 +118,18 @@ export const OrgList = (props: {
               { key: 'delete', label: <a onClick={() => onDelOrg(record)}>{t('delete')}</a> },
             );
           }
+          if (record.kind === OrgKind.Root) {
+            items.push(
+              { key: 'policy', label: <Link to={`/org/departments/policys?id=${record.id}`}>{t('policy')}</Link> },
+              { key: 'app', label: <Link to={`/org/departments/apps?id=${record.id}`}>{t('auth_app')}</Link> },
+              { key: 'orgUserGroups', label: <Link to={`/org/departments/groups?id=${record.id}`}>{t('user_group')}</Link> },
+              { key: 'orgRoles', label: <Link to={`/org/departments/roles?id=${record.id}`}>{t('role')}</Link> },
+            );
+          }
         }
 
         return (<Space>
-          {record.kind === kind ? <>
+          {kind === OrgKind.Org && record.parentID != '0' ? <>
             <Auth authKey="updateOrganization">
               <a key="editor" onClick={() => editorAction(record, 'editor')}>
                 {t('edit')}
@@ -132,6 +140,9 @@ export const OrgList = (props: {
             kind == 'root' ? <>
               <Link key="userGroup" to={`/system/org/groups?id=${record.id}`}>
                 {t('user_group')}
+              </Link>
+              <Link key="role" to={`/system/org/roles?id=${record.id}`}>
+                {t('role')}
               </Link>
               {items.length ? <Dropdown
                 trigger={['click']}
@@ -211,7 +222,7 @@ export const OrgList = (props: {
     <>
       <PageContainer
         header={{
-          title: kind == 'org' ? t('department_manage') : t('org_manage'),
+          title: <div>{t('org_manage')}</div>,
           style: { background: token.colorBgContainer },
           breadcrumb: {
             items: props.isFromSystem ? kind == 'org' ?
@@ -224,7 +235,7 @@ export const OrgList = (props: {
                 { title: t('org_manage') },
               ] : [
               { title: t('org_cooperation') },
-              { title: kind == 'org' ? t('department_manage') : t('org_manage') },
+              { title: t('org_manage') },
             ],
           },
         }}
@@ -234,7 +245,7 @@ export const OrgList = (props: {
           rowKey={'id'}
           search={false}
           toolbar={{
-            title: kind === 'org' ? t('department_manage') : t('org_manage'),
+            title: t('org_manage'),
             actions: kind == 'org' ? [] : [
               <Auth authKey={kind === 'root' ? 'createRoot' : 'createOrganization'}>
                 <Button
@@ -313,7 +324,7 @@ export const OrgList = (props: {
           kind={kind}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
-              setDataSource(saveDataSource(dataSource, newInfo as OrgTree))
+              proTableRef.current?.reload()
             }
             setModal({ open: false, title: '', id: '', scene: 'editor' });
           }}

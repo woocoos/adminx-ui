@@ -14,6 +14,7 @@ import { delDataSource } from '@/util';
 
 export const PageOrgPolicys = (props: {
   isFromSystem?: boolean;
+  isFromOrg?: boolean;
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
@@ -131,10 +132,15 @@ export const PageOrgPolicys = (props: {
             { title: t('system_conf') },
             { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
             { title: t('policy') },
-          ] : [
-            { title: t('org_cooperation') },
-            { title: t('policy') },
-          ],
+          ] :
+            props.isFromOrg ? [
+              { title: t('org_cooperation') },
+              { title: <Link to={'/org/departments'}>{t('org_manage')}</Link> },
+              { title: t('policy') },
+            ] : [
+              { title: t('org_cooperation') },
+              { title: t('policy') },
+            ],
         },
         children: <Alert
           showIcon

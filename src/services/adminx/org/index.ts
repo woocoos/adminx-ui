@@ -11,8 +11,8 @@ export const EnumOrgStatus = {
   processing: { text: 'processing', status: 'warning' },
 },
   EnumOrgKind = {
-    root: { text: '组织' },
-    org: { text: '部门' },
+    [OrgKind.Root]: { text: '组织' },
+    [OrgKind.Org]: { text: '部门' },
   };
 
 const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){

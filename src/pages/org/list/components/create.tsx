@@ -1,6 +1,6 @@
 import { Org, OrgKind, User, UserUserType } from '@/generated/adminx/graphql';
 import InputAccount from '@/pages/account/components/inputAccount';
-import { createOrgInfo, getOrgInfo, updateOrgInfo } from '@/services/adminx/org';
+import { createOrgInfo, EnumOrgKind, getOrgInfo, updateOrgInfo } from '@/services/adminx/org';
 import { TreeEditorAction, formatTreeData, isValidDomain, updateFormat } from '@/util';
 import { DrawerForm, ProFormSelect, ProFormText, ProFormTextArea, ProFormTreeSelect } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
@@ -10,6 +10,8 @@ import { getCacheCountryList } from '@/services/adminx/country';
 import { getCacheCurrencyList } from '@/services/adminx/currency';
 import { getDictItems } from '@knockout-js/api';
 import StringsInput from './stringsInput';
+import { useForm } from 'antd/es/form/Form';
+import { Form } from 'antd';
 
 type SelectTreeData = {
   value: string;
@@ -31,6 +33,7 @@ type ProFormData = {
   logo?: string;
   favicon?: string;
   thumbLogo?: string;
+  kind?: OrgKind;
 };
 
 export default (props: {
@@ -43,6 +46,8 @@ export default (props: {
   onClose?: (isSuccess?: boolean, newInfo?: Org) => void;
 }) => {
   const { t } = useTranslation(),
+    [form] = useForm<ProFormData>(),
+    kindValue = Form.useWatch('kind', form),
     [saveLoading, setSaveLoading] = useState(false),
     [countryCodeOptions, setCountryCodeOptions] = useState<{ value: string, label: string }[]>([]),
     [currencyOptions, setCurrencyOptions] = useState<{ value: string, label: string }[]>([]),
@@ -132,15 +137,19 @@ export default (props: {
               result.localCurrency = orgInfo.localCurrency ?? undefined
               result.timezone = orgInfo.timezone ?? undefined
               result.profile = orgInfo.profile ?? undefined
+              result.kind = orgInfo.kind
               result.logo = orgInfo.logo?.logo ?? undefined
               result.favicon = orgInfo.logo?.favicon ?? undefined
               result.thumbLogo = orgInfo.logo?.thumbLogo ?? undefined
               break;
             case 'peer':
-              result = { parentID: orgInfo.parentID };
+              result.parentID = orgInfo.parentID;
               break;
             case 'child':
-              result = { parentID: orgInfo.id };
+              result.parentID = orgInfo.id;
+              if (orgInfo.kind === OrgKind.Org) {
+                result.kind = OrgKind.Org;
+              }
               break;
             default:
               break;
@@ -214,7 +223,7 @@ export default (props: {
             favicon: values.favicon,
             thumbLogo: values.thumbLogo,
           }
-        }, props.kind);
+        }, values.kind as OrgKind);
         if (result?.id) {
           setSaveDisabled(true);
           props.onClose?.(true, result as Org);
@@ -235,7 +244,7 @@ export default (props: {
             favicon: values.favicon,
             thumbLogo: values.thumbLogo,
           },
-        }, props.kind);
+        }, values.kind as OrgKind);
         if (result?.id) {
           setSaveDisabled(true);
           props.onClose?.(true, result as Org);
@@ -265,6 +274,7 @@ export default (props: {
           disabled: saveDisabled,
         },
       }}
+      form={form}
       title={props.title}
       open={props?.open}
       onReset={getRequest}
@@ -273,113 +283,127 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <ProFormText
-        name="name"
-        label={t('name')}
-        rules={[
-          { required: true, message: `${t('please_enter_name')}` },
-        ]}
-      />
-      <ProFormTreeSelect
-        name="parentID"
-        label={t('parent_org')}
-        disabled={!!props.id}
-        request={parentRequest}
-        rules={[
-          { required: true, message: `${t('please_enter_parent_org')}` },
-        ]}
-      />
-      <ProFormText
-        x-if={props.kind === 'root'}
-        disabled={!!oldInfo?.domain}
-        name="domain"
-        label={t('domain')}
-        tooltip={t('domain_tooltip')}
-      />
-      <ProFormText
-        x-if={props.kind === 'root'}
-        name="customDomain"
-        label={t('custom_domain')}
-        rules={[
-          {
-            validator(rule, value) {
-              let isTrue = true;
-              if (Array.isArray(value)) {
-                value.forEach(item => {
-                  if (!isValidDomain(item)) {
-                    isTrue = false;
-                  }
-                })
-              }
-              if (isTrue) {
-                return Promise.resolve();
-              } else {
-                return Promise.reject(t('domain_format_error'));
-              }
-            },
-          },
-        ]}
-      >
-        <StringsInput />
-      </ProFormText>
-      <ProFormSelect
-        x-if={props.kind === 'root'}
-        name="countryCode"
-        label={t('country_region')}
-        options={countryCodeOptions}
-      />
-      <ProFormText
-        x-if={props.kind === 'root'}
-        name="owner"
-        label={t('manage_account')}
-        tooltip={t('owner_tooltip')}
-      >
-        <InputAccount
-          disabled={!!oldInfo?.ownerID}
-          userType={UserUserType.Account}
+      <div>
+        <ProFormText
+          name="name"
+          label={t('name')}
+          rules={[
+            { required: true, message: `${t('please_enter_name')}` },
+          ]}
         />
-      </ProFormText>
-      <ProFormSelect
-        x-if={props.kind === 'root'}
-        name="baseCurrency"
-        label={t('org_currency')}
-        options={currencyOptions}
-      />
-      <ProFormSelect
-        x-if={props.kind === 'root'}
-        name="timezone"
-        label={t('timezone')}
-        options={timezoneOptions}
-      />
-      <ProFormText
-        x-if={props.kind === 'root'}
-        name="logo"
-        label={t('logo')}
-        rules={[
-          { type: 'url', message: `${t('url_format_error')}` }
-        ]}
-      />
-      <ProFormText
-        x-if={props.kind === 'root'}
-        name="favicon"
-        label={t('favicon')}
-        rules={[
-          { type: 'url', message: `${t('url_format_error')}` }
-        ]}
-      />
-      <ProFormText
-        x-if={props.kind === 'root'}
-        name="thumbLogo"
-        label={t('thumb_logo')}
-        rules={[
-          { type: 'url', message: `${t('url_format_error')}` }
-        ]}
-      />
-      <ProFormTextArea
-        name="profile"
-        label={t('description')}
-        placeholder={`${t('please_enter_description')}`}
-      />
+        <ProFormTreeSelect
+          name="parentID"
+          label={t('parent_org')}
+          disabled={!!props.id}
+          request={parentRequest}
+          rules={[
+            { required: true, message: `${t('please_enter_parent_org')}` },
+          ]}
+        />
+        <ProFormSelect
+          x-if={['peer', 'child'].includes(props.scene ?? '')}
+          name="kind"
+          label={t('type')}
+          rules={[
+            { required: true, message: `${t('please_select_type')}` },
+          ]}
+          options={[
+            { label: EnumOrgKind[OrgKind.Root].text, value: OrgKind.Root, disabled: (props.scene == 'child') && (oldInfo?.kind != OrgKind.Root) },
+            { label: EnumOrgKind[OrgKind.Org].text, value: OrgKind.Org },
+          ]}
+        />
+        <ProFormText
+          x-if={kindValue === 'root'}
+          disabled={!!oldInfo?.domain}
+          name="domain"
+          label={t('domain')}
+          tooltip={<div>{t('domain_tooltip')}</div>}
+        />
+        <ProFormText
+          x-if={kindValue === 'root'}
+          name="customDomain"
+          label={t('custom_domain')}
+          rules={[
+            {
+              validator(rule, value) {
+                let isTrue = true;
+                if (Array.isArray(value)) {
+                  value.forEach(item => {
+                    if (!isValidDomain(item)) {
+                      isTrue = false;
+                    }
+                  })
+                }
+                if (isTrue) {
+                  return Promise.resolve();
+                } else {
+                  return Promise.reject(t('domain_format_error'));
+                }
+              },
+            },
+          ]}
+        >
+          <StringsInput />
+        </ProFormText>
+        <ProFormSelect
+          x-if={kindValue === 'root'}
+          name="countryCode"
+          label={t('country_region')}
+          options={countryCodeOptions}
+        />
+        <ProFormText
+          x-if={kindValue === 'root'}
+          name="owner"
+          label={t('manage_account')}
+          tooltip={<div>{t('owner_tooltip')}</div>}
+        >
+          <InputAccount
+            disabled={!!oldInfo?.ownerID}
+            userType={UserUserType.Account}
+          />
+        </ProFormText>
+        <ProFormSelect
+          x-if={kindValue === 'root'}
+          name="baseCurrency"
+          label={t('org_currency')}
+          options={currencyOptions}
+        />
+        <ProFormSelect
+          x-if={kindValue === 'root'}
+          name="timezone"
+          label={t('timezone')}
+          options={timezoneOptions}
+        />
+        <ProFormText
+          x-if={kindValue === 'root'}
+          name="logo"
+          label={t('logo')}
+          rules={[
+            { type: 'url', message: `${t('url_format_error')}` }
+          ]}
+        />
+        <ProFormText
+          x-if={kindValue === 'root'}
+          name="favicon"
+          label={t('favicon')}
+          rules={[
+            { type: 'url', message: `${t('url_format_error')}` }
+          ]}
+        />
+        <ProFormText
+          x-if={kindValue === 'root'}
+          name="thumbLogo"
+          label={t('thumb_logo')}
+          rules={[
+            { type: 'url', message: `${t('url_format_error')}` }
+          ]}
+        />
+        <ProFormTextArea
+          name="profile"
+          label={t('description')}
+          placeholder={`${t('please_enter_description')}`}
+        />
+      </div>
     </DrawerForm>
   );
 };

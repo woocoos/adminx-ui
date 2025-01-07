@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 export default (props: {
   isFromSystem?: boolean;
+  isFromOrg?: boolean;
 }) => {
   const { t } = useTranslation(),
     { token } = useToken(),
@@ -36,6 +37,10 @@ export default (props: {
         items: props.isFromSystem ? [
           { title: t('system_conf') },
           { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+          { title: t('auth_app') },
+        ] : props.isFromOrg ? [
+          { title: t('org_cooperation') },
+          { title: <Link to={'/org/departments'}>{t('org_manage')}</Link> },
           { title: t('auth_app') },
         ] : [
           { title: t('org_cooperation') },
