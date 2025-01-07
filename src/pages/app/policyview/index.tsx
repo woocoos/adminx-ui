@@ -335,20 +335,19 @@ export default () => {
             </Col>
           </Row>
           <br />
-          <div style={{ height: 'calc(100vh - 300px)', overflow: 'auto' }}>
-            <Tree
-              x-if={treeData.length != 0}
-              draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
-              treeData={treeData}
-              onSelect={onTreeSelect}
-              selectedKeys={selectedTree.keys}
-              defaultExpandAll
-              titleRender={customerTitleRender}
-              onDrop={onTreeDrop}
-            />
-            <div x-else>
-              <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
-            </div>
+          <Tree
+            x-if={treeData.length != 0}
+            draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
+            treeData={treeData}
+            onSelect={onTreeSelect}
+            height={600}
+            selectedKeys={selectedTree.keys}
+            defaultExpandAll
+            titleRender={customerTitleRender}
+            onDrop={onTreeDrop}
+          />
+          <div x-else>
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
           </div>
         </ProCard>
         <ProCard split="horizontal">
