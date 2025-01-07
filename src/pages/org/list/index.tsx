@@ -101,6 +101,8 @@ export const OrgList = (props: {
         const items: ItemType[] = [];
         if (kind == OrgKind.Root) {
           items.push(
+            { key: 'userGroup', label: <Link to={`/system/org/groups?id=${record.id}`}>{t('user_group')}</Link> },
+            { key: 'role', label: <Link to={`/system/org/roles?id=${record.id}`}>{t('role')}</Link> },
             { key: 'policy', label: <Link to={`/system/org/policys?id=${record.id}`}>{t('policy')}</Link> },
             { key: 'app', label: <Link to={`/system/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
             { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('department_manage')}</Link> },
@@ -129,7 +131,7 @@ export const OrgList = (props: {
         }
 
         return (<Space>
-          {kind === OrgKind.Org && record.parentID != '0' ? <>
+          {(kind === OrgKind.Org && record.parentID != '0') || (kind === OrgKind.Root) ? <>
             <Auth authKey="updateOrganization">
               <a key="editor" onClick={() => editorAction(record, 'editor')}>
                 {t('edit')}
@@ -138,12 +140,6 @@ export const OrgList = (props: {
           </> : <></>}
           {
             kind == 'root' ? <>
-              <Link key="userGroup" to={`/system/org/groups?id=${record.id}`}>
-                {t('user_group')}
-              </Link>
-              <Link key="role" to={`/system/org/roles?id=${record.id}`}>
-                {t('role')}
-              </Link>
               {items.length ? <Dropdown
                 trigger={['click']}
                 menu={{
@@ -295,6 +291,7 @@ export const OrgList = (props: {
                 }
               } else {
                 where.kind = kind;
+                where.parentID = "0"
                 const result = await getOrgList({
                   pageSize: 999,
                   where,
@@ -315,20 +312,23 @@ export const OrgList = (props: {
           }}
           pagination={false}
         />
-        <OrgCreate
-          open={modal.open}
-          title={modal.title}
-          id={modal.id}
-          scene={modal.scene}
-          parentDataSource={parentDataSource}
-          kind={kind}
-          onClose={(isSuccess, newInfo) => {
-            if (isSuccess && newInfo) {
-              proTableRef.current?.reload()
-            }
-            setModal({ open: false, title: '', id: '', scene: 'editor' });
-          }}
-        />
+        {modal.open ?
+          <OrgCreate
+            open={modal.open}
+            title={modal.title}
+            id={modal.id}
+            scene={modal.scene}
+            parentDataSource={parentDataSource}
+            kind={kind}
+            onClose={(isSuccess, newInfo) => {
+              if (isSuccess && newInfo) {
+                proTableRef.current?.reload()
+              }
+              setModal({ open: false, title: '', id: '', scene: 'editor' });
+            }}
+          /> : <></>
+        }
+
       </PageContainer>
     </>
   );

@@ -12,6 +12,7 @@ import { getDictItems } from '@knockout-js/api';
 import StringsInput from './stringsInput';
 import { useForm } from 'antd/es/form/Form';
 import { Form } from 'antd';
+import store from '@/store';
 
 type SelectTreeData = {
   value: string;
@@ -47,7 +48,9 @@ export default (props: {
 }) => {
   const { t } = useTranslation(),
     [form] = useForm<ProFormData>(),
+    [userState] = store.useModel('user'),
     kindValue = Form.useWatch('kind', form),
+    parentIDValue = Form.useWatch('parentID', form),
     [saveLoading, setSaveLoading] = useState(false),
     [countryCodeOptions, setCountryCodeOptions] = useState<{ value: string, label: string }[]>([]),
     [currencyOptions, setCurrencyOptions] = useState<{ value: string, label: string }[]>([]),
@@ -301,7 +304,7 @@ export default (props: {
           ]}
         />
         <ProFormSelect
-          x-if={['peer', 'child'].includes(props.scene ?? '')}
+          disabled={!['peer', 'child'].includes(props.scene ?? '')}
           name="kind"
           label={t('type')}
           rules={[
@@ -359,7 +362,8 @@ export default (props: {
         >
           <InputAccount
             disabled={!!oldInfo?.ownerID}
-            userType={UserUserType.Account}
+            orgId={parentIDValue == '0' ? undefined : userState.tenantId}
+            userType={parentIDValue == '0' ? UserUserType.Account : UserUserType.Member}
           />
         </ProFormText>
         <ProFormSelect

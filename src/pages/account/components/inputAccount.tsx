@@ -3,12 +3,13 @@ import ModalAccount from './modalAccount';
 import { useState } from 'react';
 import { CloseCircleFilled } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
-import { User, UserUserType } from '@/generated/adminx/graphql';
+import { Org, User, UserUserType } from '@/generated/adminx/graphql';
 
 export default (props: {
   value?: User;
   disabled?: boolean;
   userType: UserUserType;
+  orgId?: string;
   onChange?: (value?: User) => void;
 }) => {
   const
@@ -39,6 +40,7 @@ export default (props: {
       <ModalAccount
         open={modal.open}
         title={t('click_search_account')}
+        orgId={props.orgId}
         userType={props.userType}
         onClose={(selectData) => {
           if (selectData?.length) {
