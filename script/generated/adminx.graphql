@@ -5130,13 +5130,13 @@ type Query {
   """用户组"""
   orgGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """权限策略引用列表"""
-  orgPolicyReferences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, orgID: ID, policyID: ID!, where: PermissionWhereInput): PermissionConnection!
+  orgPolicyReferences(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: PermissionOrder, policyID: ID!, where: PermissionWhereInput): PermissionConnection!
   """登录用户策略视图"""
   orgPolicyView(appCode: String!, orgID: ID): [AppPolicyViewOrgPolicy!]!
-  """组织策略视图角色/用户组选中项"""
-  orgPolicyViewRoleAssigned(appCode: String!, orgID: ID, orgRoleID: ID!): [AppPolicyView!]!
-  """组织策略视图用户选择项"""
-  orgPolicyViewUserAssigned(appCode: String!, orgID: ID, userID: ID!): [AppPolicyView!]!
+  """组织策略视图角色/用户组选中项，返回OrgPolicyIDs"""
+  orgPolicyViewRoleAssigned(appCode: String!, orgID: ID, orgRoleID: ID!): [ID!]!
+  """组织策略视图用户选择项，返回OrgPolicyIDs"""
+  orgPolicyViewUserAssigned(appCode: String!, orgID: ID, userID: ID!): [ID!]!
   """组织回收站列表"""
   orgRecycleUsers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户组组成员"""

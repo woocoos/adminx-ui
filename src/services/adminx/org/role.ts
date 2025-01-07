@@ -491,9 +491,7 @@ export async function getOrgRoleQty(where?: OrgRoleWhereInput) {
 
 
 const queryOrgRoleAssigned = gql(/* GraphQL */`query orgPolicyViewRoleAssigned($appCode: String!,$orgRoleID:ID!,$orgID: ID){
-  orgPolicyViewRoleAssigned(appCode:$appCode,orgID:$orgID,orgRoleID:$orgRoleID){
-    id,name,kind,policyID
-  }
+  orgPolicyViewRoleAssigned(appCode:$appCode,orgID:$orgID,orgRoleID:$orgRoleID)
 }`);
 
 /**

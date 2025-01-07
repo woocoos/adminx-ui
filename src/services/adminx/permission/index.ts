@@ -16,8 +16,8 @@ export const EnumPermissionStatus = {
 };
 
 
-const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgID:ID,$orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  orgPolicyReferences(policyID:$orgPolicyId,orgID: $orgID, first:$first,orderBy: $orderBy,where: $where){
+const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  orgPolicyReferences(policyID:$orgPolicyId, first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -148,10 +148,9 @@ export async function getOrgPolicyReferenceList(
     pageSize?: number;
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
-  }, orgID?: string) {
+  }) {
   const result = await paging(queryOrgPolicyReferences, {
     orgPolicyId,
-    orgID,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {

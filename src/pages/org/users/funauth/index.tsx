@@ -50,8 +50,8 @@ export default (props: {
             const result = await getOrgUserAssignedPolicyView(app.code, userInfo.id, orgId)
             list.push({
               appInfo: app as App,
-              checked: result.map(item => item.policyID as string),
-              oldChecked: result.map(item => item.policyID as string)
+              checked: [...result],
+              oldChecked: [...result],
             })
           }
         }
