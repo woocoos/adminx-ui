@@ -105,7 +105,7 @@ export const OrgList = (props: {
             { key: 'role', label: <Link to={`/system/org/roles?id=${record.id}`}>{t('role')}</Link> },
             { key: 'policy', label: <Link to={`/system/org/policys?id=${record.id}`}>{t('policy')}</Link> },
             { key: 'app', label: <Link to={`/system/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
-            { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('department_manage')}</Link> },
+            { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('org_manage')}</Link> },
             { key: 'orgUser', label: <Link to={`/system/org/users?id=${record.id}`}>{t('user_manage')}</Link> },
             { key: 'pwdPolicy', label: <Link to={`/system/org/pwdPolicy?id=${record.id}`}>{t('password_policy')}</Link> },
           );
@@ -225,7 +225,7 @@ export const OrgList = (props: {
               [
                 { title: t('system_conf') },
                 { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
-                { title: t('department_manage') },
+                { title: t('org_manage') },
               ] : [
                 { title: t('system_conf') },
                 { title: t('org_manage') },

@@ -135,6 +135,7 @@ export default (props: {
                     ]
                   }
                   where.kind = props.kind;
+                  where.orgID = props.orgId;
                   const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
                     current: params.current,
                     pageSize: params.pageSize,

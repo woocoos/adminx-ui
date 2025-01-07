@@ -4,7 +4,7 @@ import { Button, Space, Modal, message } from 'antd';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
-import { getUserJoinGroupList, revokeOrgRoleUser } from '@/services/adminx/org/role';
+import { getUserJoinGroupList, getUserJoinRoleList, revokeOrgRoleUser } from '@/services/adminx/org/role';
 import DrawerRole from '@/pages/org/components/drawerRole';
 import Auth from '@/components/auth';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
@@ -14,6 +14,7 @@ import { useSearchParams } from 'ice';
 
 export default (props: {
   userInfo: User;
+  kind: OrgRoleKind;
 }) => {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
@@ -110,7 +111,7 @@ export default (props: {
                   setModal({ open: true, title: '' });
                 }}
               >
-                {t('add_user_group')}
+                {props.kind === OrgRoleKind.Group ? t('add_user_group') : t('add_user_role')}
               </Button>
             </Auth>,
           ],
@@ -120,18 +121,20 @@ export default (props: {
         dataSource={dataSource}
         request={async (params) => {
           const table = { data: [] as OrgRole[], success: true, total: 0 },
-            orgId = searchParams.get('org_id'),
+            orgId = searchParams.get('org_id') ?? userState.tenantId,
             where: OrgRoleWhereInput = {};
           where.nameContains = params.nameContains;
           where.createdAt = params.createdAt;
-          if (orgId) {
-            where.orgID = orgId;
-          }
-          const result = await getUserJoinGroupList(props.userInfo.id, {
+
+          const result = props.kind === OrgRoleKind.Group ? await getUserJoinGroupList(props.userInfo.id, {
             current: params.current,
             pageSize: params.pageSize,
             where,
-          });
+          }, orgId) : await getUserJoinRoleList(props.userInfo.id, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          }, orgId);
           if (result?.totalCount) {
             table.data = result.edges?.map(item => item?.node) as OrgRole[];
             table.total = result.totalCount;
@@ -147,10 +150,10 @@ export default (props: {
         }}
       />
       {modal.open ? <DrawerRole
-        title={`${t('add_user_group')}`}
+        title={`${props.kind === OrgRoleKind.Group ? t('add_user_group') : t('add_user_role')}`}
         open={modal.open}
-        orgId={userState.tenantId}
-        kind={OrgRoleKind.Group}
+        orgId={searchParams.get('org_id') ?? userState.tenantId}
+        kind={props.kind}
         userInfo={props.userInfo}
         onClose={(isSuccess) => {
           if (isSuccess) {

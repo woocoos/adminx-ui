@@ -26,8 +26,18 @@ const queryOrgGroupListAndIsGrant = gql(/* GraphQL */`query orgGroupListAndIsGra
   }
 }`);
 
-const queryUserGroupList = gql(/* GraphQL */`query userGroupList($userId: ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
-  userGroups(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+const queryUserGroupList = gql(/* GraphQL */`query userGroupList($userId: ID!,$orgID: ID,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  userGroups(userID:$userId,orgID:$orgID,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+      }
+    }
+  }
+}`);
+const queryUserRoleList = gql(/* GraphQL */`query userRoleList($userId: ID!,$orgId:ID,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  userRoles(userID:$userId,orgID:$orgId,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -157,9 +167,6 @@ export async function getOrgGroupList(
 /**
  * 获取用户加入的用户组
  * @param userId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
 export async function getUserJoinGroupList(
@@ -169,11 +176,13 @@ export async function getUserJoinGroupList(
     pageSize?: number;
     where?: OrgRoleWhereInput;
     orderBy?: OrgRoleOrder;
-  }) {
+  },
+  orgID?: string) {
   const
     result = await paging(
       queryUserGroupList, {
       userId: userId,
+      orgID,
       first: gather.pageSize || 20,
       where: gather.where,
       orderBy: gather.orderBy ?? {
@@ -184,6 +193,37 @@ export async function getUserJoinGroupList(
 
   if (result.data?.userGroups) {
     return result.data.userGroups;
+  }
+  return null;
+}
+/**
+ * 获取用户加入的角色
+ * @param userId
+ * @returns
+ */
+export async function getUserJoinRoleList(
+  userId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: OrgRoleWhereInput;
+    orderBy?: OrgRoleOrder;
+  }, orgID?: string) {
+  const
+    result = await paging(
+      queryUserRoleList, {
+      userId: userId,
+      orgId: orgID,
+      first: gather.pageSize || 20,
+      where: gather.where,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgRoleOrderField.CreatedAt
+      },
+    }, gather.current || 1);
+
+  if (result.data?.userRoles) {
+    return result.data.userRoles;
   }
   return null;
 }

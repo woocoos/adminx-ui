@@ -84,6 +84,21 @@ const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupP
   }
 }`);
 
+const queryUserExtendRolePolicieList = gql(/* GraphQL */`query userExtendRolePolicieList($userId: ID!,$orgID:ID,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  userExtendRolePolicies(userID:$userId,orgID:$orgID,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+        role{ id,orgID,kind,name,isAppRole }
+        orgPolicy{ id,orgID,appPolicyID,name,comments}
+        user{ id,displayName }
+      }
+    }
+  }
+}`);
+
 const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
   node(id:$gid){
     ... on Permission{
@@ -211,9 +226,6 @@ export async function getUserPermissionList(
 /**
  * 用户继承用户组的权限策略
  * @param userId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
 export async function getUserExtendGroupPolicyList(
@@ -239,6 +251,38 @@ export async function getUserExtendGroupPolicyList(
   );
   if (result.data?.userExtendGroupPolicies) {
     return result.data.userExtendGroupPolicies;
+  }
+  return null;
+}
+
+/**
+ * 用户继承角色的权限策略
+ * @param userId
+ * @returns
+ */
+export async function getUserExtendRolePolicyList(
+  userId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: PermissionWhereInput;
+    orderBy?: PermissionOrder;
+  },
+  orgID?: string,
+) {
+  const result = await paging(queryUserExtendRolePolicieList, {
+    userId: userId,
+    orgID,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
+  }, gather.current || 1,
+  );
+  if (result.data?.userExtendRolePolicies) {
+    return result.data.userExtendRolePolicies;
   }
   return null;
 }

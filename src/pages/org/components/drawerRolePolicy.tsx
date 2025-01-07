@@ -5,7 +5,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { getOrgPolicyList } from '@/services/adminx/org/policy';
 import { createPermission } from '@/services/adminx/permission';
 import { useTranslation } from 'react-i18next';
-import { OrgPolicy, OrgPolicyWhereInput, OrgRole, Permission, PermissionPrincipalKind, User } from '@/generated/adminx/graphql';
+import { AppPolicyKind, OrgPolicy, OrgPolicyWhereInput, OrgRole, Permission, PermissionPrincipalKind, User } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
@@ -143,13 +143,20 @@ export default (props: {
                 actionRef={proTableRef}
                 request={async (params) => {
                   const table = { data: [] as OrgPolicy[], success: true, total: 0 },
-                    where: OrgPolicyWhereInput = {};
+                    where: OrgPolicyWhereInput = {
+                      hasAppPolicyWith: [
+                        {
+                          kind: AppPolicyKind.App
+                        }
+                      ]
+                    };
                   if (keyword) {
                     where.or = [
                       { nameContains: keyword },
                       { commentsContains: keyword },
                     ]
                   }
+
                   const result = await getOrgPolicyList(props.orgId, {
                     current: params.current,
                     pageSize: params.pageSize,

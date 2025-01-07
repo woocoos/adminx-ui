@@ -11,7 +11,7 @@ import ListUserJoinGroup from './components/listUserJoinGroup';
 import { Link, useNavigate, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
 import style from './index.module.css';
-import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGender } from '@/generated/adminx/graphql';
+import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGender, OrgRoleKind } from '@/generated/adminx/graphql';
 import AccessKey from './components/accessKey';
 import { parseStorageUrl } from '@knockout-js/api';
 
@@ -234,6 +234,7 @@ export default (props: {
                 >
                   {identityRender()}
                 </ProDescriptions>
+                <br />
                 <Divider />
                 <ProDescriptions
                   size="small"
@@ -262,6 +263,7 @@ export default (props: {
                     {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
                   </ProDescriptions.Item>
                 </ProDescriptions>
+                <br />
                 <Divider />
                 <ProDescriptions
                   size="small"
@@ -320,6 +322,7 @@ export default (props: {
                     </ProDescriptions.Item>
                   </> : <></>}
                 </ProDescriptions>
+                <br />
                 <Divider />
                 <AccessKey userId={info.id} />
               </>
@@ -327,7 +330,11 @@ export default (props: {
             }, {
               label: t('join_group'),
               key: 'group',
-              children: <ListUserJoinGroup userInfo={info} />,
+              children: <ListUserJoinGroup userInfo={info} kind={OrgRoleKind.Group} />,
+            }, {
+              label: t('join_role'),
+              key: 'role',
+              children: <ListUserJoinGroup userInfo={info} kind={OrgRoleKind.Role} />,
             }, {
               label: t('permission_manage'),
               key: 'permission',
@@ -348,7 +355,15 @@ export default (props: {
                       key: 'group-permission',
                       children: <ListUserPermission
                         userInfo={info}
-                        isExtendGroup
+                        orgRoleKind={OrgRoleKind.Group}
+                        principalKind={PermissionPrincipalKind.Role}
+                      />,
+                    }, {
+                      label: t('extend_user_role_permissions'),
+                      key: 'role-permission',
+                      children: <ListUserPermission
+                        userInfo={info}
+                        orgRoleKind={OrgRoleKind.Role}
                         principalKind={PermissionPrincipalKind.Role}
                       />,
                     },

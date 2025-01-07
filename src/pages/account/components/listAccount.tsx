@@ -89,7 +89,7 @@ export const UserList = (props: {
       open: boolean;
       title: string;
       data?: User;
-      scene: 'add' | 'create' | 'addGroup' | 'addPermission' | '';
+      scene: 'add' | 'create' | 'addGroup' | 'addPermission' | 'addRole' | '';
     }>({
       open: false,
       title: '',
@@ -136,6 +136,19 @@ export const UserList = (props: {
                 }}
                 >
                   {t('add_user_group')}
+                </a>,
+              },
+            );
+          }
+          if (checkAuth('assignRoleUser', auth)) {
+            items.push(
+              {
+                key: 'addRole',
+                label: <a onClick={() => {
+                  setModal({ open: true, data: record, title: t('add_user_role'), scene: 'addRole' });
+                }}
+                >
+                  {t('add_user_role')}
                 </a>,
               },
             );
@@ -636,6 +649,21 @@ export const UserList = (props: {
           open={modal.open}
           orgId={props.orgId}
           kind={OrgRoleKind.Group}
+          userInfo={modal.data}
+          onClose={(isSuccess) => {
+            if (isSuccess) {
+              // proTableRef.current?.reload();
+            }
+            setModal({ open: false, title: '', scene: modal.scene });
+          }}
+        /> : ''
+      }
+      {
+        modal.scene === 'addRole' && props.orgId && modal.open ? <DrawerRole
+          title={modal.title}
+          open={modal.open}
+          orgId={props.orgId}
+          kind={OrgRoleKind.Role}
           userInfo={modal.data}
           onClose={(isSuccess) => {
             if (isSuccess) {
