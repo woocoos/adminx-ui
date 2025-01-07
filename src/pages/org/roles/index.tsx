@@ -10,10 +10,11 @@ import DrawerUser from '../../account/components/drawerUser';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
 import Auth from '@/components/auth';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
+import { Org, OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
 import { delDataSource, saveDataSource } from '@/util';
+import { getOrgInfo } from '@/services/adminx/org';
 
 
 export const PageOrgRoleList = (props: {
@@ -41,6 +42,7 @@ export const PageOrgRoleList = (props: {
       { title: t('remarks'), dataIndex: 'comments', width: 120, search: false },
 
     ],
+    [orgInfo, setOrgInfo] = useState<Org>(),
     [dataSource, setDataSource] = useState<OrgRole[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
@@ -134,6 +136,12 @@ export const PageOrgRoleList = (props: {
 
 
   const
+    reqOrg = async () => {
+      const result = await getOrgInfo(props.orgId)
+      if (result?.id) {
+        setOrgInfo(result as Org)
+      }
+    },
     onDel = (record: OrgRole) => {
       Modal.confirm({
         title: t('delete'),
@@ -156,6 +164,7 @@ export const PageOrgRoleList = (props: {
     };
 
   useEffect(() => {
+    reqOrg()
     proTableRef.current?.reload(true);
   }, [props.orgId]);
 
@@ -200,7 +209,7 @@ export const PageOrgRoleList = (props: {
           }}
           rowKey={'id'}
           toolbar={{
-            title: kind == 'role' ? t('role_list') : t('user_group_list'),
+            title: `${orgInfo?.name}`,
             actions: [
               <Auth authKey="createRole">
                 <Button

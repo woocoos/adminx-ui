@@ -164,7 +164,7 @@ export const PageOrgPolicys = (props: {
         }}
         rowKey={'id'}
         toolbar={{
-          title: `${t('organization')}:${orgInfo?.name || '-'}`,
+          title: `${orgInfo?.name}`,
           actions: [
             <Auth authKey="createOrganizationPolicy">
               <Button type="primary">

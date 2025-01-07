@@ -1,4 +1,3 @@
-import { KeepAlive } from "@knockout-js/layout"
 import { OrgRoleKind } from "@/generated/adminx/graphql"
 import { PageOrgRoleList } from "../../roles"
 import { useSearchParams } from "ice"
@@ -8,7 +7,5 @@ export default () => {
   const [searchParams] = useSearchParams(),
     orgId = searchParams.get('id')
 
-  return (orgId ? <KeepAlive clearAlive>
-    <PageOrgRoleList kind={OrgRoleKind.Group} orgId={orgId} isFromOrg />
-  </KeepAlive> : <Empty description={`参数错误`} />)
+  return (orgId ? <PageOrgRoleList kind={OrgRoleKind.Group} orgId={orgId} isFromOrg /> : <Empty description={`参数错误`} />)
 }
