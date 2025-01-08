@@ -35,7 +35,7 @@ export const OrgList = (props: {
       { title: t('code'), dataIndex: 'code', width: 200 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
       { title: t('domain'), dataIndex: 'domain', width: 200, search: false },
-      { title: t('org_curreny'), dataIndex: 'localCurrency', width: 200, search: false },
+      { title: t('org_currency'), dataIndex: 'localCurrency', width: 200, search: false },
       { title: t('timezone'), dataIndex: 'timezone', width: 200, search: false },
       {
         title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false,
