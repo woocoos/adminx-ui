@@ -30,7 +30,7 @@ const RuleItem = (props: {
     updateAppInfo = async (info?: App) => {
       setAppInfo(info);
       if (info?.code) {
-        const actionsList = await getOrgAppActionList(info.code);
+        const actionsList = await getOrgAppActionList(info.code, props.orgId);
         setAppActions(actionsList as AppAction[]);
       } else {
         setAppActions([]);

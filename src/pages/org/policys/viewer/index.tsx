@@ -205,7 +205,7 @@ export default (props: {
           {
             orgInfo?.id ? <ProFormText>
               <PolicyRules
-                orgId={orgInfo?.id}
+                orgId={orgInfo.id}
                 rules={rules}
                 readonly={isReadonly()}
                 onChange={(rules) => {

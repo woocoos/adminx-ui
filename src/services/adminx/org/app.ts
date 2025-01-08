@@ -28,8 +28,8 @@ const mutationRevOrgApp = gql(/* GraphQL */`mutation revokeOrgApp($orgId:ID!,$ap
   revokeOrganizationApp(orgID: $orgId,appID: $appId)
 }`);
 
-const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!){
-  orgAppActions(appCode: $appCode){
+const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!,$orgId:ID!){
+  orgAppActions(appCode: $appCode,orgID: $orgId){
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
   }
 }`);
@@ -112,10 +112,11 @@ export async function revokeOrgApp(orgId: string, appId: string) {
  * @param appCode
  * @returns
  */
-export async function getOrgAppActionList(appCode: string) {
+export async function getOrgAppActionList(appCode: string, orgId: string) {
   const result = await query(
     queryOrgAppActionList, {
     appCode,
+    orgId,
   });
 
   if (result.data?.orgAppActions) {

@@ -3856,9 +3856,9 @@ type OrgPolicy implements Node {
   createdBy: Int!
   id: ID!
   """是否授权role"""
-  isGrantRole(roleID: ID!): Boolean!
+  isGrantRole(orgID: ID, roleID: ID!): Boolean!
   """是否授权user"""
-  isGrantUser(userID: ID!): Boolean!
+  isGrantUser(orgID: ID, userID: ID!): Boolean!
   """策略名称"""
   name: String!
   org: Org
@@ -4026,7 +4026,7 @@ type OrgRole implements Node {
   """是否系统角色"""
   isAppRole: Boolean!
   """是否分配给user"""
-  isGrantUser(userID: ID!): Boolean!
+  isGrantUser(orgID: ID, userID: ID!): Boolean!
   """类型,group:组,role:角色"""
   kind: OrgRoleKind!
   """名称"""
@@ -5124,7 +5124,7 @@ type Query {
     ids: [GID!]!
   ): [Node]!
   """组织策略可授权的appActions"""
-  orgAppActions(appCode: String!): [AppAction!]!
+  orgAppActions(appCode: String!, orgID: ID!): [AppAction!]!
   """获取组织应用资源模板"""
   orgAppResources(after: Cursor, appID: ID!, before: Cursor, first: Int, last: Int, orderBy: AppResOrder, where: AppResWhereInput): AppResConnection!
   """用户组"""
@@ -6597,7 +6597,7 @@ type User implements Node {
   """是否允许解除角色授权"""
   isAllowRevokeRole(orgRoleID: ID!): Boolean!
   """是否分配role"""
-  isAssignOrgRole(orgRoleID: ID!): Boolean!
+  isAssignOrgRole(orgID: ID, orgRoleID: ID!): Boolean!
   """语言"""
   lang: String
   """姓氏"""
