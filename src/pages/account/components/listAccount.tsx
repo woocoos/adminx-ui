@@ -613,7 +613,7 @@ export const UserList = (props: {
       {modal.scene === 'create' ? <AccountCreate
         open={modal.open}
         title={modal.title}
-        orgId={userState.tenantId}
+        orgId={props.orgId}
         userType={props.userType || UserUserType.Member}
         orgUserType={props.scene === 'orgMember' ? OrgUserUserType.Internal : OrgUserUserType.External}
         scene="create"
@@ -630,7 +630,7 @@ export const UserList = (props: {
         modal.scene === 'add' && props.orgId && modal.open ? <DrawerUser
           open={modal.open}
           title={modal.title}
-          orgId={userState.tenantId}
+          orgId={props.orgId}
           orgRole={props.orgRole}
           orgInfo={props.orgInfo}
           userType={props.userType}

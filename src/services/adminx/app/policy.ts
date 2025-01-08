@@ -220,7 +220,13 @@ export async function getAppPolicyView(appCode: string) {
   });
 
   if (result.data?.appPolicyView) {
-    return result.data.appPolicyView
+    return result.data.appPolicyView.sort((a, b) => {
+      const apid = a.parentID,
+        bpid = b.parentID,
+        aSort = a.displaySort ?? 0,
+        bSort = b.displaySort ?? 0;
+      return apid < bpid ? -1 : apid > bpid ? 1 : aSort > bSort ? 1 : aSort < bSort ? -1 : 0;
+    })
   }
   return [];
 }

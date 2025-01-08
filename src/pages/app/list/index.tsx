@@ -18,6 +18,8 @@ import { ItemType } from 'antd/lib/menu/interface';
 export const PageAppList = (props: {
   title?: string;
   orgId?: string;
+  isFromSystem?: boolean;
+  isFromOrg?: boolean;
   scene?: 'orgApp';
 }) => {
   const { token } = useToken(),
@@ -259,6 +261,7 @@ export const PageAppList = (props: {
             <ModalApp
               open={modal.open}
               title={modal.title}
+              isLoginOrgId={props.isFromOrg}
               onClose={async (selectData) => {
                 const sdata = selectData?.[0];
                 if (sdata && props.orgId) {

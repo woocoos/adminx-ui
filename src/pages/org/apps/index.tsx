@@ -49,6 +49,9 @@ export default (props: {
       },
     }}
   >
-    <PageAppList x-if={info?.id} scene="orgApp" title={`${t('organization')}：${info?.name}`} orgId={info?.id} />
+    <PageAppList x-if={info?.id} scene="orgApp" title={`${t('organization')}：${info?.name}`} orgId={info?.id}
+      isFromSystem={props.isFromSystem}
+      isFromOrg={props.isFromOrg}
+    />
   </PageContainer>);
 };

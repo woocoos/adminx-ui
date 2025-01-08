@@ -78,7 +78,8 @@ export default (props: {
       setCurrencyOptions(currencyResult?.edges?.map(item => {
         return {
           value: item?.node?.code ?? '',
-          label: item?.node?.name ?? '',
+          label: item?.node?.code ?? '',
+          // label: item?.node?.name ?? '',
         };
       }) ?? []);
       // 获取时区列表
@@ -158,7 +159,10 @@ export default (props: {
               break;
           }
         }
+      } else {
+        result.kind = OrgKind.Root
       }
+
       return result;
     },
     onValuesChange = () => {
@@ -368,7 +372,7 @@ export default (props: {
         </ProFormText>
         <ProFormSelect
           x-if={kindValue === 'root'}
-          name="baseCurrency"
+          name="localCurrency"
           label={t('org_currency')}
           options={currencyOptions}
         />

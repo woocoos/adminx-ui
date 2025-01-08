@@ -83,7 +83,7 @@ export const PageOrgUsers = (props: {
     },
     proCardtitle = () => {
       if (selectedData) {
-        return `${selectedData.name}-${t('user_list')}`;
+        return `${t('organization')}/${t('department')}:${selectedData.name},${t('manage_user')}:${selectedData.owner?.displayName ?? '-'}`;
       }
       return `${t('user_list')}`;
     };
