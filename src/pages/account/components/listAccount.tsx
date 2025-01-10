@@ -126,7 +126,7 @@ export const UserList = (props: {
             { key: 'fun_authority', label: <Link to={`/org/members/funauth?id=${record.id}&${orgIdParameter}`} >{t('fun_authority')}</Link> },
           );
         }
-        if (props.scene === 'orgUser' && props.orgInfo?.kind === 'root') {
+        if (['orgUser', 'orgMember'].includes(props.scene ?? '')) {
           if (checkAuth('assignRoleUser', auth)) {
             items.push(
               {
@@ -182,7 +182,7 @@ export const UserList = (props: {
           }
         }
 
-        if (props.scene === 'orgUser') {
+        if (['orgUser', 'orgMember'].includes(props.scene ?? '')) {
           if (checkAuth('userDevices', auth)) {
             items.push(
               { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}&${orgIdParameter}`} >{t('user_devices')}</Link> },
@@ -191,7 +191,7 @@ export const UserList = (props: {
           if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
             if (checkAuth('removeOrganizationUser', auth)) {
               items.push(
-                { key: 'delete', label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> },
+                { key: 'remove', label: <a onClick={() => onRemoveOrg(record)}>{t('remove')}</a> },
               );
             }
           }
@@ -400,7 +400,7 @@ export const UserList = (props: {
                     </Button>
                   </Auth>,
                 ] :
-                  props.scene === 'orgUser' ? [
+                  ['orgUser', 'orgMember'].includes(props.scene ?? '') ? [
                     props.orgInfo?.kind === 'root'
                       ? <Auth authKey="createOrganizationUser">
                         <Button
@@ -416,7 +416,7 @@ export const UserList = (props: {
                       ? <Button>
                         <Link to={`${props.isFromSystem ? `/system/account/recycle?orgId=${props.orgId}` : '/account/recycle'}`}>{t('recycle_bin')}</Link>
                       </Button> : '',
-                    props.orgInfo?.kind === 'org' ? <Auth authKey="allotOrganizationUser">
+                    props.orgInfo?.parentID != '0' ? <Auth authKey="allotOrganizationUser">
                       <Button
                         type="primary"
                         onClick={() => {
@@ -665,6 +665,7 @@ export const UserList = (props: {
           orgId={props.orgId}
           kind={OrgRoleKind.Role}
           userInfo={modal.data}
+          isLoginRestrict
           onClose={(isSuccess) => {
             if (isSuccess) {
               // proTableRef.current?.reload();

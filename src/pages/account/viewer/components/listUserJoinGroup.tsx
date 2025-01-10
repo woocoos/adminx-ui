@@ -154,6 +154,7 @@ export default (props: {
         open={modal.open}
         orgId={searchParams.get('org_id') ?? userState.tenantId}
         kind={props.kind}
+        isLoginRestrict
         userInfo={props.userInfo}
         onClose={(isSuccess) => {
           if (isSuccess) {

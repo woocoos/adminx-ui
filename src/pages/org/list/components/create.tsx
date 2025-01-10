@@ -115,8 +115,8 @@ export default (props: {
     onOpenChange = (open: boolean) => {
       if (!open) {
         if (checkLeave()) {
-          props.onClose?.();
           setSaveDisabled(true);
+          props.onClose?.();
         }
       } else {
         setSaveDisabled(true);

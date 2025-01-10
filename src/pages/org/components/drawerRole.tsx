@@ -6,12 +6,17 @@ import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/a
 import { useTranslation } from 'react-i18next';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';
+import { getUserOrgRoleList } from '@/services/adminx/org/user';
 
 export default (props: {
   open: boolean;
   title?: string;
   orgId: string;
   userInfo?: User;
+  /**
+   * 根据登录用户限制角色选取
+   */
+  isLoginRestrict?: boolean;
   kind: OrgRoleKind;
   onClose: (isSuccess?: boolean) => void;
 }) => {
@@ -136,7 +141,11 @@ export default (props: {
                   }
                   where.kind = props.kind;
                   where.orgID = props.orgId;
-                  const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
+                  const result = props.kind === OrgRoleKind.Role ? props.isLoginRestrict ? props.userInfo?.id ? await getUserOrgRoleList(props.userInfo.id, {
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  }) : null : await getOrgRoleList({
                     current: params.current,
                     pageSize: params.pageSize,
                     where,

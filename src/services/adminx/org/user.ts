@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { CreateOrgUserInput, OrderDirection, OrgUserUserType, UserOrder, UserOrderField, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOrgUserInput, OrderDirection, OrgRoleOrder, OrgRoleOrderField, OrgRoleWhereInput, OrgUserUserType, UserOrder, UserOrderField, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -358,4 +358,47 @@ export async function assignOrgUserPolicyView(orgID: string, userID: string, add
     return result.data.assignOrgUserPolicyView;
   }
   return false;
+}
+
+const queryUserOrgRoleList = gql(/* GraphQL */`query userOrgRoles($userId:ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  userOrgRoles(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+        isGrantUser(userID: $userId)
+      }
+    }
+  }
+}`);
+
+/**
+ * 当前登录用户授权的角色 用来做弹出选择用
+ * @param userId
+ * @param gather
+ * @returns
+ */
+export async function getUserOrgRoleList(
+  userId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: OrgRoleWhereInput;
+    orderBy?: OrgRoleOrder;
+  },
+) {
+  const result = await paging(
+    queryUserOrgRoleList, {
+    userId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: OrgRoleOrderField.CreatedAt
+    },
+  }, gather.current || 1)
+  if (result.data?.userOrgRoles) {
+    return result.data.userOrgRoles;
+  }
+  return null
 }

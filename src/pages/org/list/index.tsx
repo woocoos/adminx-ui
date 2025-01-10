@@ -117,7 +117,7 @@ export const OrgList = (props: {
               { key: 'create', label: t('created'), children: createAction },
             );
           }
-          if (record.kind === kind && checkAuth('deleteOrganization', auth)) {
+          if (record.parentID != "0" && checkAuth('deleteOrganization', auth)) {
             items.push(
               { key: 'delete', label: <a onClick={() => onDelOrg(record)}>{t('delete')}</a> },
             );

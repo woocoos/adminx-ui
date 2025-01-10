@@ -200,13 +200,24 @@ export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
  * @returns
  */
 export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
-  const
-    result = await mutation(
-      kind === OrgKind.Root ? mutationCreateRootOrg : mutationCreateOrg, {
-      input,
-    });
-  if (result.data?.createRoot?.id) {
-    return result.data.createRoot;
+  if (kind === OrgKind.Root) {
+    const
+      result = await mutation(
+        mutationCreateRootOrg, {
+        input,
+      });
+    if (result.data?.createRoot?.id) {
+      return result.data.createRoot;
+    }
+  } else {
+    const
+      result = await mutation(
+        mutationCreateOrg, {
+        input,
+      });
+    if (result.data?.createOrganization?.id) {
+      return result.data.createOrganization;
+    }
   }
   return null;
 }

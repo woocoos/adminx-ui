@@ -3856,9 +3856,9 @@ type OrgPolicy implements Node {
   createdBy: Int!
   id: ID!
   """是否授权role"""
-  isGrantRole(orgID: ID, roleID: ID!): Boolean!
+  isGrantRole(roleID: ID!): Boolean!
   """是否授权user"""
-  isGrantUser(orgID: ID, userID: ID!): Boolean!
+  isGrantUser(userID: ID!): Boolean!
   """策略名称"""
   name: String!
   org: Org
@@ -4026,7 +4026,7 @@ type OrgRole implements Node {
   """是否系统角色"""
   isAppRole: Boolean!
   """是否分配给user"""
-  isGrantUser(orgID: ID, userID: ID!): Boolean!
+  isGrantUser(userID: ID!): Boolean!
   """类型,group:组,role:角色"""
   kind: OrgRoleKind!
   """名称"""
@@ -5145,17 +5145,6 @@ type Query {
   orgRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """获取组织用户偏好"""
   orgUserPreference: OrgUserPreference
-  """获取组织用户"""
-  orgUsers(
-    after: Cursor
-    before: Cursor
-    first: Int
-    last: Int
-    orderBy: UserOrder
-    """组织ID或者部门ID"""
-    orgID: ID!
-    where: UserWhereInput
-  ): UserConnection!
   organizations(
     """Returns the elements in the list that come after the specified cursor."""
     after: Cursor
@@ -5172,6 +5161,17 @@ type Query {
     """Filtering options for Orgs returned from the connection."""
     where: OrgWhereInput
   ): OrgConnection!
+  """获取父组织用户，如果是部门取所在组织用户，如果是组织取登录组织用户"""
+  parentOrgUsers(
+    after: Cursor
+    before: Cursor
+    first: Int
+    last: Int
+    orderBy: UserOrder
+    """组织ID或者部门ID"""
+    orgID: ID!
+    where: UserWhereInput
+  ): UserConnection!
   """配额定义"""
   quotaItems(
     """Returns the elements in the list that come after the specified cursor."""
@@ -5252,6 +5252,8 @@ type Query {
   userMembers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户菜单"""
   userMenus(appCode: String!): [AppMenu!]!
+  """用户在登录组织授权的组织角色"""
+  userOrgRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """获取租户密码策略"""
   userPasswordPolicy: UserPasswordPolicy
   """获取用户所有权限"""
@@ -6597,7 +6599,7 @@ type User implements Node {
   """是否允许解除角色授权"""
   isAllowRevokeRole(orgRoleID: ID!): Boolean!
   """是否分配role"""
-  isAssignOrgRole(orgID: ID, orgRoleID: ID!): Boolean!
+  isAssignOrgRole(orgRoleID: ID!): Boolean!
   """语言"""
   lang: String
   """姓氏"""
