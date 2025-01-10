@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 export default (props: {
   token: string;
+  email?: string;
   onSuccess: (token: string) => void;
   onChangeMode: () => void;
 }) => {
@@ -27,7 +28,7 @@ export default (props: {
   return (<>
     <LoginForm
       title={t('email_auth')}
-      subTitle={t('pwd_step_0_email_title_{{field}}', { field: 'xxx' })}
+      subTitle={t('pwd_step_0_email_title_{{field}}', { field: props.email })}
       submitter={{
         searchConfig: {
           submitText: t('confirm'),

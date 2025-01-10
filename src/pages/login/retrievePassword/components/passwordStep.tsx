@@ -83,6 +83,7 @@ export default (props: {
           <VerifyEmail
             x-if={mode === 'email'}
             token={props.token.stateToken}
+            email={usableMode.email}
             onChangeMode={() => {
               setMode(undefined);
             }}
