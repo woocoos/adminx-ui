@@ -4,7 +4,7 @@ import { CloseOutlined } from '@ant-design/icons';
 import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { assignOrgRoleUser } from '@/services/adminx/org/role';
-import { allotOrgUser, getOrgUserList } from '@/services/adminx/org/user';
+import { allotOrgUser, getParentOrgUsers } from '@/services/adminx/org/user';
 import { getDate } from '@/util';
 import { Org, OrgRole, User, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';
@@ -151,7 +151,8 @@ export default (props: {
                   where.displayNameContains = keyword;
                 }
                 where.userType = props.userType;
-                const result = await getOrgUserList(props.orgId, {
+                // 旧的方法 看后续是否需要使用先备注再这 getOrgUserList
+                const result = await getParentOrgUsers(props.orgId, {
                   current: params.current,
                   pageSize: params.pageSize,
                   where,

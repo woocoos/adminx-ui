@@ -402,3 +402,72 @@ export async function getUserOrgRoleList(
   }
   return null
 }
+
+const queryParentOrgUsers = gql(/* GraphQL */`query parentOrgUsers($orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  parentOrgUsers(orgID:$orgId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        contact{email,mobile},userType,creationType,registerIP,status,comments,
+      }
+    }
+  }
+}`);
+const queryParentOrgUsersRoleId = gql(/* GraphQL */`query parentOrgUsersRoleId($orgId:ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  parentOrgUsers(orgID:$orgId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        contact{email,mobile},userType,creationType,registerIP,status,comments,
+        isAssignOrgRole(orgRoleID: $orgRoleId)
+        isAllowRevokeRole(orgRoleID: $orgRoleId)
+      }
+    }
+  }
+}`);
+
+/**
+ * 获取父组织用户列表
+ * @param orgId
+ * @param gather
+ * @returns
+ */
+export async function getParentOrgUsers(
+  orgId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: UserWhereInput;
+    orderBy?: UserOrder;
+  },
+  isGrant?: {
+    orgRoleId?: string;
+  },
+) {
+  const result = isGrant?.orgRoleId ? await paging(
+    queryParentOrgUsersRoleId, {
+    orgId,
+    orgRoleId: isGrant.orgRoleId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    }
+  }, gather.current ?? 1) : await paging(
+    queryParentOrgUsers, {
+    orgId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    }
+  }, gather.current ?? 1)
+  if (result.data?.parentOrgUsers) {
+    return result.data.parentOrgUsers;
+  }
+  return null
+}
