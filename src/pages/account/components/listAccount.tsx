@@ -96,7 +96,7 @@ export const UserList = (props: {
       scene: '',
     });
 
-  if (props.scene === 'orgMember') {
+  if (['orgMember', 'orgUser'].includes(props.scene ?? '')) {
     columns.push({
       title: t('user_type'),
       dataIndex: 'orgUserType',
@@ -318,19 +318,17 @@ export const UserList = (props: {
         title: title,
         content: `${record.displayName} ${title}`,
         onOk: async (close) => {
-          if (props.orgRole) {
-            const result = await changeOrgUserType(record.id, record.orgUserType === OrgUserUserType.Internal ? OrgUserUserType.External : OrgUserUserType.Internal);
-            if (result) {
-              setDataSource(delDataSource(dataSource, record.id));
-              if (dataSource.length === 0) {
-                const pageInfo = { ...proTableRef.current?.pageInfo };
-                pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
-                proTableRef.current?.setPageInfo?.(pageInfo);
-                proTableRef.current?.reload();
-              }
-              message.success(t('submit_success'));
-              close();
+          const result = await changeOrgUserType(record.id, record.orgUserType === OrgUserUserType.Internal ? OrgUserUserType.External : OrgUserUserType.Internal);
+          if (result) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
+              const pageInfo = { ...proTableRef.current?.pageInfo };
+              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
+              proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
+            message.success(t('submit_success'));
+            close();
           }
         },
       });

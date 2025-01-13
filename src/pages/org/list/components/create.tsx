@@ -365,7 +365,7 @@ export default (props: {
           tooltip={<div>{t('owner_tooltip')}</div>}
         >
           <InputAccount
-            disabled={!!oldInfo?.ownerID}
+            disabled={(props.scene === 'editor' && !!oldInfo?.ownerID)}
             orgId={parentIDValue == '0' ? undefined : userState.tenantId}
             userType={parentIDValue == '0' ? UserUserType.Account : UserUserType.Member}
           />

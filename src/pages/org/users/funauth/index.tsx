@@ -103,7 +103,7 @@ export default (props: {
 
   useEffect(() => {
     reqCheckedsData()
-  }, [userInfo])
+  }, [userInfo, orgInfo])
 
   useEffect(() => {
     reqUserInfo()

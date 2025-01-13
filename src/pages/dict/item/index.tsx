@@ -178,7 +178,7 @@ export default () => {
           }}
           pagination={false}
           dragSortKey="displaySort"
-          onDragSortEnd={async (newDataSource) => {
+          onDragSortEnd={async (_beforeIndex, _afterIndex, newDataSource) => {
             /**
              * 往下移动
              * o  [1, 2, 3, 4, 5]

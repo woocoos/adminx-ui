@@ -8,7 +8,7 @@ export const EnumOrgUserType = {
   [OrgUserUserType.Internal]: { text: '内部用户' },
 }
 
-const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
     ... on Org{
       id,
@@ -18,6 +18,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
           cursor,node{
             id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
             contact{email,mobile},userType,creationType,registerIP,status,comments
+            orgUserType(orgID: $orgId)
           }
         }
       }
@@ -25,7 +26,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
   }
 }`);
 
-const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrgRole($gid: GID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrgRole($gid: GID!,$orgId:ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
     ... on Org{
       id,
@@ -33,7 +34,7 @@ const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrg
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
-            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,orgUserType(orgID: $orgId)
             contact{email,mobile},userType,creationType,registerIP,status,comments
             isAssignOrgRole(orgRoleID: $orgRoleId)
             isAllowRevokeRole(orgRoleID: $orgRoleId)
@@ -155,6 +156,7 @@ export async function getOrgUserList(
     queryOrgUserListAndIsOrgRole, {
     orgRoleId: isGrant.orgRoleId,
     gid: gid('Org', orgId),
+    orgId: orgId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {
@@ -164,6 +166,7 @@ export async function getOrgUserList(
   }, gather.current || 1) : await paging(
     queryOrgUserList, {
     gid: gid('Org', orgId),
+    orgId: orgId,
     first: gather.pageSize || 20,
     where: gather.where,
     orderBy: gather.orderBy ?? {

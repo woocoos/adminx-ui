@@ -134,7 +134,7 @@ const PageList = () => {
         toolbar={{
           title: t('country_list'),
         }}
-        onDragSortEnd={async (newDataSource) => {
+        onDragSortEnd={async (_beforeIndex, _afterIndex, newDataSource) => {
           const moveData = searchMoveList(dataSource, newDataSource)
           if (moveData) {
             const result = await moveCountryInfo(moveData.sourceId, moveData.targetId, moveData.action);

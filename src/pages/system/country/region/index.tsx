@@ -354,6 +354,7 @@ export default () => {
             draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
             treeData={treeData}
             onSelect={onTreeSelect}
+            height={600}
             selectedKeys={selectedTree.keys}
             defaultExpandAll
             titleRender={customerTitleRender}
