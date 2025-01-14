@@ -101,8 +101,8 @@ const queryMemberList = gql(/* GraphQL */`query memberList($orgId:ID!,$first: In
   }
 }`);
 
-const mutationChangeOrgUserType = gql(/* GraphQL */`mutation changeOrgUserType($userId:ID!,$userType:OrgUserUserType!){
-  changeOrgUserType(userID:$userId,userType:$userType)
+const mutationChangeOrgUserType = gql(/* GraphQL */`mutation changeOrgUserType($orgId:ID!,$userId:ID!,$userType:OrgUserUserType!){
+  changeOrgUserType(userID:$userId,userType:$userType,orgID: $orgId)
 }`);
 
 /**
@@ -290,14 +290,16 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
 /**
  * 切换用户类型
  * @param userId
+ * @param orgId
  * @param userType
  * @returns
  */
-export async function changeOrgUserType(userId: string, userType: OrgUserUserType) {
+export async function changeOrgUserType(userId: string, orgId: string, userType: OrgUserUserType) {
   const
     result = await mutation(
       mutationChangeOrgUserType, {
       userId,
+      orgId,
       userType,
     });
 

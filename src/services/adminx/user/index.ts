@@ -752,3 +752,27 @@ export async function getUserAppList() {
   }
   return null;
 }
+
+
+const queryUserMfaInfo = gql(/* GraphQL */`query userMfaInfo($userId: ID!,$orgId:ID!){
+  userMfaInfo(userID: $userId,orgID: $orgId){
+    accountName, mfaEnabled, qrCodeUri, secret
+  }
+}`);
+
+/**
+ * 获取mfa信息
+ * @param userId
+ * @param orgId
+ * @returns
+ */
+export async function getUserMfaInfo(userId: string, orgId: string) {
+  const result = await query(queryUserMfaInfo, {
+    userId,
+    orgId,
+  });
+  if (result.data?.userMfaInfo) {
+    return result.data.userMfaInfo;
+  }
+  return null;
+}

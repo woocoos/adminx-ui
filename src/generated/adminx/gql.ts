@@ -152,7 +152,7 @@ const documents = {
     "mutation allotOrgUser($input:CreateOrgUserInput!){\n  allotOrganizationUser(input:$input)\n}": types.AllotOrgUserDocument,
     "mutation removeOrgUser($orgId:ID!,$userId:ID!){\n  removeOrganizationUser(orgID: $orgId,userID: $userId)\n}": types.RemoveOrgUserDocument,
     "query memberList($orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){\n  userMembers(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,\n        contact{email,mobile},userType,creationType,registerIP,status,comments,\n        orgUserType(orgID: $orgId)\n      }\n    }\n  }\n}": types.MemberListDocument,
-    "mutation changeOrgUserType($userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType)\n}": types.ChangeOrgUserTypeDocument,
+    "mutation changeOrgUserType($orgId:ID!,$userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType,orgID: $orgId)\n}": types.ChangeOrgUserTypeDocument,
     "query orgPolicyViewUserAssigned($appCode: String!,$userID:ID!,$orgID:ID){\n  orgPolicyViewUserAssigned(appCode:$appCode,orgID:$orgID,userID: $userID)\n}": types.OrgPolicyViewUserAssignedDocument,
     "mutation assignOrgUserPolicyView($orgID: ID!, $userID: ID!,$rmOrgPolicyIDs: [ID!],$addOrgPolicyIDs: [ID!]){\n  assignOrgUserPolicyView(orgID: $orgID, userID: $userID,rmOrgPolicyIDs: $rmOrgPolicyIDs,addOrgPolicyIDs: $addOrgPolicyIDs)\n}": types.AssignOrgUserPolicyViewDocument,
     "query userOrgRoles($userId:ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){\n  userOrgRoles(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole\n        isGrantUser(userID: $userId)\n      }\n    }\n  }\n}": types.UserOrgRolesDocument,
@@ -205,6 +205,7 @@ const documents = {
     "query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){\n  userDevices(first:$first,orderBy: $orderBy,where: $where){\n    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }\n    edges{\n      cursor,node{\n        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,\n      }\n    }\n  }\n}": types.UserDevicesDocument,
     "mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}": types.DeleteUserDeviceDocument,
     "query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}": types.UserAppDocument,
+    "query userMfaInfo($userId: ID!,$orgId:ID!){\n  userMfaInfo(userID: $userId,orgID: $orgId){\n    accountName, mfaEnabled, qrCodeUri, secret\n  }\n}": types.UserMfaInfoDocument,
 };
 
 /**
@@ -776,7 +777,7 @@ export function gql(source: "query memberList($orgId:ID!,$first: Int,$orderBy:Us
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "mutation changeOrgUserType($userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType)\n}"): (typeof documents)["mutation changeOrgUserType($userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType)\n}"];
+export function gql(source: "mutation changeOrgUserType($orgId:ID!,$userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType,orgID: $orgId)\n}"): (typeof documents)["mutation changeOrgUserType($orgId:ID!,$userId:ID!,$userType:OrgUserUserType!){\n  changeOrgUserType(userID:$userId,userType:$userType,orgID: $orgId)\n}"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -985,6 +986,10 @@ export function gql(source: "mutation deleteUserDevice($userID: ID!,$deviceID: I
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"): (typeof documents)["query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query userMfaInfo($userId: ID!,$orgId:ID!){\n  userMfaInfo(userID: $userId,orgID: $orgId){\n    accountName, mfaEnabled, qrCodeUri, secret\n  }\n}"): (typeof documents)["query userMfaInfo($userId: ID!,$orgId:ID!){\n  userMfaInfo(userID: $userId,orgID: $orgId){\n    accountName, mfaEnabled, qrCodeUri, secret\n  }\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

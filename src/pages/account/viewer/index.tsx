@@ -1,10 +1,10 @@
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { ReactNode, useEffect, useState } from 'react';
-import { Button, Divider, Modal, Space, message } from 'antd';
+import { Button, Divider, Modal, QRCode, Space, message } from 'antd';
 import UserCreate from '../list/components/create';
 import UserCreateIdentity from './components/createIdentity';
-import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, sendMFAEmail } from '@/services/adminx/user';
+import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, getUserMfaInfo, sendMFAEmail } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
@@ -14,6 +14,8 @@ import style from './index.module.css';
 import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGender, OrgRoleKind } from '@/generated/adminx/graphql';
 import AccessKey from './components/accessKey';
 import { parseStorageUrl } from '@knockout-js/api';
+import store from '@/store';
+import { text } from 'stream/consumers';
 
 export default (props: {
   isFromOrg?: boolean;
@@ -24,6 +26,7 @@ export default (props: {
     { t } = useTranslation(),
     navigate = useNavigate(),
     [searchParams] = useSearchParams(),
+    [userState] = store.useModel('user'),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
     [avatar, setAvatar] = useState<string>(),
@@ -97,6 +100,24 @@ export default (props: {
             }
           },
         });
+      }
+    },
+    viewMfa = async () => {
+      const orgId = searchParams.get('org_id') ?? userState.tenantId
+      if (info && orgId) {
+        const result = await getUserMfaInfo(info.id, orgId)
+        if (result) {
+          Modal.info({
+            title: `${t('view')} ${t('MFA')}`,
+            content: <div>
+              <div style={{ width: '160px', margin: '0 auto' }}>
+                <QRCode value={result.qrCodeUri} />
+              </div>
+              <div>{t('account_number')}: {result.accountName}</div>
+              <div>{t('secret_key')}: {result.secret} </div>
+            </div>,
+          })
+        }
       }
     },
     sendEmail = () => {
@@ -286,6 +307,13 @@ export default (props: {
                               {t('send_to_email')}
                             </Button>
                           </Auth>
+                          {
+                            info?.loginProfile?.mfaEnabled ? <Button onClick={() => {
+                              viewMfa()
+                            }}>
+                              {t('view')}
+                            </Button> : <></>
+                          }
                           <Auth authKey="enableMFA">
                             <Button
                               type="primary"
@@ -316,11 +344,11 @@ export default (props: {
                       {t('user_viewer_MFA_description')}
                     </span>
                   </ProDescriptions.Item>
-                  {info?.loginProfile?.mfaEnabled ? <>
+                  {/* {info?.loginProfile?.mfaEnabled ? <>
                     <ProDescriptions.Item label={t('account_number')} >
                       {info.principalName}
                     </ProDescriptions.Item>
-                  </> : <></>}
+                  </> : <></>} */}
                 </ProDescriptions>
                 <br />
                 <Divider />

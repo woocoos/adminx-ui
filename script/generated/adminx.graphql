@@ -3261,7 +3261,7 @@ type Mutation {
   """绑定用户凭证(管理端使用)"""
   bindUserIdentity(input: CreateUserIdentityInput!): UserIdentity
   """更改组织用户类型"""
-  changeOrgUserType(userID: ID!, userType: OrgUserUserType!): Boolean!
+  changeOrgUserType(orgID: ID!, userID: ID!, userType: OrgUserUserType!): Boolean!
   """用户修改自己的登录密码"""
   changePassword(newPwd: String!, oldPwd: String!): Boolean!
   """创建应用"""
@@ -5137,6 +5137,8 @@ type Query {
   orgPolicyViewRoleAssigned(appCode: String!, orgID: ID, orgRoleID: ID!): [ID!]!
   """组织策略视图用户选择项，返回OrgPolicyIDs"""
   orgPolicyViewUserAssigned(appCode: String!, orgID: ID, userID: ID!): [ID!]!
+  """组织策略视图，用户授权的角色/用户组选中项，返回OrgPolicyIDs"""
+  orgPolicyViewUserRoleAssigned(appCode: String!, orgID: ID!, userID: ID!): [ID!]!
   """组织回收站列表"""
   orgRecycleUsers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户组组成员"""
@@ -5252,6 +5254,8 @@ type Query {
   userMembers(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: UserOrder, where: UserWhereInput): UserConnection!
   """用户菜单"""
   userMenus(appCode: String!): [AppMenu!]!
+  """查看用户mfa信息"""
+  userMfaInfo(orgID: ID!, userID: ID!): UserMfaInfo!
   """用户在登录组织授权的组织角色"""
   userOrgRoles(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """获取租户密码策略"""
@@ -7470,6 +7474,18 @@ input UserLoginProfileWhereInput {
   """verify_device field predicates"""
   verifyDevice: Boolean
   verifyDeviceNEQ: Boolean
+}
+
+"""查看用户mfa信息"""
+type UserMfaInfo {
+  """用户账号"""
+  accountName: String!
+  """是否启用mfa"""
+  mfaEnabled: Boolean!
+  """二维码"""
+  qrCodeUri: String!
+  """秘钥"""
+  secret: String!
 }
 
 """Ordering options for User connections"""

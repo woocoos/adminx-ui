@@ -169,7 +169,7 @@ export default {
     enable_MFA: '开启MFA多因素认证',
     close_MFA: '关闭MFA多因素认证',
     account_number: '账号',
-    secret_key: '秘钥',
+    secret_key: '密钥',
     qr_code: '二维码',
     filter_operation: '筛选操作',
     org_cooperation: '组织协作',

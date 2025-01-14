@@ -296,7 +296,7 @@ export const UserList = (props: {
         content: `${t('confirm_remove')}：${record.displayName} ?`,
         onOk: async (close) => {
           if (props?.orgId) {
-            const result = props.orgInfo?.kind === 'root' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id);
+            const result = props.orgInfo?.parentID == '0' ? await delUserInfo(record.id) : await removeOrgUser(props.orgId, record.id);
             if (result) {
               setDataSource(delDataSource(dataSource, record.id));
               if (dataSource.length === 0) {
@@ -318,17 +318,13 @@ export const UserList = (props: {
         title: title,
         content: `${record.displayName} ${title}`,
         onOk: async (close) => {
-          const result = await changeOrgUserType(record.id, record.orgUserType === OrgUserUserType.Internal ? OrgUserUserType.External : OrgUserUserType.Internal);
-          if (result) {
-            setDataSource(delDataSource(dataSource, record.id));
-            if (dataSource.length === 0) {
-              const pageInfo = { ...proTableRef.current?.pageInfo };
-              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
-              proTableRef.current?.setPageInfo?.(pageInfo);
+          if (props?.orgId) {
+            const result = await changeOrgUserType(record.id, props.orgId, record.orgUserType === OrgUserUserType.Internal ? OrgUserUserType.External : OrgUserUserType.Internal);
+            if (result) {
               proTableRef.current?.reload();
+              message.success(t('submit_success'));
+              close();
             }
-            message.success(t('submit_success'));
-            close();
           }
         },
       });
