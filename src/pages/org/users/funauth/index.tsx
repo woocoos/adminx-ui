@@ -6,7 +6,7 @@ import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import CheckPolicyView from "@/pages/app/roles/funauth/components/checkPolicyView"
 import Auth from "@/components/auth"
-import { getUserAppList, getUserInfo } from "@/services/adminx/user"
+import { getOrgUserRoleAssigned, getUserAppList, getUserInfo } from "@/services/adminx/user"
 import store from "@/store"
 import { assignOrgUserPolicyView, getOrgUserAssignedPolicyView } from "@/services/adminx/org/user"
 import { getOrgInfo } from "@/services/adminx/org"
@@ -15,6 +15,7 @@ type CheckedsType = {
   appInfo: App
   checked: string[]
   oldChecked: string[]
+  disabledIds?: string[]
 }
 
 export default (props: {
@@ -55,15 +56,18 @@ export default (props: {
         for await (const app of appResult) {
           if (app) {
             const result = await getOrgUserAssignedPolicyView(app.code, userInfo.id, orgInfo.id)
+            const disabledIds = await getOrgUserRoleAssigned(app.code, userInfo.id, orgInfo.id)
             list.push({
               appInfo: app as App,
               checked: [...result],
               oldChecked: [...result],
+              disabledIds,
             })
           }
         }
       }
     }
+    console.log(list)
     setDataSource(list)
   }, onSave = async () => {
     if (userInfo) {
@@ -147,6 +151,7 @@ export default (props: {
             orgId={orgInfo?.id}
             appInfo={item.appInfo}
             value={item.checked}
+            disabledValues={item.disabledIds}
             onChange={(value) => {
               setSaveDisabled(false)
               setDataSource(dataSource.map(dsItem => {

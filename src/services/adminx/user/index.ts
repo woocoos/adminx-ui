@@ -776,3 +776,27 @@ export async function getUserMfaInfo(userId: string, orgId: string) {
   }
   return null;
 }
+
+
+const queryOrgPolicyViewUserRoleAssigned = gql(/* GraphQL */`query orgPolicyViewUserRoleAssigned($appCode:String!, $userId: ID!,$orgId:ID!){
+  orgPolicyViewUserRoleAssigned(appCode:$appCode userID: $userId,orgID: $orgId)
+}`);
+
+/**
+ * 用户已授权不能再变更的权限
+ * @param appCode
+ * @param userId
+ * @param orgId
+ * @returns
+ */
+export async function getOrgUserRoleAssigned(appCode: string, userId: string, orgId: string) {
+  const result = await query(queryOrgPolicyViewUserRoleAssigned, {
+    appCode,
+    userId,
+    orgId,
+  });
+  if (result.data?.orgPolicyViewUserRoleAssigned) {
+    return result.data.orgPolicyViewUserRoleAssigned;
+  }
+  return [];
+}

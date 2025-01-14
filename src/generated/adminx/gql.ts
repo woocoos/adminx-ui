@@ -206,6 +206,7 @@ const documents = {
     "mutation deleteUserDevice($userID: ID!,$deviceID: ID!){\n  deleteUserDevice( userID: $userID,deviceID: $deviceID)\n}": types.DeleteUserDeviceDocument,
     "query userApp{\n  userApps{\n    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,\n    refreshTokenValidity,logo,comments,status,createdAt\n  }\n}": types.UserAppDocument,
     "query userMfaInfo($userId: ID!,$orgId:ID!){\n  userMfaInfo(userID: $userId,orgID: $orgId){\n    accountName, mfaEnabled, qrCodeUri, secret\n  }\n}": types.UserMfaInfoDocument,
+    "query orgPolicyViewUserRoleAssigned($appCode:String!, $userId: ID!,$orgId:ID!){\n  orgPolicyViewUserRoleAssigned(appCode:$appCode userID: $userId,orgID: $orgId)\n}": types.OrgPolicyViewUserRoleAssignedDocument,
 };
 
 /**
@@ -990,6 +991,10 @@ export function gql(source: "query userApp{\n  userApps{\n    id,name,code,kind,
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "query userMfaInfo($userId: ID!,$orgId:ID!){\n  userMfaInfo(userID: $userId,orgID: $orgId){\n    accountName, mfaEnabled, qrCodeUri, secret\n  }\n}"): (typeof documents)["query userMfaInfo($userId: ID!,$orgId:ID!){\n  userMfaInfo(userID: $userId,orgID: $orgId){\n    accountName, mfaEnabled, qrCodeUri, secret\n  }\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "query orgPolicyViewUserRoleAssigned($appCode:String!, $userId: ID!,$orgId:ID!){\n  orgPolicyViewUserRoleAssigned(appCode:$appCode userID: $userId,orgID: $orgId)\n}"): (typeof documents)["query orgPolicyViewUserRoleAssigned($appCode:String!, $userId: ID!,$orgId:ID!){\n  orgPolicyViewUserRoleAssigned(appCode:$appCode userID: $userId,orgID: $orgId)\n}"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};

@@ -14,6 +14,7 @@ export default (props: {
   appInfo: App
   orgId?: string
   value?: string[]
+  disabledValues?: string[]
   disabled?: boolean
   onChange?: (value: string[]) => void
 }) => {
@@ -85,20 +86,19 @@ export default (props: {
       if (kind === AppPolicyViewKind.Dir) {
         list.push(<Flex key={`dir-list${data.key}`} flex={1} vertical>{...data.children.map(item => treeItemRender(item))}</Flex>)
       } else {
-        // 检测id不存的情况 后续遇到问题可以用这个方法定位
-        // const noIds = data.children.filter(child => !child.node?.orgPolicy?.id)
-        // if (noIds.length) {
-        //   console.log(noIds)
-        // }
         list.push(<Flex key={`child${data.key}`} className={style.policy} flex={1}>
           <Space>
             <Checkbox.Group
               value={props.value}
               disabled={props.disabled}
-              options={data.children.map(item => ({
-                label: `${item.title}`,
-                value: getRealkey(item),
-              }))}
+              options={data.children.map(item => {
+                const realkey = getRealkey(item)
+                return {
+                  label: `${item.title}`,
+                  value: realkey,
+                  disabled: props.disabledValues?.includes(realkey)
+                }
+              })}
               onChange={(value) => {
                 const currentKeys = data.children?.map(item => getRealkey(item)) ?? []
                 const valueKeys = [...(props.value ?? [])].filter(key => !currentKeys.includes(key))
