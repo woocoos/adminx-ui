@@ -262,13 +262,13 @@ export const PageAppList = (props: {
               open={modal.open}
               title={modal.title}
               isLoginOrgId={props.isFromOrg}
+              isMultiple
               onClose={async (selectData) => {
-                const sdata = selectData?.[0];
-                if (sdata && props.orgId) {
-                  const result = await assignOrgApp(props.orgId, sdata.id);
-                  if (result) {
-                    proTableRef.current?.reload();
+                if (selectData?.length && props.orgId) {
+                  for await (const item of selectData) {
+                    await assignOrgApp(props.orgId, item.id);
                   }
+                  proTableRef.current?.reload();
                 }
                 setModal({ open: false, title: modal.title, id: '' });
               }}
