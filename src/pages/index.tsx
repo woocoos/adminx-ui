@@ -125,7 +125,7 @@ export default () => {
         </ProCard>
       </ProCard>
       <br />
-      <ProCard title={t('my_app')}>
+      <ProCard title={t('my_app')} gutter={[8, 16]} wrap>
         {
           myApps.map(item =>
           (<ProCard
