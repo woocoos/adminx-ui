@@ -144,11 +144,18 @@ export default (props: {
                 request={async (params) => {
                   const table = { data: [] as OrgPolicy[], success: true, total: 0 },
                     where: OrgPolicyWhereInput = {
-                      hasAppPolicyWith: [
+                      or: [
                         {
-                          kind: AppPolicyKind.App
+                          hasAppPolicyWith: [
+                            {
+                              kind: AppPolicyKind.App
+                            }
+                          ]
+                        },
+                        {
+                          appPolicyIDIsNil: true
                         }
-                      ]
+                      ],
                     };
                   if (keyword) {
                     where.or = [
