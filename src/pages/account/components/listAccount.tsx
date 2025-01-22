@@ -183,11 +183,9 @@ export const UserList = (props: {
         }
 
         if (['orgUser', 'orgMember'].includes(props.scene ?? '')) {
-          if (checkAuth('viewer', auth)) {
-            items.push(
-              { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}&${orgIdParameter}`} >{t('user_devices')}</Link> },
-            );
-          }
+          items.push(
+            { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}&${orgIdParameter}`} >{t('user_devices')}</Link> },
+          );
           if (props.orgInfo?.kind === 'org' || record.userType === 'member') {
             if (checkAuth('removeOrganizationUser', auth)) {
               items.push(
