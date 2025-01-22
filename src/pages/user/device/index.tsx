@@ -149,6 +149,7 @@ export default () => {
             current: params.current,
             pageSize: params.pageSize,
             where,
+            userId: userId,
           });
           if (result?.totalCount) {
             table.data = result.edges?.map(item => item?.node) as UserDevice[];

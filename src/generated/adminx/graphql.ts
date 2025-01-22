@@ -352,7 +352,7 @@ export type AppDictItem = Node & {
   /** 名称 */
   name: Scalars['String']['output'];
   org?: Maybe<Org>;
-  /** 组织ID,空为全局字典 */
+  /** 租户ID,空为全局字典 */
   orgID?: Maybe<Scalars['ID']['output']>;
   /** 关联代码,由app_code和dict_code组成 */
   refCode: Scalars['String']['output'];
@@ -2450,8 +2450,8 @@ export type CreateQuotaInput = {
   /** 限制值 */
   limit: Scalars['Int']['input'];
   quotaItemID: Scalars['ID']['input'];
-  quotaOrgID: Scalars['ID']['input'];
-  quotaUserID: Scalars['ID']['input'];
+  quotaOrgID?: InputMaybe<Scalars['ID']['input']>;
+  quotaUserID?: InputMaybe<Scalars['ID']['input']>;
   /** 生效时间 */
   startAt?: InputMaybe<Scalars['Time']['input']>;
 };
@@ -4462,7 +4462,7 @@ export type OrgPolicy = Node & {
   /** 策略名称 */
   name: Scalars['String']['output'];
   org?: Maybe<Org>;
-  /** 组织ID */
+  /** 租户ID */
   orgID?: Maybe<Scalars['ID']['output']>;
   permissions?: Maybe<Array<Permission>>;
   /** 策略规则 */
@@ -4644,7 +4644,7 @@ export type OrgRole = Node & {
   kind: OrgRoleKind;
   /** 名称 */
   name: Scalars['String']['output'];
-  /** 组织ID */
+  /** 租户ID */
   orgID?: Maybe<Scalars['ID']['output']>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
@@ -4901,7 +4901,7 @@ export type OrgUserPreference = Node & {
   /** 用户最近访问菜单 */
   menuRecent?: Maybe<Array<Scalars['ID']['output']>>;
   org: Org;
-  /** 组织ID */
+  /** 租户ID */
   orgID: Scalars['ID']['output'];
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
@@ -5384,7 +5384,7 @@ export type Permission = Node & {
   /** 是否允许撤销：根用户授权及系统角色授权不允许撤销 */
   isAllowRevoke: Scalars['Boolean']['output'];
   org: Org;
-  /** 授权的域根组织 */
+  /** 授权的租户 */
   orgID: Scalars['ID']['output'];
   orgPolicy: OrgPolicy;
   /** 策略 */
@@ -5627,7 +5627,10 @@ export type Query = {
   apps: AppConnection;
   /** 检测权限 */
   checkPermission: Scalars['Boolean']['output'];
-  /** 检测权限 ko-proxy使用 */
+  /**
+   * 检测权限 ko-proxy使用
+   * @deprecated 未来将弃用.
+   */
   checkPermissionByJwt: Scalars['Boolean']['output'];
   /** 国家查询 */
   countries: CountryConnection;
@@ -5682,8 +5685,6 @@ export type Query = {
   regions: RegionConnection;
   /** 用户授权的应用列表 */
   userApps: Array<App>;
-  /** 用户设备查询 */
-  userDevices: UserDeviceConnection;
   /** 用户继承用户组的权限策略 */
   userExtendGroupPolicies: PermissionConnection;
   /** 用户继承角色的权限策略 */
@@ -6013,16 +6014,6 @@ export type QueryRegionsArgs = {
 };
 
 
-export type QueryUserDevicesArgs = {
-  after?: InputMaybe<Scalars['Cursor']['input']>;
-  before?: InputMaybe<Scalars['Cursor']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  last?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<UserDeviceOrder>;
-  where?: InputMaybe<UserDeviceWhereInput>;
-};
-
-
 export type QueryUserExtendGroupPoliciesArgs = {
   after?: InputMaybe<Scalars['Cursor']['input']>;
   before?: InputMaybe<Scalars['Cursor']['input']>;
@@ -6130,19 +6121,19 @@ export type Quota = Node & {
   /** 配额项ID */
   quotaItemID: Scalars['ID']['output'];
   /** 配额关联租户 */
-  quotaOrg: Org;
+  quotaOrg?: Maybe<Org>;
   /** 配额关联用户 */
-  quotaUser: User;
+  quotaUser?: Maybe<User>;
   /** 生效时间 */
   startAt?: Maybe<Scalars['Time']['output']>;
   /** 租户ID,来源于root的组织ID. */
-  tenantID: Scalars['ID']['output'];
+  tenantID?: Maybe<Scalars['ID']['output']>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
   /** 已使用值 */
   used: Scalars['Int']['output'];
   /** 来源于用户ID */
-  userID: Scalars['ID']['output'];
+  userID?: Maybe<Scalars['ID']['output']>;
 };
 
 /** A connection to a list of items. */
@@ -6435,8 +6426,10 @@ export type QuotaWhereInput = {
   /** tenant_id field predicates */
   tenantID?: InputMaybe<Scalars['ID']['input']>;
   tenantIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
   tenantIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   tenantIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  tenantIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** updated_at field predicates */
   updatedAt?: InputMaybe<Scalars['Time']['input']>;
   updatedAtGT?: InputMaybe<Scalars['Time']['input']>;
@@ -6462,8 +6455,10 @@ export type QuotaWhereInput = {
   /** user_id field predicates */
   userID?: InputMaybe<Scalars['ID']['input']>;
   userIDIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  userIDIsNil?: InputMaybe<Scalars['Boolean']['input']>;
   userIDNEQ?: InputMaybe<Scalars['ID']['input']>;
   userIDNotIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+  userIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Region = Node & {
@@ -7158,6 +7153,8 @@ export type UpdatePermissionInput = {
  */
 export type UpdateQuotaInput = {
   clearEndAt?: InputMaybe<Scalars['Boolean']['input']>;
+  clearQuotaOrg?: InputMaybe<Scalars['Boolean']['input']>;
+  clearQuotaUser?: InputMaybe<Scalars['Boolean']['input']>;
   clearStartAt?: InputMaybe<Scalars['Boolean']['input']>;
   /** 过期时间 */
   endAt?: InputMaybe<Scalars['Time']['input']>;
@@ -7421,8 +7418,7 @@ export type User = Node & {
   /** 创建类型,邀请，注册,手工创建 */
   creationType: UserCreationType;
   deletedAt?: Maybe<Scalars['Time']['output']>;
-  /** 用户设备 */
-  devices?: Maybe<Array<UserDevice>>;
+  devices: UserDeviceConnection;
   /** 显示名 */
   displayName: Scalars['String']['output'];
   /** 名字 */
@@ -7461,6 +7457,16 @@ export type User = Node & {
   userQuota?: Maybe<Array<Quota>>;
   /** 用户类型 */
   userType: UserUserType;
+};
+
+
+export type UserDevicesArgs = {
+  after?: InputMaybe<Scalars['Cursor']['input']>;
+  before?: InputMaybe<Scalars['Cursor']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  last?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<UserDeviceOrder>;
+  where?: InputMaybe<UserDeviceWhereInput>;
 };
 
 
@@ -10213,21 +10219,21 @@ export type QuotaListQueryVariables = Exact<{
 }>;
 
 
-export type QuotaListQuery = { __typename?: 'Query', quotas: { __typename?: 'QuotaConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'QuotaEdge', cursor: any, node?: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string, quotaOrg: { __typename?: 'Org', id: string, name: string }, quotaUser: { __typename?: 'User', id: string, displayName: string }, quotaItem: { __typename?: 'QuotaItem', id: string, name: string } } | null } | null> | null } };
+export type QuotaListQuery = { __typename?: 'Query', quotas: { __typename?: 'QuotaConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'QuotaEdge', cursor: any, node?: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID?: string | null, tenantID?: string | null, quotaOrg?: { __typename?: 'Org', id: string, name: string } | null, quotaUser?: { __typename?: 'User', id: string, displayName: string } | null, quotaItem: { __typename?: 'QuotaItem', id: string, name: string } } | null } | null> | null } };
 
 export type QuotaInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type QuotaInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string, quotaOrg: { __typename?: 'Org', id: string, name: string }, quotaUser: { __typename?: 'User', id: string, displayName: string }, quotaItem: { __typename?: 'QuotaItem', id: string, name: string } } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type QuotaInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID?: string | null, tenantID?: string | null, quotaOrg?: { __typename?: 'Org', id: string, name: string } | null, quotaUser?: { __typename?: 'User', id: string, displayName: string } | null, quotaItem: { __typename?: 'QuotaItem', id: string, name: string } } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type CreateQuotaMutationVariables = Exact<{
   input: CreateQuotaInput;
 }>;
 
 
-export type CreateQuotaMutation = { __typename?: 'Mutation', createQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string } };
+export type CreateQuotaMutation = { __typename?: 'Mutation', createQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID?: string | null, tenantID?: string | null } };
 
 export type UpdateQuotaMutationVariables = Exact<{
   quotaId: Scalars['ID']['input'];
@@ -10235,7 +10241,7 @@ export type UpdateQuotaMutationVariables = Exact<{
 }>;
 
 
-export type UpdateQuotaMutation = { __typename?: 'Mutation', updateQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID: string, tenantID: string } };
+export type UpdateQuotaMutation = { __typename?: 'Mutation', updateQuota: { __typename?: 'Quota', id: string, createdAt: any, limit: number, used: number, startAt?: any | null, endAt?: any | null, userID?: string | null, tenantID?: string | null } };
 
 export type DeleteQuotaMutationVariables = Exact<{
   quotaId: Scalars['ID']['input'];
@@ -10438,10 +10444,11 @@ export type UserDevicesQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<UserDeviceOrder>;
   where?: InputMaybe<UserDeviceWhereInput>;
+  gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserDevicesQuery = { __typename?: 'Query', userDevices: { __typename?: 'UserDeviceConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserDeviceEdge', cursor: any, node?: { __typename?: 'UserDevice', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, status?: UserDeviceSimpleStatus | null, comments?: string | null, deviceUID: string, deviceName?: string | null, systemName?: string | null, systemVersion?: string | null, appVersion?: string | null, deviceModel?: string | null } | null } | null> | null } };
+export type UserDevicesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, devices: { __typename?: 'UserDeviceConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserDeviceEdge', cursor: any, node?: { __typename?: 'UserDevice', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, status?: UserDeviceSimpleStatus | null, comments?: string | null, deviceUID: string, deviceName?: string | null, systemName?: string | null, systemVersion?: string | null, appVersion?: string | null, deviceModel?: string | null } | null } | null> | null } } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type DeleteUserDeviceMutationVariables = Exact<{
   userID: Scalars['ID']['input'];
@@ -10662,7 +10669,7 @@ export const CreateOauthClientDocument = {"kind":"Document","definitions":[{"kin
 export const EnableOauthClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"enableOauthClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"enableOauthClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"clientID"}},{"kind":"Field","name":{"kind":"Name","value":"clientSecret"}},{"kind":"Field","name":{"kind":"Name","value":"grantTypes"}},{"kind":"Field","name":{"kind":"Name","value":"lastAuthAt"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<EnableOauthClientMutation, EnableOauthClientMutationVariables>;
 export const DisableOauthClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"disableOauthClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"disableOauthClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"clientID"}},{"kind":"Field","name":{"kind":"Name","value":"clientSecret"}},{"kind":"Field","name":{"kind":"Name","value":"grantTypes"}},{"kind":"Field","name":{"kind":"Name","value":"lastAuthAt"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<DisableOauthClientMutation, DisableOauthClientMutationVariables>;
 export const DelOauthClientDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"delOauthClient"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteOauthClient"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DelOauthClientMutation, DelOauthClientMutationVariables>;
-export const UserDevicesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"userDevices"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserDeviceOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserDeviceWhereInput"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userDevices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"deviceUID"}},{"kind":"Field","name":{"kind":"Name","value":"deviceName"}},{"kind":"Field","name":{"kind":"Name","value":"systemName"}},{"kind":"Field","name":{"kind":"Name","value":"systemVersion"}},{"kind":"Field","name":{"kind":"Name","value":"appVersion"}},{"kind":"Field","name":{"kind":"Name","value":"deviceModel"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UserDevicesQuery, UserDevicesQueryVariables>;
+export const UserDevicesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"userDevices"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"first"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserDeviceOrder"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"where"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserDeviceWhereInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"gid"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"GID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"node"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"gid"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"InlineFragment","typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"User"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"devices"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"first"},"value":{"kind":"Variable","name":{"kind":"Name","value":"first"}}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"Variable","name":{"kind":"Name","value":"where"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"totalCount"}},{"kind":"Field","name":{"kind":"Name","value":"pageInfo"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"hasNextPage"}},{"kind":"Field","name":{"kind":"Name","value":"hasPreviousPage"}},{"kind":"Field","name":{"kind":"Name","value":"startCursor"}},{"kind":"Field","name":{"kind":"Name","value":"endCursor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"edges"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"cursor"}},{"kind":"Field","name":{"kind":"Name","value":"node"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"createdBy"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedBy"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"deviceUID"}},{"kind":"Field","name":{"kind":"Name","value":"deviceName"}},{"kind":"Field","name":{"kind":"Name","value":"systemName"}},{"kind":"Field","name":{"kind":"Name","value":"systemVersion"}},{"kind":"Field","name":{"kind":"Name","value":"appVersion"}},{"kind":"Field","name":{"kind":"Name","value":"deviceModel"}}]}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<UserDevicesQuery, UserDevicesQueryVariables>;
 export const DeleteUserDeviceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"deleteUserDevice"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"deviceID"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteUserDevice"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userID"}}},{"kind":"Argument","name":{"kind":"Name","value":"deviceID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"deviceID"}}}]}]}}]} as unknown as DocumentNode<DeleteUserDeviceMutation, DeleteUserDeviceMutationVariables>;
 export const UserAppDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"userApp"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userApps"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"code"}},{"kind":"Field","name":{"kind":"Name","value":"kind"}},{"kind":"Field","name":{"kind":"Name","value":"redirectURI"}},{"kind":"Field","name":{"kind":"Name","value":"appKey"}},{"kind":"Field","name":{"kind":"Name","value":"appSecret"}},{"kind":"Field","name":{"kind":"Name","value":"scopes"}},{"kind":"Field","name":{"kind":"Name","value":"tokenValidity"}},{"kind":"Field","name":{"kind":"Name","value":"refreshTokenValidity"}},{"kind":"Field","name":{"kind":"Name","value":"logo"}},{"kind":"Field","name":{"kind":"Name","value":"comments"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<UserAppQuery, UserAppQueryVariables>;
 export const UserMfaInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"userMfaInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"userMfaInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}},{"kind":"Argument","name":{"kind":"Name","value":"orgID"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orgId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accountName"}},{"kind":"Field","name":{"kind":"Name","value":"mfaEnabled"}},{"kind":"Field","name":{"kind":"Name","value":"qrCodeUri"}},{"kind":"Field","name":{"kind":"Name","value":"secret"}}]}}]}}]} as unknown as DocumentNode<UserMfaInfoQuery, UserMfaInfoQueryVariables>;

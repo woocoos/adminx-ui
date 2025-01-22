@@ -226,12 +226,17 @@ const mutationDelOauthClient = gql(/* GraphQL */`mutation delOauthClient($id: ID
   deleteOauthClient( id: $id )
 }`);
 
-const queryUserDevices = gql(/* GraphQL */`query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput){
-  userDevices(first:$first,orderBy: $orderBy,where: $where){
-    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
-    edges{
-      cursor,node{
-        id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,
+const queryUserDevices = gql(/* GraphQL */`query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput,$gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,
+      devices(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,
+          }
+        }
       }
     }
   }
@@ -702,6 +707,7 @@ export async function getUserDevices(gather: {
   pageSize?: number;
   where?: UserDeviceWhereInput;
   orderBy?: UserDeviceOrder;
+  userId: string;
 }) {
   const result = await paging(queryUserDevices, {
     first: gather.pageSize,
@@ -710,9 +716,10 @@ export async function getUserDevices(gather: {
       direction: OrderDirection.Desc,
       field: UserDeviceOrderField.CreatedAt
     },
+    gid: gid('User', gather.userId),
   }, gather.current || 1);
-  if (result.data?.userDevices) {
-    return result?.data?.userDevices;
+  if (result.data?.node?.__typename == "User") {
+    return result.data.node.devices
   }
   return null;
 }

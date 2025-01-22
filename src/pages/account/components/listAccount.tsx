@@ -183,7 +183,7 @@ export const UserList = (props: {
         }
 
         if (['orgUser', 'orgMember'].includes(props.scene ?? '')) {
-          if (checkAuth('userDevices', auth)) {
+          if (checkAuth('viewer', auth)) {
             items.push(
               { key: 'userDevices', label: <Link to={`/user/device?id=${record.id}&${orgIdParameter}`} >{t('user_devices')}</Link> },
             );
