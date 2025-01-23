@@ -156,7 +156,7 @@ export const PageOrgRoleList = (props: {
               proTableRef.current?.setPageInfo?.(pageInfo);
               proTableRef.current?.reload();
             }
-            message.success('submit_success');
+            message.success(t('submit_success'));
             close();
           }
         },

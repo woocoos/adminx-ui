@@ -72,7 +72,7 @@ export default (props: {
                         dataSource[idx] = result as OauthClient
                       }
                       setDataSource([...dataSource])
-                      message.success('submit_success')
+                      message.success(t('submit_success'))
                     }
                   }}
                 >
@@ -91,7 +91,7 @@ export default (props: {
                         dataSource[idx] = result as OauthClient
                       }
                       setDataSource([...dataSource])
-                      message.success('submit_success')
+                      message.success(t('submit_success'))
                     }
                   }}
                 >
@@ -108,7 +108,7 @@ export default (props: {
                   const result = await delAccessKey(record.id);
                   if (result) {
                     setDataSource(delDataSource(dataSource, record.id));
-                    message.success('submit_success')
+                    message.success(t('submit_success'))
                   }
                 }}
               >
