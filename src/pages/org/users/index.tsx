@@ -109,7 +109,7 @@ export const PageOrgUsers = (props: {
       }}
       loading={loading}
     >
-      <Splitter>
+      <Splitter style={{ background: token.colorBgContainer }}>
         <Splitter.Panel collapsible defaultSize="22%" min="22%" max="32%">
           <ProCard colSpan="280px" >
             <Row wrap={false}>
