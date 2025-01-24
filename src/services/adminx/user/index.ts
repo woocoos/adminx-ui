@@ -121,7 +121,7 @@ const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GI
 
 const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!,$orgUserType:OrgUserUserType){
   createOrganizationUser(rootOrgID:$rootOrgID,input:$input,orgUserType:$orgUserType){
-    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,orgUserType(orgID:$rootOrgID),
     contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
    }
 }`);
@@ -361,7 +361,7 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
       input,
     });
     if (result.data?.createOrganizationUser?.id) {
-      return result.data?.createOrganizationUser;
+      return result.data.createOrganizationUser;
     }
   }
 

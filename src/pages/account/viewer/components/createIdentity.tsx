@@ -5,7 +5,6 @@ import { ActionType, EditableProTable, ProColumns } from '@ant-design/pro-compon
 import { Drawer, Popconfirm, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { delDataSource, saveDataSource } from '@/util';
 
 
 export default (props: {
@@ -74,7 +73,7 @@ export default (props: {
                 const reulst = await delUserIdentity(record.id);
                 if (reulst === true) {
                   setLoading(true);
-                  setDataSource(delDataSource(dataSource, record.id));
+                  proTableRef.current?.reload()
                   message.success(t('submit_success'));
                 }
               }}
@@ -102,55 +101,56 @@ export default (props: {
         props.onClose?.(isAction, dataSource);
       }}
     >
-      <EditableProTable
-        actionRef={proTableRef}
-        rowKey="id"
-        loading={loading}
-        columns={columns}
-        dataSource={dataSource}
-        request={async () => {
-          setLoading(true);
-          const table = { data: [] as UserIdentity[], success: true, total: 0 };
-          if (props.id) {
-            const userInfo = await getUserInfoIdentities(props.id);
-            if (userInfo?.identities) {
-              table.data = userInfo.identities;
-              table.total = userInfo?.identities.length;
-            }
-          }
-          setDataSource(table.data)
-          setLoading(false);
-          return table;
-        }}
-        recordCreatorProps={checkAuth('deleteUserIdentity') ? {
-          record: { id: 'new', status: 'active' } as any,
-          creatorButtonText: t('add'),
-        } : false}
-        editable={{
-          type: 'single',
-          saveText: t('save'),
-          deleteText: t('delete'),
-          cancelText: t('cancel'),
-          onSave: async (_key: string, record: UserIdentity) => {
+      <div>
+        <EditableProTable
+          actionRef={proTableRef}
+          rowKey="id"
+          loading={loading}
+          columns={columns}
+          request={async () => {
+            setLoading(true);
+            const table = { data: [] as UserIdentity[], success: true, total: 0 };
             if (props.id) {
-              const result = await bindUserIdentity({
-                kind: record.kind,
-                code: record.code,
-                status: record.status,
-                codeExtend: record.codeExtend,
-                userID: props.id,
-              });
-              if (result?.id) {
-                setLoading(true);
-                message.success(t('submit_success'));
-                setDataSource(saveDataSource(dataSource, record))
+              const userInfo = await getUserInfoIdentities(props.id);
+              if (userInfo?.identities) {
+                table.data = userInfo.identities;
+                table.total = userInfo?.identities.length;
               }
-              setIsAction(true);
             }
-          },
+            setDataSource(table.data)
+            setLoading(false);
+            return table;
+          }}
+          recordCreatorProps={checkAuth('deleteUserIdentity') ? {
+            record: { id: 'new', status: 'active' } as any,
+            creatorButtonText: t('add'),
+          } : false}
+          editable={{
+            type: 'single',
+            saveText: t('save'),
+            deleteText: t('delete'),
+            cancelText: t('cancel'),
+            onSave: async (_key: string, record: UserIdentity) => {
+              if (props.id) {
+                const result = await bindUserIdentity({
+                  kind: record.kind,
+                  code: record.code,
+                  status: record.status,
+                  codeExtend: record.codeExtend,
+                  userID: props.id,
+                });
+                if (result?.id) {
+                  setLoading(true);
+                  proTableRef.current?.reload()
+                  message.success(t('submit_success'));
+                }
+                setIsAction(true);
+              }
+            },
 
-        }}
-      />
+          }}
+        />
+      </div>
     </Drawer>
   );
 };

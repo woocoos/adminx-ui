@@ -422,6 +422,7 @@ export const UserList = (props: {
             }}
             scroll={{ x: 'max-content' }}
             columns={columns}
+            dataSource={dataSource}
             request={async (params, sort, filter) => {
               const table = { data: [] as User[], success: true, total: 0 },
                 where: UserWhereInput = {};
