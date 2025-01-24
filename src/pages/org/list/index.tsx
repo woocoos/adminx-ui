@@ -220,17 +220,17 @@ export const OrgList = (props: {
     <>
       <PageContainer
         header={{
-          title: <div>{t('org_manage')}</div>,
+          title: <div>{kind === OrgKind.Root ? t('tenant_manage') : t('org_manage')}</div>,
           style: { background: token.colorBgContainer },
           breadcrumb: {
             items: props.isFromSystem ? kind == 'org' ?
               [
                 { title: t('system_conf') },
-                { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+                { title: <Link to={'/system/org'}>{t('tenant_manage')}</Link> },
                 { title: t('org_manage') },
               ] : [
                 { title: t('system_conf') },
-                { title: t('org_manage') },
+                { title: t('tenant_manage') },
               ] : [
               { title: t('org_cooperation') },
               { title: t('org_manage') },
@@ -243,7 +243,7 @@ export const OrgList = (props: {
           rowKey={'id'}
           search={false}
           toolbar={{
-            title: t('org_manage'),
+            title: kind === OrgKind.Root ? t('tenant_manage') : t('org_manage'),
             actions: kind == 'org' ? [] : [
               <Auth authKey={kind === 'root' ? 'createRoot' : 'createOrganization'}>
                 <Button

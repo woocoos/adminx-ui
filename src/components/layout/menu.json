@@ -53,7 +53,7 @@
     "icon": "icon-shezhi",
     "children": [
       {
-        "name": "组织管理",
+        "name": "租户管理",
         "path": "/system/org"
       },
       {

@@ -372,6 +372,7 @@ export default {
     app_manage: '应用管理',
     menu_manage: '菜单管理',
     org_manage: '组织管理',
+    tenant_manage: '租户管理',
     manage_user: '管理用户',
     manage_account: '管理账户',
     manage_system: '管理系统',

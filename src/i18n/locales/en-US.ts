@@ -372,6 +372,7 @@ export default {
     app_manage: 'Application management',
     menu_manage: 'Menu management',
     org_manage: 'Organization management',
+    tenant_manage: 'Tenant management',
     manage_user: 'Manage user',
     manage_account: 'Administrative account',
     manage_system: 'Management system',
