@@ -5130,6 +5130,8 @@ type Query {
   orgAppActions(appCode: String!, orgID: ID!): [AppAction!]!
   """获取组织应用资源模板"""
   orgAppResources(after: Cursor, appID: ID!, before: Cursor, first: Int, last: Int, orderBy: AppResOrder, where: AppResWhereInput): AppResConnection!
+  """获取登录组织的文件凭证，登录组织未取到，则往上级组织获取"""
+  orgFileIdentities: [FileIdentity!]!
   """用户组"""
   orgGroups(after: Cursor, before: Cursor, first: Int, last: Int, orderBy: OrgRoleOrder, where: OrgRoleWhereInput): OrgRoleConnection!
   """权限策略引用列表"""

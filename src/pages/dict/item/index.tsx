@@ -35,7 +35,7 @@ export default () => {
         width: 100,
       },
       {
-        title: t('org'),
+        title: t('organization'),
         dataIndex: 'org',
         width: 120,
         renderFormItem: () => {

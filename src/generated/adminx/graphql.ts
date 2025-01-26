@@ -5654,6 +5654,8 @@ export type Query = {
   orgAppActions: Array<AppAction>;
   /** 获取组织应用资源模板 */
   orgAppResources: AppResConnection;
+  /** 获取登录组织的文件凭证，登录组织未取到，则往上级组织获取 */
+  orgFileIdentities: Array<FileIdentity>;
   /** 用户组 */
   orgGroups: OrgRoleConnection;
   /** 权限策略引用列表 */

@@ -3,13 +3,15 @@ import { DrawerForm, ProFormDigit, ProFormInstance, ProFormText, ProFormTextArea
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLeavePrompt } from '@knockout-js/layout';
-import { FileIdentity } from '@/generated/adminx/graphql';
+import { FileIdentity, Org, OrgKind } from '@/generated/adminx/graphql';
 import { createFileIdentity, getAccessKeySecret, getFileIdentityInfo, updateFileIdentity } from '@/services/adminx/file/identities';
 import Editor from '@/components/editor';
 import { Button } from 'antd';
 import store from '@/store';
+import InputOrg from '@/pages/org/components/inputOrg';
 
 type ProFormData = {
+  org?: Org
   accessKeyID?: string
   accessKeySecret?: string
   durationSeconds?: number
@@ -71,6 +73,7 @@ export default (props: {
           data.roleArn = result.roleArn
           data.sourceID = result.fileSourceID
           data.comments = result.comments || undefined;
+          data.org = result.org as Org;
           setOldInfo(result as FileIdentity);
         }
       } else {
@@ -118,10 +121,14 @@ export default (props: {
           }
         }
       } else {
+        let oid = userState.tenantId
+        if (values.org) {
+          oid = values.org.id
+        }
         const result = await createFileIdentity({
           ...data,
           accessKeySecret: values.accessKeySecret ?? '',
-          orgID: userState.tenantId
+          orgID: oid
         });
         if (result?.id) {
           setSaveDisabled(true);
@@ -163,6 +170,12 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
+      <ProFormText
+        name="org"
+        label={t('organization')}
+      >
+        <InputOrg disabled={props.id ? true : false} kind={OrgKind.Root} />
+      </ProFormText>
       <ProFormText
         name="accessKeyID"
         label="AccessKeyID"

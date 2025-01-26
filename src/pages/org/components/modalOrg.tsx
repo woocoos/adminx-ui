@@ -23,7 +23,7 @@ export default (props: {
     [userState] = store.useModel('user'),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
-      { title: t('name'), dataIndex: 'name', width: 120 },
+      { title: t('name'), dataIndex: 'name', width: 180 },
       { title: t('code'), dataIndex: 'code', width: 120 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
       { title: t('domain'), dataIndex: 'domain', width: 120, search: false },
