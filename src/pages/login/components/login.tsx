@@ -43,6 +43,7 @@ export default (
 
   return (
     <LoginForm
+      autoFocus
       title="Adminx Pro"
       logo={<img alt="logo" src={logo} />}
       subTitle={t('manage_system')}
