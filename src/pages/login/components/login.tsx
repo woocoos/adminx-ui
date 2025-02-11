@@ -56,7 +56,6 @@ export default (
 
   return (
     <LoginForm
-      autoFocus
       title={pbAppConfig?.loginTitle}
       subTitle={<div>
         <img alt="logo" src={pbAppConfig?.logo} height={26} />
@@ -72,6 +71,7 @@ export default (
           resetText: t('cancel'),
         },
         submitButtonProps: {
+          tabIndex: 4,
           loading: saveLoading,
           disabled: saveDisabled,
         },
@@ -86,6 +86,7 @@ export default (
         fieldProps={{
           size: 'large',
           prefix: <UserOutlined className={'prefixIcon'} />,
+          tabIndex: 1,
         }}
         placeholder={`${t('please_enter_principal_name')}`}
         rules={[
@@ -100,6 +101,7 @@ export default (
         fieldProps={{
           size: 'large',
           prefix: <LockOutlined className={'prefixIcon'} />,
+          tabIndex: 2,
         }}
         placeholder={`${t('please_enter_password')}`}
         rules={[
@@ -121,6 +123,7 @@ export default (
                 getCaptcha();
               }}
             />,
+            tabIndex: 3,
           }}
           placeholder={`${t('auth_code')}`}
           rules={[
