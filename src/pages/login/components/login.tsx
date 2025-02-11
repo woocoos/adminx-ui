@@ -3,8 +3,8 @@ import { ProFormText, LoginForm } from '@ant-design/pro-components';
 import logo from '@/assets/images/woocoo.png';
 import Sha256 from 'crypto-js/sha256';
 import { useTranslation } from 'react-i18next';
-import { CaptchaRes, LoginRes, captcha, login } from '@/services/auth';
-import { useState } from 'react';
+import { CaptchaRes, LoginRes, PbAppConfig, captcha, getAppConfig, login } from '@/services/auth';
+import { useEffect, useState } from 'react';
 import { Link } from '@ice/runtime';
 
 export default (
@@ -14,12 +14,21 @@ export default (
 ) => {
   const { t } = useTranslation(),
     [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
+    [pbAppConfig, setPbAppConfig] = useState<PbAppConfig>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
   const
     getCaptcha = async () => {
       setCaptchaInfo(await captcha());
+    },
+    getLoginTitle = async () => {
+      const result = await getAppConfig();
+      setPbAppConfig(result ?? {
+        logo: logo,
+        loginTitle: 'Adminx Pro',
+        loginSubTitle: `${t('manage_system')}`,
+      })
     },
     onFinish = async (values: { username: string; password: string; captcha?: string }) => {
       setSaveLoading(true);
@@ -40,17 +49,23 @@ export default (
       return false;
     };
 
+  useEffect(() => {
+    getLoginTitle()
+  }, [])
+
 
   return (
     <LoginForm
       autoFocus
-      title="Adminx Pro"
-      logo={<img alt="logo" src={logo} />}
-      subTitle={t('manage_system')}
-      initialValues={{
-        // username: 'admin',
-        // password: '123456',
-      }}
+      title={pbAppConfig?.loginTitle}
+      subTitle={<div>
+        <img alt="logo" src={pbAppConfig?.logo} height={26} />
+        {pbAppConfig ? <div
+          style={{ marginTop: 8 }}
+        >
+          {pbAppConfig.loginSubTitle}
+        </div> : <></>}
+      </div>}
       submitter={{
         searchConfig: {
           submitText: t('login'),
