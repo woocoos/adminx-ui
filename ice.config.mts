@@ -71,10 +71,10 @@ export default defineConfig(() => ({
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_FILE_PREFIX}`]: '' },
     },
-    [`${ICE_API_DEO_PREFIX}/pb-framework`]: {
+    [`${ICE_API_DEO_PREFIX}/api-egg`]: {
       target: ICE_PROXY_DEO_PBF,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_DEO_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_DEO_PREFIX}/api-egg`]: '' },
     },
   },
 }));

@@ -380,7 +380,7 @@ export type PbAppConfig = {
 }
 export async function getAppConfig() {
   try {
-    const result = await request.get(`${ICE_API_DEO_PREFIX}/pb-framework/app-code-config?appCode=${ICE_APP_CODE}`)
+    const result = await request.get(`${ICE_API_DEO_PREFIX}/api-egg/pb-framework/app-code-config?appCode=${ICE_APP_CODE}`)
     return result as PbAppConfig
   } catch (error) {
 
