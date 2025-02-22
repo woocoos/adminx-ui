@@ -1,7 +1,7 @@
-import { OrgKind, Quota, QuotaItemResourceType, UserUserType } from '@/generated/adminx/graphql';
-import { updateFormat } from '@/util';
+import { Org, OrgKind, Quota, QuotaItemResourceType, User, UserUserType } from '@/generated/adminx/graphql';
+import { getDate, updateFormat } from '@/util';
 import {
-  DrawerForm, ProFormDateTimePicker,
+  DrawerForm, FormInstance, ProFormDateTimePicker,
   ProFormDateTimeRangePicker,
   ProFormDigit,
   ProFormSelect,
@@ -9,32 +9,40 @@ import {
   ProFormTextArea
 } from '@ant-design/pro-components';
 import { useLeavePrompt } from '@knockout-js/layout';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { createQuota, getQuotaInfo, updateQuota } from '@/services/adminx/quotaItem/quota';
 import InputOrg from "@/pages/org/components/inputOrg";
 import InputAccount from "@/pages/account/components/inputAccount";
+import { Form, message } from "antd";
 
 type ProFormData = {
-  tenantId: number;
-  userId: number;
-  limit: number;
-  used: number;
-  startAt: string;
-  endAt: string;
+  tenant?: Org;
+  user?: User;
+  limit?: number;
+  used?: number;
+  startAt?: string;
+  endAt?: string;
 };
 
 export default (props: {
   open?: boolean;
   title?: string;
   id?: string | null;
+  quotaItemID: string,
   onClose?: (isSuccess?: boolean, newInfo?: Quota) => void;
 }) => {
   const {t} = useTranslation(),
     [info, setInfo] = useState<Quota>(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
-    [saveDisabled, setSaveDisabled] = useState(true);
+    [saveDisabled, setSaveDisabled] = useState(true),
+    [form] = Form.useForm<ProFormData>();
+
+  const tenantValue = Form.useWatch('tenant', form);
+
+
+  const formRef = React.useRef<FormInstance>();
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -58,7 +66,14 @@ export default (props: {
         const result = await getQuotaInfo(props.id);
         if (result?.id) {
           setInfo(result as Quota);
-          return result;
+          return {
+            tenant: result.quotaOrg as Org,
+            user: result.quotaUser as User,
+            limit: result.limit,
+            used: result.used,
+            startAt: result.startAt,
+            endAt: result.endAt,
+          } as ProFormData;
         }
       }
       return {};
@@ -67,23 +82,27 @@ export default (props: {
       setSaveDisabled(false);
     },
     onFinish = async (values: ProFormData) => {
+      if (!values.tenant && !values.user) {
+        message.warning(t('please_select_tenant_or_user'));
+        return false;
+      }
       setSaveLoading(true);
       const result = props.id
         ? await updateQuota(props.id, updateFormat({
-          tenantId: values.tenantId,
-          userId: values.userId,
+          quotaOrgID: values.tenant?.id,
+          quotaUserID: values.user?.id,
           limit: values.limit,
           used: values.used,
-          startAt: values.startAt,
-          endAt: values.endAt,
+          startAt: values.startAt ? getDate(values.startAt, 'YYYY-MM-DDTHH:mm:ssZ') : undefined,
+          endAt: values.endAt ? getDate(values.endAt, 'YYYY-MM-DDTHH:mm:ssZ') : undefined,
         }, info || {}))
         : await createQuota({
-          tenantId: values.tenantId,
-          userId: values.userId,
-          limit: values.limit,
-          used: values.used ?? 0,
-          startAt: values.startAt,
-          endAt: values.endAt,
+          quotaItemID: props.quotaItemID,
+          quotaOrgID: values.tenant?.id,
+          quotaUserID: values.user?.id,
+          limit: values.limit ?? 0,
+          startAt: values.startAt ? getDate(values.startAt, 'YYYY-MM-DDTHH:mm:ssZ') : undefined,
+          endAt: values.endAt ? getDate(values.endAt, 'YYYY-MM-DDTHH:mm:ssZ') : undefined,
         });
       if (result?.id) {
         setSaveDisabled(true);
@@ -118,22 +137,22 @@ export default (props: {
       onOpenChange={onOpenChange}
     >
       <ProFormText
-        name="tenantId"
+        name="tenant"
         label={t('organization')}
-        rules={[
-          {required: true, message: `${t('please_enter_org')}`},
-        ]}>
-      <InputOrg orgId={OrgKind.Root} />
+        >
+        <InputOrg
+          orgId={OrgKind.Root}
+        />
       </ProFormText>
 
       <ProFormText
-        name="userId"
+        name="user"
         label={t('user')}
-        rules={[
-          {required: true, message: `${t('please_enter_user')}`},
-        ]}
       >
-        <InputAccount userType={UserUserType.Account} />
+        <InputAccount
+          orgId={tenantValue?.id}
+          userType={UserUserType.Member}
+          />
       </ProFormText>
       <ProFormDigit
         name="limit"
@@ -156,7 +175,7 @@ export default (props: {
         ]}
       />
       <ProFormDateTimePicker
-        name="entAt"
+        name="endAt"
         label={t('end_at')}
         rules={[
           {required: true, message: `${t('please_select_end_at')}`},

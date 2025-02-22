@@ -1,7 +1,15 @@
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 import { gql } from "@/generated/adminx";
-import { OrderDirection, Quota, QuotaOrder, QuotaOrderField, QuotaWhereInput } from "@/generated/adminx/graphql";
+import {
+  CreateQuotaInput,
+  OrderDirection,
+  Quota,
+  QuotaOrder,
+  QuotaOrderField,
+  QuotaWhereInput,
+  UpdateQuotaInput
+} from "@/generated/adminx/graphql";
 
 
 const queryQuotaList = gql(/* GraphQL */`query quotaList($first: Int,$orderBy:QuotaOrder,$where:QuotaWhereInput){
@@ -92,7 +100,7 @@ export async function getQuotaInfo(id: string) {
   return null;
 }
 
-export async function createQuota(input: any) {
+export async function createQuota(input: CreateQuotaInput) {
   const result = await mutation(mutationCreateQuota, {
     input,
   })
@@ -102,7 +110,7 @@ export async function createQuota(input: any) {
   return null;
 }
 
-export async function updateQuota(quotaId: string, input: any) {
+export async function updateQuota(quotaId: string, input: UpdateQuotaInput) {
   const result = await mutation(mutationUpdateQuota, {
     quotaId,
     input,

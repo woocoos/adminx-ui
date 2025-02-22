@@ -55,11 +55,13 @@ const PageQuotaList = () => {
         title: '生效时间',
         dataIndex: 'startAt',
         width: 120,
+        valueType: 'dateTime',
       },
       {
         title: '过期时间',
         dataIndex: 'endAt',
         width: 120,
+        valueType: 'dateTime',
       },
     ],
     [dataSource, setDataSource] = useState<Quota[]>([]),
@@ -186,6 +188,7 @@ const PageQuotaList = () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
+          quotaItemID={searchParams.get('id') ?? ''}
           onClose={(isSuccess, newInfo) => {
             if (isSuccess && newInfo) {
               setDataSource(saveDataSource(dataSource, newInfo));

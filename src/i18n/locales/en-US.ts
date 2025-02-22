@@ -460,5 +460,6 @@ export default {
     pwd_policy_retry: "password retry constraint",
     pwd_policy_retry_limit_befroe: "maximum login attempts with the wrong password within one hour",
     pwd_policy_retry_limit_after: "the time(the maximum value is 32. Enter 0 to disable password retry constraints.)",
+    please_select_tenant_or_user: 'Please select a tenant or user',
   },
 };

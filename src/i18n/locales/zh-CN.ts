@@ -461,5 +461,6 @@ export default {
     pwd_policy_retry: "密码重试约束",
     pwd_policy_retry_limit_befroe: "一小时内使用错误密码最多尝试登录",
     pwd_policy_retry_limit_after: "次 （最大值为 32，输入 0 表示不启用密码重试约束）",
+    please_select_tenant_or_user: '请选择一个组织或用户',
   },
 };
