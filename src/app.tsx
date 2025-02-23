@@ -123,7 +123,7 @@ export const urqlConfig = defineUrqlConfig([
               refreshToken = userState.refreshToken ?? getItem<string>('refreshToken');
             if (isInIcestark()) {
               const iceStore = starkStore.get('iceStore')
-              token = iceStore?.user?.token
+              token = starkStore.get('token') ?? iceStore?.user?.token
               tenantId = iceStore?.user?.tenantId
               refreshToken = iceStore?.user?.refreshToken
             }
@@ -164,7 +164,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     tenantId = appData?.user?.tenantId ?? getItem<string>('tenantId');
   if (isInIcestark()) {
     const iceStore = starkStore.get('iceStore')
-    token = iceStore?.user?.token
+    token = starkStore.get('token') ?? iceStore?.user?.token
     tenantId = iceStore?.user?.tenantId
   }
   // 判断路由权限
@@ -218,7 +218,7 @@ export const requestConfig = defineRequestConfig(() => {
             tenantId = getItem<string>('tenantId') as string;
           if (isInIcestark()) {
             const iceStore = starkStore.get('iceStore')
-            token = iceStore?.user?.token
+            token = starkStore.get('token') ?? iceStore?.user?.token
             tenantId = iceStore?.user?.tenantId
           }
           return {
