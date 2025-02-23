@@ -1,5 +1,6 @@
 import i18n from "@/i18n";
 import store from "@/store";
+import { store as starkStore } from '@ice/stark-data';
 import { Outlet, useLocation } from "@ice/runtime"
 import { useEffect } from "react";
 import { CollectProviders } from "@knockout-js/layout";
@@ -8,12 +9,20 @@ const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
 
 export default () => {
   const [appState] = store.useModel('app'),
-    [userState] = store.useModel('user'),
+    [userState, userDispatcher] = store.useModel('user'),
     location = useLocation();
 
   useEffect(() => {
     i18n.changeLanguage(appState.locale);
   }, [appState.locale]);
+
+  useEffect(() => {
+    starkStore.on('token', (data: string) => {
+      if (data) {
+        userDispatcher.updateToken(data)
+      }
+    }, true);
+  }, []);
 
   return <CollectProviders
     locale={appState.locale}
