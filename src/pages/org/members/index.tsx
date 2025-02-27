@@ -4,13 +4,25 @@ import store from '@/store';
 import { useTranslation } from 'react-i18next';
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
-import { UserUserType } from '@/generated/adminx/graphql';
+import { Org, UserUserType } from '@/generated/adminx/graphql';
+import { useEffect, useState } from 'react';
+import { getOrgInfo } from '@/services/adminx/org';
 
 export const PageOrgUsers = (props: {
   orgId: string;
 }) => {
   const { token } = useToken(),
-    { t } = useTranslation();
+    { t } = useTranslation(),
+    [orgInfo, setOrgInfo] = useState<Org>();
+
+  const reqOrgInfo = async () => {
+    const result = await getOrgInfo(props.orgId);
+    setOrgInfo((result as Org) ?? undefined);
+  }
+
+  useEffect(() => {
+    reqOrgInfo()
+  }, [props.orgId])
 
   return (
     <PageContainer
@@ -29,6 +41,7 @@ export const PageOrgUsers = (props: {
         title={t('member_list') ?? ''}
         scene="orgMember"
         userType={UserUserType.Member}
+        orgInfo={orgInfo}
         orgId={props.orgId}
       />
     </PageContainer>
@@ -38,10 +51,12 @@ export const PageOrgUsers = (props: {
 
 
 export default () => {
-  const [userState] = store.useModel('user');
+  const [userState] = store.useModel('user')
 
   return (<KeepAlive clearAlive>
-    <PageOrgUsers orgId={userState.tenantId} />
+    <PageOrgUsers
+      orgId={userState.tenantId}
+    />
   </KeepAlive>
   );
 };
