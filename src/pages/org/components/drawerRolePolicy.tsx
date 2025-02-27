@@ -186,7 +186,9 @@ export default (props: {
                 scroll={{ y: 500 }}
                 rowKey="id"
                 size="small"
-                pagination={false}
+                pagination={{
+                  size: "small"
+                }}
                 rowSelection={{
                   selectedRowKeys: selectedDatas.map(item => item.id),
                   onChange: (selectedRowKeys: string[]) => {
