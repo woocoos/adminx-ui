@@ -263,6 +263,7 @@ export default {
     create_policy: 'Creating a permission Policy',
     create_role: 'Create a role',
     create_org: 'Create organization',
+    create_tenant: 'Create tenant',
     create_user_group: 'Creating a User Group',
     create_file_source: 'Creating a File source',
     create_country: 'Creating Country',

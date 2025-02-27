@@ -249,10 +249,10 @@ export const OrgList = (props: {
                 <Button
                   type="primary"
                   onClick={() => {
-                    setModal({ open: true, title: t('create_org'), id: '', scene: 'editor' });
+                    setModal({ open: true, title: t('create_tenant'), id: '', scene: 'editor' });
                   }}
                 >
-                  {t('create_org')}
+                  {t('create_tenant')}
                 </Button>
               </Auth>,
             ],

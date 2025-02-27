@@ -263,6 +263,7 @@ export default {
     create_policy: '创建权限策略',
     create_role: '创建角色',
     create_org: '创建组织',
+    create_tenant: '创建租户',
     create_user_group: '创建用户组',
     create_file_source: '创建文件来源',
     create_country: '创建国家',
