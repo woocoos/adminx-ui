@@ -40,7 +40,6 @@ export const PageOrgUsers = (props: {
       <UserList
         title={t('member_list') ?? ''}
         scene="orgMember"
-        userType={UserUserType.Member}
         orgInfo={orgInfo}
         orgId={props.orgId}
       />
