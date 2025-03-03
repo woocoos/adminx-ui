@@ -370,6 +370,10 @@ export type PbAppConfig = {
    */
   logo?: string
   /**
+   * icon
+   */
+  icon?: string
+  /**
    * 登录标题
    */
   loginTitle?: string

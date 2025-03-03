@@ -24,6 +24,13 @@ export default (
     },
     getLoginTitle = async () => {
       const result = await getAppConfig();
+      if (result?.icon) {
+        const iconDom = document.querySelector('link[rel="icon"]')
+        if (iconDom) {
+          iconDom.setAttribute('href', result.icon);
+        }
+      }
+
       setPbAppConfig(result ?? {
         logo: logo,
         loginTitle: 'Adminx Pro',
