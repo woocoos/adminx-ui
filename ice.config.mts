@@ -55,20 +55,20 @@ export default defineConfig(() => ({
     }),
   ],
   proxy: {
-    [ICE_API_ADMINX_PREFIX]: {
+    [`${ICE_API_ADMINX_PREFIX}/`]: {
       target: ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' },
     },
-    [ICE_API_AUTH_PREFIX]: {
+    [`${ICE_API_AUTH_PREFIX}/`]: {
       target: ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
     },
-    [`${ICE_API_DEO_PREFIX}/api-egg`]: {
+    [`${ICE_API_DEO_PREFIX}/api-egg/`]: {
       target: ICE_PROXY_DEO_PBF,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_DEO_PREFIX}/api-egg`]: '' },
+      pathRewrite: { [`^${ICE_API_DEO_PREFIX}/api-egg/`]: '/' },
     },
   },
 }));

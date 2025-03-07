@@ -3,7 +3,7 @@ import { getItem, setItem } from '@/pkg/localStore';
 import { request } from 'ice';
 import { LoginRes } from '.';
 
-const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth'
+const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? ''
 
 /**
  * 解析spm信息

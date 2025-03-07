@@ -19,6 +19,7 @@ import { browserLanguage, getMenuAppActions } from './util';
 import { setLibraryName } from '@ice/stark-app';
 import { isInIcestark } from '@ice/stark-app';
 import { store as starkStore, event as starkEvent } from '@ice/stark-data';
+import { setStsApi } from '@knockout-js/api';
 
 const ICE_API_ADMINX = process.env.ICE_API_ADMINX ?? '',
   ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
@@ -150,7 +151,7 @@ export const urqlConfig = defineUrqlConfig([
         beforeRefreshTime: 5 * 60 * 1000,
         headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
         login: ICE_LOGIN_URL,
-        refreshApi: `${ICE_API_AUTH_PREFIX ?? '/api-auth'}/login/refresh-token`
+        refreshApi: `${ICE_API_AUTH_PREFIX ?? ''}/login/refresh-token`
       }
     },
   },
@@ -185,6 +186,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
       await logout();
     }
   }
+  setStsApi(`${ICE_API_AUTH_PREFIX}/oss/sts`)
   return {
     initialAuth,
     NoAuthFallback: () => {

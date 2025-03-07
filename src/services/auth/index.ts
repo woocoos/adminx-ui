@@ -56,11 +56,11 @@ export type AppDeployConfig = {
   forceTenantId: boolean;
 };
 
-const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
+const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_APP_DEPLOY_CONFIG = process.env.ICE_APP_DEPLOY_CONFIG ?? '',
   ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   ICE_API_DEO_PREFIX = process.env.ICE_API_DEO_PREFIX ?? '',
-  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login'
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? ''
 
 /**
  * 获取验证码
