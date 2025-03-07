@@ -3,7 +3,7 @@ import { ProFormText, LoginForm } from '@ant-design/pro-components';
 import logo from '@/assets/images/woocoo.png';
 import Sha256 from 'crypto-js/sha256';
 import { useTranslation } from 'react-i18next';
-import { CaptchaRes, LoginRes, PbAppConfig, captcha, getAppConfig, login } from '@/services/auth';
+import { CaptchaRes, LoginRes, CustomAppConfig, captcha, getAppConfig, login } from '@/services/auth';
 import { useEffect, useState } from 'react';
 import { Link } from '@ice/runtime';
 
@@ -14,7 +14,7 @@ export default (
 ) => {
   const { t } = useTranslation(),
     [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
-    [pbAppConfig, setPbAppConfig] = useState<PbAppConfig>(),
+    [appConfig, setAppConfig] = useState<CustomAppConfig>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -31,7 +31,7 @@ export default (
         }
       }
 
-      setPbAppConfig(result ?? {
+      setAppConfig(result ?? {
         logo: logo,
         loginTitle: 'Adminx Pro',
         loginSubTitle: `${t('manage_system')}`,
@@ -63,13 +63,13 @@ export default (
 
   return (
     <LoginForm
-      title={pbAppConfig?.loginTitle}
+      title={appConfig?.loginTitle}
       subTitle={<div>
-        <img alt="logo" src={pbAppConfig?.logo} height={26} />
-        {pbAppConfig ? <div
+        <img alt="logo" src={appConfig?.logo} height={26} />
+        {appConfig ? <div
           style={{ marginTop: 8 }}
         >
-          {pbAppConfig.loginSubTitle}
+          {appConfig.loginSubTitle}
         </div> : <></>}
       </div>}
       submitter={{

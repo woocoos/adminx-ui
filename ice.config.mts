@@ -10,7 +10,6 @@ import urqlPlugin from '@knockout-js/ice-urql';
 const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
-  ICE_API_DEO_PREFIX = process.env.ICE_API_DEO_PREFIX ?? '',
   ICE_PROXY_DEO_PBF = process.env.ICE_PROXY_DEO_PBF ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
@@ -64,11 +63,6 @@ export default defineConfig(() => ({
       target: ICE_PROXY_AUTH,
       changeOrigin: true,
       pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
-    },
-    [`${ICE_API_DEO_PREFIX}/api-egg/`]: {
-      target: ICE_PROXY_DEO_PBF,
-      changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_DEO_PREFIX}/api-egg/`]: '/' },
     },
   },
 }));

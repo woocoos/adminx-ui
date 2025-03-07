@@ -58,8 +58,7 @@ export type AppDeployConfig = {
 
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_APP_DEPLOY_CONFIG = process.env.ICE_APP_DEPLOY_CONFIG ?? '',
-  ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
-  ICE_API_DEO_PREFIX = process.env.ICE_API_DEO_PREFIX ?? '',
+  ICE_CUSTOM_APP_CONFIG_URL = process.env.ICE_CUSTOM_APP_CONFIG_URL ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? ''
 
 /**
@@ -364,7 +363,7 @@ export async function urlSpm(url: string, tenantId?: string, headers?: Record<st
   return url
 }
 
-export type PbAppConfig = {
+export type CustomAppConfig = {
   /**
    * logo
    */
@@ -383,11 +382,12 @@ export type PbAppConfig = {
   loginSubTitle?: string
 }
 export async function getAppConfig() {
-  try {
-    const result = await request.get(`${ICE_API_DEO_PREFIX}/api-egg/pb-framework/app-code-config?appCode=${ICE_APP_CODE}`)
-    return result as PbAppConfig
-  } catch (error) {
-
+  if (ICE_CUSTOM_APP_CONFIG_URL) {
+    try {
+      const result = await request.get(`${ICE_CUSTOM_APP_CONFIG_URL}`)
+      return result as CustomAppConfig
+    } catch (error) {
+    }
   }
   return null
 }
