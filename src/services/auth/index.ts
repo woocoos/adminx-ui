@@ -58,7 +58,6 @@ export type AppDeployConfig = {
 
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_APP_DEPLOY_CONFIG = process.env.ICE_APP_DEPLOY_CONFIG ?? '',
-  ICE_CUSTOM_APP_CONFIG_URL = process.env.ICE_CUSTOM_APP_CONFIG_URL ?? '',
   ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? ''
 
 /**
@@ -361,33 +360,4 @@ export async function urlSpm(url: string, tenantId?: string, headers?: Record<st
     return u.href
   }
   return url
-}
-
-export type CustomAppConfig = {
-  /**
-   * logo
-   */
-  logo?: string
-  /**
-   * icon
-   */
-  icon?: string
-  /**
-   * 登录标题
-   */
-  loginTitle?: string
-  /**
-   * 登录副标题
-   */
-  loginSubTitle?: string
-}
-export async function getAppConfig() {
-  if (ICE_CUSTOM_APP_CONFIG_URL) {
-    try {
-      const result = await request.get(`${ICE_CUSTOM_APP_CONFIG_URL}`)
-      return result as CustomAppConfig
-    } catch (error) {
-    }
-  }
-  return null
 }

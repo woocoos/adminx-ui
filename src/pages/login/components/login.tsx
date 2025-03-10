@@ -3,7 +3,7 @@ import { ProFormText, LoginForm } from '@ant-design/pro-components';
 import logo from '@/assets/images/woocoo.png';
 import Sha256 from 'crypto-js/sha256';
 import { useTranslation } from 'react-i18next';
-import { CaptchaRes, LoginRes, CustomAppConfig, captcha, getAppConfig, login } from '@/services/auth';
+import { CaptchaRes, LoginRes, captcha, login } from '@/services/auth';
 import { useEffect, useState } from 'react';
 import { Link } from '@ice/runtime';
 
@@ -14,7 +14,7 @@ export default (
 ) => {
   const { t } = useTranslation(),
     [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
-    [appConfig, setAppConfig] = useState<CustomAppConfig>(),
+    [appConfig, setAppConfig] = useState<Window['resource']>(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
 
@@ -23,18 +23,17 @@ export default (
       setCaptchaInfo(await captcha());
     },
     getLoginTitle = async () => {
-      const result = await getAppConfig();
-      if (result?.icon) {
+      if (window.resource?.icon) {
         const iconDom = document.querySelector('link[rel="icon"]')
         if (iconDom) {
-          iconDom.setAttribute('href', result.icon);
+          iconDom.setAttribute('href', window.resource.icon);
         }
       }
 
-      setAppConfig(result ?? {
-        logo: logo,
-        loginTitle: 'Adminx Pro',
-        loginSubTitle: `${t('manage_system')}`,
+      setAppConfig({
+        logo: window.resource?.logo ?? logo,
+        loginTitle: window.resource?.loginTitle ?? 'Adminx Pro',
+        loginSubTitle: window.resource?.loginSubTitle ?? `${t('manage_system')}`,
       })
     },
     onFinish = async (values: { username: string; password: string; captcha?: string }) => {
