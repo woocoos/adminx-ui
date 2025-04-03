@@ -15,8 +15,7 @@ export default (
   const { t } = useTranslation(),
     [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
     [appConfig, setAppConfig] = useState<Window['resource']>(),
-    [saveLoading, setSaveLoading] = useState(false),
-    [saveDisabled, setSaveDisabled] = useState(true);
+    [saveLoading, setSaveLoading] = useState(false);
 
   const
     getCaptcha = async () => {
@@ -39,8 +38,8 @@ export default (
     onFinish = async (values: { username: string; password: string; captcha?: string }) => {
       setSaveLoading(true);
       const result = await login(
-        values.username,
-        Sha256(values.password).toString(),
+        values.username?.trim(),
+        Sha256(values.password?.trim()).toString(),
         values.captcha,
         captchaInfo?.captchaId,
       );
@@ -79,11 +78,7 @@ export default (
         submitButtonProps: {
           tabIndex: 4,
           loading: saveLoading,
-          disabled: saveDisabled,
         },
-      }}
-      onValuesChange={() => {
-        setSaveDisabled(false);
       }}
       onFinish={onFinish}
     >
