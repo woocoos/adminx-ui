@@ -9,11 +9,13 @@ import InputOrg from '@/pages/org/components/inputOrg';
 import Create from './components/create';
 import { Link, useSearchParams } from '@ice/runtime';
 import { delDataSource, saveDataSource } from '@/util';
+import store from '@/store';
 
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
+    [userState] = store.useModel('user'),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<AppDictItem>[] = [
@@ -148,27 +150,27 @@ export default () => {
           dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as AppDictItem[], success: true, total: 0 };
-            const result = await getAppDictItemList(searchParams.get('id') ?? '');
+            const result = await getAppDictItemList(searchParams.get('id') ?? '', { or: [{ orgID: userState.tenantId }, { orgIDIsNil: true }] });
             if (result?.id) {
               setDictInfo(result as AppDict);
             }
             if (result?.items) {
-              result.items.forEach(item => {
+              result.items.edges?.forEach(item => {
                 let isPubsh = true;
-                if (params.name) {
-                  isPubsh = isPubsh && item.name.indexOf(params.name) > -1
+                if (params.name && item?.node) {
+                  isPubsh = isPubsh && item?.node?.name.indexOf(params.name) > -1
                 }
-                if (params.code) {
-                  isPubsh = isPubsh && item.code.indexOf(params.code) > -1
+                if (params.code && item?.node) {
+                  isPubsh = isPubsh && item?.node?.code.indexOf(params.code) > -1
                 }
-                if (params.org) {
-                  isPubsh = isPubsh && item.orgID == params.org.id
+                if (params.org && item?.node) {
+                  isPubsh = isPubsh && item.node.orgID == params.org.id
                 }
-                if (params.status) {
-                  isPubsh = isPubsh && item.status == params.status
+                if (params.status && item?.node) {
+                  isPubsh = isPubsh && item.node.status == params.status
                 }
                 if (isPubsh) {
-                  table.data.push(item as AppDictItem);
+                  table.data.push(item?.node as AppDictItem);
                 }
               })
             }
