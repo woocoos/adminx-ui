@@ -1,7 +1,6 @@
 import { gql } from "@/generated/adminx";
 import { AppDictOrder, AppDictOrderField, AppDictWhereInput, CreateAppDictInput, CreateAppDictItemInput, OrderDirection, TreeAction, UpdateAppDictInput, UpdateAppDictItemInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
-import { AppDictItemWhereInput } from "@knockout-js/api/ucenter";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
 export const EnumAppDictItemStatus = {
@@ -32,17 +31,13 @@ const appDictInfoQuery = gql(/* GraphQL */`query appDictInfo($gid:GID!){
    }
  }`);
 
-const appDictItemListQuery = gql(/* GraphQL */`query appDictItemList($gid:GID!,$where:AppDictItemWhereInput){
+const appDictItemListQuery = gql(/* GraphQL */`query appDictItemList($gid:GID!){
   node(id:$gid){
    ... on AppDict{
        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
-       items(where: $where){
-        edges{
-          node{
-            id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
-            org{ id,name }
-          }
-        }
+       items{
+        id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
+        org{ id,name }
        }
      }
    }
@@ -218,13 +213,11 @@ export async function delAppDictInfo(dictId: string) {
  */
 export async function getAppDictItemList(
   appDictId: string,
-  where?: AppDictItemWhereInput,
 ) {
   const
     result = await query(
       appDictItemListQuery, {
       gid: gid('AppDict', appDictId),
-      where: where,
     });
 
   if (result.data?.node?.__typename === 'AppDict') {

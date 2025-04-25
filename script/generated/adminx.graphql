@@ -310,24 +310,11 @@ type AppDict implements Node {
   createdAt: Time!
   createdBy: Int!
   id: ID!
-  items(
-    """Returns the elements in the list that come after the specified cursor."""
-    after: Cursor
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-    """Returns the first _n_ elements from the list."""
-    first: Int
-    """Returns the last _n_ elements from the list."""
-    last: Int
-    """Ordering options for AppDictItems returned from the connection."""
-    orderBy: AppDictItemOrder
-    """Filtering options for AppDictItems returned from the connection."""
-    where: AppDictItemWhereInput
-  ): AppDictItemConnection!
+  items: [AppDictItem!]
   """名称"""
   name: String!
+  """根据组织获取字典项,用户后台展示"""
+  orgItems: [AppDictItem!]!
   updatedAt: Time
   updatedBy: Int
 }
@@ -373,24 +360,6 @@ type AppDictItem implements Node {
   status: AppDictItemSimpleStatus
   updatedAt: Time
   updatedBy: Int
-}
-
-"""A connection to a list of items."""
-type AppDictItemConnection {
-  """A list of edges."""
-  edges: [AppDictItemEdge]
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-
-"""An edge in a connection."""
-type AppDictItemEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor!
-  """The item at the end of the edge."""
-  node: AppDictItem
 }
 
 """Ordering options for AppDictItem connections"""
