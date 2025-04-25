@@ -152,8 +152,8 @@ export default () => {
             if (result?.id) {
               setDictInfo(result as AppDict);
             }
-            if (result?.items) {
-              result.items?.forEach(item => {
+            if (result?.orgItems) {
+              result.orgItems?.forEach(item => {
                 let isPubsh = true;
                 if (params.name) {
                   isPubsh = isPubsh && item?.name.indexOf(params.name) > -1

@@ -313,8 +313,11 @@ type AppDict implements Node {
   items: [AppDictItem!]
   """名称"""
   name: String!
-  """根据组织获取字典项,用户后台展示"""
-  orgItems: [AppDictItem!]!
+  """根据组织获取字典项,过滤有orgID与无orgID重复的code"""
+  orgItems(
+    """是否取消code过滤，不传会过滤重复的code"""
+    noFilterCode: Boolean
+  ): [AppDictItem!]!
   updatedAt: Time
   updatedBy: Int
 }

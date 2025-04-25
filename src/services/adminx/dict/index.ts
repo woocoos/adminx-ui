@@ -35,7 +35,7 @@ const appDictItemListQuery = gql(/* GraphQL */`query appDictItemList($gid:GID!){
   node(id:$gid){
    ... on AppDict{
        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
-       items{
+       orgItems(noFilterCode: true){
         id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
         org{ id,name }
        }
