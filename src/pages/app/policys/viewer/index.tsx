@@ -123,6 +123,7 @@ export default () => {
           message.success(t('submit_success'));
           setRules(result.rules as PolicyRule[] || []);
           setAppPolicyInfo(result as AppPolicy);
+          setSaveDisabled(true);
         }
       } else {
         const appId = searchParams.get('appId');
@@ -143,6 +144,7 @@ export default () => {
             if (!policyId) {
               setSearchParams({ id: result.id });
             }
+            setSaveDisabled(true);
           }
         }
       }

@@ -1,5 +1,5 @@
 import { PageContainer, ProCard, useToken, ProForm, ProFormText, ProFormSelect, ProFormTextArea, ProFormInstance } from '@ant-design/pro-components';
-import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col } from 'antd';
+import { Space, Dropdown, Tree, Empty, Input, message, Modal, Button, Row, Col, Form } from 'antd';
 import { SettingOutlined } from '@ant-design/icons';
 import { useEffect, useState, useRef } from 'react';
 import { TreeDataState, TreeEditorAction, delTreeData, formatTreeData, getTreeDropData, updateFormat, saveTreeData } from '@/util';
@@ -21,16 +21,19 @@ type TreeSelectedData = {
 };
 
 type ProFormData = {
-  name: string;
-  kind: AppPolicyViewKind;
-  comments?: string;
+  id?: string
+  name: string
+  kind: AppPolicyViewKind
+  comments?: string
 };
 
 export default () => {
   const { token } = useToken(),
     [auth] = useAuth(),
     { t } = useTranslation(),
-    formRef = useRef<ProFormInstance>(),
+    [form] = Form.useForm<ProFormData>(),
+    kindValue = Form.useWatch('kind', form),
+    idValue = Form.useWatch('id', form),
     [searchParams] = useSearchParams(),
     id = searchParams.get('id'),
     [loading, setLoading] = useState(false),
@@ -155,17 +158,22 @@ export default () => {
           case 'editor':
             title = `${t('edit')}-${menuInfo.name}`;
             setFormFieldsValue(menuInfo);
-            formRef.current?.setFieldsValue(menuInfo);
+            form.setFieldsValue({
+              id: menuInfo.id,
+              name: menuInfo.name,
+              kind: menuInfo.kind,
+              comments: menuInfo.comments ?? undefined,
+            });
             break;
           case 'peer':
             title = `${t('created')}-${menuInfo.name}-${t('same_level')}`;
             setFormFieldsValue(undefined);
-            formRef.current?.resetFields();
+            form.resetFields();
             break;
           case 'child':
             title = `${t('created')}-${menuInfo.name}-${t('sublayer')}`;
             setFormFieldsValue(undefined);
-            formRef.current?.resetFields();
+            form.resetFields();
             break;
           default:
             break;
@@ -174,7 +182,7 @@ export default () => {
       } else {
         setSelectedTree({ keys: [], info: undefined, action: action });
         setActionTitle(`${t('created')}-${t('top_menu')}`);
-        formRef.current?.resetFields();
+        form.resetFields();
       }
     },
     onTreeDrop = async (dragInfo) => {
@@ -207,7 +215,7 @@ export default () => {
     getRequest = async () => {
       setSaveLoading(false);
       setSaveDisabled(true);
-      return {};
+      return {} as ProFormData;
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
@@ -360,13 +368,13 @@ export default () => {
                 loading={saveLoading}
                 disabled={saveDisabled}
                 onClick={() => {
-                  formRef.current?.submit();
+                  form.submit();
                 }}
               >{t('save')}</Button>
             </> : <></>}
           >
-            <ProForm
-              formRef={formRef}
+            <ProForm<ProFormData>
+              form={form}
               style={{ maxWidth: 400 }}
               submitter={false}
               onFinish={onFinish}
@@ -374,6 +382,10 @@ export default () => {
               request={getRequest}
               onValuesChange={onValuesChange}
             >
+              <ProFormText
+                name="id"
+                hidden={true}
+              />
               <ProFormText
                 name="name"
                 label={t('name')}
@@ -402,7 +414,7 @@ export default () => {
               />
             </ProForm>
           </ProCard>
-          {selectedTree.info?.kind === AppPolicyViewKind.Policy ? <>
+          {kindValue === AppPolicyViewKind.Policy && idValue ? <>
             <RelevancyProlicy info={selectedTree.info} />
           </> : <></>}
         </ProCard>

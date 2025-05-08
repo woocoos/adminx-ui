@@ -38,11 +38,16 @@ export default (props: {
     [appList, setAppList] = useState<App[]>([]),
     [appActionList, setAppActionList] = useState<AppAction[]>([]),
     [selectedRowKeys, setSelectedRowKeys] = useState<Key[]>([]),
+    [search, setSearch] = useState<{
+      appId?: string
+      name?: string
+    }>({}),
     [loading, setLoading] = useState(false),
     [dataSource, setDataSource] = useState<AppAction[]>([]),
     [info, setInfo] = useState<AppPolicy>()
 
   const reqData = async () => {
+    setSelectedRowKeys([])
     if (props.info?.policyID) {
       setLoading(true)
       const result = await getAppPolicyInfo(props.info.policyID)
@@ -113,50 +118,26 @@ export default (props: {
       setAppActionList([])
       setAppList([])
     }
-  },
-    updateAppPolicyAction = async () => {
-      if (selectedRowKeys.length) {
-        const delActions = appActionList.filter(item => selectedRowKeys.includes(item.id)).map(item => `${item.app?.code}:${item.name}`);
-        Modal.confirm({
-          title: t('delete'),
-          content: `${t('confirm_delete')}：${delActions.join(',')} ?`,
-          onOk: async (close) => {
-            if (props.info?.policyID) {
-              const appPolicyInfo = await getAppPolicyInfo(props.info.policyID)
-              if (appPolicyInfo) {
-                const rules: PolicyRuleInput[] = []
-                appPolicyInfo.rules?.forEach(item => {
-                  if (item) {
-                    delete item.__typename
-                    item.actions = item.actions?.filter(item => !delActions.includes(item))
-                    rules.push(item)
-                  }
-                })
-                const result = await updateAppPolicy(appPolicyInfo.id, {
-                  rules,
-                })
-                if (result?.id) {
-                  setDataSource(dataSource.filter(item => !selectedRowKeys.includes(item.id)))
-                  setAppActionList(appActionList.filter(item => !selectedRowKeys.includes(item.id)))
-                  message.success(t('submit_success'))
-                }
-              }
-            }
-            close()
-          },
-        });
-      } else {
-        message.warning(t('please_select_delete_data'))
-      }
-    }
+  }
 
   useEffect(() => {
-    setDataSource(appActionList)
+    setDataSource(
+      appActionList.filter(item => {
+        let isTrue = true;
+        if (search.appId) {
+          isTrue = item.app?.id === search.appId
+        }
+        if (isTrue && search.name) {
+          isTrue = item.name.includes(search.name) || (item.comments ?? '').includes(search.name)
+        }
+        return isTrue;
+      })
+    )
   }, [appActionList])
 
   useEffect(() => {
     reqData()
-  }, [props.info])
+  }, [props.info, search])
 
   return (props.info ? <>
     <ProCard title={t('associated_authority')} headerBordered extra={<>
@@ -170,15 +151,6 @@ export default (props: {
             </Link>
           </Auth> : <></>
         }
-        {/* <Auth authKey="updateAppPolicy">
-          <Button
-            type="primary"
-            danger
-            onClick={() => {
-              updateAppPolicyAction()
-            }}
-          >{t('delete')}</Button>
-        </Auth> */}
       </Space>
     </>}>
       <ProTable
@@ -204,19 +176,7 @@ export default (props: {
           appId?: string
           name?: string
         }) => {
-          setSelectedRowKeys([])
-          setDataSource(
-            appActionList.filter(item => {
-              let isTrue = true;
-              if (params.appId) {
-                isTrue = item.app?.id === params.appId
-              }
-              if (isTrue && params.name) {
-                isTrue = item.name.includes(params.name) || (item.comments ?? '').includes(params.name)
-              }
-              return isTrue;
-            })
-          )
+          setSearch(params)
         }}
       />
     </ProCard>
