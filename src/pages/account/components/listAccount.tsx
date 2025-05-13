@@ -26,6 +26,7 @@ export const UserList = (props: {
   scene?: 'user' | 'orgUser' | 'roleUser' | 'orgMember';
   userType?: UserUserType;
   isFromSystem?: boolean;
+  scrollY?: number;
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
@@ -420,7 +421,7 @@ export const UserList = (props: {
                     </Auth> : '',
                   ] : [],
             }}
-            scroll={{ x: 'max-content' }}
+            scroll={{ x: 'max-content', y: props.scrollY }}
             columns={columns}
             dataSource={dataSource}
             request={async (params, sort, filter) => {
@@ -603,8 +604,8 @@ export const UserList = (props: {
           </PageContainer>
         )
       }
-      {modal.scene === 'create' ? <AccountCreate
-        open={modal.open}
+      <AccountCreate
+        open={modal.open && modal.scene === 'create'}
         title={modal.title}
         orgId={props.orgId}
         userType={props.userType || UserUserType.Member}
@@ -616,12 +617,11 @@ export const UserList = (props: {
           }
           setModal({ open: false, title: '', scene: modal.scene });
         }}
-      /> : ''}
-
+      />
       {
         // 添加用户
-        modal.scene === 'add' && props.orgId && modal.open ? <DrawerUser
-          open={modal.open}
+        props.orgId ? <DrawerUser
+          open={modal.open && modal.scene === 'add'}
           title={modal.title}
           orgId={props.orgId}
           orgRole={props.orgRole}
@@ -633,13 +633,12 @@ export const UserList = (props: {
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
-        />
-          : ''
+        /> : <></>
       }
       {
-        modal.scene === 'addGroup' && props.orgId && modal.open ? <DrawerRole
+        props.orgId ? <DrawerRole
           title={modal.title}
-          open={modal.open}
+          open={modal.open && modal.scene === 'addGroup'}
           orgId={props.orgId}
           kind={OrgRoleKind.Group}
           userInfo={modal.data}
@@ -649,12 +648,12 @@ export const UserList = (props: {
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
-        /> : ''
+        /> : <></>
       }
       {
-        modal.scene === 'addRole' && props.orgId && modal.open ? <DrawerRole
+        props.orgId ? <DrawerRole
           title={modal.title}
-          open={modal.open}
+          open={modal.open && modal.scene === 'addRole'}
           orgId={props.orgId}
           kind={OrgRoleKind.Role}
           userInfo={modal.data}
@@ -665,13 +664,13 @@ export const UserList = (props: {
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
-        /> : ''
+        /> : <></>
       }
       {
-        modal.scene === 'addPermission' && props.orgId && modal.open ? <DrawerRolePolicy
+        props.orgId ? <DrawerRolePolicy
           orgId={props.orgId}
           userInfo={modal.data}
-          open={modal.open}
+          open={modal.open && modal.scene === 'addPermission'}
           title={modal.title}
           onClose={(isSuccess) => {
             if (isSuccess) {
@@ -679,7 +678,7 @@ export const UserList = (props: {
             }
             setModal({ open: false, title: '', scene: modal.scene });
           }}
-        /> : ''
+        /> : <></>
       }
     </>
   );

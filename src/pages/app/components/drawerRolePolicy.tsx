@@ -126,6 +126,7 @@ export default (props: {
                   }
                 }
                 setDataSource(table.data);
+                setSelectedDatas([]);
                 return table;
               }}
               search={false}

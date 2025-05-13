@@ -169,6 +169,7 @@ export default (props: {
                   table.total = result.totalCount;
                 }
                 setdataSource(table.data);
+                setSelectedDatas([])
                 return table;
               }}
               search={false}

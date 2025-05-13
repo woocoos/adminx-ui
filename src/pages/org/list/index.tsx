@@ -314,23 +314,20 @@ export const OrgList = (props: {
           }}
           pagination={false}
         />
-        {modal.open ?
-          <OrgCreate
-            open={modal.open}
-            title={modal.title}
-            id={modal.id}
-            scene={modal.scene}
-            parentDataSource={parentDataSource}
-            kind={kind}
-            onClose={(isSuccess, newInfo) => {
-              if (isSuccess && newInfo) {
-                proTableRef.current?.reload()
-              }
-              setModal({ open: false, title: '', id: '', scene: 'editor' });
-            }}
-          /> : <></>
-        }
-
+        <OrgCreate
+          open={modal.open}
+          title={modal.title}
+          id={modal.id}
+          scene={modal.scene}
+          parentDataSource={parentDataSource}
+          kind={kind}
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              proTableRef.current?.reload()
+            }
+            setModal({ open: false, title: '', id: '', scene: 'editor' });
+          }}
+        />
       </PageContainer>
     </>
   );

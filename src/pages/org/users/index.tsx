@@ -132,6 +132,7 @@ export const PageOrgUsers = (props: {
               draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
               treeData={treeData}
               onSelect={onTreeSelect}
+              height={600}
               onDrop={onTreeDrop}
               titleRender={(node) => {
                 return (
@@ -151,6 +152,7 @@ export const PageOrgUsers = (props: {
             orgInfo={selectedData}
             orgId={selectedData?.id}
             isFromSystem={props.isFromSystem}
+            scrollY={460}
           />
         </Splitter.Panel>
       </Splitter>

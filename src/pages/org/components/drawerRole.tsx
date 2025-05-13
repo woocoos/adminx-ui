@@ -162,6 +162,7 @@ export default (props: {
                     table.data = result.edges?.map(item => item?.node) as OrgRole[];
                     table.total = result.totalCount;
                   }
+                  setSelectedDatas([]);
                   setdataSource(table.data);
                   return table;
                 }}

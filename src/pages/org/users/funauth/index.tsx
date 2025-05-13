@@ -67,7 +67,6 @@ export default (props: {
         }
       }
     }
-    console.log(list)
     setDataSource(list)
   }, onSave = async () => {
     if (userInfo) {

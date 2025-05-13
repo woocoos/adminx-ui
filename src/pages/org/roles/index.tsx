@@ -250,8 +250,7 @@ export const PageOrgRoleList = (props: {
           }}
         />
         <CreateOrgRole
-          x-if={modal.scene === 'editor'}
-          open={modal.open}
+          open={modal.scene === 'editor' && modal.open}
           title={modal.title}
           id={modal.id}
           kind={kind}
@@ -264,8 +263,7 @@ export const PageOrgRoleList = (props: {
           }}
         />
         <DrawerUser
-          x-if={modal.scene === 'addUser' && modal.open}
-          open={modal.open}
+          open={modal.scene === 'addUser' && modal.open}
           title={modal.title}
           orgId={props.orgId}
           orgRole={modal.data}
@@ -274,18 +272,16 @@ export const PageOrgRoleList = (props: {
           }}
         />
         <DrawerRolePolicy
-          x-if={modal.scene === 'addPermission' && modal.open}
           orgId={props.orgId}
           orgRoleInfo={modal.data}
-          open={modal.open}
+          open={modal.scene === 'addPermission' && modal.open}
           title={modal.title}
           onClose={(isSuccess) => {
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />
         <DrawerAppRolePolicy
-          x-if={modal.scene === 'addAppPermission' && modal.open}
-          open={modal.open}
+          open={modal.scene === 'addAppPermission' && modal.open}
           title={modal.title}
           onClose={(isSuccess) => {
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
