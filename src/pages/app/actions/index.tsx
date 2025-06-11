@@ -1,14 +1,15 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal } from 'antd';
+import { Button, Space, Modal, message, Upload } from 'antd';
 import { MutableRefObject, forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { getAppInfo } from '@/services/adminx/app';
 import CreateAppAction from './components/create';
-import { EnumAppActionKind, EnumAppActionMethod, delAppAction, getAppActionList } from '@/services/adminx/app/action';
+import { EnumAppActionKind, EnumAppActionMethod, createAppAction, delAppAction, getAppActionList } from '@/services/adminx/app/action';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
-import { App, AppAction, AppActionKind, AppActionWhereInput } from '@/generated/adminx/graphql';
-import { delDataSource, saveDataSource } from '@/util';
+import { App, AppAction, AppActionKind, AppActionMethod, AppActionWhereInput, CreateAppActionInput } from '@/generated/adminx/graphql';
+import { delDataSource, getDate, saveDataSource } from '@/util';
+import { exportExecel, importExcel, SheetData } from '@/util/excel';
 
 export type AppActionListRef = {
   getSelect: () => AppAction[];
@@ -44,6 +45,8 @@ const AppActionList = (props: {
     [dataSource, setDataSource] = useState<AppAction[]>([]),
     // 选中处理
     [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]),
+    [importLoading, setImportLoading] = useState(false),
+    [exportLoading, setExportLoading] = useState(false),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -162,6 +165,79 @@ const AppActionList = (props: {
         toolbar={{
           title: `${t('app')}:${appInfo?.name || '-'}`,
           actions: [
+            <Auth authKey="importAppActions">
+              <Upload
+                accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                showUploadList={false}
+                beforeUpload={async (file) => {
+                  if (appInfo) {
+                    setImportLoading(true);
+                    importExcel(file, async (sheetData) => {
+                      const list = sheetData[0]?.data?.filter(item => `${item[0]}`.trim().length > 0) ?? [];
+                      if (list.length) {
+                        const inputs: CreateAppActionInput[] = []
+                        list.forEach(item => {
+                          inputs.push({
+                            appID: appInfo.id,
+                            name: item[0] as string,
+                            kind: item[1] as AppActionKind,
+                            method: item[2] as AppActionMethod,
+                            comments: item[3] as string,
+                          })
+                        })
+                        const result = await createAppAction(appInfo.id, inputs)
+                        if (result?.[0]?.id) {
+                          message.success(t('submit_success'))
+                        }
+                      }
+                      setImportLoading(false);
+                    });
+                  }
+                  return false;
+                }}
+              >
+                <Button
+                  key="import"
+                  type="primary"
+                  loading={importLoading}
+                >
+                  {t('import')}
+                </Button>
+              </Upload>
+            </Auth>,
+            <Auth authKey="exportAppActions">
+              <Button
+                key="export"
+                type="primary"
+                loading={exportLoading}
+                onClick={() => {
+                  if (selectedRowKeys.length) {
+                    setExportLoading(true)
+                    const outData: SheetData = {
+                      sheetName: t('app_auth'),
+                      data: [],
+                    }
+                    selectedRowKeys.forEach(srkId => {
+                      const d = dataSource.find(dsItem => dsItem.id === srkId)
+                      if (d) {
+                        outData.data.push([
+                          d.name.trim(),
+                          d.kind,
+                          d.method,
+                          d.comments?.trim() ?? '',
+                        ])
+                      }
+                    })
+                    exportExecel(`${appInfo?.name ?? ''}${getDate(new Date())}${t('app_auth')}`, [outData]);
+                    setExportLoading(false)
+                  } else {
+                    message.warning(t('please_select_export_row'));
+                  }
+                }}
+              >
+                {t('export')}
+              </Button>
+            </Auth>,
             <Auth authKey="createAppActions">
               <Button
                 key="created"

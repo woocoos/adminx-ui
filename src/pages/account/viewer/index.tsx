@@ -15,7 +15,6 @@ import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGend
 import AccessKey from './components/accessKey';
 import { parseStorageUrl } from '@knockout-js/api';
 import store from '@/store';
-import { text } from 'stream/consumers';
 
 export default (props: {
   isFromOrg?: boolean;

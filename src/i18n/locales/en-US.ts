@@ -103,6 +103,8 @@ export default {
     logo: 'logo',
     thumb_logo: 'thumb logo',
     favicon: 'favicon',
+    import: 'Import',
+    export: 'Export',
 
     // 多个字符组成
     confirm_copy: 'confirm copy',
@@ -462,5 +464,6 @@ export default {
     pwd_policy_retry_limit_befroe: "maximum login attempts with the wrong password within one hour",
     pwd_policy_retry_limit_after: "the time(the maximum value is 32. Enter 0 to disable password retry constraints.)",
     please_select_tenant_or_user: 'Please select a tenant or user',
+    please_select_export_row: 'Please select the lines to be exported',
   },
 };
