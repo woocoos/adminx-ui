@@ -503,3 +503,32 @@ export const getORResult = <T extends number | string>(list: T[]): T => {
   // 返回原始类型
   return (typeof list[0] === 'string' ? val.toString() : val) as T;
 }
+
+/**
+ * 导出json
+ * @param text
+ * @param filename
+ */
+export const exportJson = (text: string, filename: string) => {
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * 读取文件内容
+ * @param file
+ * @returns
+ */
+export const readFile = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
+}
