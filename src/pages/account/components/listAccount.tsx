@@ -13,7 +13,7 @@ import DrawerRole from '@/pages/org/components/drawerRole';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/auth';
 import store from '@/store';
-import { OrderDirection, Org, OrgRole, OrgRoleKind, OrgUserUserType, User, UserAddrAddrType, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { OrderDirection, Org, OrgRole, OrgRoleKind, OrgUserUserType, User, UserAddrAddrType, UserOrder, UserOrderField,  UserUserStatus,  UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource } from '@/util';
 import { ItemType } from 'antd/es/menu/interface';
 
@@ -436,7 +436,7 @@ export const UserList = (props: {
                 where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
               if (params.mobileContains)
                 where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
-              where.statusIn = filter.status as UserSimpleStatus[] | null;
+              where.statusIn = filter.status as UserUserStatus[] | null;
               if (sort.createdAt) {
                 orderBy = {
                   direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
@@ -552,7 +552,7 @@ export const UserList = (props: {
                   where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
                 if (params.mobileContains)
                   where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
-                where.statusIn = filter.status as UserSimpleStatus[] | null;
+                where.statusIn = filter.status as UserUserStatus[] | null;
                 if (sort.createdAt) {
                   orderBy = {
                     direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,

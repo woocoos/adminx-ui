@@ -252,6 +252,7 @@ export default {
     user_devices: '用户设备',
     device_name: '设备名称',
     device_model: '设备型号',
+    device_verification: '设备验证',
     system_version: '系统版本',
     device_uid: '设备UID',
     login_time: '登录时间',

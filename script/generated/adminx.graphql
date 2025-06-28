@@ -2608,7 +2608,7 @@ input CreateUserInput {
   """登陆名称"""
   principalName: String!
   """状态"""
-  status: UserSimpleStatus
+  status: UserUserStatus
 }
 
 """
@@ -2624,7 +2624,7 @@ input CreateUserLoginProfileInput {
   setKind: UserLoginProfileSetKind!
   userID: ID
   """是否开启设备认证"""
-  verifyDevice: Boolean!
+  verifyDevice: Boolean
 }
 
 """
@@ -4306,7 +4306,7 @@ enum OrgUserOrderField {
 }
 
 type OrgUserPreference implements Node {
-  clientPreference(appCode: String!): ClientPreference!
+  clientPreference(appCode: String!): ClientPreference
   """客户端偏好设置"""
   clientPreferences: [ClientPreference!]
   createdAt: Time!
@@ -6688,7 +6688,7 @@ type User implements Node {
   """注册时IP"""
   registerIP: String!
   """状态"""
-  status: UserSimpleStatus
+  status: UserUserStatus
   updatedAt: Time
   updatedBy: Int
   """用户配额"""
@@ -7858,12 +7858,12 @@ input UserPasswordWhereInput {
   userIDNotNil: Boolean
 }
 
-"""UserSimpleStatus is enum for the field status"""
-enum UserSimpleStatus @goModel(model: "github.com/woocoos/knockout-go/ent/schemax/typex.SimpleStatus") {
+"""UserUserStatus is enum for the field status"""
+enum UserUserStatus @goModel(model: "github.com/woocoos/knockout/codegen/entgen/types.UserStatus") {
   active
   disabled
   inactive
-  processing
+  locked
 }
 
 """UserUserType is enum for the field user_type"""
@@ -8069,11 +8069,11 @@ input UserWhereInput {
   registerIPNEQ: String
   registerIPNotIn: [String!]
   """status field predicates"""
-  status: UserSimpleStatus
-  statusIn: [UserSimpleStatus!]
+  status: UserUserStatus
+  statusIn: [UserUserStatus!]
   statusIsNil: Boolean
-  statusNEQ: UserSimpleStatus
-  statusNotIn: [UserSimpleStatus!]
+  statusNEQ: UserUserStatus
+  statusNotIn: [UserUserStatus!]
   statusNotNil: Boolean
   """updated_at field predicates"""
   updatedAt: Time

@@ -2637,7 +2637,7 @@ export type CreateUserInput = {
   /** 登陆名称 */
   principalName: Scalars['String']['input'];
   /** 状态 */
-  status?: InputMaybe<UserSimpleStatus>;
+  status?: InputMaybe<UserUserStatus>;
 };
 
 /**
@@ -2653,7 +2653,7 @@ export type CreateUserLoginProfileInput = {
   setKind: UserLoginProfileSetKind;
   userID?: InputMaybe<Scalars['ID']['input']>;
   /** 是否开启设备认证 */
-  verifyDevice: Scalars['Boolean']['input'];
+  verifyDevice?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 /**
@@ -4931,7 +4931,7 @@ export enum OrgUserOrderField {
 
 export type OrgUserPreference = Node & {
   __typename?: 'OrgUserPreference';
-  clientPreference: ClientPreference;
+  clientPreference?: Maybe<ClientPreference>;
   /** 客户端偏好设置 */
   clientPreferences?: Maybe<Array<ClientPreference>>;
   createdAt: Scalars['Time']['output'];
@@ -7504,7 +7504,7 @@ export type User = Node & {
   /** 注册时IP */
   registerIP: Scalars['String']['output'];
   /** 状态 */
-  status?: Maybe<UserSimpleStatus>;
+  status?: Maybe<UserUserStatus>;
   updatedAt?: Maybe<Scalars['Time']['output']>;
   updatedBy?: Maybe<Scalars['Int']['output']>;
   /** 用户配额 */
@@ -8720,12 +8720,12 @@ export type UserPasswordWhereInput = {
   userIDNotNil?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
-/** UserSimpleStatus is enum for the field status */
-export enum UserSimpleStatus {
+/** UserUserStatus is enum for the field status */
+export enum UserUserStatus {
   Active = 'active',
   Disabled = 'disabled',
   Inactive = 'inactive',
-  Processing = 'processing'
+  Locked = 'locked'
 }
 
 /** UserUserType is enum for the field user_type */
@@ -8931,11 +8931,11 @@ export type UserWhereInput = {
   registerIPNEQ?: InputMaybe<Scalars['String']['input']>;
   registerIPNotIn?: InputMaybe<Array<Scalars['String']['input']>>;
   /** status field predicates */
-  status?: InputMaybe<UserSimpleStatus>;
-  statusIn?: InputMaybe<Array<UserSimpleStatus>>;
+  status?: InputMaybe<UserUserStatus>;
+  statusIn?: InputMaybe<Array<UserUserStatus>>;
   statusIsNil?: InputMaybe<Scalars['Boolean']['input']>;
-  statusNEQ?: InputMaybe<UserSimpleStatus>;
-  statusNotIn?: InputMaybe<Array<UserSimpleStatus>>;
+  statusNEQ?: InputMaybe<UserUserStatus>;
+  statusNotIn?: InputMaybe<Array<UserUserStatus>>;
   statusNotNil?: InputMaybe<Scalars['Boolean']['input']>;
   /** updated_at field predicates */
   updatedAt?: InputMaybe<Scalars['Time']['input']>;
@@ -10018,7 +10018,7 @@ export type OrgUserListQueryVariables = Exact<{
 }>;
 
 
-export type OrgUserListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, orgUserType: OrgUserUserType, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type OrgUserListQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, orgUserType: OrgUserUserType, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgUserListAndIsOrgRoleQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -10030,7 +10030,7 @@ export type OrgUserListAndIsOrgRoleQueryVariables = Exact<{
 }>;
 
 
-export type OrgUserListAndIsOrgRoleQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, orgUserType: OrgUserUserType, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type OrgUserListAndIsOrgRoleQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org', id: string, users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, orgUserType: OrgUserUserType, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User' } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type OrgRoleUserListQueryVariables = Exact<{
   roleId: Scalars['ID']['input'];
@@ -10040,7 +10040,7 @@ export type OrgRoleUserListQueryVariables = Exact<{
 }>;
 
 
-export type OrgRoleUserListQuery = { __typename?: 'Query', orgRoleUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type OrgRoleUserListQuery = { __typename?: 'Query', orgRoleUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type OrgRoleUserListAndIsOrgRoleQueryVariables = Exact<{
   roleId: Scalars['ID']['input'];
@@ -10051,7 +10051,7 @@ export type OrgRoleUserListAndIsOrgRoleQueryVariables = Exact<{
 }>;
 
 
-export type OrgRoleUserListAndIsOrgRoleQuery = { __typename?: 'Query', orgRoleUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type OrgRoleUserListAndIsOrgRoleQuery = { __typename?: 'Query', orgRoleUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type OrgUserNumQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -10085,7 +10085,7 @@ export type MemberListQueryVariables = Exact<{
 }>;
 
 
-export type MemberListQuery = { __typename?: 'Query', userMembers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, orgUserType: OrgUserUserType, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type MemberListQuery = { __typename?: 'Query', userMembers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, orgUserType: OrgUserUserType, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type ChangeOrgUserTypeMutationVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -10133,7 +10133,7 @@ export type ParentOrgUsersQueryVariables = Exact<{
 }>;
 
 
-export type ParentOrgUsersQuery = { __typename?: 'Query', parentOrgUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type ParentOrgUsersQuery = { __typename?: 'Query', parentOrgUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type ParentOrgUsersRoleIdQueryVariables = Exact<{
   orgId: Scalars['ID']['input'];
@@ -10144,7 +10144,7 @@ export type ParentOrgUsersRoleIdQueryVariables = Exact<{
 }>;
 
 
-export type ParentOrgUsersRoleIdQuery = { __typename?: 'Query', parentOrgUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type ParentOrgUsersRoleIdQuery = { __typename?: 'Query', parentOrgUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, isAssignOrgRole: boolean, isAllowRevokeRole: boolean, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type OrgPolicyReferencesQueryVariables = Exact<{
   orgPolicyId: Scalars['ID']['input'];
@@ -10311,35 +10311,35 @@ export type UserListQueryVariables = Exact<{
 }>;
 
 
-export type UserListQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type UserListQuery = { __typename?: 'Query', users: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type UserInfoQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type UserInfoQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserInfoLoginProfileQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoLoginProfileQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type UserInfoLoginProfileQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserInfoLoginProfileIdentitiesQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoLoginProfileIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type UserInfoLoginProfileIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, loginProfile?: { __typename?: 'UserLoginProfile', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, lastLoginIP?: string | null, lastLoginAt?: any | null, canLogin?: boolean | null, setKind: UserLoginProfileSetKind, passwordReset?: boolean | null, verifyDevice: boolean, mfaEnabled?: boolean | null, mfaStatus?: UserLoginProfileSimpleStatus | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserInfoIdentitiesQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
 }>;
 
 
-export type UserInfoIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
+export type UserInfoIdentitiesQuery = { __typename?: 'Query', node?: { __typename?: 'App' } | { __typename?: 'AppAction' } | { __typename?: 'AppDict' } | { __typename?: 'AppDictItem' } | { __typename?: 'AppMenu' } | { __typename?: 'AppPolicy' } | { __typename?: 'AppPolicyView' } | { __typename?: 'AppRes' } | { __typename?: 'AppRole' } | { __typename?: 'Country' } | { __typename?: 'Currency' } | { __typename?: 'FileIdentity' } | { __typename?: 'FileIdentityForApp' } | { __typename?: 'FileSource' } | { __typename?: 'OauthClient' } | { __typename?: 'Org' } | { __typename?: 'OrgPolicy' } | { __typename?: 'OrgRole' } | { __typename?: 'OrgUserPreference' } | { __typename?: 'Permission' } | { __typename?: 'Quota' } | { __typename?: 'QuotaItem' } | { __typename?: 'Region' } | { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null, identities?: Array<{ __typename?: 'UserIdentity', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, userID?: string | null, kind: UserIdentityKind, code?: string | null, codeExtend?: string | null, status?: UserIdentitySimpleStatus | null }> | null } | { __typename?: 'UserAddr' } | { __typename?: 'UserDevice' } | { __typename?: 'UserIdentity' } | { __typename?: 'UserLoginProfile' } | { __typename?: 'UserPassword' } | { __typename?: 'UserPasswordPolicy' } | null };
 
 export type UserAccessKeyListQueryVariables = Exact<{
   gid: Scalars['GID']['input'];
@@ -10355,7 +10355,7 @@ export type CreateUserMutationVariables = Exact<{
 }>;
 
 
-export type CreateUserMutation = { __typename?: 'Mutation', createOrganizationUser?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, orgUserType: OrgUserUserType, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null };
+export type CreateUserMutation = { __typename?: 'Mutation', createOrganizationUser?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, orgUserType: OrgUserUserType, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null };
 
 export type CreateAccountMutationVariables = Exact<{
   rootOrgID: Scalars['ID']['input'];
@@ -10363,7 +10363,7 @@ export type CreateAccountMutationVariables = Exact<{
 }>;
 
 
-export type CreateAccountMutation = { __typename?: 'Mutation', createOrganizationAccount?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null };
+export type CreateAccountMutation = { __typename?: 'Mutation', createOrganizationAccount?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null };
 
 export type UpdateUserMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -10372,7 +10372,7 @@ export type UpdateUserMutationVariables = Exact<{
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null };
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null };
 
 export type UpdateUserLoginProfileMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -10453,7 +10453,7 @@ export type OrgRecycleUsersQueryVariables = Exact<{
 }>;
 
 
-export type OrgRecycleUsersQuery = { __typename?: 'Query', orgRecycleUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
+export type OrgRecycleUsersQuery = { __typename?: 'Query', orgRecycleUsers: { __typename?: 'UserConnection', totalCount: number, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, hasPreviousPage: boolean, startCursor?: any | null, endCursor?: any | null }, edges?: Array<{ __typename?: 'UserEdge', cursor: any, node?: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } | null } | null> | null } };
 
 export type RecoverOrgUserMutationVariables = Exact<{
   userId: Scalars['ID']['input'];
@@ -10464,7 +10464,7 @@ export type RecoverOrgUserMutationVariables = Exact<{
 }>;
 
 
-export type RecoverOrgUserMutation = { __typename?: 'Mutation', recoverOrgUser: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserSimpleStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } };
+export type RecoverOrgUserMutation = { __typename?: 'Mutation', recoverOrgUser: { __typename?: 'User', id: string, createdBy: number, createdAt: any, updatedBy?: number | null, updatedAt?: any | null, principalName: string, displayName: string, gender: UserGender, userType: UserUserType, creationType: UserCreationType, registerIP: string, status?: UserUserStatus | null, comments?: string | null, avatar?: string | null, contact?: { __typename?: 'UserAddr', email?: string | null, mobile?: string | null } | null } };
 
 export type CreateOauthClientMutationVariables = Exact<{
   input: CreateOauthClientInput;

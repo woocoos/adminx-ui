@@ -282,6 +282,9 @@ export default (props: {
                   <ProDescriptions.Item label={t('reset_login_pwd')} >
                     {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
                   </ProDescriptions.Item>
+                  <ProDescriptions.Item label={t('device_verification')} >
+                    {info?.loginProfile?.verifyDevice ? t('yes') : t('no')}
+                  </ProDescriptions.Item>
                 </ProDescriptions>
                 <br />
                 <Divider />

@@ -1,4 +1,4 @@
-import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType, UserGender, OrgUserUserType } from '@/generated/adminx/graphql';
+import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserUserType, UserGender, OrgUserUserType, UserUserStatus } from '@/generated/adminx/graphql';
 import { getOrgInfo } from '@/services/adminx/org';
 import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/adminx/user';
 import store from '@/store';
@@ -24,6 +24,7 @@ type ProFormData = {
   comments?: string;
   canLogin?: boolean;
   passwordReset?: boolean;
+  verifyDevice?: boolean;
 };
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
@@ -168,7 +169,7 @@ export default (props: {
             principalName: values.principalName || '',
             displayName: values.displayName || '',
             comments: values.comments,
-            status: UserSimpleStatus.Active,
+            status: UserUserStatus.Active,
             loginProfile: {
               setKind,
               verifyDevice: false,
@@ -300,6 +301,7 @@ export default (props: {
       <div x-if={['loginProfile'].includes(props.scene)}>
         <ProFormSwitch name="canLogin" label={t('allow_pwd_login')} />
         <ProFormSwitch name="passwordReset" label={t('reset_login_pwd')} />
+        <ProFormSwitch name="verifyDevice" label={t('device_verification')} />
       </div>
     </DrawerForm>
   );

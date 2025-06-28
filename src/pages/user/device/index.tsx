@@ -1,20 +1,23 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Modal } from 'antd';
+import { Button, Space, Modal, Switch } from 'antd';
 import { MutableRefObject, forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { getAppInfo } from '@/services/adminx/app';
-import { getUserDevices, delUserDevice, EnumUserDeviceStatus, getUserInfo } from '@/services/adminx/user';
+import { getUserDevices, delUserDevice, EnumUserDeviceStatus, getUserInfo, getUserInfoLoginProfileIdentities, updateUserProfile } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from '@ice/runtime';
-import Auth from '@/components/auth';
+import Auth, { checkAuth } from '@/components/auth';
 import { User, UserDevice, UserDeviceWhereInput } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource, getDate } from '@/util';
+import { useAuth } from 'ice';
 
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    [auth] = useAuth(),
     [searchParams] = useSearchParams(),
     userId = searchParams.get('id'),
     [userInfo, setUserInfo] = useState<User>(),
+    [verifyDevice, setVerifyDevice] = useState(false),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<UserDevice>[] = [
@@ -76,10 +79,11 @@ export default () => {
   );
 
   useEffect(() => {
-    getUserInfo(userId || '').then(result => {
+    getUserInfoLoginProfileIdentities(userId || '').then(result => {
       if (result && result.id) {
         setUserInfo(result as User);
       }
+      setVerifyDevice(result?.loginProfile?.verifyDevice ?? false)
     });
   }, []);
 
@@ -132,8 +136,26 @@ export default () => {
         rowKey={'id'}
         toolbar={{
           title: `${t('user')}：${userInfo?.displayName || '-'}`,
-          actions: [
-          ],
+          actions: userInfo ? [
+            <>
+              {
+                t('device_verification')
+              }:
+              {
+                checkAuth('updateLoginProfile', auth) ? <Switch
+                  value={verifyDevice}
+                  onChange={async (checked) => {
+                    const result = await updateUserProfile(userInfo.id, {
+                      verifyDevice: checked,
+                    });
+                    if (result?.id) {
+                      setVerifyDevice(checked);
+                    }
+                  }}
+                /> : t(verifyDevice ? 'yes' : 'no')
+              }
+            </>
+          ] : undefined,
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}

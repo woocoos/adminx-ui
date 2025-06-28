@@ -252,6 +252,7 @@ export default {
     user_devices: 'user devices',
     device_name: 'device name',
     device_model: 'device model',
+    device_verification: 'Equipment verification',
     system_version: 'system version',
     device_uid: 'device uid',
     login_time: 'login time',

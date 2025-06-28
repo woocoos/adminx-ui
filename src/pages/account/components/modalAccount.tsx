@@ -4,7 +4,7 @@ import { EnumUserStatus, getUserList } from '@/services/adminx/user';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { useTranslation } from 'react-i18next';
 import { getOrgRoleUserList, getOrgUserList } from '@/services/adminx/org/user';
-import { OrderDirection, User, UserOrder, UserOrderField, UserSimpleStatus, UserUserType, UserWhereInput, UserAddrAddrType } from '@/generated/adminx/graphql';
+import { OrderDirection, User, UserOrder, UserOrderField,  UserUserType, UserWhereInput, UserAddrAddrType, UserUserStatus } from '@/generated/adminx/graphql';
 
 export default (props: {
   open: boolean;
@@ -112,7 +112,7 @@ export default (props: {
             where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
           if (params.mobileContains)
             where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
-          where.statusIn = filter.status as UserSimpleStatus[] | null;
+          where.statusIn = filter.status as UserUserStatus[] | null;
           if (sort.createdAt) {
             orderBy = {
               direction: sort.createdAt === 'ascend' ? OrderDirection.Asc : OrderDirection.Desc,
