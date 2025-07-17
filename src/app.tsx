@@ -36,6 +36,8 @@ setLibraryName('adminx-ui')
 export const icestark = defineChildConfig(() => ({
   mount: (data) => {
     // 在微应用挂载前执行
+    removeItem('token');
+    removeItem('refreshToken');
   },
   unmount: () => {
     // 在微应用卸载后执行
