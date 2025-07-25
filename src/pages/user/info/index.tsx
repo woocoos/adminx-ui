@@ -161,7 +161,10 @@ export default () => {
             label={t('mobile')}
             placeholder={`${t('please_enter_mobile')}`}
           >
-            <InputMobile />
+            <InputMobile inputProps={{
+              allowClear: true,
+              style: { width: '440px', maxWidth: "100%" },
+            }} />
           </ProFormText>
         </ProForm>
       </Card>

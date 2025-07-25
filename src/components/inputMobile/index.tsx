@@ -1,12 +1,13 @@
 import { Country } from "@/generated/adminx/graphql";
 import { getCountryList } from "@/services/adminx/country";
-import { Input, Select } from "antd";
+import { Input, InputProps, Select } from "antd";
 import { useEffect, useState } from "react";
 
 export default (props: {
   value?: string;
   onChange?: (value: string) => void;
   disabled?: boolean;
+  inputProps?: InputProps;
 }) => {
   const [code, setCode] = useState<string>()
   const [mobile, setMobile] = useState<string>()
@@ -58,11 +59,16 @@ export default (props: {
           setCode(v)
           props.onChange?.(`${v} ${mobile}`)
         }}
+        popupMatchSelectWidth={false}
         options={
           countryList.map(item => ({
             label: `+${item.code}`, value: `+${item.code}`,
+            optionLabel: `${item.name}(+${item.code})`
           }))
-        } />
+        }
+        optionRender={(option) => option.data.optionLabel}
+      />
     }
+    {...props.inputProps}
   />
 }
