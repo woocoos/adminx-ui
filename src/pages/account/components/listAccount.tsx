@@ -13,7 +13,7 @@ import DrawerRole from '@/pages/org/components/drawerRole';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/auth';
 import store from '@/store';
-import { OrderDirection, Org, OrgRole, OrgRoleKind, OrgUserUserType, User, UserAddrAddrType, UserOrder, UserOrderField,  UserUserStatus,  UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { OrderDirection, Org, OrgRole, OrgRoleKind, OrgUserUserType, User, UserAddrAddrType, UserOrder, UserOrderField, UserUserStatus, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { delDataSource, saveDataSource } from '@/util';
 import { ItemType } from 'antd/es/menu/interface';
 
@@ -82,6 +82,13 @@ export const UserList = (props: {
         search: false,
         width: 100,
         valueEnum: EnumUserStatus,
+      },
+      {
+        title: t('introduction'),
+        dataIndex: 'comments',
+        ellipsis: true,
+        search: false,
+        width: 100,
       },
       { title: t('created_at'), dataIndex: 'createdAt', width: 160, valueType: 'dateTime', search: false, sorter: true },
     ],

@@ -88,8 +88,8 @@ importers:
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.9.0)
       '@ice/app':
-        specifier: ^3.4.12
-        version: 3.4.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^3.6.5
+        version: 3.6.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ice/plugin-antd':
         specifier: ^1.0.2
         version: 1.0.2
@@ -97,8 +97,8 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ice/plugin-icestark':
-        specifier: ^1.1.1
-        version: 1.1.1(react@18.3.1)
+        specifier: ^1.2.1
+        version: 1.2.1(react@18.3.1)
       '@ice/plugin-jsx-plus':
         specifier: ^1.0.4
         version: 1.0.4
@@ -109,8 +109,8 @@ importers:
         specifier: ^1.1.2
         version: 1.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ice/runtime':
-        specifier: ^1.4.13
-        version: 1.4.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^1.5.6
+        version: 1.5.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ice/stark-app':
         specifier: ^1.5.0
         version: 1.5.0
@@ -1256,16 +1256,16 @@ packages:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     deprecated: Use @eslint/object-schema instead
 
-  '@ice/app@3.4.12':
-    resolution: {integrity: sha512-l7tMKh2N1a11Hq/s5miAwNMCGGtIQszaR5RnGxOT2iwmK2HIH0gsVJq9vRrp/BKeBIms6sQkt+cOdMT7BvF3Eg==}
+  '@ice/app@3.6.5':
+    resolution: {integrity: sha512-XWD54zBBOduTwUCa0XMJ6CU7SVksa1HKf1FR9qISEoyzQt6Br4SgVGMieFT+/IhC+JQZs8atPDEsM6bzrpCBlQ==}
     engines: {node: '>=14.19.0', npm: '>=3.0.0'}
     hasBin: true
     peerDependencies:
       react: '>=18.0.0'
       react-dom: '>=18.0.0'
 
-  '@ice/bundles@0.2.7':
-    resolution: {integrity: sha512-kx2eCqEt2p//m3Z7HGYvCm3zprJzc7/d3yuVlPw2pcBbIbytZNCyTytY4gNrK9Lua0blx5mHslIFBOMHMCKVzQ==}
+  '@ice/bundles@0.2.9':
+    resolution: {integrity: sha512-n61ruKaxZ4K/TseMudOaOZ4txEh+XQgyKxsMLgE4va/fzaq74hDoNWzFSpxcdNybNj+WFCnRgjGIEH5wQtEfWQ==}
 
   '@ice/css-modules-hash-darwin-arm64@0.0.10':
     resolution: {integrity: sha512-eQaYWf+r8rvyOp3bYU2Kq/jDStWPdUh6bmul2nwe3dE3ePngI6fg7hde3l1aoG23LnSvgaGrceioFecvI9OVKg==}
@@ -1339,8 +1339,8 @@ packages:
     peerDependencies:
       react: ^16 || ^17 || ^18
 
-  '@ice/jsx-runtime@0.3.0':
-    resolution: {integrity: sha512-DnfQJGNPng6NusAPanRDqdRpueqFljX+wE+Q0FVtGsLmmnhg5vt/FODB5QMliheAVeCgKE1AJlLO/mEY4cutPg==}
+  '@ice/jsx-runtime@0.3.2':
+    resolution: {integrity: sha512-4JLg6dLHbXQOAPviIstHWHcvYpDfgzUR1KedBnrLSDD0xPLEJYGcwTkwyiwdjTx/cufwylsNv75qw4GyMjU/Yw==}
     peerDependencies:
       react: ^16 || ^17 || ^18
 
@@ -1420,8 +1420,8 @@ packages:
       react: ^18.0.0
       react-dom: ^18.0.0
 
-  '@ice/plugin-icestark@1.1.1':
-    resolution: {integrity: sha512-SdhZc+I0vVXTcP+5xRQjd0c9a6CUvo3IB9br1BzD7IU2cemFjkFOtASBXFfRjR5Er03aigrHqnOKr8Z96v+Xxg==}
+  '@ice/plugin-icestark@1.2.1':
+    resolution: {integrity: sha512-4Ky2XQA3Hd8AOXjSJrfRmiKYqhMtPREVEzZyegIf9IdDqrQb6QcMIAT2JRk6TD+07wYpTDqz5M9ExLmcDsbkhA==}
 
   '@ice/plugin-jsx-plus@1.0.4':
     resolution: {integrity: sha512-d6qROduqAwQPhEV5ALiEzhzqiBme9HnhujwPEJWrcv3UxxPKU4zs0HPjd2JAbruDz7eLWhgpG1wk0ieOgV32yA==}
@@ -1438,14 +1438,14 @@ packages:
       react: ^18.0.0
       react-dom: ^18.0.0
 
-  '@ice/route-manifest@1.2.2':
-    resolution: {integrity: sha512-wu8qg/3MKnUkldOIq8fJYwnMoc2YmtQ/ry2OeQdnrHK8S+H4gbwR3uRseioKfoUhpMw0Ds7bjVDLX3ucGY078Q==}
+  '@ice/route-manifest@1.3.0':
+    resolution: {integrity: sha512-wFSn+UZ/QcupdIhtHdzrgy398Ft9yVk1Bd1ho/lgLqT/A/mNMOTjd+ncl6sEpzHOj/IpbDoNmCXr9SfTLkEY6g==}
 
-  '@ice/rspack-config@1.1.10':
-    resolution: {integrity: sha512-qlr2kxVA1jUF3TZN14txNTNW4+xzIFWGiBRDUJQVnd04Um6ZLpsnezAIk+/4oJvZAMl/mCG9iJYEzr5ZxUU0wg==}
+  '@ice/rspack-config@1.2.4':
+    resolution: {integrity: sha512-VF4/mjsYWdCrfsm+avuep6a2KjAd8kywajUBLccH8Res2I0BsMahT5lpmNQnRqQSmENx1wbs5cJDRnfzdiP13A==}
 
-  '@ice/runtime@1.4.13':
-    resolution: {integrity: sha512-TSuzBGpBA3GId6O/JDgnwmtw1Rob1618km1JEOCKY2HymQwj2YbMcF9aLZoyoXs7WGvs9bBh79W/396Qed0FRg==}
+  '@ice/runtime@1.5.6':
+    resolution: {integrity: sha512-t2kbwk30X5Cz31Gifghh+A+10JnYWgf7nX/PrHCvZ99K5+XdZ+dFnKd91b89Tnl0+uuWg8ANjM3gicrbTjlrMA==}
     peerDependencies:
       react: ^18.1.0
       react-dom: ^18.1.0
@@ -1453,11 +1453,11 @@ packages:
   '@ice/sandbox@1.1.4':
     resolution: {integrity: sha512-MEVF0Ze3McKDutnFiUAhUoc+WwOFxITVBgSSHmbGpKtWbXJX9kUVlx3VsEVJvdqU3O1kiBNx6zE1sFMjKPRTIQ==}
 
-  '@ice/shared-config@1.2.9':
-    resolution: {integrity: sha512-6sgOC/2ILUoxZNiipg8MHU8aMifOiz5lgIRCEQAuU3wAm9K4WTStvKQ+njQXyJ1pY/Psue/MSW3W1w85Ke6LSA==}
+  '@ice/shared-config@1.3.2':
+    resolution: {integrity: sha512-hd6CGC2S0Z4f0Mo0KY8XezsAmJVKHVRbnpkBa4IHbOo1ZGibX4VNKVosYNMC9KeM6JJfCSbQZe9SZwWEjY1S9Q==}
 
-  '@ice/shared@1.0.2':
-    resolution: {integrity: sha512-fSSTUzQEqodKsnvIFShJujp8qljCd88QjfEDJ9JIGgeHQfanMjZeL8s+jwI4o6L0oYl6Xg0hh/3UTIJ1Xar7KQ==}
+  '@ice/shared@1.1.0':
+    resolution: {integrity: sha512-2zoWinY+ngkI7wzoVXInJK+KpEE4NMKRWvDrLS2gvS0nmLWZ0A0IO++BW9RQMcAiQc2GNwsiYevVX2uNTHf0Tw==}
 
   '@ice/stark-app@1.5.0':
     resolution: {integrity: sha512-9fuCri48eZj6TnfPkCju4vVLhGurz+mt6lFx4JQFHhnRBQ5MuiBqRZg5F/3vdnJ7dAYQJlCXmHlQtBHok82z+g==}
@@ -1487,8 +1487,8 @@ packages:
   '@ice/swc-plugin-remove-export@0.2.0':
     resolution: {integrity: sha512-kmyrCMtuEsS7J3rpENT5qUhhbuu3eldsN1WpJjtXX4rgogJ1+QmnAPjnhB0SWzr0/b5ArGfz83O6M+5NNGRd+A==}
 
-  '@ice/webpack-config@1.1.16':
-    resolution: {integrity: sha512-RFWs6JHGmqkQu3EE4kpCqzKGhzCMR8UM7asAm6dE5ELIhBYMkVUKhvs8a4tTHMWUi936/zUA2B/hqLNf+D9Jfw==}
+  '@ice/webpack-config@1.2.2':
+    resolution: {integrity: sha512-e+kuzeh4MXGY6qo+9r3MK4JDLorrFnO3+UJdce2GNy3IiAw/WcUaPQCow2sKVeU5lY1Ga4C9TeQIMf/XiKboDQ==}
 
   '@jridgewell/gen-mapping@0.3.5':
     resolution: {integrity: sha512-IzL8ZoEDIBRWEzlCcRhOaCupYyN5gdIK+Q6fbFdPDg6HqX6jpkItn7DFIpW9LQzXG6Df9sA7+OKnq0qlz/GaQg==}
@@ -2001,11 +2001,11 @@ packages:
   '@swc/counter@0.1.3':
     resolution: {integrity: sha512-e2BR4lsJkkRlKZ/qCHPw9ZaSxc0MVUd7gtbtaB7aMvHeJVYe8sOB8DBZkP2DtISHGSku9sCK6T6cnY0CtXrOCQ==}
 
-  '@swc/helpers@0.5.1':
-    resolution: {integrity: sha512-sJ902EfIzn1Fa+qYmjdQqh8tPsoxyBz+8yBKC2HKUxyezKJFwPGOn7pv4WY6QuQW//ySQi5lJjA/ZT9sNWWNTg==}
-
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
+
+  '@swc/helpers@0.5.17':
+    resolution: {integrity: sha512-5IKx/Y13RsYd+sauPb2x+U/xZikHjolzfuDgTAl/Tdf3Q8rslRvC19NKDLgAJQ6wsqADk10ntlv08nPFw/gO/A==}
 
   '@swc/types@0.1.12':
     resolution: {integrity: sha512-wBJA+SdtkbFhHjTMYH+dEH1y4VpfGdAc2Kw/LK09i9bXd/K6j6PkDcFCEzb6iVfZMkPRrl/q0e3toqTAJdkIVA==}
@@ -3882,6 +3882,7 @@ packages:
 
   lodash.isequal@4.5.0:
     resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    deprecated: This package is deprecated. Use require('node:util').isDeepStrictEqual instead.
 
   lodash.isfunction@3.0.9:
     resolution: {integrity: sha512-AirXNj15uRIMMPihnkInB4i3NHeb4iBtNg9WRWuK2o31S+ePwwNmDPaTL3o7dTJ+VXNZim7rFs4rxN4YU1oUJw==}
@@ -7484,19 +7485,20 @@ snapshots:
 
   '@humanwhocodes/object-schema@2.0.3': {}
 
-  '@ice/app@3.4.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@ice/app@3.6.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@ice/bundles': 0.2.7(@swc/helpers@0.5.1)
-      '@ice/route-manifest': 1.2.2
-      '@ice/rspack-config': 1.1.10(@swc/helpers@0.5.1)
-      '@ice/runtime': 1.4.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@ice/shared-config': 1.2.9(@swc/helpers@0.5.1)
-      '@ice/webpack-config': 1.1.16(@swc/helpers@0.5.1)
-      '@swc/helpers': 0.5.1
+      '@ice/bundles': 0.2.9(@swc/helpers@0.5.17)
+      '@ice/route-manifest': 1.3.0
+      '@ice/rspack-config': 1.2.4(@swc/helpers@0.5.17)
+      '@ice/runtime': 1.5.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ice/shared-config': 1.3.2(@swc/helpers@0.5.17)
+      '@ice/webpack-config': 1.2.2(@swc/helpers@0.5.17)
+      '@swc/helpers': 0.5.17
       '@types/express': 4.17.21
       address: 1.2.2
       build-scripts: 2.1.2
       chalk: 4.1.2
+      chokidar: 3.5.3
       commander: 9.5.0
       consola: 2.15.3
       cross-spawn: 7.0.5
@@ -7523,14 +7525,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@ice/bundles@0.2.7(@swc/helpers@0.5.1)':
+  '@ice/bundles@0.2.9(@swc/helpers@0.5.17)':
     dependencies:
       '@ice/css-modules-hash': 0.0.10
       '@ice/pack-binding': 0.0.13
       '@ice/swc-plugin-keep-export': 0.2.0
       '@ice/swc-plugin-node-transform': 0.2.0
       '@ice/swc-plugin-remove-export': 0.2.0
-      '@swc/core': 1.3.80(@swc/helpers@0.5.1)
+      '@swc/core': 1.3.80(@swc/helpers@0.5.17)
       ansi-html-community: 0.0.8
       browserslist: 4.24.2
       caniuse-lite: 1.0.30001680
@@ -7609,8 +7611,9 @@ snapshots:
       react: 18.3.1
       style-unit: 3.0.5
 
-  '@ice/jsx-runtime@0.3.0(react@18.3.1)':
+  '@ice/jsx-runtime@0.3.2(react@18.3.1)':
     dependencies:
+      '@swc/helpers': 0.5.17
       react: 18.3.1
       style-unit: 3.0.5
 
@@ -7666,7 +7669,7 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
-  '@ice/plugin-icestark@1.1.1(react@18.3.1)':
+  '@ice/plugin-icestark@1.2.1(react@18.3.1)':
     dependencies:
       '@ice/stark': 2.7.5(react@18.3.1)
       '@ice/stark-app': 1.5.0
@@ -7705,22 +7708,22 @@ snapshots:
     transitivePeerDependencies:
       - react-native
 
-  '@ice/route-manifest@1.2.2':
+  '@ice/route-manifest@1.3.0':
     dependencies:
       minimatch: 5.1.6
 
-  '@ice/rspack-config@1.1.10(@swc/helpers@0.5.1)':
+  '@ice/rspack-config@1.2.4(@swc/helpers@0.5.17)':
     dependencies:
-      '@ice/bundles': 0.2.7(@swc/helpers@0.5.1)
-      '@ice/shared-config': 1.2.9(@swc/helpers@0.5.1)
+      '@ice/bundles': 0.2.9(@swc/helpers@0.5.17)
+      '@ice/shared-config': 1.3.2(@swc/helpers@0.5.17)
     transitivePeerDependencies:
       - '@swc/helpers'
       - supports-color
 
-  '@ice/runtime@1.4.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@ice/runtime@1.5.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@ice/jsx-runtime': 0.3.0(react@18.3.1)
-      '@ice/shared': 1.0.2
+      '@ice/jsx-runtime': 0.3.2(react@18.3.1)
+      '@ice/shared': 1.1.0
       '@remix-run/router': 1.14.2
       abortcontroller-polyfill: 1.7.5
       history: 5.3.0
@@ -7731,9 +7734,9 @@ snapshots:
 
   '@ice/sandbox@1.1.4': {}
 
-  '@ice/shared-config@1.2.9(@swc/helpers@0.5.1)':
+  '@ice/shared-config@1.3.2(@swc/helpers@0.5.17)':
     dependencies:
-      '@ice/bundles': 0.2.7(@swc/helpers@0.5.1)
+      '@ice/bundles': 0.2.9(@swc/helpers@0.5.17)
       '@rollup/pluginutils': 4.2.1
       browserslist: 4.24.2
       consola: 2.15.3
@@ -7743,7 +7746,7 @@ snapshots:
       - '@swc/helpers'
       - supports-color
 
-  '@ice/shared@1.0.2': {}
+  '@ice/shared@1.1.0': {}
 
   '@ice/stark-app@1.5.0': {}
 
@@ -7781,10 +7784,10 @@ snapshots:
 
   '@ice/swc-plugin-remove-export@0.2.0': {}
 
-  '@ice/webpack-config@1.1.16(@swc/helpers@0.5.1)':
+  '@ice/webpack-config@1.2.2(@swc/helpers@0.5.17)':
     dependencies:
-      '@ice/bundles': 0.2.7(@swc/helpers@0.5.1)
-      '@ice/shared-config': 1.2.9(@swc/helpers@0.5.1)
+      '@ice/bundles': 0.2.9(@swc/helpers@0.5.17)
+      '@ice/shared-config': 1.3.2(@swc/helpers@0.5.17)
       fast-glob: 3.3.2
       process: 0.11.10
     transitivePeerDependencies:
@@ -7826,10 +7829,10 @@ snapshots:
 
   '@knockout-js/ice-urql@0.1.7(@urql/core@5.0.8(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@ice/app': 3.4.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ice/app': 3.6.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
       '@ice/plugin-request': 1.0.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      '@ice/runtime': 1.4.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ice/runtime': 1.5.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@swc/helpers': 0.5.15
       '@urql/exchange-auth': 2.2.0(@urql/core@5.0.8(graphql@16.9.0))
       crypto-js: 4.2.0
@@ -7852,7 +7855,7 @@ snapshots:
       '@dnd-kit/sortable': 7.0.2(@dnd-kit/core@6.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
       '@ice/jsx-runtime': 0.2.2(react@18.3.1)
-      '@ice/runtime': 1.4.13(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@ice/runtime': 1.5.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@knockout-js/api': 0.1.14(react@18.3.1)
       '@knockout-js/ice-urql': 0.1.7(@urql/core@5.0.8(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@swc/helpers': 0.5.15
@@ -8422,7 +8425,7 @@ snapshots:
   '@swc/core-win32-x64-msvc@1.3.80':
     optional: true
 
-  '@swc/core@1.3.80(@swc/helpers@0.5.1)':
+  '@swc/core@1.3.80(@swc/helpers@0.5.17)':
     dependencies:
       '@swc/types': 0.1.12
     optionalDependencies:
@@ -8436,15 +8439,15 @@ snapshots:
       '@swc/core-win32-arm64-msvc': 1.3.80
       '@swc/core-win32-ia32-msvc': 1.3.80
       '@swc/core-win32-x64-msvc': 1.3.80
-      '@swc/helpers': 0.5.1
+      '@swc/helpers': 0.5.17
 
   '@swc/counter@0.1.3': {}
 
-  '@swc/helpers@0.5.1':
+  '@swc/helpers@0.5.15':
     dependencies:
       tslib: 2.8.1
 
-  '@swc/helpers@0.5.15':
+  '@swc/helpers@0.5.17':
     dependencies:
       tslib: 2.8.1
 
