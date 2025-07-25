@@ -160,12 +160,6 @@ export default () => {
             label={t('mobile')}
             placeholder={`${t('please_enter_mobile')}`}
           />
-          <ProFormTextArea
-            name="comments"
-            width="lg"
-            label={t('introduction')}
-            placeholder={`${t('please_enter_introduction')}`}
-          />
         </ProForm>
       </Card>
     </PageContainer>

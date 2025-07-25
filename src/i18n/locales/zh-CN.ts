@@ -256,6 +256,7 @@ export default {
     system_version: '系统版本',
     device_uid: '设备UID',
     login_time: '登录时间',
+    internal_notes: '内部备注',
 
     // 创建
     create_user: '创建用户',
@@ -304,6 +305,7 @@ export default {
     // 必填
     required_app: '必需填写应用',
     required_operation: '必需填写操作',
+    please_enter: '请输入',
     'please_enter_{{field}}': '请输入{{field}}',
     please_enter_principal_name: '请输入登录名称',
     please_enter_password: '请输入密码',

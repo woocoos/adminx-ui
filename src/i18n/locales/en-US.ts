@@ -256,6 +256,7 @@ export default {
     system_version: 'system version',
     device_uid: 'device uid',
     login_time: 'login time',
+    internal_notes: 'Internal Notes',
 
     // 创建
     create_user: 'Create a user',
@@ -305,6 +306,7 @@ export default {
     // 必填提示
     required_app: 'Required application',
     required_operation: 'Required operation',
+    please_enter: 'Please enter',
     'please_enter_{{field}}': 'Please enter {{field}}',
     please_enter_principal_name: 'Please enter your login name',
     please_enter_password: 'Please enter password',

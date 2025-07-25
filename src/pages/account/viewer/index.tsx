@@ -221,7 +221,7 @@ export default (props: {
               <ProDescriptions.Item label={t('created_at')} valueType="dateTime" span={2}>
                 {info?.createdAt}
               </ProDescriptions.Item>
-              <ProDescriptions.Item label={t('introduction')} span={2} >
+              <ProDescriptions.Item label={t('internal_notes')} span={2} >
                 {info?.comments}
               </ProDescriptions.Item>
             </ProDescriptions>

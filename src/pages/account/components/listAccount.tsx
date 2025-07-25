@@ -84,7 +84,7 @@ export const UserList = (props: {
         valueEnum: EnumUserStatus,
       },
       {
-        title: t('introduction'),
+        title: t('internal_notes'),
         dataIndex: 'comments',
         ellipsis: true,
         search: false,

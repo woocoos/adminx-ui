@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
+import InputMobile from '@/components/inputMobile';
 
 type FormUser = User & {
   email?: string | null;
@@ -291,11 +292,13 @@ export default (props: {
             },
           ]}
         />
-        <ProFormText name="mobile" label={t('mobile')} />
+        <ProFormText name="mobile" label={t('mobile')} >
+          <InputMobile />
+        </ProFormText>
         <ProFormTextArea
           name="comments"
-          label={t('introduction')}
-          placeholder={`${t('please_enter_introduction')}`}
+          label={t('internal_notes')}
+          placeholder={`${t('please_enter')}`}
         />
       </div>
       <div x-if={['loginProfile'].includes(props.scene)}>
