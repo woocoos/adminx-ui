@@ -8,6 +8,7 @@ import { User, UserGender } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
+import InputMobile from '@/components/inputMobile';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
 
@@ -159,7 +160,9 @@ export default () => {
             width="lg"
             label={t('mobile')}
             placeholder={`${t('please_enter_mobile')}`}
-          />
+          >
+            <InputMobile />
+          </ProFormText>
         </ProForm>
       </Card>
     </PageContainer>
