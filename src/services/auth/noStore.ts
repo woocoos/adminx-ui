@@ -62,19 +62,13 @@ export async function parseSpm() {
 export const initFillI18n = async () => {
   if (ICE_API_I18N_PREFIX) {
     const i18n = getI18n()
-    const lngFiles = Object.keys(i18n.store.data).map(lng => ({
-      lng: lng,
-      fileName: `${lng}.json`,
-    }))
-    for await (const lf of lngFiles) {
-      try {
-        const file = await request.get(`${ICE_API_I18N_PREFIX}/${lf.fileName}?t=${randomId(5)}`)
-        if (typeof file === 'object') {
-          i18n.addResources(lf.lng, 'translation', file)
-        }
-      } catch (error) {
-        console.error(`${lf.fileName}读取失败！`)
+    try {
+      const file = await request.get(`/i18n/${i18n.language}.json?t=${randomId(5)}`)
+      if (typeof file === 'object') {
+        i18n.addResources(i18n.language, 'translation', file)
       }
+    } catch (error) {
+      console.error(`${i18n.language}读取失败！`)
     }
   }
 }
