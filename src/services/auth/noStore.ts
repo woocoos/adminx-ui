@@ -2,8 +2,11 @@ import { User } from '@/generated/adminx/graphql';
 import { getItem, setItem } from '@/pkg/localStore';
 import { request } from 'ice';
 import { LoginRes } from '.';
+import { getI18n } from 'react-i18next';
+import { randomId } from '@/util';
 
 const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? ''
+const ICE_API_I18N_PREFIX = process.env.ICE_API_I18N_PREFIX ?? ''
 
 /**
  * 解析spm信息
@@ -51,4 +54,27 @@ export async function parseSpm() {
     location.replace(u)
   }
 
+}
+
+/**
+ * 多语言文件获取
+ */
+export const initFillI18n = async () => {
+  if (ICE_API_I18N_PREFIX) {
+    const i18n = getI18n()
+    const lngFiles = Object.keys(i18n.store.data).map(lng => ({
+      lng: lng,
+      fileName: `${lng}.json`,
+    }))
+    for await (const lf of lngFiles) {
+      try {
+        const file = await request.get(`${ICE_API_I18N_PREFIX}/${lf.fileName}?t=${randomId(5)}`)
+        if (typeof file === 'object') {
+          i18n.addResources(lf.lng, 'translation', file)
+        }
+      } catch (error) {
+        console.error(`${lf.fileName}读取失败！`)
+      }
+    }
+  }
 }

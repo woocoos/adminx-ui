@@ -19,7 +19,7 @@
     "@ant-design/pro-components": "^2.8.4",
     "@ice/stark-data": "^0.1.3",
     "@knockout-js/api": "0.1.14",
-    "@knockout-js/ice-urql": "0.1.7",
+    "@knockout-js/ice-urql": "0.1.15",
     "@knockout-js/layout": "0.1.20",
     "@monaco-editor/react": "^4.5.1",
     "antd": "^5.23.2",

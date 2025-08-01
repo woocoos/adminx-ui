@@ -11,10 +11,10 @@ import { defineUrqlConfig, requestInterceptor } from "@knockout-js/ice-urql/type
 import { Result, message } from 'antd';
 import { defineAppConfig, defineDataLoader } from 'ice';
 import jwtDcode, { JwtPayload } from 'jwt-decode';
-import { useTranslation } from 'react-i18next';
+import { getI18n, useTranslation } from 'react-i18next';
 import { User } from './generated/adminx/graphql';
 import { logout } from './services/auth';
-import { parseSpm } from './services/auth/noStore';
+import { initFillI18n, parseSpm } from './services/auth/noStore';
 import { browserLanguage, getMenuAppActions } from './util';
 import { setLibraryName } from '@ice/stark-app';
 import { isInIcestark } from '@ice/stark-app';
@@ -119,6 +119,7 @@ export const urqlConfig = defineUrqlConfig([
     exchangeOpt: {
       authOpts: {
         store: {
+          getI18n: () => getI18n(),
           getState: () => {
             const userState = store.getModelState('user')
             let token = userState.token ?? getItem<string>('token'),
@@ -170,6 +171,7 @@ export const authConfig = defineAuthConfig(async (appData) => {
     token = starkStore.get('token') ?? iceStore?.user?.token
     tenantId = iceStore?.user?.tenantId
   }
+  await initFillI18n()
   // 判断路由权限
   if (!['/login', '/login/retrievePassword'].includes(location.pathname)) {
     if (token && tenantId) {
@@ -230,6 +232,7 @@ export const requestConfig = defineRequestConfig(() => {
             tenantId: tenantId,
           }
         },
+        getI18n: () => getI18n(),
       },
       headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
       login: ICE_LOGIN_URL,
