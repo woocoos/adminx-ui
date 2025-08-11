@@ -146,7 +146,9 @@ export const urqlConfig = defineUrqlConfig([
           }
         },
         error: (err, errstr) => {
-          if (errstr) {
+          if (err.response.status === 403) {
+            message.error(getI18n().t("403"))
+          } else if (errstr) {
             message.error(errstr)
           }
           return false;
@@ -237,7 +239,9 @@ export const requestConfig = defineRequestConfig(() => {
       headerMode: ICE_HTTP_SIGN === 'ko' ? RequestHeaderAuthorizationMode.KO : undefined,
       login: ICE_LOGIN_URL,
       error: (err, str) => {
-        if (str) {
+        if (err?.['response']?.['status'] === 403) {
+          message.error(getI18n().t("403"))
+        } else if (str) {
           message.error(str)
         }
       }
