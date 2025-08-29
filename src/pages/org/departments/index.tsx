@@ -11,7 +11,12 @@ export default (props: {
     [searchParams] = useSearchParams();
 
   return (
-    <OrgList kind={OrgKind.Org} tenantId={searchParams.get('id') || userState.tenantId} isFromSystem={props.isFromSystem} />
+    <OrgList
+      kind={OrgKind.Org}
+      isSearch
+      tenantId={searchParams.get('id') || userState.tenantId}
+      isFromSystem={props.isFromSystem}
+    />
   );
 };
 

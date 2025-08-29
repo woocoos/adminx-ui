@@ -450,6 +450,7 @@ export default {
     page_403: "对不起，您没有权限访问此页面",
     save_failure: "保存失败",
     input_enter: "输入完成后回车",
+    input_name_enter: "输入名称后回车查询",
     // "": "",
     pwd_policy_length: "密码长度",
     pwd_policy_length_limit: "至 32 位（至少6位）",

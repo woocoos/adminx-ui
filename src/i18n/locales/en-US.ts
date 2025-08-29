@@ -450,6 +450,7 @@ export default {
     page_403: "Sorry, you are not authorized to access this page",
     save_failure: "Save failure",
     input_enter: "Enter and press enter",
+    input_name_enter: "Enter the name and press Enter to query",
     pwd_policy_length: "password length",
     pwd_policy_length_limit: "up to 32 bits (minimum 6 bits)",
     pwd_policy_include: "the password must contain elements",

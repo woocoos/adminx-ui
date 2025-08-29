@@ -1,5 +1,5 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Dropdown, Modal } from 'antd';
+import { Button, Space, Dropdown, Modal, Input } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
 import { useEffect, useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
@@ -20,6 +20,7 @@ export const OrgList = (props: {
   tenantId?: string;
   appId?: string;
   kind?: OrgKind;
+  isSearch?: boolean;
   isFromSystem?: boolean;
 }) => {
   const { token } = useToken(),
@@ -53,6 +54,7 @@ export const OrgList = (props: {
         },
       },
     ],
+    [keyword, setKeyword] = useState<string>(),
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
     [dataSource, setDataSource] = useState<OrgTree[]>([]),
     [parentDataSource, setParentDataSource] = useState<OrgTree[]>([]),
@@ -210,6 +212,27 @@ export const OrgList = (props: {
           break;
       }
       setModal({ open: true, title: title, id: info.id, scene: action });
+    },
+    searchTopOrgList = (list: Org[], parentId: string) => {
+      const pList = list.filter(item => item.id === parentId);
+      if (pList.length) {
+        pList.forEach(item => {
+          pList.push(...searchTopOrgList(list, item.parentID))
+        })
+      }
+      return pList
+    },
+    searchKeyword = (list: Org[]) => {
+      if (keyword) {
+        const keyList = list.filter(item => item.name.includes(keyword))
+        keyList.forEach(item => {
+          keyList.push(...searchTopOrgList(list, item.parentID))
+        })
+        const allId = Array.from(new Set(keyList.map(item => item.id)))
+        return list.filter(item => allId.includes(item.id))
+      } else {
+        return list;
+      }
     };
 
   useEffect(() => {
@@ -244,7 +267,19 @@ export const OrgList = (props: {
           search={false}
           toolbar={{
             title: kind === OrgKind.Root ? t('tenant_manage') : t('org_manage'),
-            actions: kind == 'org' ? [] : [
+            actions: kind == 'org' ? [
+              props.isSearch ? <Input
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value)
+                }}
+                allowClear
+                placeholder={`${t('input_name_enter')}`}
+                onPressEnter={() => {
+                  proTableRef.current?.reload()
+                }}
+              /> : <></>
+            ] : [
               <Auth authKey={kind === 'root' ? 'createRoot' : 'createOrganization'}>
                 <Button
                   type="primary"
@@ -288,7 +323,7 @@ export const OrgList = (props: {
               if (kind === 'org') {
                 if (props.tenantId) {
                   const restul = await getOrgPathList(props.tenantId);
-                  list = restul.map(item => item) as OrgTree[] || [];
+                  list = searchKeyword(restul)?.map(item => item) as OrgTree[];
                   table.total = list.length;
                 }
               } else {
@@ -299,7 +334,7 @@ export const OrgList = (props: {
                   where,
                 });
                 if (result?.totalCount) {
-                  list = result.edges?.map(item => item?.node) as OrgTree[] || [];
+                  list = result.edges?.map(item => item?.node) as OrgTree[];
                   table.total = result.totalCount;
                 }
               }
