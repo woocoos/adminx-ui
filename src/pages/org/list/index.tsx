@@ -314,7 +314,7 @@ export const OrgList = (props: {
           }}
           pagination={false}
         />
-        <OrgCreate
+        {modal.open ? <OrgCreate
           open={modal.open}
           title={modal.title}
           id={modal.id}
@@ -327,7 +327,7 @@ export const OrgList = (props: {
             }
             setModal({ open: false, title: '', id: '', scene: 'editor' });
           }}
-        />
+        /> : <></>}
       </PageContainer>
     </>
   );
