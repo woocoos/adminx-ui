@@ -4,7 +4,7 @@ import logo from '@/assets/images/woocoo.png';
 import Sha256 from 'crypto-js/sha256';
 import { useTranslation } from 'react-i18next';
 import { CaptchaRes, LoginRes, captcha, login } from '@/services/auth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from '@ice/runtime';
 
 export default (
@@ -14,18 +14,32 @@ export default (
 ) => {
   const { t } = useTranslation(),
     [captchaInfo, setCaptchaInfo] = useState<CaptchaRes>(),
-    [saveLoading, setSaveLoading] = useState(false),
-    [saveDisabled, setSaveDisabled] = useState(true);
+    [appConfig, setAppConfig] = useState<Window['resource']>(),
+    [saveLoading, setSaveLoading] = useState(false);
 
   const
     getCaptcha = async () => {
       setCaptchaInfo(await captcha());
     },
+    getLoginTitle = async () => {
+      if (window.resource?.icon) {
+        const iconDom = document.querySelector('link[rel="icon"]')
+        if (iconDom) {
+          iconDom.setAttribute('href', window.resource.icon);
+        }
+      }
+
+      setAppConfig({
+        logo: window.resource?.logo ?? logo,
+        loginTitle: window.resource?.loginTitle ?? 'Adminx Pro',
+        loginSubTitle: window.resource?.loginSubTitle ?? `${t('manage_system')}`,
+      })
+    },
     onFinish = async (values: { username: string; password: string; captcha?: string }) => {
       setSaveLoading(true);
       const result = await login(
-        values.username,
-        Sha256(values.password).toString(),
+        values.username?.trim(),
+        Sha256(values.password?.trim()).toString(),
         values.captcha,
         captchaInfo?.captchaId,
       );
@@ -40,28 +54,31 @@ export default (
       return false;
     };
 
+  useEffect(() => {
+    getLoginTitle()
+  }, [])
+
 
   return (
     <LoginForm
-      title="Adminx Pro"
-      logo={<img alt="logo" src={logo} />}
-      subTitle={t('manage_system')}
-      initialValues={{
-        // username: 'admin',
-        // password: '123456',
-      }}
+      title={appConfig?.loginTitle}
+      subTitle={<div>
+        <img alt="logo" src={appConfig?.logo} height={26} />
+        {appConfig ? <div
+          style={{ marginTop: 8 }}
+        >
+          {appConfig.loginSubTitle}
+        </div> : <></>}
+      </div>}
       submitter={{
         searchConfig: {
           submitText: t('login'),
           resetText: t('cancel'),
         },
         submitButtonProps: {
+          tabIndex: 4,
           loading: saveLoading,
-          disabled: saveDisabled,
         },
-      }}
-      onValuesChange={() => {
-        setSaveDisabled(false);
       }}
       onFinish={onFinish}
     >
@@ -70,6 +87,7 @@ export default (
         fieldProps={{
           size: 'large',
           prefix: <UserOutlined className={'prefixIcon'} />,
+          tabIndex: 1,
         }}
         placeholder={`${t('please_enter_principal_name')}`}
         rules={[
@@ -84,6 +102,7 @@ export default (
         fieldProps={{
           size: 'large',
           prefix: <LockOutlined className={'prefixIcon'} />,
+          tabIndex: 2,
         }}
         placeholder={`${t('please_enter_password')}`}
         rules={[
@@ -105,6 +124,7 @@ export default (
                 getCaptcha();
               }}
             />,
+            tabIndex: 3,
           }}
           placeholder={`${t('auth_code')}`}
           rules={[

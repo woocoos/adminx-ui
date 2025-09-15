@@ -121,7 +121,31 @@ export const getObject = (store: IMockStore, ref: Ref) => {
   return null
 }
 
-
+/**
+ * 字典数据获取
+ * @param store
+ * @param refCode
+ * @returns
+ */
+export const getAllDist = (store: IMockStore, refCode: string | string[]) => {
+  const result: any[] = [], codes: string[] = [];
+  if (Array.isArray(refCode)) {
+    codes.push(...refCode.map(item => item.split(':')[1]))
+  } else {
+    codes.push(refCode.split(':')[1]);
+  }
+  const dictList: any[] = [
+    store.get('AppDict', 1),
+    store.get('AppDict', 2),
+  ]
+  codes.forEach(code => {
+    const dRef = dictList.find(dictRef => store.get(dictRef, 'code') == code)
+    if (dRef) {
+      result.push(...store.get(dRef, 'items') as any[]);
+    }
+  })
+  return result;
+}
 
 /**
  * store内的基础数据
@@ -161,16 +185,44 @@ export const initStoreData = (store: IMockStore) => {
   store.set('Query', 'ROOT', 'fileIdentities', listTemp([
     store.get('OrgFileIdentity', 1),
   ]))
+  store.set('Query', 'ROOT', 'countries', listTemp([
+    store.get('Country', 1),
+  ]))
+  store.set('Query', 'ROOT', 'regions', listTemp([
+    store.get('Region', 1),
+    store.get('Region', 11),
+    store.get('Region', 12),
+    store.get('Region', 13),
+  ]))
+  store.set('Query', 'ROOT', 'userMembers', listTemp([
+    store.get('User', 1),
+  ]))
+  store.set('Query', 'ROOT', 'currencies', listTemp([
+    store.get('Currency', 1),
+    store.get('Currency', 2),
+  ]))
+  store.set('Query', 'ROOT', 'quotaItems', listTemp([
+    store.get('QuotaItem', 1),
+    store.get('QuotaItem', 2),
+    store.get('QuotaItem', 3),
+  ]))
+  store.set('Query', 'ROOT', 'quotas', listTemp([
+    store.get('Quota', 1),
+    store.get('Quota', 2),
+  ]))
+
   // -------------root-end------------------------
 
   // Org
   store.set('Org', 1, {
     id: 1, name: 'woocoo', code: 'woocoo', domain: 'woocoo', parentID: 0, kind: 'root', ownerID: 1, owner: store.get('User', 1),
+    countryCode: 'cn',
     users: listTemp([
       store.get('User', 1)
     ]),
     apps: listTemp([
-      store.get('App', 1)
+      store.get('App', 1),
+      store.get('App', 2)
     ]),
     permissions: listTemp([
       store.get("AppPolicy", 1)
@@ -200,10 +252,12 @@ export const initStoreData = (store: IMockStore) => {
 
   // User
   store.set('User', 1, {
-    id: 1, displayName: 'admin', userType: "account", email: "admin@woocoo.com",
-    avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg',
+    id: 1, displayName: 'admin', userType: "account", contact: { email: "admin@woocoo.com" },
+    // avatar: 'http://127.0.0.1:9000/test1/test/r6utsqowmb.jpg', 这是本地调试用的
+    avatar: '',
     loginProfile: { mfaEnabled: false }
   })
+
 
   // app
   store.set('App', 1, {
@@ -262,13 +316,28 @@ export const initStoreData = (store: IMockStore) => {
   store.set('AppAction', 11, { id: 11, name: '/system/app', method: 'list', appID: 1, app: store.get('App', 1) })
   store.set('AppAction', 12, { id: 12, name: '/system/file/source', method: 'list', appID: 1, app: store.get('App', 1) })
   store.set('AppAction', 13, { id: 13, name: '/dict', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 14, { id: 14, name: '/system/country', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 15, { id: 15, name: '/org/members', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 16, { id: 16, name: '/system/currency', method: 'list', appID: 1, app: store.get('App', 1) })
+  store.set('AppAction', 17, { id: 17, name: '/system/quotaItem', method: 'list', appID: 1, app: store.get('App', 1) })
 
   // AppPolicy
   store.set('AppPolicy', 1, {
-    id: 1, name: 'app1Policy1', appID: 1, app: store.get('App', 1), rules: [
+    id: 1, name: 'app1Policy1', appID: 1, app: store.get('App', 1), kind: 'app', rules: [
       {
         effect: 'allow',
-        actions: ['*'],
+        actions: ['app1:*'],
+        resources: ['*'],
+        conditions: [],
+      }
+    ]
+  })
+  // AppPolicy 权限试图用的
+  store.set('AppPolicy', 2, {
+    id: 2, name: 'app1Policy1', appID: 1, app: store.get('App', 1), kind: 'view', rules: [
+      {
+        effect: 'allow',
+        actions: ['app1:xxxxx1', 'app1:xxxxx2'],
         resources: ['*'],
         conditions: [],
       }
@@ -329,6 +398,12 @@ export const initStoreData = (store: IMockStore) => {
       store.get('AppDictItem', 3),
     ]
   })
+  store.set('AppDict', 2, {
+    id: 2, code: "DLSH", items: [
+      store.get('AppDictItem', 4),
+      store.get('AppDictItem', 5),
+    ]
+  })
 
   // AppDictItem
   store.set('AppDictItem', 1, {
@@ -339,6 +414,13 @@ export const initStoreData = (store: IMockStore) => {
   })
   store.set('AppDictItem', 3, {
     id: 3, code: "confidentiality", name: '保密', dictID: "1", refCode: "app1:sex", dict: store.get('AppDict', 1)
+  })
+
+  store.set('AppDictItem', 4, {
+    id: 4, code: "Asia/Hong_Kong", name: 'Asia/Hong_Kong', dictID: "2", refCode: "resource:DLSH", dict: store.get('AppDict', 2)
+  })
+  store.set('AppDictItem', 5, {
+    id: 5, code: "America/New_York", name: 'America/New_York', dictID: "2", refCode: "resource:DLSH", dict: store.get('AppDict', 2)
   })
 
   // OrgFileIdentity
@@ -356,4 +438,105 @@ export const initStoreData = (store: IMockStore) => {
     id: 1, bucket: 'test1', bucketURL: 'http://127.0.0.1:9000/test1', endpoint: 'http://127.0.0.1:9000', region: 'local', stsEndpoint: 'http://127.0.0.1:9000'
   })
 
-}
+  // Country
+  store.set('Country', 1, {
+    id: 1, code: 'cn', name: '中国', nameEn: 'CN', regions: [
+      store.get('Region', 1)
+    ]
+  })
+
+  // Region
+  store.set('Region', 1, {
+    id: 1, countryID: 1, parentID: 0, shortCode: 'fujian', name: '福建省', nameEn: 'fujian', displaySort: 0,
+    children: [
+      store.get('Region', 11),
+      store.get('Region', 12),
+      store.get('Region', 13),
+    ]
+  })
+  store.set('Region', 11, {
+    id: 11, countryID: 1, parentID: 1, shortCode: 'fuzhou', name: '福州市', nameEn: 'fuzhou', displaySort: 0,
+  })
+  store.set('Region', 12, {
+    id: 12, countryID: 1, parentID: 1, shortCode: 'quanzhou', name: '泉州市', nameEn: 'quanzhou', displaySort: 1,
+  })
+  store.set('Region', 13, {
+    id: 13, countryID: 1, parentID: 1, shortCode: 'xiamen', name: '厦门市', nameEn: 'xiamen', displaySort: 2,
+  })
+
+  // Currency
+  store.set('Currency', 1, {
+    id: 1, name: '人民币', code: 'CNY'
+  })
+  store.set('Currency', 2, {
+    id: 2, name: '港币', code: 'HKD'
+  })
+
+  // AppPolicyView
+  store.set('AppPolicyView', 1, {
+    id: 1, name: '测试1', kind: 'dir', parentID: 0, appID: 1, policyID: null,
+  })
+  store.set('AppPolicyView', 2, {
+    id: 2, name: '测试1-1', kind: 'policy', parentID: 1, appID: 1, policyID: 1
+  })
+  store.set('AppPolicyView', 3, {
+    id: 3, name: '测试1-2', kind: 'policy', parentID: 1, appID: 1, policyID: 2
+  })
+  store.set('AppPolicyView', 4, {
+    id: 4, name: '测试2', kind: 'dir', parentID: 0, appID: 1, policyID: null,
+  })
+  store.set('AppPolicyView', 5, {
+    id: 5, name: '测试2-1', kind: 'dir', parentID: 4, appID: 1, policyID: null,
+  })
+  store.set('AppPolicyView', 6, {
+    id: 6, name: '测试2-1-1', kind: 'policy', parentID: 5, appID: 1, policyID: 3
+  })
+
+  // QuotaItem
+  store.set('QuotaItem', 1, {
+    id: 1,
+    name: '设备数限制',
+    code: 'deviceLimit',
+    resourceType: 'number',
+    defaultLimit: 10,
+    unit: '个',
+    description: '描述',
+    active: true,
+    quota: {
+      edges: [
+        { node: store.get('Quota', 1) },
+        { node: store.get('Quota', 2) },
+      ],
+      pageInfo: {
+        hasNextPage: false,
+        hasPreviousPage: false,
+      },
+      totalCount: 2,
+    },
+  });
+  store.set('QuotaItem', 2, { id: 2, name: '组织数限制', code: 'orgLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: false, });
+  store.set('QuotaItem', 3, { id: 3, name: '账户数限制', code: 'accountLimit', resourceType: 'number', defaultLimit: 10, unit: '个', description: '描述', active: true, });
+  // Quota
+  store.set('Quota', 1, {
+    id: 1,
+    tenantID: 1,
+    quotaOrg: store.get('Org', 1),
+    userID: 1,
+    quotaUser: store.get('User', 1),
+    quotaItemID: 1,
+    quotaItem: store.get('QuotaItem', 1),
+    limit: 10,
+    used: 0,
+  });
+  store.set('Quota', 2, {
+    id: 2,
+    tenantID: 5,
+    quotaOrg: store.get('Org', 5),
+    userID: 1,
+    quotaUser: store.get('User', 1),
+    quotaItemID: 1,
+    quotaItem: store.get('QuotaItem', 1),
+    limit: 10,
+    used: 3,
+  });
+};

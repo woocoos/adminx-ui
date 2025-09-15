@@ -37,11 +37,15 @@ const queryAppRoleInfoPolicieList = gql(/* GraphQL */`query appRoleInfoPolicieLi
 }`);
 
 const mutationCreateAppRole = gql(/* GraphQL */`mutation createAppRole($appId:ID!,$input: CreateAppRoleInput!){
-  createAppRole(appID:$appId,input:$input){id}
+  createAppRole(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+  }
 }`);
 
 const mutationUpdateAppRole = gql(/* GraphQL */`mutation updateAppRole($appRoleId:ID!, $input: UpdateAppRoleInput!){
-  updateAppRole(roleID:$appRoleId,input:$input){id}
+  updateAppRole(roleID:$appRoleId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,autoGrant,editable
+  }
 }`);
 
 const mutationDelAppRole = gql(/* GraphQL */`mutation delAppRole($appRoleId:ID!){
@@ -56,6 +60,10 @@ const mutationRevokeAppRolePolicy = gql(/* GraphQL */`mutation revokeAppRolePoli
   revokeAppRolePolicy(appID: $appId,roleID: $appRoleId,policyIDs:$policyIds)
 }`);
 
+const mutationSyncAppRoleToOrg = gql(/* GraphQL */`mutation syncAppRoleToOrg($orgId:ID!,$appRoleId:ID!){
+  syncAppRoleToOrg(orgID: $orgId,appRoleID: $appRoleId,)
+}`);
+
 
 /**
  * 获取应用角色
@@ -66,7 +74,7 @@ export async function getAppRoleList(appId: string) {
   const
     result = await query(
       queryAppRoleList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
     });
 
   if (result.data?.node?.__typename === 'App') {
@@ -85,7 +93,7 @@ export async function getAppRoleInfo(appRoleId: string) {
   const
     result = await query(
       queryAppRoleInfo, {
-      gid: gid('app_role', appRoleId),
+      gid: gid('AppRole', appRoleId),
     });
 
   if (result.data?.node?.__typename === 'AppRole') {
@@ -103,7 +111,7 @@ export async function getAppRoleInfoPolicieList(appRoleId: string) {
   const
     result = await query(
       queryAppRoleInfoPolicieList, {
-      gid: gid('app_role', appRoleId),
+      gid: gid('AppRole', appRoleId),
     });
 
   if (result.data?.node?.__typename === 'AppRole') {
@@ -213,4 +221,74 @@ export async function revokeAppRolePolicy(appId: string, appRoleId: string, appP
     return result.data.revokeAppRolePolicy;
   }
   return null;
+}
+
+export async function syncAppRoleToOrg(orgId: string, appRoleId: string) {
+  const
+    result = await mutation(
+      mutationSyncAppRoleToOrg, {
+      orgId,
+      appRoleId,
+    });
+
+  if (result.data?.syncAppRoleToOrg) {
+    return result.data.syncAppRoleToOrg;
+  }
+  return null;
+}
+
+
+const mutationAssignAppRolePolicyView = gql(/* GraphQL */`mutation assignAppRolePolicyView($appID: ID!, $roleID: ID!,$rmAppPolicyIDs: [ID!],$addAppPolicyIDs: [ID!]){
+  assignAppRolePolicyView(appID: $appID, roleID: $roleID,rmAppPolicyIDs: $rmAppPolicyIDs,addAppPolicyIDs: $addAppPolicyIDs)
+}`);
+
+
+/**
+ * 角色权限试图授权保存
+ * @param appID
+ * @param roleID
+ * @param addAppPolicyIDs
+ * @param rmAppPolicyIDs
+ * @returns
+ */
+export async function assignAppRolePolicyView(appID: string, roleID: string, addAppPolicyIDs: string[], rmAppPolicyIDs: string[]) {
+  const
+    result = await mutation(
+      mutationAssignAppRolePolicyView, {
+      appID,
+      roleID,
+      addAppPolicyIDs,
+      rmAppPolicyIDs,
+    });
+
+  if (result.data?.assignAppRolePolicyView) {
+    return result.data.assignAppRolePolicyView;
+  }
+  return false;
+}
+
+
+const queryAppRoleAssigned = gql(/* GraphQL */`query appPolicyViewRoleAssigned($appRoleID:ID!){
+  appPolicyViewRoleAssigned(appRoleID:$appRoleID){
+    id,name,kind,policyID
+  }
+}`);
+
+/**
+ * 获取应用角色已授权的策略试图
+ * @param appCode
+ * @param appRoleID
+ * @returns
+ */
+export async function getAppRoleAssignedPolicyView(appRoleID: string) {
+  const
+    result = await query(
+      queryAppRoleAssigned, {
+      appRoleID,
+    });
+
+  if (result.data?.appPolicyViewRoleAssigned) {
+    return result.data.appPolicyViewRoleAssigned;
+  }
+  return [];
 }

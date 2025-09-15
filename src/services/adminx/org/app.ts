@@ -1,6 +1,6 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { AppOrder, AppWhereInput } from '@/generated/adminx/graphql';
+import { AppOrder, AppOrderField, AppWhereInput, OrderDirection } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 const queryOrgAppList = gql(/* GraphQL */`query orgAppList($gid: GID!,$first: Int,$orderBy:AppOrder,$where:AppWhereInput){
@@ -28,8 +28,8 @@ const mutationRevOrgApp = gql(/* GraphQL */`mutation revokeOrgApp($orgId:ID!,$ap
   revokeOrganizationApp(orgID: $orgId,appID: $appId)
 }`);
 
-const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!){
-  orgAppActions(appCode: $appCode){
+const queryOrgAppActionList = gql(/* GraphQL */`query orgAppActionList($appCode:String!,$orgId:ID!){
+  orgAppActions(appCode: $appCode,orgID: $orgId){
     id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
   }
 }`);
@@ -52,10 +52,13 @@ export async function getOrgAppList(
   }) {
   const result = await paging(
     queryOrgAppList, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: AppOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
@@ -109,10 +112,11 @@ export async function revokeOrgApp(orgId: string, appId: string) {
  * @param appCode
  * @returns
  */
-export async function getOrgAppActionList(appCode: string) {
+export async function getOrgAppActionList(appCode: string, orgId: string) {
   const result = await query(
     queryOrgAppActionList, {
     appCode,
+    orgId,
   });
 
   if (result.data?.orgAppActions) {

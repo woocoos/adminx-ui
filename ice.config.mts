@@ -10,11 +10,11 @@ import urqlPlugin from '@knockout-js/ice-urql';
 const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_PROXY_DEO_PBF = process.env.ICE_PROXY_DEO_PBF ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
-  ICE_API_FILE_PREFIX = process.env.ICE_API_FILE_PREFIX ?? '',
   minify = NODE_ENV === 'production' ? 'swc' : false;
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
@@ -25,7 +25,7 @@ export default defineConfig(() => ({
   codeSplitting: 'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
-  compileDependencies: NODE_ENV === 'development' ? [/@urql\/core/, /@smithy\/*/] : true,
+  compileDependencies: NODE_ENV === 'development' ? [] : true,
   hash: NODE_ENV === 'development' ? false : true,
   routes: {
     ignoreFiles: [
@@ -33,12 +33,14 @@ export default defineConfig(() => ({
     ],
   },
   externals: {
-    'react': 'React',
-    'react-dom': 'ReactDOM',
-    'react-i18next': 'ReactI18next',
-    'i18next': 'i18next',
-    'antd': 'antd',
-    '@ant-design/pro-components': 'ProComponents',
+    // 先禁用cdn处理 由于子应用加载会找不到react问题
+    // Uncaught Error: Dynamic require of "react" is not supported
+    // 'react': 'React',
+    // 'react-dom': 'ReactDOM',
+    // 'react-i18next': 'ReactI18next',
+    // 'i18next': 'i18next',
+    // 'antd': 'antd',
+    // '@ant-design/pro-components': 'ProComponents',
   },
   plugins: [
     icestark({ type: 'child' }),
@@ -52,20 +54,15 @@ export default defineConfig(() => ({
     }),
   ],
   proxy: {
-    [ICE_API_ADMINX_PREFIX]: {
+    [`${ICE_API_ADMINX_PREFIX}/`]: {
       target: ICE_PROXY_ADMINX,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' },
     },
-    [ICE_API_AUTH_PREFIX]: {
+    [`${ICE_API_AUTH_PREFIX}/`]: {
       target: ICE_PROXY_AUTH,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}`]: '' },
-    },
-    [ICE_API_FILE_PREFIX]: {
-      target: ICE_PROXY_AUTH,
-      changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_FILE_PREFIX}`]: '' },
+      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
     },
   },
 }));

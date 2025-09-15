@@ -1,10 +1,14 @@
 import { gql } from '@/generated/adminx';
-import { CreateOrgUserInput, UserOrder, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOrgUserInput, OrderDirection, OrgRoleOrder, OrgRoleOrderField, OrgRoleWhereInput, OrgUserUserType, UserOrder, UserOrderField, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
+export const EnumOrgUserType = {
+  [OrgUserUserType.External]: { text: '外部用户' },
+  [OrgUserUserType.Internal]: { text: '内部用户' },
+}
 
-const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
     ... on Org{
       id,
@@ -13,7 +17,8 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
         edges{
           cursor,node{
             id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-            email,mobile,userType,creationType,registerIP,status,comments
+            contact{email,mobile},userType,creationType,registerIP,status,comments
+            orgUserType(orgID: $orgId)
           }
         }
       }
@@ -21,7 +26,7 @@ const queryOrgUserList = gql(/* GraphQL */`query orgUserList($gid: GID!,$first: 
   }
 }`);
 
-const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrgRole($gid: GID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrgRole($gid: GID!,$orgId:ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
   node(id:$gid){
     ... on Org{
       id,
@@ -29,8 +34,8 @@ const queryOrgUserListAndIsOrgRole = gql(/* GraphQL */`query orgUserListAndIsOrg
         totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
         edges{
           cursor,node{
-            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-            email,mobile,userType,creationType,registerIP,status,comments
+            id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,orgUserType(orgID: $orgId)
+            contact{email,mobile},userType,creationType,registerIP,status,comments
             isAssignOrgRole(orgRoleID: $orgRoleId)
             isAllowRevokeRole(orgRoleID: $orgRoleId)
           }
@@ -46,7 +51,7 @@ const queryOrgRoleUserList = gql(/* GraphQL */`query orgRoleUserList($roleId: ID
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        contact{email,mobile},userType,creationType,registerIP,status,comments
       }
     }
   }
@@ -58,7 +63,7 @@ const queryOrgRoleUserListAndIsOrgRole = gql(/* GraphQL */`query orgRoleUserList
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        contact{email,mobile},userType,creationType,registerIP,status,comments
         isAssignOrgRole(orgRoleID: $orgRoleId)
         isAllowRevokeRole(orgRoleID: $orgRoleId)
       }
@@ -83,6 +88,53 @@ const mutationRemoveOrgUser = gql(/* GraphQL */`mutation removeOrgUser($orgId:ID
   removeOrganizationUser(orgID: $orgId,userID: $userId)
 }`);
 
+const queryMemberList = gql(/* GraphQL */`query memberList($orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  userMembers(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        contact{email,mobile},userType,creationType,registerIP,status,comments,
+        orgUserType(orgID: $orgId)
+      }
+    }
+  }
+}`);
+
+const mutationChangeOrgUserType = gql(/* GraphQL */`mutation changeOrgUserType($orgId:ID!,$userId:ID!,$userType:OrgUserUserType!){
+  changeOrgUserType(userID:$userId,userType:$userType,orgID: $orgId)
+}`);
+
+/**
+ * 成员管理
+ * @param gather
+ * @returns
+ */
+export async function getMemberList(
+  orgId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: UserWhereInput;
+    orderBy?: UserOrder;
+  },
+) {
+  const result = await paging(
+    queryMemberList, {
+    orgId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    }
+  }, gather.current || 1)
+  if (result.data?.userMembers) {
+    return result.data.userMembers;
+  }
+  return null;
+}
+
 /**
  * 组织下的用户信息
  * @param orgId
@@ -103,16 +155,24 @@ export async function getOrgUserList(
   const result = isGrant?.orgRoleId ? await paging(
     queryOrgUserListAndIsOrgRole, {
     orgRoleId: isGrant.orgRoleId,
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
+    orgId: orgId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1) : await paging(
     queryOrgUserList, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
+    orgId: orgId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
@@ -147,13 +207,19 @@ export async function getOrgRoleUserList(
     orgRoleId: isGrant.orgRoleId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1) : await paging(
     queryOrgRoleUserList, {
     roleId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
 
   if (result.data?.orgRoleUsers) {
@@ -210,7 +276,7 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
   const
     result = await query(
       queryOrgUserNum, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       where,
       first: 9999,
     });
@@ -219,4 +285,194 @@ export async function getOrgUserQty(orgId: string, where?: UserWhereInput) {
     return result?.data?.node.users.totalCount;
   }
   return 0;
+}
+
+/**
+ * 切换用户类型
+ * @param userId
+ * @param orgId
+ * @param userType
+ * @returns
+ */
+export async function changeOrgUserType(userId: string, orgId: string, userType: OrgUserUserType) {
+  const
+    result = await mutation(
+      mutationChangeOrgUserType, {
+      userId,
+      orgId,
+      userType,
+    });
+
+  if (result.data?.changeOrgUserType) {
+    return result?.data?.changeOrgUserType;
+  }
+  return null;
+}
+
+
+const queryOrgUserAssigned = gql(/* GraphQL */`query orgPolicyViewUserAssigned($appCode: String!,$userID:ID!,$orgID:ID){
+  orgPolicyViewUserAssigned(appCode:$appCode,orgID:$orgID,userID: $userID)
+}`);
+
+/**
+ * 获取组织用户已授权的策略试图
+ * @param appCode
+ * @param userID
+ * @returns
+ */
+export async function getOrgUserAssignedPolicyView(appCode: string, userID: string, orgID: string) {
+  const
+    result = await query(
+      queryOrgUserAssigned, {
+      appCode,
+      userID,
+      orgID,
+    });
+
+  if (result.data?.orgPolicyViewUserAssigned) {
+    return result.data.orgPolicyViewUserAssigned;
+  }
+  return [];
+}
+
+
+const mutationAssignOrgUserPolicyView = gql(/* GraphQL */`mutation assignOrgUserPolicyView($orgID: ID!, $userID: ID!,$rmOrgPolicyIDs: [ID!],$addOrgPolicyIDs: [ID!]){
+  assignOrgUserPolicyView(orgID: $orgID, userID: $userID,rmOrgPolicyIDs: $rmOrgPolicyIDs,addOrgPolicyIDs: $addOrgPolicyIDs)
+}`);
+
+
+/**
+ * 组织用户权限试图授权保存
+ * @param orgID
+ * @param userID
+ * @param addOrgPolicyIDs
+ * @param rmOrgPolicyIDs
+ * @returns
+ */
+export async function assignOrgUserPolicyView(orgID: string, userID: string, addOrgPolicyIDs: string[], rmOrgPolicyIDs: string[]) {
+  const
+    result = await mutation(
+      mutationAssignOrgUserPolicyView, {
+      orgID,
+      userID,
+      addOrgPolicyIDs,
+      rmOrgPolicyIDs,
+    });
+
+  if (result.data?.assignOrgUserPolicyView) {
+    return result.data.assignOrgUserPolicyView;
+  }
+  return false;
+}
+
+const queryUserOrgRoleList = gql(/* GraphQL */`query userOrgRoles($userId:ID!,$first: Int,$orderBy:OrgRoleOrder,$where:OrgRoleWhereInput){
+  userOrgRoles(first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,kind,name,comments,isAppRole
+        isGrantUser(userID: $userId)
+      }
+    }
+  }
+}`);
+
+/**
+ * 当前登录用户授权的角色 用来做弹出选择用
+ * @param userId
+ * @param gather
+ * @returns
+ */
+export async function getUserOrgRoleList(
+  userId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: OrgRoleWhereInput;
+    orderBy?: OrgRoleOrder;
+  },
+) {
+  const result = await paging(
+    queryUserOrgRoleList, {
+    userId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: OrgRoleOrderField.CreatedAt
+    },
+  }, gather.current || 1)
+  if (result.data?.userOrgRoles) {
+    return result.data.userOrgRoles;
+  }
+  return null
+}
+
+const queryParentOrgUsers = gql(/* GraphQL */`query parentOrgUsers($orgId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  parentOrgUsers(orgID:$orgId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        contact{email,mobile},userType,creationType,registerIP,status,comments,
+      }
+    }
+  }
+}`);
+const queryParentOrgUsersRoleId = gql(/* GraphQL */`query parentOrgUsersRoleId($orgId:ID!,$orgRoleId:ID!,$first: Int,$orderBy:UserOrder,$where:UserWhereInput){
+  parentOrgUsers(orgID:$orgId,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
+        contact{email,mobile},userType,creationType,registerIP,status,comments,
+        isAssignOrgRole(orgRoleID: $orgRoleId)
+        isAllowRevokeRole(orgRoleID: $orgRoleId)
+      }
+    }
+  }
+}`);
+
+/**
+ * 获取父组织用户列表
+ * @param orgId
+ * @param gather
+ * @returns
+ */
+export async function getParentOrgUsers(
+  orgId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: UserWhereInput;
+    orderBy?: UserOrder;
+  },
+  isGrant?: {
+    orgRoleId?: string;
+  },
+) {
+  const result = isGrant?.orgRoleId ? await paging(
+    queryParentOrgUsersRoleId, {
+    orgId,
+    orgRoleId: isGrant.orgRoleId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    }
+  }, gather.current ?? 1) : await paging(
+    queryParentOrgUsers, {
+    orgId,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    }
+  }, gather.current ?? 1)
+  if (result.data?.parentOrgUsers) {
+    return result.data.parentOrgUsers;
+  }
+  return null
 }

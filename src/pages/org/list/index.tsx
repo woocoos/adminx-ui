@@ -1,22 +1,26 @@
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
-import { Button, Space, Dropdown, Modal } from 'antd';
+import { Button, Space, Dropdown, Modal, Input } from 'antd';
 import { EllipsisOutlined } from '@ant-design/icons';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useAuth } from 'ice';
 import { EnumOrgKind, delOrgInfo, getOrgList, getOrgPathList } from '@/services/adminx/org';
 import OrgCreate from './components/create';
-import { TreeEditorAction, formatTreeData } from '@/util';
+import { TreeEditorAction, delTreeData, formatTreeData, saveTreeData } from '@/util';
 import { getAppOrgList } from '@/services/adminx/app/org';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
-import { Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
+import { Country, Org, OrgKind, OrgWhereInput } from '@/generated/adminx/graphql';
+import { getCacheCountryList } from '@/services/adminx/country';
+import { ItemType } from 'antd/es/menu/interface';
+
+type OrgTree = Org & { children?: Org[] }
 
 export const OrgList = (props: {
   title?: string;
   tenantId?: string;
   appId?: string;
   kind?: OrgKind;
+  isSearch?: boolean;
   isFromSystem?: boolean;
 }) => {
   const { token } = useToken(),
@@ -25,27 +29,35 @@ export const OrgList = (props: {
     // 表格相关
     proTableRef = useRef<ActionType>(),
     kind = props.kind || OrgKind.Root,
+    [countryList, setCountryList] = useState<Country[]>([]),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
-      { title: t('name'), dataIndex: 'name', width: 120 },
-      { title: t('code'), dataIndex: 'code', width: 120 },
+      { title: t('name'), dataIndex: 'name', },
+      { title: t('code'), dataIndex: 'code', width: 200 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
-      { title: t('domain'), dataIndex: 'domain', width: 120, search: false },
-      { title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false },
+      { title: t('domain'), dataIndex: 'domain', width: 200, search: false },
+      { title: t('org_currency'), dataIndex: 'localCurrency', width: 200, search: false },
+      { title: t('timezone'), dataIndex: 'timezone', width: 200, search: false },
+      {
+        title: t('country_region'), dataIndex: 'countryCode', width: 120, search: false,
+        render: (text) => {
+          return <div>{countryList.find(item => item.code === text)?.name ?? text}</div>;
+        }
+      },
       {
         title: t('manage_account'),
         dataIndex: 'owner',
-        width: 120,
+        width: 200,
         search: false,
         render: (text, record) => {
           return <div>{record?.owner?.displayName || '-'}</div>;
         },
       },
-      { title: t('description'), dataIndex: 'profile', width: 120, search: false },
     ],
+    [keyword, setKeyword] = useState<string>(),
     [expandedRowKeys, setExpandedRowKeys] = useState<string[]>([]),
-    [dataSource, setDataSource] = useState<Org[]>([]),
-    [parentDataSource, setParentDataSource] = useState<Org[]>([]),
+    [dataSource, setDataSource] = useState<OrgTree[]>([]),
+    [parentDataSource, setParentDataSource] = useState<OrgTree[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
       open: boolean;
@@ -91,12 +103,15 @@ export const OrgList = (props: {
           });
         }
         const items: ItemType[] = [];
-        if (kind == 'root') {
+        if (kind == OrgKind.Root) {
           items.push(
+            { key: 'userGroup', label: <Link to={`/system/org/groups?id=${record.id}`}>{t('user_group')}</Link> },
+            { key: 'role', label: <Link to={`/system/org/roles?id=${record.id}`}>{t('role')}</Link> },
             { key: 'policy', label: <Link to={`/system/org/policys?id=${record.id}`}>{t('policy')}</Link> },
             { key: 'app', label: <Link to={`/system/org/apps?id=${record.id}`}>{t('auth_app')}</Link> },
-            { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('department_manage')}</Link> },
+            { key: 'org', label: <Link to={`/system/org/departments?id=${record.id}`} >{t('org_manage')}</Link> },
             { key: 'orgUser', label: <Link to={`/system/org/users?id=${record.id}`}>{t('user_manage')}</Link> },
+            { key: 'pwdPolicy', label: <Link to={`/system/org/pwdPolicy?id=${record.id}`}>{t('password_policy')}</Link> },
           );
         } else {
           if (checkAuth('createOrganization', auth)) {
@@ -104,15 +119,23 @@ export const OrgList = (props: {
               { key: 'create', label: t('created'), children: createAction },
             );
           }
-          if (record.kind === kind && checkAuth('deleteOrganization', auth)) {
+          if (record.parentID != "0" && checkAuth('deleteOrganization', auth)) {
             items.push(
               { key: 'delete', label: <a onClick={() => onDelOrg(record)}>{t('delete')}</a> },
+            );
+          }
+          if (record.kind === OrgKind.Root) {
+            items.push(
+              { key: 'policy', label: <Link to={`/org/departments/policys?id=${record.id}`}>{t('policy')}</Link> },
+              { key: 'app', label: <Link to={`/org/departments/apps?id=${record.id}`}>{t('auth_app')}</Link> },
+              { key: 'orgUserGroups', label: <Link to={`/org/departments/groups?id=${record.id}`}>{t('user_group')}</Link> },
+              { key: 'orgRoles', label: <Link to={`/org/departments/roles?id=${record.id}`}>{t('role')}</Link> },
             );
           }
         }
 
         return (<Space>
-          {record.kind === kind ? <>
+          {(kind === OrgKind.Org && record.parentID != '0') || (kind === OrgKind.Root) ? <>
             <Auth authKey="updateOrganization">
               <a key="editor" onClick={() => editorAction(record, 'editor')}>
                 {t('edit')}
@@ -121,9 +144,6 @@ export const OrgList = (props: {
           </> : <></>}
           {
             kind == 'root' ? <>
-              <Link key="userGroup" to={`/system/org/groups?id=${record.id}`}>
-                {t('user_group')}
-              </Link>
               {items.length ? <Dropdown
                 trigger={['click']}
                 menu={{
@@ -151,6 +171,17 @@ export const OrgList = (props: {
 
 
   const
+    getBase = async () => {
+      const result = await getCacheCountryList({ pageSize: 999 }), list: Country[] = [];
+      if (result) {
+        result.edges?.forEach(item => {
+          if (item?.node) {
+            list.push(item.node as Country)
+          }
+        })
+        setCountryList(list)
+      }
+    },
     onDelOrg = (record: Org) => {
       Modal.confirm({
         title: t('delete'),
@@ -158,22 +189,12 @@ export const OrgList = (props: {
         onOk: async (close) => {
           const result = await delOrgInfo(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
-              const pageInfo = { ...proTableRef.current?.pageInfo };
-              pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
-              proTableRef.current?.setPageInfo?.(pageInfo);
-            }
-            proTableRef.current?.reload();
+            delTreeData(dataSource as any, record.id)
+            setDataSource([...dataSource])
             close();
           }
         },
       });
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '', id: '', scene: 'editor' });
     },
     editorAction = (info: Org, action: TreeEditorAction) => {
       let title = '';
@@ -191,26 +212,51 @@ export const OrgList = (props: {
           break;
       }
       setModal({ open: true, title: title, id: info.id, scene: action });
+    },
+    searchTopOrgList = (list: Org[], parentId: string) => {
+      const pList = list.filter(item => item.id === parentId);
+      if (pList.length) {
+        pList.forEach(item => {
+          pList.push(...searchTopOrgList(list, item.parentID))
+        })
+      }
+      return pList
+    },
+    searchKeyword = (list: Org[]) => {
+      if (keyword) {
+        const keyList = list.filter(item => item.name.includes(keyword))
+        keyList.forEach(item => {
+          keyList.push(...searchTopOrgList(list, item.parentID))
+        })
+        const allId = Array.from(new Set(keyList.map(item => item.id)))
+        return list.filter(item => allId.includes(item.id))
+      } else {
+        return list;
+      }
     };
+
+  useEffect(() => {
+    getBase()
+  }, [])
 
   return (
     <>
       <PageContainer
         header={{
-          title: kind == 'org' ? t('department_manage') : t('org_manage'),
+          title: <div>{kind === OrgKind.Root ? t('tenant_manage') : t('org_manage')}</div>,
           style: { background: token.colorBgContainer },
           breadcrumb: {
             items: props.isFromSystem ? kind == 'org' ?
               [
                 { title: t('system_conf') },
-                { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
-                { title: t('department_manage') },
-              ] : [
-                { title: t('system_conf') },
+                { title: <Link to={'/system/org'}>{t('tenant_manage')}</Link> },
                 { title: t('org_manage') },
               ] : [
+                { title: t('system_conf') },
+                { title: t('tenant_manage') },
+              ] : [
               { title: t('org_cooperation') },
-              { title: kind == 'org' ? t('department_manage') : t('org_manage') },
+              { title: t('org_manage') },
             ],
           },
         }}
@@ -220,16 +266,28 @@ export const OrgList = (props: {
           rowKey={'id'}
           search={false}
           toolbar={{
-            title: kind === 'org' ? t('department_manage') : t('org_manage'),
-            actions: kind == 'org' ? [] : [
+            title: kind === OrgKind.Root ? t('tenant_manage') : t('org_manage'),
+            actions: kind == 'org' ? [
+              props.isSearch ? <Input
+                value={keyword}
+                onChange={(e) => {
+                  setKeyword(e.target.value)
+                }}
+                allowClear
+                placeholder={`${t('input_name_enter')}`}
+                onPressEnter={() => {
+                  proTableRef.current?.reload()
+                }}
+              /> : <></>
+            ] : [
               <Auth authKey={kind === 'root' ? 'createRoot' : 'createOrganization'}>
                 <Button
                   type="primary"
                   onClick={() => {
-                    setModal({ open: true, title: t('create_org'), id: '', scene: 'editor' });
+                    setModal({ open: true, title: t('create_tenant'), id: '', scene: 'editor' });
                   }}
                 >
-                  {t('create_org')}
+                  {t('create_tenant')}
                 </Button>
               </Auth>,
             ],
@@ -242,8 +300,9 @@ export const OrgList = (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params) => {
-            const table = { data: [] as Org[], success: true, total: 0 },
+            const table = { data: [] as OrgTree[], success: true, total: 0 },
               where: OrgWhereInput = {};
             setExpandedRowKeys([]);
             if (props.appId) {
@@ -256,24 +315,26 @@ export const OrgList = (props: {
                 where,
               });
               if (data?.totalCount) {
-                table.data = data.edges?.map(item => item?.node) as Org[];
+                table.data = data.edges?.map(item => item?.node) as OrgTree[];
                 table.total = data.totalCount;
               }
             } else {
-              let list: Org[] = [];
+              let list: OrgTree[] = [];
               if (kind === 'org') {
                 if (props.tenantId) {
-                  list = await getOrgPathList(props.tenantId, kind);
+                  const restul = await getOrgPathList(props.tenantId);
+                  list = searchKeyword(restul)?.map(item => item) as OrgTree[];
                   table.total = list.length;
                 }
               } else {
                 where.kind = kind;
+                where.parentID = "0"
                 const result = await getOrgList({
                   pageSize: 999,
                   where,
                 });
                 if (result?.totalCount) {
-                  list = result.edges?.map(item => item?.node) as Org[] || [];
+                  list = result.edges?.map(item => item?.node) as OrgTree[];
                   table.total = result.totalCount;
                 }
               }
@@ -288,15 +349,20 @@ export const OrgList = (props: {
           }}
           pagination={false}
         />
-        <OrgCreate
+        {modal.open ? <OrgCreate
           open={modal.open}
           title={modal.title}
           id={modal.id}
           scene={modal.scene}
           parentDataSource={parentDataSource}
           kind={kind}
-          onClose={onDrawerClose}
-        />
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              proTableRef.current?.reload()
+            }
+            setModal({ open: false, title: '', id: '', scene: 'editor' });
+          }}
+        /> : <></>}
       </PageContainer>
     </>
   );

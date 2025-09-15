@@ -1,6 +1,6 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { CreateOrgPolicyInput, OrgPolicyOrder, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/generated/adminx/graphql';
+import { CreateOrgPolicyInput, OrderDirection, OrgPolicyOrder, OrgPolicyOrderField, OrgPolicyWhereInput, UpdateOrgPolicyInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 const queryOrgPolicyList = gql(/* GraphQL */`query orgPolicyList($gid: GID!,$first: Int,$orderBy:OrgPolicyOrder,$where:OrgPolicyWhereInput){
@@ -67,11 +67,15 @@ const queryOrgPolicyInfo = gql(/* GraphQL */`query orgPolicyInfo($gid:GID!){
 }`);
 
 const mutationCreateOrgPolicy = gql(/* GraphQL */`mutation createOrgPolicy($input: CreateOrgPolicyInput!){
-  createOrganizationPolicy(input:$input){id}
+  createOrganizationPolicy(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+  }
 }`);
 
 const mutationUpdateOrgPolicy = gql(/* GraphQL */`mutation updateOrgPolicy($orgPolicyId:ID!,$input: UpdateOrgPolicyInput!){
-  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){id}
+  updateOrganizationPolicy(orgPolicyID:$orgPolicyId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,appPolicyID,name,comments
+  }
 }`);
 
 const mutationDelOrgPolicy = gql(/* GraphQL */`mutation deleteOrgPolicy($orgPolicyId:ID!){
@@ -107,25 +111,34 @@ export async function getOrgPolicyList(
 ) {
   const result = isGrant?.roleId ? await paging(
     queryOrgPolicyListAndIsGrantRole, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     roleId: isGrant.roleId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: OrgPolicyOrderField.CreatedAt
+    },
   }, gather.current || 1) :
     isGrant?.userId ? await paging(
       queryOrgPolicyListAndIsGrantUser, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       userId: isGrant.userId,
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgPolicyOrderField.CreatedAt
+      },
     }, gather.current || 1) : await paging(
       queryOrgPolicyList, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgPolicyOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'Org') {
@@ -144,7 +157,7 @@ export async function getOrgPolicyInfo(orgPolicyId: string) {
   const
     result = await query(
       queryOrgPolicyInfo, {
-      gid: gid('org_policy', orgPolicyId),
+      gid: gid('OrgPolicy', orgPolicyId),
     });
 
   if (result.data?.node?.__typename === 'OrgPolicy') {
@@ -262,7 +275,7 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
   const
     result = await query(
       queryOrgPolicyListNum, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
       first: 9999,
       where,
     });
@@ -271,4 +284,34 @@ export async function getOrgPolicyQty(orgId: string, where?: OrgPolicyWhereInput
     return result.data.node.policies.totalCount;
   }
   return 0;
+}
+
+
+const queryOrgPolicyView = gql(/* GraphQL */`query orgPolicyView($appCode: String!,$orgID: ID){
+  orgPolicyView(appCode: $appCode,orgID: $orgID){
+    appPolicyView{
+      id,createdBy,createdAt,updatedBy,updatedAt,appID,name,comments,parentID,displaySort,kind,
+      policyID
+    }
+    orgPolicy{id}
+  }
+}`);
+
+/**
+ * 组织下的应用权限试图
+ * @param appCode
+ * @returns
+ */
+export async function getOrgPolicyView(appCode: string, orgID?: string) {
+  const
+    result = await query(
+      queryOrgPolicyView, {
+      appCode,
+      orgID,
+    });
+
+  if (result.data?.orgPolicyView) {
+    return result.data.orgPolicyView;
+  }
+  return [];
 }

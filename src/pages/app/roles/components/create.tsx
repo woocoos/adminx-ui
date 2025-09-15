@@ -18,7 +18,7 @@ export default (props: {
   title?: string;
   id?: string;
   appId?: string;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: AppRole) => void;
 }) => {
   const { t } = useTranslation(),
     [appRoleInfo, setAppRoleInfo] = useState<AppRole>(),
@@ -61,7 +61,6 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
       if (props.id) {
         const result = await updateAppRole(props.id, updateFormat({
           autoGrant: values.autoGrant,
@@ -70,7 +69,8 @@ export default (props: {
           name: values.name,
         }, appRoleInfo || {}));
         if (result?.id) {
-          isTrue = true;
+          setSaveDisabled(true);
+          props.onClose?.(true, result);
         }
       } else {
         if (props?.appId) {
@@ -82,13 +82,10 @@ export default (props: {
             name: values.name,
           });
           if (result?.id) {
-            isTrue = true;
+            setSaveDisabled(true);
+            props.onClose?.(true, result);
           }
         }
-      }
-      if (isTrue) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
       }
       setSaveLoading(false);
       return false;

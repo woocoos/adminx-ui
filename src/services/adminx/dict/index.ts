@@ -1,5 +1,5 @@
 import { gql } from "@/generated/adminx";
-import { AppDictOrder, AppDictWhereInput, CreateAppDictInput, CreateAppDictItemInput, TreeAction, UpdateAppDictInput, UpdateAppDictItemInput } from "@/generated/adminx/graphql";
+import { AppDictOrder, AppDictOrderField, AppDictWhereInput, CreateAppDictInput, CreateAppDictItemInput, OrderDirection, TreeAction, UpdateAppDictInput, UpdateAppDictItemInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
@@ -35,11 +35,9 @@ const appDictItemListQuery = gql(/* GraphQL */`query appDictItemList($gid:GID!){
   node(id:$gid){
    ... on AppDict{
        id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
-       items{
+       orgItems(noFilterCode: true){
         id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
-        org{
-          id,name
-        }
+        org{ id,name }
        }
      }
    }
@@ -55,11 +53,17 @@ const appDictItemInfoQuery = gql(/* GraphQL */`query appDictItemInfo($gid:GID!){
  }`);
 
 const mutationUpdateAppDict = gql(/* GraphQL */`mutation updateAppDict($dictId:ID!,$input: UpdateAppDictInput!){
-  updateAppDict(dictID:$dictId,input:$input){id}
+  updateAppDict(dictID:$dictId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
+    app{id,name}
+  }
 }`);
 
 const mutationCreateAppDict = gql(/* GraphQL */`mutation createAppDict($appId:ID!,$input: CreateAppDictInput!){
-  createAppDict(appID:$appId,input:$input){ id }
+  createAppDict(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,code,name,comments,
+    app{id,name}
+   }
 }`);
 
 const mutationDelAppDict = gql(/* GraphQL */`mutation deleteAppDict($dictId:ID!){
@@ -67,11 +71,17 @@ const mutationDelAppDict = gql(/* GraphQL */`mutation deleteAppDict($dictId:ID!)
 }`);
 
 const mutationUpdateAppDictItem = gql(/* GraphQL */`mutation updateAppDictItem($itemId:ID!,$input:  UpdateAppDictItemInput!){
-  updateAppDictItem(itemID:$itemId,input:$input){id}
+  updateAppDictItem(itemID:$itemId,input:$input){
+    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
+    org{ id,name }
+  }
 }`);
 
 const mutationCreateAppDictItem = gql(/* GraphQL */`mutation createAppDictItem($dictId:ID!,$input: CreateAppDictItemInput!){
-  createAppDictItem(dictID:$dictId,input:$input){ id }
+  createAppDictItem(dictID:$dictId,input:$input){
+    id,name,code,orgID,createdBy,createdAt,dictID,comments,displaySort,status,
+    org{ id,name }
+  }
 }`);
 
 const mutationDelAppDictItem = gql(/* GraphQL */`mutation deleteAppDictItem($itemId:ID!){
@@ -103,7 +113,10 @@ export async function getAppDictList(
       appDictListQuery, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: AppDictOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.appDicts) {
@@ -121,7 +134,7 @@ export async function getAppDictInfo(appDictId: string) {
   const
     result = await query(
       appDictInfoQuery, {
-      gid: gid('app_dict', appDictId),
+      gid: gid('AppDict', appDictId),
     });
 
   if (result.data?.node?.__typename === "AppDict") {
@@ -204,7 +217,7 @@ export async function getAppDictItemList(
   const
     result = await query(
       appDictItemListQuery, {
-      gid: gid('app_dict', appDictId)
+      gid: gid('AppDict', appDictId),
     });
 
   if (result.data?.node?.__typename === 'AppDict') {
@@ -222,7 +235,7 @@ export async function getAppDictItemInfo(appDictItemId: string) {
   const
     result = await query(
       appDictItemInfoQuery, {
-      gid: gid('app_dict_item', appDictItemId),
+      gid: gid('AppDictItem', appDictItemId),
     });
 
   if (result.data?.node?.__typename === "AppDictItem") {

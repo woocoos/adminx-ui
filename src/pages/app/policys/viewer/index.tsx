@@ -9,7 +9,7 @@ import { getAppInfo } from '@/services/adminx/app';
 import { useTranslation } from 'react-i18next';
 import { checkAuth } from '@/components/auth';
 import { useAuth } from 'ice';
-import { App, AppAction, AppPolicy, AppPolicySimpleStatus, PolicyRule } from '@/generated/adminx/graphql';
+import { App, AppAction, AppPolicy, AppPolicyKind, AppPolicySimpleStatus, PolicyRule } from '@/generated/adminx/graphql';
 import { updateFormat } from '@/util';
 import { useLeavePrompt } from '@knockout-js/layout';
 
@@ -32,7 +32,8 @@ export default () => {
     [rules, setRules] = useState<PolicyRule[]>([]),
     [appActions, setAppActions] = useState<AppAction[]>([]),
     [, setLeavePromptWhen] = useLeavePrompt(),
-    policyId = searchParams.get('id');
+    policyId = searchParams.get('id'),
+    policyviewId = searchParams.get('policyview_id');
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -85,18 +86,19 @@ export default () => {
     verifyRules = () => {
       let errMsg = '';
       if (appInfo) {
+        // 支持空规则 只验证应用必须填写
         // const appCode = appInfo.code;
-        if (rules.length) {
-          for (let idx in rules) {
-            const item = rules[idx];
-            if (!item.actions?.length) {
-              errMsg = t('required_operation');
-            }
-            if (errMsg.length) {
-              break;
-            }
-          }
-        }
+        // if (rules.length) {
+        //   for (let idx in rules) {
+        //     const item = rules[idx];
+        //     if (!item.actions?.length) {
+        //       errMsg = t('required_operation');
+        //     }
+        //     if (errMsg.length) {
+        //       break;
+        //     }
+        //   }
+        // }
       } else {
         errMsg = t('required_app');
       }
@@ -109,7 +111,6 @@ export default () => {
       if (verifyRules()) {
         return;
       }
-      let id: string | null = null;
       setSaveLoading(true);
       if (policyId) {
         const result = await updateAppPolicy(policyId, updateFormat({
@@ -119,7 +120,10 @@ export default () => {
           rules: rules,
         }, appPolicyInfo || {}));
         if (result?.id) {
-          id = result.id;
+          message.success(t('submit_success'));
+          setRules(result.rules as PolicyRule[] || []);
+          setAppPolicyInfo(result as AppPolicy);
+          setSaveDisabled(true);
         }
       } else {
         const appId = searchParams.get('appId');
@@ -129,21 +133,20 @@ export default () => {
             rules: rules,
             appID: appId,
             autoGrant: values.autoGrant,
+            kind: policyviewId ? AppPolicyKind.View : AppPolicyKind.App,
             comments: values.comments,
             status: AppPolicySimpleStatus.Active,
-          });
+          }, policyviewId ?? undefined);
           if (result?.id) {
-            id = result.id;
+            message.success(t('submit_success'));
+            setRules(result.rules as PolicyRule[] || []);
+            setAppPolicyInfo(result as AppPolicy);
+            if (!policyId) {
+              setSearchParams({ id: result.id });
+            }
+            setSaveDisabled(true);
           }
         }
-      }
-
-      if (id) {
-        message.success(t('submit_success'));
-        if (!policyId) {
-          setSearchParams({ id: id });
-        }
-        await getRequest();
       }
       setSaveLoading(false);
     };
@@ -206,20 +209,21 @@ export default () => {
             name="autoGrant"
             label={t('auto_grant')}
           />
-          <ProFormText>
-            {appInfo ? <PolicyRules
-              rules={rules}
-              readonly={isReadonly()}
-              onChange={(rules) => {
-                setRules([...rules]);
-                onValuesChange();
-              }}
-              appInfo={appInfo}
-              appActions={appActions}
-            /> : ''}
-          </ProFormText>
-
-
+          {
+            appInfo ? <ProFormText>
+              <PolicyRules
+                kind={appPolicyInfo?.kind ?? (policyviewId ? AppPolicyKind.View : AppPolicyKind.App)}
+                rules={rules}
+                readonly={isReadonly()}
+                onChange={(rules) => {
+                  setRules([...rules]);
+                  onValuesChange();
+                }}
+                appInfo={appInfo}
+                appActions={appActions}
+              />
+            </ProFormText> : <></>
+          }
         </ProForm>
       </ProCard>
     </PageContainer>

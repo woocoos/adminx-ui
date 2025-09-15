@@ -30,9 +30,9 @@ export default () => {
     });
 
   const
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        getRequest();
+    onDrawerClose = (isSuccess: boolean, newInfo?: App) => {
+      if (isSuccess && newInfo) {
+        setAppInfo(newInfo);
       }
       setModal({ open: false, title: '', scene: undefined });
     },

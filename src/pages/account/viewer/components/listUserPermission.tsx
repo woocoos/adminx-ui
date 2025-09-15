@@ -2,22 +2,25 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, Space, Modal, message, Select } from 'antd';
 import { useEffect, useRef, useState } from 'react';
-import { delPermssion, getUserExtendGroupPolicyList, getUserPermissionList } from '@/services/adminx/permission';
+import { delPermssion, getUserExtendGroupPolicyList, getUserExtendRolePolicyList, getUserPermissionList } from '@/services/adminx/permission';
 import DrawerRolePolicy from '@/pages/org/components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import store from '@/store';
 import { getUserJoinGroupList } from '@/services/adminx/org/role';
 import Auth from '@/components/auth';
-import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/generated/adminx/graphql';
+import { OrgRole, OrgRoleKind, Permission, PermissionPrincipalKind, PermissionWhereInput, User } from '@/generated/adminx/graphql';
+import { delDataSource, saveDataSource } from '@/util';
+import { Link, useSearchParams } from 'ice';
 
 
 export default (props: {
   userInfo: User;
-  isExtendGroup?: boolean;
+  orgRoleKind?: OrgRoleKind;
   principalKind: PermissionPrincipalKind;
 }) => {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
+    [searchParams] = useSearchParams(),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<Permission>[] = [
@@ -133,12 +136,13 @@ export default (props: {
         onOk: async (close) => {
           const result = await delPermssion(record.id, record.orgID);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             message.success(t('submit_success'));
             close();
           }
@@ -164,6 +168,11 @@ export default (props: {
         toolbar={{
           title: t('policy_list'),
           actions: props.principalKind === 'user' ? [
+            <Button>
+              <Link to={`/org/users/funauth?id=${props.userInfo.id}&org_id=${searchParams.get('org_id') ?? userState.tenantId}`} target='_blank'>
+                {t('fun_authority')}
+              </Link>
+            </Button>,
             <Auth authKey="grant">
               <Button
                 type="primary"
@@ -178,11 +187,12 @@ export default (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params) => {
           const table = { data: [] as Permission[], success: true, total: 0 },
+            orgId = searchParams.get('org_id') ?? userState.tenantId,
             where: PermissionWhereInput = {};
           where.principalKind = props.principalKind;
-          where.orgID = userState.tenantId;
           if (params.orgRoleId) {
             where.hasRoleWith = [{
               id: params.orgRoleId || undefined,
@@ -196,16 +206,22 @@ export default (props: {
               appPolicyIDIsNil: params.type === 'cust' ? true : undefined,
             }];
           }
-
-          const result = props.isExtendGroup ? await getUserExtendGroupPolicyList(props.userInfo.id, {
+          if (props.principalKind === PermissionPrincipalKind.User) {
+            where.orgID = orgId
+          }
+          const result = props.principalKind === PermissionPrincipalKind.User ? await getUserPermissionList(props.userInfo.id, {
             current: params.current,
             pageSize: params.pageSize,
             where,
-          }) : await getUserPermissionList(props.userInfo.id, {
+          }) : props.orgRoleKind === OrgRoleKind.Group ? await getUserExtendGroupPolicyList(props.userInfo.id, {
             current: params.current,
             pageSize: params.pageSize,
             where,
-          });
+          }, orgId) : await getUserExtendRolePolicyList(props.userInfo.id, {
+            current: params.current,
+            pageSize: params.pageSize,
+            where,
+          }, orgId);
           if (result?.totalCount) {
             table.data = result.edges?.map(item => item?.node) as Permission[] || [];
             table.total = result.totalCount;
@@ -221,13 +237,13 @@ export default (props: {
         }}
       />
       {modal.open ? <DrawerRolePolicy
-        orgId={userState.tenantId}
+        orgId={searchParams.get('org_id') ?? userState.tenantId}
         userInfo={props.userInfo}
         open={modal.open}
         title={`${t('add_permission')}`}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
+        onClose={(isSuccess, newInfo) => {
+          if (isSuccess && newInfo) {
+            setDataSource(saveDataSource(dataSource, newInfo))
           }
           setModal({ open: false, title: '' });
         }}

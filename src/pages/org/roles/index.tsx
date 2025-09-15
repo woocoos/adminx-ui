@@ -10,13 +10,16 @@ import DrawerUser from '../../account/components/drawerUser';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import DrawerAppRolePolicy from '@/pages/app/components/drawerRolePolicy';
 import Auth from '@/components/auth';
-import { OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
+import { Org, OrgRole, OrgRoleKind, OrgRoleWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
+import { delDataSource, saveDataSource } from '@/util';
+import { getOrgInfo } from '@/services/adminx/org';
 
 
 export const PageOrgRoleList = (props: {
   isFromSystem?: boolean;
+  isFromOrg?: boolean;
   kind?: OrgRoleKind;
   orgId: string;
   title?: string;
@@ -39,6 +42,7 @@ export const PageOrgRoleList = (props: {
       { title: t('remarks'), dataIndex: 'comments', width: 120, search: false },
 
     ],
+    [orgInfo, setOrgInfo] = useState<Org>(),
     [dataSource, setDataSource] = useState<OrgRole[]>([]),
     // 弹出层处理
     [modal, setModal] = useState<{
@@ -80,6 +84,9 @@ export const PageOrgRoleList = (props: {
             <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/viewer?id=${record.id}`}>
               {t('view')}
             </Link>
+            <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/funauth?id=${record.id}`}>
+              {t('fun_authority')}
+            </Link>
             <Auth authKey="assignRoleUser">
               <a onClick={() => {
                 setModal({ open: true, title: t('add_member'), id: '', data: record, scene: 'addUser' });
@@ -92,6 +99,9 @@ export const PageOrgRoleList = (props: {
             : <>
               <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/viewer?id=${record.id}`}>
                 {t('view')}
+              </Link>
+              <Link to={`${props.isFromSystem ? '/system' : ''}/org/${record.kind}s/funauth?id=${record.id}`}>
+                {t('fun_authority')}
               </Link>
               <Auth authKey="assignRoleUser">
                 <a onClick={() => {
@@ -126,6 +136,12 @@ export const PageOrgRoleList = (props: {
 
 
   const
+    reqOrg = async () => {
+      const result = await getOrgInfo(props.orgId)
+      if (result?.id) {
+        setOrgInfo(result as Org)
+      }
+    },
     onDel = (record: OrgRole) => {
       Modal.confirm({
         title: t('delete'),
@@ -133,26 +149,22 @@ export const PageOrgRoleList = (props: {
         onOk: async (close) => {
           const result = await delOrgRole(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
-            message.success('submit_success');
+            message.success(t('submit_success'));
             close();
           }
         },
       });
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '', id: '', scene: 'editor' });
     };
 
   useEffect(() => {
+    reqOrg()
     proTableRef.current?.reload(true);
   }, [props.orgId]);
 
@@ -166,6 +178,10 @@ export const PageOrgRoleList = (props: {
             items: props.isFromSystem ? [
               { title: t('system_conf') },
               { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
+              { title: kind == 'role' ? t('role') : t('user_group') },
+            ] : props.isFromOrg ? [
+              { title: t('org_cooperation') },
+              { title: <Link to={'/org/departments'}>{t('org_manage')}</Link> },
               { title: kind == 'role' ? t('role') : t('user_group') },
             ] : [
               { title: t('org_cooperation') },
@@ -193,7 +209,7 @@ export const PageOrgRoleList = (props: {
           }}
           rowKey={'id'}
           toolbar={{
-            title: kind == 'role' ? t('role_list') : t('user_group_list'),
+            title: `${orgInfo?.name}`,
             actions: [
               <Auth authKey="createRole">
                 <Button
@@ -209,6 +225,7 @@ export const PageOrgRoleList = (props: {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params) => {
             const table = { data: [] as OrgRole[], success: true, total: 0 },
               where: OrgRoleWhereInput = {};
@@ -233,48 +250,40 @@ export const PageOrgRoleList = (props: {
           }}
         />
         <CreateOrgRole
-          x-if={modal.scene === 'editor'}
-          open={modal.open}
+          open={modal.scene === 'editor' && modal.open}
           title={modal.title}
           id={modal.id}
           kind={kind}
           orgId={props.orgId}
-          onClose={onDrawerClose}
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
+            }
+            setModal({ open: false, title: '', id: '', scene: 'editor' });
+          }}
         />
         <DrawerUser
-          x-if={modal.scene === 'addUser' && modal.open}
-          open={modal.open}
+          open={modal.scene === 'addUser' && modal.open}
           title={modal.title}
           orgId={props.orgId}
           orgRole={modal.data}
           onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
-            }
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />
         <DrawerRolePolicy
-          x-if={modal.scene === 'addPermission' && modal.open}
           orgId={props.orgId}
           orgRoleInfo={modal.data}
-          open={modal.open}
+          open={modal.scene === 'addPermission' && modal.open}
           title={modal.title}
           onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
-            }
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />
         <DrawerAppRolePolicy
-          x-if={modal.scene === 'addAppPermission' && modal.open}
-          open={modal.open}
+          open={modal.scene === 'addAppPermission' && modal.open}
           title={modal.title}
           onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
-            }
             setModal({ open: false, title: modal.title, scene: modal.scene, id: '' });
           }}
         />

@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { AppOrder, AppWhereInput, CreateAppInput, UpdateAppInput } from '@/generated/adminx/graphql';
+import { AppOrder, AppOrderField, AppWhereInput, CreateAppInput, OrderDirection, UpdateAppInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -39,11 +39,17 @@ const queryAppInfo = gql(/* GraphQL */`query appInfo($gid:GID!){
 }`);
 
 const mutationUpdateApp = gql(/* GraphQL */`mutation updateApp($appId:ID!,$input: UpdateAppInput!){
-  updateApp(appID:$appId,input:$input){id}
+  updateApp(appID:$appId,input:$input){
+    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+    refreshTokenValidity,logo,comments,status,createdAt
+  }
 }`);
 
 const mutationCreateApp = gql(/* GraphQL */`mutation createApp($input: CreateAppInput!){
-  createApp(input:$input){ id }
+  createApp(input:$input){
+    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+    refreshTokenValidity,logo,comments,status,createdAt
+  }
 }`);
 
 const mutationDelApp = gql(/* GraphQL */`mutation delApp($appId:ID!){
@@ -74,7 +80,10 @@ export async function getAppList(
       queryAppList, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: AppOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.apps) {
@@ -92,7 +101,7 @@ export async function getAppInfo(appId: string) {
   const
     result = await query(
       queryAppInfo, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
     });
 
   if (result.data?.node?.__typename === 'App') {

@@ -1,4 +1,4 @@
-import { getUserInfo } from '@/services/adminx/user';
+import { getUserAppList, getUserInfo } from '@/services/adminx/user';
 import store from '@/store';
 import { PageContainer, ProCard, useToken } from '@ant-design/pro-components';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,6 @@ import { Avatar, Col, Empty, Row, Space, Statistic } from 'antd';
 import { getOrgUserQty } from '@/services/adminx/org/user';
 import { getOrgGroupQty, getOrgRoleQty } from '@/services/adminx/org/role';
 import { getOrgPolicyQty } from '@/services/adminx/org/policy';
-import { getOrgAppList } from '@/services/adminx/org/app';
 import { Link } from '@ice/runtime';
 import { App, OrgRoleKind, User } from '@/generated/adminx/graphql';
 import { parseStorageUrl } from '@knockout-js/api';
@@ -43,26 +42,24 @@ export default () => {
           setRoleQty(await getOrgRoleQty({ kind: OrgRoleKind.Role }));
           setPolicyQty(await getOrgPolicyQty(userState.tenantId, { appPolicyIDIsNil: true }));
 
-          const orgAppsRes = await getOrgAppList(userState.tenantId, {
-            pageSize: 999,
-          });
-          if (orgAppsRes?.edges) {
-            const orgApps: App[] = [];
-            for (const item of orgAppsRes.edges) {
-              if (item?.node) {
+          const userAppRes = await getUserAppList();
+          const userApps: App[] = [];
+          if (userAppRes) {
+            for (const item of userAppRes) {
+              if (item) {
                 let logo: string = defaultApp;
-                if (item.node?.logo) {
-                  const logoRes = await parseStorageUrl(item.node.logo);
+                if (item.logo) {
+                  const logoRes = await parseStorageUrl(item.logo);
                   if (logoRes) {
                     logo = logoRes;
                   }
                 }
-                item.node.logo = logo;
-                orgApps.push(item.node as App);
+                item.logo = logo;
+                userApps.push(item as App);
               }
             }
-            setMyApps(orgApps);
           }
+          setMyApps(userApps);
         }
       }
       setLoading(false);
@@ -128,7 +125,7 @@ export default () => {
         </ProCard>
       </ProCard>
       <br />
-      <ProCard title={t('my_app')}>
+      <ProCard title={t('my_app')} gutter={[8, 16]} wrap>
         {
           myApps.map(item =>
           (<ProCard

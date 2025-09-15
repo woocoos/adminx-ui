@@ -10,13 +10,16 @@ import { assignOrgApp, getOrgAppList, revokeOrgApp } from '@/services/adminx/org
 import ModalApp from '../components/modalApp';
 import { useTranslation } from 'react-i18next';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
 import { parseStorageUrl } from '@knockout-js/api';
+import { delDataSource, saveDataSource } from '@/util';
+import { ItemType } from 'antd/lib/menu/interface';
 
 export const PageAppList = (props: {
   title?: string;
   orgId?: string;
+  isFromSystem?: boolean;
+  isFromOrg?: boolean;
   scene?: 'orgApp';
 }) => {
   const { token } = useToken(),
@@ -80,6 +83,7 @@ export const PageAppList = (props: {
       render: (text, record) => {
         const items: ItemType[] = [
           { key: 'policys', label: <Link to={`/app/policys?id=${record.id}`} >{t('policy')}</Link> },
+          { key: 'policy-view', label: <Link to={`/app/policyview?id=${record.id}`} >{t('policy_view')}</Link> },
           { key: 'menu', label: <Link to={`/app/menu?id=${record.id}`} >{t('menu')}</Link> },
           { key: 'roles', label: <Link to={`/app/roles?id=${record.id}`} >{t('role')}</Link> },
           { key: 'resource', label: <Link to={`/app/resources?id=${record.id}`} >{t('resources')}</Link> },
@@ -132,12 +136,13 @@ export const PageAppList = (props: {
         onOk: async (close) => {
           const result = await delAppInfo(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
@@ -151,23 +156,18 @@ export const PageAppList = (props: {
           if (props.orgId) {
             const result = await revokeOrgApp(props.orgId, record.id);
             if (result === true) {
-              if (dataSource.length === 1) {
+              setDataSource(delDataSource(dataSource, record.id));
+              if (dataSource.length === 0) {
                 const pageInfo = { ...proTableRef.current?.pageInfo };
                 pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
                 proTableRef.current?.setPageInfo?.(pageInfo);
+                proTableRef.current?.reload();
               }
-              proTableRef.current?.reload();
               close();
             }
           }
         },
       });
-    },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
-      }
-      setModal({ open: false, title: '', id: '' });
     };
 
   return (
@@ -200,6 +200,7 @@ export const PageAppList = (props: {
               }}
               scroll={{ x: 'max-content', y: 300 }}
               columns={columns}
+              dataSource={dataSource}
               request={async (params, sort, filter) => {
                 const table = { data: [] as App[], success: true, total: 0 },
                   where: AppWhereInput = {};
@@ -260,13 +261,14 @@ export const PageAppList = (props: {
             <ModalApp
               open={modal.open}
               title={modal.title}
+              isLoginOrgId={props.isFromOrg}
+              isMultiple
               onClose={async (selectData) => {
-                const sdata = selectData?.[0];
-                if (sdata && props.orgId) {
-                  const result = await assignOrgApp(props.orgId, sdata.id);
-                  if (result) {
-                    proTableRef.current?.reload();
+                if (selectData?.length && props.orgId) {
+                  for await (const item of selectData) {
+                    await assignOrgApp(props.orgId, item.id);
                   }
+                  proTableRef.current?.reload();
                 }
                 setModal({ open: false, title: modal.title, id: '' });
               }}
@@ -314,6 +316,7 @@ export const PageAppList = (props: {
               }}
               scroll={{ x: 'max-content' }}
               columns={columns}
+              dataSource={dataSource}
               request={async (params, sort, filter) => {
                 const table = { data: [] as App[], success: true, total: 0 },
                   where: AppWhereInput = {};
@@ -375,7 +378,12 @@ export const PageAppList = (props: {
               open={modal.open}
               title={modal.title}
               id={modal.id}
-              onClose={onDrawerClose}
+              onClose={(isSuccess, newInfo) => {
+                if (isSuccess && newInfo) {
+                  setDataSource(saveDataSource(dataSource, newInfo))
+                }
+                setModal({ open: false, title: '', id: '' });
+              }}
             />
           </PageContainer >
         )

@@ -1,4 +1,4 @@
-import { AppDict, AppDictItemSimpleStatus, Org, OrgKind } from '@/generated/adminx/graphql';
+import { AppDict, AppDictItem, AppDictItemSimpleStatus, Org, OrgKind } from '@/generated/adminx/graphql';
 import InputOrg from '@/pages/org/components/inputOrg';
 import { createAppDictItemInfo, getAppDictItemInfo, updateAppDictItemInfo } from '@/services/adminx/dict';
 import { updateFormat } from '@/util';
@@ -20,10 +20,10 @@ export default (props: {
   title?: string;
   appDictId: string;
   id?: string | null;
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: AppDictItem) => void;
 }) => {
   const { t } = useTranslation(),
-    [info, setInfo] = useState<AppDict>(),
+    [info, setInfo] = useState<AppDictItem>(),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true);
@@ -49,7 +49,7 @@ export default (props: {
       if (props.id) {
         const result = await getAppDictItemInfo(props.id);
         if (result?.id) {
-          setInfo(result as AppDict);
+          setInfo(result as AppDictItem);
           return result;
         }
       }
@@ -75,7 +75,7 @@ export default (props: {
         });
       if (result?.id) {
         setSaveDisabled(true);
-        props.onClose?.(true);
+        props.onClose?.(true, result as AppDictItem);
       }
       setSaveLoading(false);
       return false;

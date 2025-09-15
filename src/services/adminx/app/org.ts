@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { OrgOrder, OrgWhereInput } from '@/generated/adminx/graphql';
+import { OrderDirection, OrgOrder, OrgOrderField, OrgWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -12,7 +12,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
         edges{
           cursor,node{
             id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-            domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+            domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
             owner { id,displayName }
           }
         }
@@ -24,7 +24,7 @@ const queryAppOrgList = gql(/* GraphQL */`query appOrgList($gid: GID!,$first: In
 const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToOrgList($appRoleId:ID!,$where: OrgWhereInput){
   appRoleAssignedToOrgs(roleID:$appRoleId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
   }
 }`);
@@ -32,7 +32,7 @@ const queryAppRoleAssignedToOrgList = gql(/* GraphQL */`query appRoleAssignedToO
 const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssignedToOrgList($appPolicyId:ID!,$where: OrgWhereInput){
   appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
   }
 }`);
@@ -40,7 +40,7 @@ const queryAppPolicyAssignedToOrgList = gql(/* GraphQL */`query appPolicyAssigne
 const queryAppPolicyAssignedToOrgListAndIsGrant = gql(/* GraphQL */`query appPolicyAssignedToOrgListAndIsGrant($appPolicyId:ID!,$appPolicyIdToIsAllow:ID!,$where: OrgWhereInput){
   appPolicyAssignedToOrgs(policyID:$appPolicyId,where:$where){
     id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-    domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
     owner { id,displayName }
     isAllowRevokeAppPolicy(appPolicyID: $appPolicyIdToIsAllow)
   }
@@ -63,10 +63,13 @@ export async function getAppOrgList(
   const
     result = await paging(
       queryAppOrgList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: OrgOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'App') {

@@ -1,7 +1,7 @@
 import store from '@/store';
 import { useEffect, useState } from 'react';
 import menuList from './menu.json';
-import { history } from 'ice';
+import { useNavigate } from 'ice';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { Outlet, useLocation } from '@ice/runtime';
 import i18n from '@/i18n';
@@ -14,12 +14,14 @@ import { parseStorageUrl } from '@knockout-js/api';
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
+  ICE_ROUTER_BASENAME = process.env.ICE_ROUTER_BASENAME ?? '/',
   IconFont = createFromIconfontCN({
     scriptUrl: "//at.alicdn.com/t/c/font_4214307_8x56lkek9tu.js"
   })
 
 export default () => {
   const [userState, userDispatcher] = store.useModel('user'),
+    navigate = useNavigate(),
     [appState, appDispatcher] = store.useModel('app'),
     [open, setOpen] = useState(false),
     [checkLeave] = useLeavePrompt(),
@@ -32,13 +34,16 @@ export default () => {
   }, [appState.locale]);
 
   useEffect(() => {
-    if (userState.user?.avatar) {
+    if (userState.token && userState.user?.avatar) {
       parseStorageUrl(userState.user.avatar).then(result => {
         if (result) {
           setAvatar(result);
         }
       })
     }
+  }, [userState.user]);
+
+  useEffect(() => {
     monitorKeyChange([
       {
         key: 'tenantId',
@@ -67,7 +72,13 @@ export default () => {
     ]);
   }, []);
 
-  return ['/login', '/login/retrievePassword'].includes(location.pathname) ? <Outlet />
+  return [
+    "/login",
+    "/login/retrievePassword",
+    `${ICE_ROUTER_BASENAME}/login`.replaceAll('//', '/'),
+    `${ICE_ROUTER_BASENAME}/login/retrievePassword`.replaceAll('//', '/')
+  ].includes(location.pathname) ?
+    <Outlet />
     : <Layout
       appCode={ICE_APP_CODE}
       pathname={location.pathname}
@@ -78,7 +89,7 @@ export default () => {
           if (isOpen) {
             window.open(await urlSpm(url));
           } else {
-            history?.push(await urlSpm(url));
+            navigate(await urlSpm(url));
           }
         }
       }}
@@ -129,7 +140,7 @@ export default () => {
                 if (url.toLowerCase().startsWith("http")) {
                   window.location.href = url;
                 } else {
-                  history?.push(url);
+                  navigate(url);
                 }
               }
             }

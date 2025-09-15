@@ -1,6 +1,7 @@
 import { gql } from '@/generated/adminx';
-import { CreateOrgInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput } from '@/generated/adminx/graphql';
+import { CreateOrgInput, CreateUserPasswordPolicyInput, EnableDirectoryInput, OrderDirection, Org, OrgKind, OrgOrder, OrgOrderField, OrgWhereInput, TreeAction, UpdateOrgInput, UpdateUserPasswordPolicyInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
+import { CreateUserPasswordInput } from '@knockout-js/api/ucenter';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
 export const EnumOrgStatus = {
@@ -10,8 +11,8 @@ export const EnumOrgStatus = {
   processing: { text: 'processing', status: 'warning' },
 },
   EnumOrgKind = {
-    root: { text: '组织' },
-    org: { text: '部门' },
+    [OrgKind.Root]: { text: '组织' },
+    [OrgKind.Org]: { text: '部门' },
   };
 
 const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrder,$where:OrgWhereInput){
@@ -20,7 +21,7 @@ const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrd
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-        domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+        domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
         owner { id,displayName }
       }
     }
@@ -30,27 +31,48 @@ const queryOrgList = gql(/* GraphQL */`query orgList($first: Int,$orderBy:OrgOrd
 const queryOrgInfo = gql(/* GraphQL */`query orgInfo($gid:GID!){
   node(id: $gid){
     ... on Org{
-      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
-      domain,code,name,profile,status,path,displaySort,countryCode,timezone,
+      id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,customDomain,
+      domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
       owner { id,displayName }
+      logo{ favicon, logo, thumbLogo}
     }
   }
 }`);
 
 const mutationCreateRootOrg = gql(/* GraphQL */`mutation createRootOrg($input: CreateOrgInput!){
-  createRoot(input:$input){id}
+  createRoot(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
+    owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
+  }
 }`);
 
 const mutationUpdateOrg = gql(/* GraphQL */`mutation updateOrg($orgId:ID!,$input: UpdateOrgInput!){
-  updateOrganization(orgID:$orgId,input:$input){id}
+  updateOrganization(orgID:$orgId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
+    owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
+  }
 }`);
 
 const mutationCreateOrg = gql(/* GraphQL */`mutation createOrg($input: CreateOrgInput!){
-  createOrganization(input:$input){id}
+  createOrganization(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
+    owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
+  }
 }`);
 
 const mutationEnableDirectory = gql(/* GraphQL */`mutation enableDirectory($input: EnableDirectoryInput!){
-  enableDirectory(input:$input){id}
+  enableDirectory(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,deletedAt,ownerID,parentID,kind,
+    domain,code,name,profile,status,path,displaySort,countryCode,timezone,localCurrency
+    owner { id,displayName }
+    logo{ favicon, logo, thumbLogo}
+  }
 }`);
 
 const mutationDelOrg = gql(/* GraphQL */`mutation delOrg($orgId:ID!){
@@ -59,6 +81,29 @@ const mutationDelOrg = gql(/* GraphQL */`mutation delOrg($orgId:ID!){
 
 const mutationMoveOrg = gql(/* GraphQL */`mutation moveOrg($sourceId:ID!,$targetId:ID!,$action:TreeAction!){
   moveOrganization(sourceID:$sourceId,targetId:$targetId,action:$action)
+}`);
+
+const queryUserPasswordPolicy = gql(/* GraphQL */`query userPasswordPolicy($gid: GID!){
+  node(id:$gid){
+    ... on Org{
+      id
+      userPasswordPolicy{
+        id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes
+      }
+    }
+  }
+}`);
+
+const mutationUpdatePwdPolicy = gql(/* GraphQL */`mutation updateUserPasswordPolicy($orgId:ID!,$input: UpdateUserPasswordPolicyInput!){
+  updateUserPasswordPolicy(orgID:$orgId,input:$input){
+    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID
+  }
+}`);
+
+const mutationCreatePwdPolicy = gql(/* GraphQL */`mutation createUserPasswordPolicy($orgId:ID!,$input: CreateUserPasswordPolicyInput!){
+  createUserPasswordPolicy(orgID:$orgId,input:$input){
+    id,retry,includeChar,includeElement,invalidDay,invalidLoginLimit,allowIncludeUserName,length,captchaTimes,tenantID
+  }
 }`);
 
 /**
@@ -94,7 +139,7 @@ export async function getOrgList(gather: {
  * @param orgId
  * @returns
  */
-export async function getOrgPathList(orgId: string, kind: OrgKind) {
+export async function getOrgPathList(orgId: string, kind?: OrgKind) {
   const topOrg = await getOrgInfo(orgId),
     orgList: Org[] = [];
   if (topOrg?.id) {
@@ -122,7 +167,7 @@ export async function getOrgPathList(orgId: string, kind: OrgKind) {
 export async function getOrgInfo(orgId: string) {
   const
     result = await query(queryOrgInfo, {
-      gid: gid('org', orgId),
+      gid: gid('Org', orgId),
     });
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node;
@@ -155,13 +200,24 @@ export async function updateOrgInfo(orgId: string, input: UpdateOrgInput) {
  * @returns
  */
 export async function createOrgInfo(input: CreateOrgInput, kind: OrgKind) {
-  const
-    result = await mutation(
-      kind === OrgKind.Root ? mutationCreateRootOrg : mutationCreateOrg, {
-      input,
-    });
-  if (result.data?.createRoot?.id) {
-    return result.data.createRoot;
+  if (kind === OrgKind.Root) {
+    const
+      result = await mutation(
+        mutationCreateRootOrg, {
+        input,
+      });
+    if (result.data?.createRoot?.id) {
+      return result.data.createRoot;
+    }
+  } else {
+    const
+      result = await mutation(
+        mutationCreateOrg, {
+        input,
+      });
+    if (result.data?.createOrganization?.id) {
+      return result.data.createOrganization;
+    }
   }
   return null;
 }
@@ -213,6 +269,57 @@ export async function moveOrg(sourceId: string, targetId: string, action: TreeAc
     });
   if (result.data?.moveOrganization) {
     return result.data.moveOrganization;
+  }
+  return null;
+}
+
+/**
+ * 组织下的密码策略
+ * @param orgId
+ * @returns
+ */
+export async function getPwdPolicy(orgId: string) {
+  const result = await query(queryUserPasswordPolicy, {
+    gid: gid('Org', orgId),
+  });
+  if (result.data?.node?.__typename === 'Org') {
+    return result.data.node.userPasswordPolicy;
+  }
+  return null;
+}
+
+/**
+ * 更新密码策略
+ * @param orgId
+ * @param input
+ * @returns
+ */
+export async function updatePwdPolicy(orgId: string, input: UpdateUserPasswordPolicyInput) {
+  const
+    result = await mutation(mutationUpdatePwdPolicy, {
+      orgId,
+      input,
+    });
+  if (result.data?.updateUserPasswordPolicy?.id) {
+    return result.data.updateUserPasswordPolicy;
+  }
+  return null;
+}
+
+/**
+ * 创建密码策略
+ * @param orgId
+ * @param input
+ * @returns
+ */
+export async function createPwdPolicy(orgId: string, input: CreateUserPasswordPolicyInput) {
+  const
+    result = await mutation(mutationCreatePwdPolicy, {
+      orgId,
+      input,
+    });
+  if (result.data?.createUserPasswordPolicy?.id) {
+    return result.data.createUserPasswordPolicy;
   }
   return null;
 }

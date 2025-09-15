@@ -1,6 +1,6 @@
 import store from '@/store';
 import { PageContainer, ProCard, ProForm, ProFormText, useToken } from '@ant-design/pro-components';
-import { Link, history } from '@ice/runtime';
+import { Link, useNavigate } from '@ice/runtime';
 import { Alert, QRCode, Result, message } from 'antd';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import { useLeavePrompt } from '@knockout-js/layout';
 export default () => {
   const { t } = useTranslation(),
     { token } = useToken(),
+    navigate = useNavigate(),
     countdownFn = useRef<NodeJS.Timeout>(),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
@@ -68,7 +69,7 @@ export default () => {
         const result = await bindMfa(mfaInfo.stateToken, value.code);
         if (result) {
           message.success(t('submit_success'));
-          history?.push('/user/safety');
+          navigate('/user/safety');
         }
       }
 

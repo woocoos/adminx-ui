@@ -1,27 +1,31 @@
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import defaultAvatar from '@/assets/images/default-avatar.png';
 import { ReactNode, useEffect, useState } from 'react';
-import { Button, Divider, Modal, Space, message } from 'antd';
+import { Button, Divider, Modal, QRCode, Space, message } from 'antd';
 import UserCreate from '../list/components/create';
 import UserCreateIdentity from './components/createIdentity';
-import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, sendMFAEmail } from '@/services/adminx/user';
+import { EnumUserIdentityKind, UpdateUserInfoScene, disableMFA, enableMFA, getUserInfoLoginProfileIdentities, getUserMfaInfo, sendMFAEmail } from '@/services/adminx/user';
 import { useTranslation } from 'react-i18next';
 import ListUserPermission from './components/listUserPermission';
 import ListUserJoinGroup from './components/listUserJoinGroup';
-import { Link, history, useSearchParams } from '@ice/runtime';
+import { Link, useNavigate, useSearchParams } from '@ice/runtime';
 import Auth from '@/components/auth';
 import style from './index.module.css';
-import { PermissionPrincipalKind, User, UserUserType } from '@/generated/adminx/graphql';
+import { PermissionPrincipalKind, User, UserLoginProfile, UserUserType, UserGender, OrgRoleKind } from '@/generated/adminx/graphql';
 import AccessKey from './components/accessKey';
 import { parseStorageUrl } from '@knockout-js/api';
+import store from '@/store';
 
 export default (props: {
   isFromOrg?: boolean;
+  isFromOrgMember?: boolean;
   isFromSystem?: boolean;
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    navigate = useNavigate(),
     [searchParams] = useSearchParams(),
+    [userState] = store.useModel('user'),
     [loading, setLoading] = useState(false),
     [info, setInfo] = useState<User>(),
     [avatar, setAvatar] = useState<string>(),
@@ -38,12 +42,6 @@ export default (props: {
     });
 
   const
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        getRequest();
-      }
-      setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
-    },
     getRequest = async () => {
       const id = searchParams.get('id');
       if (id) {
@@ -103,6 +101,24 @@ export default (props: {
         });
       }
     },
+    viewMfa = async () => {
+      const orgId = searchParams.get('org_id') ?? userState.tenantId
+      if (info && orgId) {
+        const result = await getUserMfaInfo(info.id, orgId)
+        if (result) {
+          Modal.info({
+            title: `${t('view')} ${t('MFA')}`,
+            content: <div>
+              <div style={{ width: '160px', margin: '0 auto' }}>
+                <QRCode value={result.qrCodeUri} />
+              </div>
+              <div>{t('account_number')}: {result.accountName}</div>
+              <div>{t('secret_key')}: {result.secret} </div>
+            </div>,
+          })
+        }
+      }
+    },
     sendEmail = () => {
       if (info) {
         Modal.confirm({
@@ -112,13 +128,22 @@ export default (props: {
             const result = await sendMFAEmail(info.id);
             if (result) {
               message.success(t('submit_success'));
-              await getRequest();
               close();
             }
           },
         });
       }
     };
+
+  const showGender = (gender: UserGender | undefined) => {
+    if (gender == UserGender.Female) {
+      return t('female');
+    } else if (gender == UserGender.Male) {
+      return t('male');
+    } else {
+      return t('privacy');
+    }
+  }
 
   useEffect(() => {
     getRequest();
@@ -136,7 +161,7 @@ export default (props: {
             { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
             {
               title: <a onClick={() => {
-                history?.go(-1);
+                navigate(-1);
               }}
               >{t('user_manage')}</a>,
             },
@@ -144,6 +169,10 @@ export default (props: {
           ] : props.isFromOrg ? [
             { title: t('org_cooperation') },
             { title: <Link to={'/org/users'}>{t('user_manage')}</Link> },
+            { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
+          ] : props.isFromOrgMember ? [
+            { title: t('org_cooperation') },
+            { title: <Link to={'/org/members'}>{t('member_manage')}</Link> },
             { title: info?.userType == 'account' ? t('account_detail') : t('member_detail') },
           ] : [
             { title: t('system_conf') },
@@ -181,15 +210,18 @@ export default (props: {
                 {info?.displayName}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('mobile')} >
-                {info?.mobile}
+                {info?.contact?.mobile}
               </ProDescriptions.Item>
               <ProDescriptions.Item label={t('email')}>
-                {info?.email}
+                {info?.contact?.email}
               </ProDescriptions.Item>
-              <ProDescriptions.Item label={t('created_at')} valueType="dateTime" >
+              <ProDescriptions.Item label={t('gender')}>
+                {showGender(info?.gender)}
+              </ProDescriptions.Item>
+              <ProDescriptions.Item label={t('created_at')} valueType="dateTime" span={2}>
                 {info?.createdAt}
               </ProDescriptions.Item>
-              <ProDescriptions.Item label={t('introduction')} span={2} >
+              <ProDescriptions.Item label={t('internal_notes')} span={2} >
                 {info?.comments}
               </ProDescriptions.Item>
             </ProDescriptions>
@@ -222,6 +254,7 @@ export default (props: {
                 >
                   {identityRender()}
                 </ProDescriptions>
+                <br />
                 <Divider />
                 <ProDescriptions
                   size="small"
@@ -249,7 +282,11 @@ export default (props: {
                   <ProDescriptions.Item label={t('reset_login_pwd')} >
                     {info?.loginProfile?.passwordReset ? t('yes') : t('no')}
                   </ProDescriptions.Item>
+                  <ProDescriptions.Item label={t('device_verification')} >
+                    {info?.loginProfile?.verifyDevice ? t('yes') : t('no')}
+                  </ProDescriptions.Item>
                 </ProDescriptions>
+                <br />
                 <Divider />
                 <ProDescriptions
                   size="small"
@@ -272,6 +309,13 @@ export default (props: {
                               {t('send_to_email')}
                             </Button>
                           </Auth>
+                          {
+                            info?.loginProfile?.mfaEnabled ? <Button onClick={() => {
+                              viewMfa()
+                            }}>
+                              {t('view')}
+                            </Button> : <></>
+                          }
                           <Auth authKey="enableMFA">
                             <Button
                               type="primary"
@@ -302,12 +346,13 @@ export default (props: {
                       {t('user_viewer_MFA_description')}
                     </span>
                   </ProDescriptions.Item>
-                  {info?.loginProfile?.mfaEnabled ? <>
+                  {/* {info?.loginProfile?.mfaEnabled ? <>
                     <ProDescriptions.Item label={t('account_number')} >
                       {info.principalName}
                     </ProDescriptions.Item>
-                  </> : <></>}
+                  </> : <></>} */}
                 </ProDescriptions>
+                <br />
                 <Divider />
                 <AccessKey userId={info.id} />
               </>
@@ -315,8 +360,11 @@ export default (props: {
             }, {
               label: t('join_group'),
               key: 'group',
-              children: <ListUserJoinGroup userInfo={info} />,
-
+              children: <ListUserJoinGroup userInfo={info} kind={OrgRoleKind.Group} />,
+            }, {
+              label: t('join_role'),
+              key: 'role',
+              children: <ListUserJoinGroup userInfo={info} kind={OrgRoleKind.Role} />,
             }, {
               label: t('permission_manage'),
               key: 'permission',
@@ -337,7 +385,15 @@ export default (props: {
                       key: 'group-permission',
                       children: <ListUserPermission
                         userInfo={info}
-                        isExtendGroup
+                        orgRoleKind={OrgRoleKind.Group}
+                        principalKind={PermissionPrincipalKind.Role}
+                      />,
+                    }, {
+                      label: t('extend_user_role_permissions'),
+                      key: 'role-permission',
+                      children: <ListUserPermission
+                        userInfo={info}
+                        orgRoleKind={OrgRoleKind.Role}
                         principalKind={PermissionPrincipalKind.Role}
                       />,
                     },
@@ -357,14 +413,46 @@ export default (props: {
         id={info?.id}
         scene={modal.scene}
         userType={modal.userType}
-        onClose={onDrawerClose}
+        onClose={async (isSuccess, newInfo) => {
+          if (isSuccess && newInfo) {
+            if (modal.scene === 'base') {
+              const userInfo = newInfo as User
+              if (userInfo.avatar) {
+                if (userInfo.avatar != info?.avatar) {
+                  const avatarRes = await parseStorageUrl(userInfo.avatar);
+                  if (avatarRes) {
+                    setAvatar(avatarRes)
+                  }
+                }
+              } else {
+                setAvatar(undefined)
+              }
+              setInfo({ ...info, ...userInfo })
+            } else if (modal.scene === 'loginProfile') {
+              const loginProfileInfo = newInfo as UserLoginProfile
+              setInfo({
+                ...info,
+                loginProfile: loginProfileInfo
+              } as User)
+            }
+          }
+          setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
+        }}
       />
       <UserCreateIdentity
         x-if={modal.scene === 'identity'}
         open={modal.open}
         title={modal.title}
         id={info?.id}
-        onClose={onDrawerClose}
+        onClose={(isSuccess, newInfo) => {
+          if (isSuccess && newInfo) {
+            setInfo({
+              ...info,
+              identities: newInfo
+            } as User)
+          }
+          setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
+        }}
       />
     </PageContainer>
   );

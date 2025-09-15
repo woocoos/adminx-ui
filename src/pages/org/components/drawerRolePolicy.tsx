@@ -5,7 +5,7 @@ import { ActionType, DrawerForm, ProColumns, ProTable } from '@ant-design/pro-co
 import { getOrgPolicyList } from '@/services/adminx/org/policy';
 import { createPermission } from '@/services/adminx/permission';
 import { useTranslation } from 'react-i18next';
-import { OrgPolicy, OrgPolicyWhereInput, OrgRole, PermissionPrincipalKind, User } from '@/generated/adminx/graphql';
+import { AppPolicyKind, OrgPolicy, OrgPolicyWhereInput, OrgRole, Permission, PermissionPrincipalKind, User } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';
 
 export default (props: {
@@ -14,7 +14,7 @@ export default (props: {
   orgId: string;
   userInfo?: User;
   orgRoleInfo?: OrgRole;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: Permission) => void;
 }) => {
   const
     { t } = useTranslation(),
@@ -47,7 +47,6 @@ export default (props: {
     },
     onFinish = async () => {
       setSaveLoading(true);
-      let isTree = false;
       for (let idx in selectedDatas) {
         const item = selectedDatas[idx];
         if (props.orgRoleInfo) {
@@ -58,7 +57,9 @@ export default (props: {
             roleID: props.orgRoleInfo.id,
           });
           if (result?.id) {
-            isTree = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as Permission);
           }
         } else if (props.userInfo) {
           const result = await createPermission({
@@ -68,14 +69,11 @@ export default (props: {
             userID: props.userInfo.id,
           });
           if (result?.id) {
-            isTree = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as Permission);
           }
         }
-      }
-      if (isTree) {
-        message.success(t('submit_success'));
-        setSaveDisabled(true);
-        props.onClose(true);
       }
       setSaveLoading(false);
       return false;
@@ -103,136 +101,155 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <Space direction="vertical">
-        {
-          props.orgRoleInfo ? <>
-            <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user_group')}</div>
-            <div>
-              <Input value={props.orgRoleInfo.name} />
-            </div>
-          </> : ''
-        }
-        {
-          props.userInfo ? <>
-            <div>{t('user')}</div>
-            <div>
-              <Input value={props.userInfo.displayName} />
-            </div>
-          </> : ''
-        }
-        <div>
-          {t('policy')}
-        </div>
-        <Row gutter={20}>
-          <Col span="16">
-            <div>
-              <Input.Search
-                value={keyword}
-                placeholder={`${t('search_keyword')}`}
-                onChange={(event) => {
-                  setKeyword(event.target.value);
-                }}
-                onSearch={() => {
-                  proTableRef.current?.reload(true);
-                }}
-              />
-            </div>
-            <br />
-            <ProTable
-              className="innerTable"
-              columns={columns}
-              actionRef={proTableRef}
-              request={async (params) => {
-                const table = { data: [] as OrgPolicy[], success: true, total: 0 },
-                  where: OrgPolicyWhereInput = {};
-                if (keyword) {
-                  where.or = [
-                    { nameContains: keyword },
-                    { commentsContains: keyword },
-                  ]
-                }
-                const result = await getOrgPolicyList(props.orgId, {
-                  current: params.current,
-                  pageSize: params.pageSize,
-                  where,
-                }, {
-                  roleId: props.orgRoleInfo?.id,
-                  userId: props.userInfo?.id,
-                });
-                if (result?.totalCount) {
-                  table.data = result.edges?.map(item => item?.node) as OrgPolicy[];
-                  table.total = result.totalCount;
-                }
-                setdataSource(table.data);
-                return table;
-              }}
-              search={false}
-              toolbar={{
-                settings: [],
-              }}
-              scroll={{ y: 500 }}
-              rowKey="id"
-              size="small"
-              pagination={false}
-              rowSelection={{
-                selectedRowKeys: selectedDatas.map(item => item.id),
-                onChange: (selectedRowKeys: string[]) => {
-                  const allIds = dataSource.map(item => item.id),
-                    oldDatas = selectedDatas.filter(sItem => !allIds.includes(sItem.id)),
-                    newDatas = selectedRowKeys.length ? dataSource.filter(item => selectedRowKeys.includes(item.id))
-                      : [];
-                  setSelectedDatas([...oldDatas, ...newDatas]);
-                  setSaveDisabled(false);
-                },
-                getCheckboxProps: (record) => ({
-                  disabled: record.isGrantRole || record.isGrantUser,
-                }),
-                type: 'checkbox',
-              }}
-            />
-          </Col>
-          <Col span="8">
-            <div style={{ paddingBottom: '30px' }}>
-              <Row>
-                <Col flex="auto">
-                  {t('selected')}（{selectedDatas.length}）
-                </Col>
-                <Col >
-                  <a onClick={() => {
-                    setSelectedDatas([]);
-                    setSaveDisabled(true);
+      <div>
+        <Space direction="vertical">
+          {
+            props.orgRoleInfo ? <>
+              <div>{props.orgRoleInfo.kind === 'role' ? t('role') : t('user_group')}</div>
+              <div>
+                <Input value={props.orgRoleInfo.name} />
+              </div>
+            </> : ''
+          }
+          {
+            props.userInfo ? <>
+              <div>{t('user')}</div>
+              <div>
+                <Input value={props.userInfo.displayName} />
+              </div>
+            </> : ''
+          }
+          <div>
+            {t('policy')}
+          </div>
+          <Row gutter={20}>
+            <Col span="16">
+              <div>
+                <Input.Search
+                  value={keyword}
+                  placeholder={`${t('search_keyword')}`}
+                  onChange={(event) => {
+                    setKeyword(event.target.value);
                   }}
-                  >{t('empty')}</a>
-                </Col>
-              </Row>
-            </div>
-            <div>
-              <List
-                style={{ overflow: 'auto', height: '500px' }}
-                bordered
+                  onSearch={() => {
+                    proTableRef.current?.reload(true);
+                  }}
+                />
+              </div>
+              <br />
+              <ProTable
+                className="innerTable"
+                columns={columns}
+                actionRef={proTableRef}
+                request={async (params) => {
+                  const table = { data: [] as OrgPolicy[], success: true, total: 0 },
+                    where: OrgPolicyWhereInput = {
+                      or: [
+                        {
+                          hasAppPolicyWith: [
+                            {
+                              kind: AppPolicyKind.App
+                            }
+                          ]
+                        },
+                        {
+                          appPolicyIDIsNil: true
+                        }
+                      ],
+                    };
+                  if (keyword) {
+                    where.or = [
+                      { nameContains: keyword },
+                      { commentsContains: keyword },
+                    ]
+                  }
+
+                  const result = await getOrgPolicyList(props.orgId, {
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  }, {
+                    roleId: props.orgRoleInfo?.id,
+                    userId: props.userInfo?.id,
+                  });
+                  if (result?.totalCount) {
+                    table.data = result.edges?.map(item => item?.node) as OrgPolicy[];
+                    table.total = result.totalCount;
+                  }
+                  setdataSource(table.data);
+                  setSelectedDatas([])
+                  return table;
+                }}
+                search={false}
+                toolbar={{
+                  settings: [],
+                }}
+                scroll={{ y: 500 }}
+                rowKey="id"
                 size="small"
-                dataSource={selectedDatas}
-                renderItem={(item) => (<List.Item extra={
-                  <a onClick={() => {
-                    const index = selectedDatas.findIndex(pItem => pItem.id == item.id);
-                    if (index > -1) {
-                      selectedDatas.splice(index, 1);
-                      setSelectedDatas([...selectedDatas]);
-                    }
+                pagination={{
+                  size: "small"
+                }}
+                rowSelection={{
+                  selectedRowKeys: selectedDatas.map(item => item.id),
+                  onChange: (selectedRowKeys: string[]) => {
+                    const allIds = dataSource.map(item => item.id),
+                      oldDatas = selectedDatas.filter(sItem => !allIds.includes(sItem.id)),
+                      newDatas = selectedRowKeys.length ? dataSource.filter(item => selectedRowKeys.includes(item.id))
+                        : [];
+                    setSelectedDatas([...oldDatas, ...newDatas]);
                     setSaveDisabled(false);
-                  }}
-                  >
-                    <CloseOutlined />
-                  </a>
-                }
-                >
-                  <List.Item.Meta title={item.name} description={item.comments} />
-                </List.Item>)}
+                  },
+                  getCheckboxProps: (record) => ({
+                    disabled: record.isGrantRole || record.isGrantUser,
+                  }),
+                  type: 'checkbox',
+                }}
               />
-            </div>
-          </Col>
-        </Row>
-      </Space>
+            </Col>
+            <Col span="8">
+              <div style={{ paddingBottom: '30px' }}>
+                <Row>
+                  <Col flex="auto">
+                    {t('selected')}（{selectedDatas.length}）
+                  </Col>
+                  <Col >
+                    <a onClick={() => {
+                      setSelectedDatas([]);
+                      setSaveDisabled(true);
+                    }}
+                    >{t('empty')}</a>
+                  </Col>
+                </Row>
+              </div>
+              <div>
+                <List
+                  style={{ overflow: 'auto', height: '500px' }}
+                  bordered
+                  size="small"
+                  dataSource={selectedDatas}
+                  renderItem={(item) => (<List.Item extra={
+                    <a onClick={() => {
+                      const index = selectedDatas.findIndex(pItem => pItem.id == item.id);
+                      if (index > -1) {
+                        selectedDatas.splice(index, 1);
+                        setSelectedDatas([...selectedDatas]);
+                      }
+                      setSaveDisabled(false);
+                    }}
+                    >
+                      <CloseOutlined />
+                    </a>
+                  }
+                  >
+                    <List.Item.Meta title={item.name} description={item.comments} />
+                  </List.Item>)}
+                />
+              </div>
+            </Col>
+          </Row>
+        </Space>
+      </div>
     </DrawerForm>
   );
 };

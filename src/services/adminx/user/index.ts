@@ -1,8 +1,11 @@
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 import { gql } from '@/generated/adminx';
-import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, UpdateUserInput, UpdateUserLoginProfileInput, UserLoginProfileSetKind, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { CreateOauthClientInput, CreateUserIdentityInput, CreateUserInput, CreateUserPasswordInput, OrderDirection, OrgUserUserType, UpdateUserAddrInput, UpdateUserInput, UpdateUserLoginProfileInput, UserDeviceWhereInput, UserLoginProfileSetKind, UserOrder, UserOrderField, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
+import { UserDeviceOrder } from '@knockout-js/api/ucenter';
+import { UserDeviceOrderField } from '@knockout-js/api/ucenter';
 
+// TODO 如何使用i18
 export const EnumUserIdentityKind = {
   name: { text: '用户名' },
   email: { text: '邮件' },
@@ -12,6 +15,13 @@ export const EnumUserIdentityKind = {
 };
 
 export const EnumUserStatus = {
+  active: { text: 'active', status: 'success' },
+  inactive: { text: 'inactive', status: 'default' },
+  disabled: { text: 'disabled', status: 'default' },
+  processing: { text: 'processing', status: 'warning' },
+};
+
+export const EnumUserDeviceStatus = {
   active: { text: 'active', status: 'success' },
   inactive: { text: 'inactive', status: 'default' },
   disabled: { text: 'disabled', status: 'default' },
@@ -41,7 +51,7 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
       }
     }
   }
@@ -50,8 +60,8 @@ const queryUserList = gql(/* GraphQL */`query userList($first: Int,$orderBy:User
 const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatar
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
     }
   }
 }`);
@@ -59,8 +69,8 @@ const queryUserInfo = gql(/* GraphQL */`query userInfo($gid:GID!){
 const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatar
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -72,8 +82,8 @@ const queryUserInfoLoginProfile = gql(/* GraphQL */`query userInfoLoginProfile($
 const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLoginProfileIdentities($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,avatar
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
       loginProfile{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
         canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
@@ -88,8 +98,8 @@ const queryUserInfoLoginProfileIdentities = gql(/* GraphQL */`query userInfoLogi
 const queryUserInfoIdentities = gql(/* GraphQL */`query userInfoIdentities($gid:GID!){
   node(id:$gid){
     ... on User {
-      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-      email,mobile,userType,creationType,registerIP,status,comments,
+      id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+      contact{email,mobile},userType,creationType,registerIP,status,comments,
       identities{
         id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
       }
@@ -109,24 +119,38 @@ const queryUserAccessKeyList = gql(/* GraphQL */`query userAccessKeyList($gid:GI
   }
 }`);
 
-const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!){
-  createOrganizationUser(rootOrgID:$rootOrgID,input:$input){ id }
+const mutationCreateUser = gql(/* GraphQL */`mutation createUser($rootOrgID:ID!,$input: CreateUserInput!,$orgUserType:OrgUserUserType){
+  createOrganizationUser(rootOrgID:$rootOrgID,input:$input,orgUserType:$orgUserType){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,orgUserType(orgID:$rootOrgID),
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
+   }
 }`);
 
 const mutationCreateAccount = gql(/* GraphQL */`mutation createAccount($rootOrgID:ID!,$input: CreateUserInput!){
-  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){ id }
+  createOrganizationAccount(rootOrgID:$rootOrgID,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
+  }
 }`);
 
-const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!){
-  updateUser(userID:$userId,input:$input){ id,displayName,avatar }
+const mutationUpdateUser = gql(/* GraphQL */`mutation updateUser($userId:ID!,$input: UpdateUserInput!,$contact: UpdateUserAddrInput!){
+  updateUser(userID:$userId,input:$input,contact:$contact){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
+   }
 }`);
 
 const mutationUpdateUserLoginProfile = gql(/* GraphQL */`mutation updateUserLoginProfile($userId:ID!,$input: UpdateUserLoginProfileInput!){
-  updateLoginProfile(userID:$userId,input:$input){ id }
+  updateLoginProfile(userID:$userId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,userID,lastLoginIP,lastLoginAt,
+    canLogin,setKind,passwordReset,verifyDevice,mfaEnabled,mfaStatus
+   }
 }`);
 
 const mutationBindUserIdentity = gql(/* GraphQL */`mutation bindUserIdentity($input: CreateUserIdentityInput!){
-  bindUserIdentity(input:$input){ id }
+  bindUserIdentity(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,userID,kind,code,codeExtend,status
+   }
 }`);
 
 const mutationDelUserIdentity = gql(/* GraphQL */`mutation deleteUserIdentity($identityId:ID!){
@@ -166,31 +190,60 @@ const queryOrgRecycleUserList = gql(/* GraphQL */`query orgRecycleUsers($first: 
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
-        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,
-        email,mobile,userType,creationType,registerIP,status,comments
+        id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+        contact{email,mobile},userType,creationType,registerIP,status,comments
       }
     }
   }
 }`);
 
-const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$pwdInput: CreateUserPasswordInput){
-  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, pwdInput: $pwdInput ){ id }
+const mutationRecOrgUser = gql(/* GraphQL */`mutation recoverOrgUser($userId:ID!,$setKind:UserLoginProfileSetKind!,$userInput: UpdateUserInput!,$contact: UpdateUserAddrInput!,$pwdInput: CreateUserPasswordInput){
+  recoverOrgUser( userID:$userId, pwdKind:$setKind, userInput: $userInput, contact :$contact, pwdInput: $pwdInput ){
+    id,createdBy,createdAt,updatedBy,updatedAt,principalName,displayName,gender,
+    contact{email,mobile},userType,creationType,registerIP,status,comments,avatar
+  }
 }`);
 
 const mutationCreateOauthClient = gql(/* GraphQL */`mutation createOauthClient($input: CreateOauthClientInput!){
-  createOauthClient( input: $input ){ id }
+  createOauthClient( input: $input ){
+    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+  }
 }`);
 
 const mutationEnableOauthClient = gql(/* GraphQL */`mutation enableOauthClient($id: ID!){
-  enableOauthClient( id: $id ){ id }
+  enableOauthClient( id: $id ){
+    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+  }
 }`);
 
 const mutationDisableOauthClient = gql(/* GraphQL */`mutation disableOauthClient($id: ID!){
-  disableOauthClient( id: $id ){ id }
+  disableOauthClient( id: $id ){
+    id,name,clientID,clientSecret,grantTypes,lastAuthAt,status,createdAt
+  }
 }`);
 
 const mutationDelOauthClient = gql(/* GraphQL */`mutation delOauthClient($id: ID!){
   deleteOauthClient( id: $id )
+}`);
+
+const queryUserDevices = gql(/* GraphQL */`query userDevices($first: Int,$orderBy:UserDeviceOrder,$where:UserDeviceWhereInput,$gid:GID!){
+  node(id:$gid){
+    ... on User {
+      id,
+      devices(first:$first,orderBy: $orderBy,where: $where){
+        totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+        edges{
+          cursor,node{
+            id,createdBy,createdAt,updatedBy,updatedAt,status,comments,deviceUID,deviceName,systemName,systemVersion,appVersion,deviceModel,
+          }
+        }
+      }
+    }
+  }
+}`);
+
+const mutationDeleteUserDevice = gql(/* GraphQL */`mutation deleteUserDevice($userID: ID!,$deviceID: ID!){
+  deleteUserDevice( userID: $userID,deviceID: $deviceID)
 }`);
 
 
@@ -209,7 +262,10 @@ export async function getUserList(gather: {
   const result = await paging(queryUserList, {
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.users) {
     return result.data.users;
@@ -224,7 +280,7 @@ export async function getUserList(gather: {
  */
 export async function getUserInfo(userId: string) {
   const result = await query(queryUserInfo, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename === 'User') {
@@ -240,7 +296,7 @@ export async function getUserInfo(userId: string) {
  */
 export async function getUserInfoLoginProfile(userId: string) {
   const result = await query(queryUserInfoLoginProfile, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   })
 
   if (result.data?.node?.__typename === 'User') {
@@ -256,7 +312,7 @@ export async function getUserInfoLoginProfile(userId: string) {
  */
 export async function getUserInfoIdentities(userId: string) {
   const result = await query(queryUserInfoIdentities, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename === 'User') {
@@ -272,7 +328,7 @@ export async function getUserInfoIdentities(userId: string) {
  */
 export async function getUserInfoLoginProfileIdentities(userId: string) {
   const result = await query(queryUserInfoLoginProfileIdentities, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename === 'User') {
@@ -287,7 +343,7 @@ export async function getUserInfoLoginProfileIdentities(userId: string) {
  * @param input
  * @returns
  */
-export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType) {
+export async function createUserInfo(rootOrgID: string, input: CreateUserInput, userType: UserUserType, orgUserUserType?: OrgUserUserType) {
   if (userType === UserUserType.Account) {
     const result = await mutation(
       mutationCreateAccount, {
@@ -301,10 +357,11 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
     const result = await mutation(
       mutationCreateUser, {
       rootOrgID: rootOrgID,
+      orgUserType: orgUserUserType,
       input,
     });
     if (result.data?.createOrganizationUser?.id) {
-      return result.data?.createOrganizationUser;
+      return result.data.createOrganizationUser;
     }
   }
 
@@ -318,11 +375,12 @@ export async function createUserInfo(rootOrgID: string, input: CreateUserInput, 
  * @param input
  * @returns
  */
-export async function updateUserInfo(userId: string, input: UpdateUserInput) {
+export async function updateUserInfo(userId: string, input: UpdateUserInput, contact: UpdateUserAddrInput) {
   const result = await mutation(
     mutationUpdateUser, {
     userId,
     input,
+    contact,
   });
 
   if (result.data?.updateUser?.id) {
@@ -523,7 +581,10 @@ export async function getRecycleUserList(gather: {
   const result = await paging(queryOrgRecycleUserList, {
     first: gather.pageSize,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.orgRecycleUsers) {
     return result?.data?.orgRecycleUsers;
@@ -540,6 +601,7 @@ export async function getRecycleUserList(gather: {
 export async function restoreRecycleUser(
   userId: string,
   userInput: UpdateUserInput,
+  contact: UpdateUserAddrInput,
   setKind: UserLoginProfileSetKind,
   pwdInput?: CreateUserPasswordInput,
 ) {
@@ -548,6 +610,7 @@ export async function restoreRecycleUser(
     userId,
     setKind,
     userInput,
+    contact,
     pwdInput,
   });
 
@@ -564,7 +627,7 @@ export async function restoreRecycleUser(
  */
 export async function getAccessKeyList(userId: string) {
   const result = await query(queryUserAccessKeyList, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
   });
 
   if (result.data?.node?.__typename == "User") {
@@ -632,4 +695,115 @@ export async function delAccessKey(accessKeyId: string) {
     return result.data.deleteOauthClient
   }
   return null
+}
+
+/**
+ * 获取用户设备
+ * @param userId
+ * @returns
+ */
+export async function getUserDevices(gather: {
+  current?: number;
+  pageSize?: number;
+  where?: UserDeviceWhereInput;
+  orderBy?: UserDeviceOrder;
+  userId: string;
+}) {
+  const result = await paging(queryUserDevices, {
+    first: gather.pageSize,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: UserDeviceOrderField.CreatedAt
+    },
+    gid: gid('User', gather.userId),
+  }, gather.current || 1);
+  if (result.data?.node?.__typename == "User") {
+    return result.data.node.devices
+  }
+  return null;
+}
+
+/**
+ * 删除设备
+ * @param accessKeyId
+ * @returns
+ */
+export async function delUserDevice(userID: string, deviceID: string) {
+  const result = await mutation(mutationDeleteUserDevice, {
+    userID: userID,
+    deviceID: deviceID,
+  })
+  if (result.data?.deleteUserDevice) {
+    return result.data.deleteUserDevice
+  }
+  return null
+}
+
+
+const queryUserAppList = gql(/* GraphQL */`query userApp{
+  userApps{
+    id,name,code,kind,redirectURI,appKey,appSecret,scopes,tokenValidity,
+    refreshTokenValidity,logo,comments,status,createdAt
+  }
+}`);
+
+/**
+ * 用户授权应用列表
+ * @returns
+ */
+export async function getUserAppList() {
+  const result = await query(queryUserAppList, {});
+  if (result.data?.userApps) {
+    return result.data.userApps;
+  }
+  return null;
+}
+
+
+const queryUserMfaInfo = gql(/* GraphQL */`query userMfaInfo($userId: ID!,$orgId:ID!){
+  userMfaInfo(userID: $userId,orgID: $orgId){
+    accountName, mfaEnabled, qrCodeUri, secret
+  }
+}`);
+
+/**
+ * 获取mfa信息
+ * @param userId
+ * @param orgId
+ * @returns
+ */
+export async function getUserMfaInfo(userId: string, orgId: string) {
+  const result = await query(queryUserMfaInfo, {
+    userId,
+    orgId,
+  });
+  if (result.data?.userMfaInfo) {
+    return result.data.userMfaInfo;
+  }
+  return null;
+}
+
+
+const queryOrgPolicyViewUserRoleAssigned = gql(/* GraphQL */`query orgPolicyViewUserRoleAssigned($appCode:String!, $userId: ID!,$orgId:ID!){
+  orgPolicyViewUserRoleAssigned(appCode:$appCode userID: $userId,orgID: $orgId)
+}`);
+
+/**
+ * 用户已授权不能再变更的权限
+ * @param appCode
+ * @param userId
+ * @param orgId
+ * @returns
+ */
+export async function getOrgUserRoleAssigned(appCode: string, userId: string, orgId: string) {
+  const result = await query(queryOrgPolicyViewUserRoleAssigned, {
+    appCode,
+    userId,
+    orgId,
+  });
+  if (result.data?.orgPolicyViewUserRoleAssigned) {
+    return result.data.orgPolicyViewUserRoleAssigned;
+  }
+  return [];
 }

@@ -28,8 +28,7 @@ export default (props: {
     [saveDisabled, setSaveDisabled] = useState(true),
     [orgInfo, setOrgInfo] = useState<Org>(),
     [rules, setRules] = useState<PolicyRule[]>([]),
-    [, setLeavePromptWhen] = useLeavePrompt(),
-    policyId = searchParams.get('id');
+    [, setLeavePromptWhen] = useLeavePrompt();
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -38,7 +37,7 @@ export default (props: {
 
   const
     isReadonly = () => {
-      if (policyId) {
+      if (searchParams.get('id')) {
         // 编辑
         return !checkAuth('updateOrganizationPolicy', auth);
       } else {
@@ -58,6 +57,7 @@ export default (props: {
     getRequest = async () => {
       setSaveLoading(false);
       setSaveDisabled(true);
+      const policyId = searchParams.get('id');
       if (policyId) {
         const result = await getOrgPolicyInfo(policyId);
         if (result?.id) {
@@ -112,6 +112,7 @@ export default (props: {
       if (verifyRules()) {
         return;
       }
+      const policyId = searchParams.get('id');
       let id: string | null = null;
       setSaveLoading(true);
       if (policyId) {
@@ -149,7 +150,7 @@ export default (props: {
   return (
     <PageContainer
       header={{
-        title: `${policyId ? t('policy') : t('create_policy')}`,
+        title: `${searchParams.get('id') ? t('policy') : t('create_policy')}`,
         style: { background: token.colorBgContainer },
         breadcrumb: {
           items: props.isFromSystem ? [
@@ -201,18 +202,19 @@ export default (props: {
             label={t('remarks')}
             placeholder={`${t('please_enter_remarks')}`}
           />
-          <ProFormText>
-            {orgInfo?.id ? <PolicyRules
-              orgId={orgInfo?.id}
-              rules={rules}
-              readonly={isReadonly()}
-              onChange={(rules) => {
-                setRules([...rules]);
-                onValuesChange();
-              }}
-            /> : ''}
-          </ProFormText>
-
+          {
+            orgInfo?.id ? <ProFormText>
+              <PolicyRules
+                orgId={orgInfo.id}
+                rules={rules}
+                readonly={isReadonly()}
+                onChange={(rules) => {
+                  setRules([...rules]);
+                  onValuesChange();
+                }}
+              />
+            </ProFormText> : <></>
+          }
         </ProForm>
       </ProCard>
     </PageContainer>

@@ -1,5 +1,5 @@
 import { PageContainer, ProCard, useToken } from '@ant-design/pro-components';
-import { Tree, Input, Button, Row, Col, message } from 'antd';
+import { Tree, Input, Button, Row, Col, message, Splitter } from 'antd';
 import { useEffect, useState } from 'react';
 import { LeftOutlined, RightOutlined } from '@ant-design/icons';
 import { UserList } from '@/pages/account/components/listAccount';
@@ -20,9 +20,7 @@ export const PageOrgUsers = (props: {
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
-    [appState] = store.useModel('app'),
     [treeDraggable, setTreeDraggable] = useState(false),
-    [stretch, setStretch] = useState(false),
     [loading, setLoading] = useState(false),
     [allOrgList, setAllOrgList] = useState<Org[]>([]),
     [treeData, setTreeData] = useState<TreeDataState<Org>[]>([]),
@@ -31,7 +29,7 @@ export const PageOrgUsers = (props: {
   const
     getRequest = async () => {
       setLoading(true);
-      const orgList = await getOrgPathList(props.orgId, OrgKind.Org),
+      const orgList = await getOrgPathList(props.orgId),
         topData = orgList[0];
       if (topData?.id) {
         setSelectedData(topData);
@@ -54,7 +52,6 @@ export const PageOrgUsers = (props: {
         ),
       );
 
-      setStretch(orgList.length <= 1);
       setLoading(false);
     },
     onSearch = (keyword: string) => {
@@ -83,7 +80,7 @@ export const PageOrgUsers = (props: {
     },
     proCardtitle = () => {
       if (selectedData) {
-        return `${selectedData.name}-${t('user_list')}`;
+        return `${selectedData.kind === OrgKind.Root ? t('organization') : t('department')}:${selectedData.name},${t('manage_user')}:${selectedData.owner?.displayName ?? '-'}`;
       }
       return `${t('user_list')}`;
     };
@@ -112,41 +109,42 @@ export const PageOrgUsers = (props: {
       }}
       loading={loading}
     >
-      <Row gutter={16} wrap={false}>
-        <Col flex="280px" x-if={!stretch}>
-          <div style={{ background: token.colorBgContainer, height: '100%' }}>
-            <ProCard colSpan="280px">
-              <Row wrap={false}>
-                <Col flex="auto">
-                  <Input.Search style={{ width: '100%' }} placeholder={`${t('search_keyword')}`} onSearch={onSearch} />
-                </Col>
-                <Col >
-                  <Auth authKey="moveOrganization">
-                    <Button
-                      type="text"
-                      onClick={() => {
-                        setTreeDraggable(!treeDraggable);
-                      }}
-                    >{treeDraggable ? t('cancel') : t('drag')}</Button>
-                  </Auth>
-                </Col>
-              </Row>
-              <br />
-              <Tree
-                draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
-                treeData={treeData}
-                onSelect={onTreeSelect}
-                onDrop={onTreeDrop}
-                selectedKeys={selectedData ? [selectedData.id] : []}
-                defaultExpandAll
-              />
-            </ProCard>
-          </div>
-        </Col>
-        <Col flex="auto">
-          <div x-if={allOrgList.length > 1} className={`stretch ${appState.darkMode ? 'dark' : ''}`} onClick={() => { setStretch(!stretch); }}>
-            {stretch ? <RightOutlined /> : <LeftOutlined />}
-          </div>
+      <Splitter style={{ background: token.colorBgContainer }}>
+        <Splitter.Panel collapsible defaultSize="22%" min="22%" max="32%">
+          <ProCard colSpan="280px" >
+            <Row wrap={false}>
+              <Col flex="auto">
+                <Input.Search style={{ width: '100%' }} placeholder={`${t('search_keyword')}`} onSearch={onSearch} />
+              </Col>
+              <Col >
+                <Auth authKey="moveOrganization">
+                  <Button
+                    type="text"
+                    onClick={() => {
+                      setTreeDraggable(!treeDraggable);
+                    }}
+                  >{treeDraggable ? t('cancel') : t('drag')}</Button>
+                </Auth>
+              </Col>
+            </Row>
+            <br />
+            <Tree
+              draggable={treeDraggable ? { icon: false, nodeDraggable: () => true } : false}
+              treeData={treeData}
+              onSelect={onTreeSelect}
+              height={600}
+              onDrop={onTreeDrop}
+              titleRender={(node) => {
+                return (
+                  <div className={styles.ellipsis}>{node.title}</div>
+                );
+              }}
+              selectedKeys={selectedData ? [selectedData.id] : []}
+              defaultExpandAll
+            />
+          </ProCard>
+        </Splitter.Panel>
+        <Splitter.Panel >
           <UserList
             x-if={selectedData}
             title={proCardtitle()}
@@ -154,11 +152,11 @@ export const PageOrgUsers = (props: {
             orgInfo={selectedData}
             orgId={selectedData?.id}
             isFromSystem={props.isFromSystem}
+            scrollY={460}
           />
-        </Col>
-      </Row>
+        </Splitter.Panel>
+      </Splitter>
     </PageContainer>
-
   );
 };
 

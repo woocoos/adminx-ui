@@ -1,6 +1,6 @@
 import { gql } from '@/generated/adminx';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
-import { AppActionOrder, AppActionWhereInput, CreateAppActionInput, UpdateAppActionInput } from '@/generated/adminx/graphql';
+import { AppActionOrder, AppActionOrderField, AppActionWhereInput, CreateAppActionInput, OrderDirection, UpdateAppActionInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 
 export const EnumAppActionKind = {
@@ -42,11 +42,15 @@ const queryAppActionInfo = gql(/* GraphQL */`query AppActionInfo($gid:GID!){
 }`);
 
 const mutationCreateAppAction = gql(/* GraphQL */`mutation createAppAction($appId:ID!,$input: [CreateAppActionInput!]){
-  createAppActions(appID:$appId,input:$input){id}
+  createAppActions(appID:$appId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+  }
 }`);
 
 const mutationUpdateAppAction = gql(/* GraphQL */`mutation updateAppAction($appActionId:ID!,$input: UpdateAppActionInput!){
-  updateAppAction(actionID:$appActionId,input:$input){id}
+  updateAppAction(actionID:$appActionId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,appID,name,kind,method,comments
+  }
 }`);
 
 const mutationDelAppAction = gql(/* GraphQL */`mutation delAppAction($appActionId:ID!){
@@ -69,10 +73,13 @@ export async function getAppActionList(
   const
     result = await paging(
       queryAppActionList, {
-      gid: gid('app', appId),
+      gid: gid('App', appId),
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: AppActionOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.node?.__typename === 'App') {
@@ -91,7 +98,7 @@ export async function getAppActionInfo(appActionId: string) {
   const
     result = await query(
       queryAppActionInfo, {
-      gid: gid('app_action', appActionId),
+      gid: gid('AppAction', appActionId),
     });
 
   if (result.data?.node?.__typename === 'AppAction') {

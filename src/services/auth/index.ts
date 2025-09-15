@@ -56,9 +56,9 @@ export type AppDeployConfig = {
   forceTenantId: boolean;
 };
 
-const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '/api-auth',
+const ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
   ICE_APP_DEPLOY_CONFIG = process.env.ICE_APP_DEPLOY_CONFIG ?? '',
-  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? '/login'
+  ICE_LOGIN_URL = process.env.ICE_LOGIN_URL ?? ''
 
 /**
  * 获取验证码
@@ -342,25 +342,22 @@ export async function forgetPwdReset(stateToken: string, newPassword: string) {
  * 处理url是否需要创建spm
  * @returns
  */
-export async function urlSpm(url: string, tenantId?: string) {
+export async function urlSpm(url: string, tenantId?: string, headers?: Record<string, string>) {
   if (url.toLowerCase().startsWith("http")) {
     const u = new URL(url);
-    if (u.origin != location.origin) {
-      try {
-        const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`), userState = store.getModelState("user");
-        if (typeof result === 'string') {
-          u.searchParams.set('spm', result)
-          if (tenantId || userState.tenantId) {
-            u.searchParams.set('tid', tenantId || userState.tenantId)
-          }
+    try {
+      const result = await request.post(`${ICE_API_AUTH_PREFIX}/spm/create`, undefined, {
+        headers,
+      }), userState = store.getModelState("user");
+      if (typeof result === 'string') {
+        u.searchParams.set('spm', result)
+        if (tenantId || userState.tenantId) {
+          u.searchParams.set('tid', tenantId || userState.tenantId)
         }
-      } catch (error) {
       }
-      return u.href
-    } else {
-      return u.href.replace(u.origin, '')
+    } catch (error) {
     }
+    return u.href
   }
   return url
 }
-

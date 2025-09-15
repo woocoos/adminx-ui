@@ -7,6 +7,7 @@ import styles from "../index.module.css";
 import { useTranslation } from "react-i18next";
 import CreateAccessKey from "./createAccessKey";
 import Auth from "@/components/auth";
+import { delDataSource, saveDataSource } from "@/util";
 
 export default (props: {
   userId: string;
@@ -66,8 +67,12 @@ export default (props: {
                   onConfirm={async () => {
                     const result = await disableAccessKey(record.id);
                     if (result?.id) {
-                      message.success('submit_success')
-                      proTableRef.current?.reload();
+                      const idx = dataSource.findIndex(item => item.id == result.id)
+                      if (idx != -1) {
+                        dataSource[idx] = result as OauthClient
+                      }
+                      setDataSource([...dataSource])
+                      message.success(t('submit_success'))
                     }
                   }}
                 >
@@ -81,8 +86,12 @@ export default (props: {
                   onConfirm={async () => {
                     const result = await enableAccessKey(record.id);
                     if (result?.id) {
-                      message.success('submit_success')
-                      proTableRef.current?.reload();
+                      const idx = dataSource.findIndex(item => item.id == result.id)
+                      if (idx != -1) {
+                        dataSource[idx] = result as OauthClient
+                      }
+                      setDataSource([...dataSource])
+                      message.success(t('submit_success'))
                     }
                   }}
                 >
@@ -98,8 +107,8 @@ export default (props: {
                 onConfirm={async () => {
                   const result = await delAccessKey(record.id);
                   if (result) {
-                    message.success('submit_success')
-                    proTableRef.current?.reload();
+                    setDataSource(delDataSource(dataSource, record.id));
+                    message.success(t('submit_success'))
                   }
                 }}
               >
@@ -112,6 +121,7 @@ export default (props: {
         }
       }
     ],
+    [dataSource, setDataSource] = useState<OauthClient[]>([]),
     [modal, setModal] = useState({
       open: false,
       title: ''
@@ -142,15 +152,15 @@ export default (props: {
       scroll={{ x: 'max-content' }}
       options={false}
       columns={columns}
+      dataSource={dataSource}
       request={async () => {
         const table = { data: [] as OauthClient[], success: true, total: 0 }
-
         const result = await getAccessKeyList(props.userId);
         if (result?.length) {
           table.data = result as OauthClient[];
           table.total = result.length;
         }
-
+        setDataSource(table.data);
         return table;
       }}
       pagination={false}
@@ -159,9 +169,9 @@ export default (props: {
       open={modal.open}
       title={modal.title}
       userId={props.userId}
-      onClose={(isSuccess) => {
-        if (isSuccess) {
-          proTableRef.current?.reload()
+      onClose={(isSuccess, newInfo) => {
+        if (isSuccess && newInfo) {
+          setDataSource(saveDataSource(dataSource, newInfo))
         }
         setModal({ open: false, title: modal.title })
       }}

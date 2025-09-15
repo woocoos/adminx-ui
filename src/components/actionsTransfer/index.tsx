@@ -101,7 +101,7 @@ export default function (props: {
                         className="delIcon"
                         onClick={() => {
                           props.onChange?.([...props.targetKeys.filter(key => (
-                            key == props.appCode ? item.name : `${props.appCode}:${item.name}`
+                            key === (props.appCode ? item.name : `${props.appCode}:${item.name}`)
                           ))]);
                         }}
                       />}

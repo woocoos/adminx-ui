@@ -7,6 +7,7 @@ import DrawerRolePolicy from '../../components/drawerRolePolicy';
 import { useTranslation } from 'react-i18next';
 import Auth from '@/components/auth';
 import { OrgRole, Permission, PermissionPrincipalKind, PermissionWhereInput } from '@/generated/adminx/graphql';
+import { delDataSource, saveDataSource } from '@/util';
 
 
 export default (props: {
@@ -96,12 +97,13 @@ export default (props: {
         onOk: async (close) => {
           const result = await delPermssion(record.id, record.orgID);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             message.success(t('submit_success'));
             close();
           }
@@ -137,6 +139,7 @@ export default (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params) => {
           const table = { data: [] as Permission[], success: true, total: 0 },
             where: PermissionWhereInput = {};
@@ -178,9 +181,9 @@ export default (props: {
         orgRoleInfo={props.orgRoleInfo}
         open={modal.open}
         title={`${t('add_permission')}`}
-        onClose={(isSuccess) => {
-          if (isSuccess) {
-            proTableRef.current?.reload();
+        onClose={(isSuccess, newInfo) => {
+          if (isSuccess && newInfo) {
+            setDataSource(saveDataSource(dataSource, newInfo))
           }
           setModal({ open: false, title: '' });
         }}

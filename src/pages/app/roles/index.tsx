@@ -9,13 +9,14 @@ import { delAppRole, getAppRoleList } from '@/services/adminx/app/role';
 import { useTranslation } from 'react-i18next';
 import DrawerRolePolicy from '../components/drawerRolePolicy';
 import Auth, { checkAuth } from '@/components/auth';
-import { ItemType } from 'antd/es/menu/hooks/useItems';
 import { useAuth } from 'ice';
 import { App, AppRole } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
+import { delDataSource, saveDataSource } from '@/util';
+import { ItemType } from 'antd/es/menu/interface';
 
 
-export default () => {
+export const AppRoleList = () => {
   const { token } = useToken(),
     { t } = useTranslation(),
     [auth] = useAuth(),
@@ -55,7 +56,9 @@ export default () => {
         search: false,
         width: 120,
         render: (text, record) => {
-          const items: ItemType[] = [];
+          const items: ItemType[] = [
+            { key: 'fun_authority', label: <Link to={`/app/roles/funauth?role_id=${record.id}`} >{t('fun_authority')}</Link> }
+          ];
           if (checkAuth('assignAppRolePolicy', auth)) {
             items.push(
               {
@@ -136,119 +139,125 @@ export default () => {
         onOk: async (close) => {
           const result = await delAppRole(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
             close();
           }
         },
       });
     },
-    onDrawerClose = (isSuccess: boolean) => {
-      if (isSuccess) {
-        proTableRef.current?.reload();
+    onDrawerClose = (isSuccess: boolean, newInfo?: AppRole) => {
+      if (isSuccess && newInfo) {
+        setDataSource(saveDataSource(dataSource, newInfo))
       }
       setModal({ open: false, title: '', id: '', scene: modal.scene });
     };
 
 
   return (
-    <KeepAlive>
-      <PageContainer
-        header={{
-          title: t('app_role'),
-          style: { background: token.colorBgContainer },
-          breadcrumb: {
-            items: [
-              { title: t('system_conf') },
-              { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
-              { title: t('app_role') },
-            ],
-          },
-          children: <Alert
-            showIcon
-            message={
-              <>
-                <div key="1">{t('app_role_alert_msg')}</div>
-                <div key="2">{t('auto_authorization')}：{t('app_role_alert_msg_1')}</div>
-                <div key="3">{t('manual_authorization')}：{t('app_role_alert_msg_2')}</div>
-              </>
-            }
-          />,
+    <PageContainer
+      header={{
+        title: t('app_role'),
+        style: { background: token.colorBgContainer },
+        breadcrumb: {
+          items: [
+            { title: t('system_conf') },
+            { title: <Link to={'/system/app'}>{t('app_manage')}</Link> },
+            { title: t('app_role') },
+          ],
+        },
+        children: <Alert
+          showIcon
+          message={
+            <>
+              <div key="1">{t('app_role_alert_msg')}</div>
+              <div key="2">{t('auto_authorization')}：{t('app_role_alert_msg_1')}</div>
+              <div key="3">{t('manual_authorization')}：{t('app_role_alert_msg_2')}</div>
+            </>
+          }
+        />,
+      }}
+    >
+      <ProTable
+        actionRef={proTableRef}
+        search={{
+          searchText: `${t('query')}`,
+          resetText: `${t('reset')}`,
+          labelWidth: 'auto',
         }}
-      >
-        <ProTable
-          actionRef={proTableRef}
-          search={{
-            searchText: `${t('query')}`,
-            resetText: `${t('reset')}`,
-            labelWidth: 'auto',
-          }}
-          rowKey={'id'}
-          toolbar={{
-            title: `${t('app')}:${appInfo?.name || '-'}`,
-            actions: [
-              <Auth authKey="createAppRole">
-                <Button
-                  key="created"
-                  type="primary"
-                  onClick={() => {
-                    setModal({ open: true, title: t('create_role'), id: '', scene: 'create' });
-                  }}
-                >
-                  {t('create_role')}
-                </Button>
-              </Auth>,
-            ],
-          }}
-          scroll={{ x: 'max-content' }}
-          columns={columns}
-          request={async (params) => {
-            const table = { data: [] as AppRole[], success: true, total: 0 },
-              info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
-            if (info) {
-              const result = await getAppRoleList(info.id);
-              if (result) {
-                table.data = result.filter(item => {
-                  let isTrue = true;
-                  if (params.name) {
-                    isTrue = item.name.indexOf(params.name) > -1;
-                  }
-                  return isTrue;
-                });
-                table.total = table.data.length;
-              }
+        rowKey={'id'}
+        toolbar={{
+          title: `${t('app')}:${appInfo?.name || '-'}`,
+          actions: [
+            <Auth authKey="createAppRole">
+              <Button
+                key="created"
+                type="primary"
+                onClick={() => {
+                  setModal({ open: true, title: t('create_role'), id: '', scene: 'create' });
+                }}
+              >
+                {t('create_role')}
+              </Button>
+            </Auth>,
+          ],
+        }}
+        scroll={{ x: 'max-content' }}
+        columns={columns}
+        dataSource={dataSource}
+        request={async (params) => {
+          const table = { data: [] as AppRole[], success: true, total: 0 },
+            info = searchParams.get('id') == appInfo?.id ? appInfo : await getApp();
+          if (info) {
+            const result = await getAppRoleList(info.id);
+            if (result) {
+              table.data = result.filter(item => {
+                let isTrue = true;
+                if (params.name) {
+                  isTrue = item.name.indexOf(params.name) > -1;
+                }
+                return isTrue;
+              });
+              table.total = table.data.length;
             }
-            setSelectedRowKeys([]);
-            setDataSource(table.data);
-            return table;
-          }}
-          rowSelection={{
-            selectedRowKeys: selectedRowKeys,
-            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-            type: 'checkbox',
-          }}
-        />
-        <CreateAppRole
-          x-if={modal.scene === 'create'}
-          open={modal.open}
-          title={modal.title}
-          id={modal.id}
-          appId={appInfo?.id}
-          onClose={onDrawerClose}
-        />
-        <DrawerRolePolicy
-          x-if={modal.scene === 'addPolicy' && modal.open}
-          open={modal.open}
-          title={modal.title}
-          appInfo={appInfo}
-          roleInfo={modal.roleInfo}
-          onClose={onDrawerClose}
-        />
-      </PageContainer>
-    </KeepAlive>
+          }
+          setSelectedRowKeys([]);
+          setDataSource(table.data);
+          return table;
+        }}
+        rowSelection={{
+          selectedRowKeys: selectedRowKeys,
+          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+          type: 'checkbox',
+        }}
+      />
+      <CreateAppRole
+        x-if={modal.scene === 'create'}
+        open={modal.open}
+        title={modal.title}
+        id={modal.id}
+        appId={appInfo?.id}
+        onClose={onDrawerClose}
+      />
+      <DrawerRolePolicy
+        x-if={modal.scene === 'addPolicy' && modal.open}
+        open={modal.open}
+        title={modal.title}
+        appInfo={appInfo}
+        roleInfo={modal.roleInfo}
+        onClose={onDrawerClose}
+      />
+    </PageContainer>
   );
+};
+
+export default () => {
+  return <KeepAlive>
+    <AppRoleList />
+  </KeepAlive>
 };

@@ -1,6 +1,6 @@
 
 import Auth from '@/components/auth';
-import { FileIdentity, FileIdentityWhereInput, FileSource, } from '@/generated/adminx/graphql';
+import { FileIdentity, FileIdentityWhereInput, FileSource, OrgKind } from '@/generated/adminx/graphql';
 import { ActionType, PageContainer, ProColumns, ProTable, useToken } from '@ant-design/pro-components';
 import { KeepAlive } from '@knockout-js/layout';
 import { Button, message, Modal, Space, Tooltip } from 'antd';
@@ -10,6 +10,8 @@ import Create from './components/create';
 import { definePageConfig, useSearchParams } from 'ice';
 import { delFileIdentity, getFileIdentityList, setDefaultFileIdentity } from '@/services/adminx/file/identities';
 import { getFileSourceInfo } from '@/services/adminx/file/source';
+import { delDataSource, saveDataSource } from '@/util';
+import InputOrg from '@/pages/org/components/inputOrg';
 
 const PageFileSourceList = () => {
   const { t } = useTranslation(),
@@ -25,6 +27,17 @@ const PageFileSourceList = () => {
         dataIndex: 'id',
         width: 80,
         search: false,
+      },
+      {
+        title: t('organization'),
+        dataIndex: 'org',
+        width: 120,
+        renderFormItem: () => {
+          return <InputOrg kind={OrgKind.Root} />
+        },
+        render: (text, record) => {
+          return record?.org?.name;
+        }
       },
       {
         title: "AccessKeyID",
@@ -85,12 +98,13 @@ const PageFileSourceList = () => {
                   onOk: async (close) => {
                     const result = await delFileIdentity(record.id);
                     if (result === true) {
-                      if (dataSource.length === 1) {
+                      setDataSource(delDataSource(dataSource, record.id));
+                      if (dataSource.length === 0) {
                         const pageInfo = { ...proTableRef.current?.pageInfo };
                         pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
                         proTableRef.current?.setPageInfo?.(pageInfo);
+                        proTableRef.current?.reload();
                       }
-                      proTableRef.current?.reload();
                       close();
                     }
                   },
@@ -147,7 +161,7 @@ const PageFileSourceList = () => {
       actionRef={proTableRef}
       rowKey={'id'}
       search={{
-        labelWidth: 110,
+        labelWidth: 'auto',
       }}
       toolbar={{
         title: `${fileSourceInfo?.bucketURL ?? ''}:${t('file_source_identity_list')}`,
@@ -194,10 +208,14 @@ const PageFileSourceList = () => {
       }}
       scroll={{ x: 'max-content' }}
       columns={columns}
+      dataSource={dataSource}
       request={async (params) => {
         const table = { data: [] as FileIdentity[], success: true, total: 0 },
           where: FileIdentityWhereInput = {}, fsInfo = await getFsInfo();
         if (fsInfo) {
+          if (params.org) {
+            where.tenantID = params.org.id;
+          }
           where.fileSourceID = fsInfo.id;
           where.accessKeyIDContains = params.accessKeyID;
           const result = await getFileIdentityList({
@@ -230,9 +248,9 @@ const PageFileSourceList = () => {
       title={modal.title}
       id={modal.id}
       fsId={fileSourceInfo?.id ?? ''}
-      onClose={(isSuccess) => {
-        if (isSuccess) {
-          proTableRef.current?.reload()
+      onClose={(isSuccess, newInfo) => {
+        if (isSuccess && newInfo) {
+          setDataSource(saveDataSource(dataSource, newInfo))
         }
         setModal({ open: false, title: modal.title })
       }}

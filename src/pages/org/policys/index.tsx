@@ -10,9 +10,11 @@ import Auth from '@/components/auth';
 import { Org, OrgPolicy, OrgPolicyWhereInput } from '@/generated/adminx/graphql';
 import { KeepAlive } from '@knockout-js/layout';
 import { definePageConfig } from 'ice';
+import { delDataSource } from '@/util';
 
 export const PageOrgPolicys = (props: {
   isFromSystem?: boolean;
+  isFromOrg?: boolean;
 }) => {
   const { token } = useToken(),
     { t } = useTranslation(),
@@ -102,13 +104,14 @@ export const PageOrgPolicys = (props: {
         onOk: async (close) => {
           const result = await delOrgPolicy(record.id);
           if (result === true) {
-            if (dataSource.length === 1) {
+            setDataSource(delDataSource(dataSource, record.id));
+            if (dataSource.length === 0) {
               const pageInfo = { ...proTableRef.current?.pageInfo };
               pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
               proTableRef.current?.setPageInfo?.(pageInfo);
+              proTableRef.current?.reload();
             }
-            proTableRef.current?.reload();
-            message.success('submit_success');
+            message.success(t('submit_success'));
             close();
           }
         },
@@ -129,10 +132,15 @@ export const PageOrgPolicys = (props: {
             { title: t('system_conf') },
             { title: <Link to={'/system/org'}>{t('org_manage')}</Link> },
             { title: t('policy') },
-          ] : [
-            { title: t('org_cooperation') },
-            { title: t('policy') },
-          ],
+          ] :
+            props.isFromOrg ? [
+              { title: t('org_cooperation') },
+              { title: <Link to={'/org/departments'}>{t('org_manage')}</Link> },
+              { title: t('policy') },
+            ] : [
+              { title: t('org_cooperation') },
+              { title: t('policy') },
+            ],
         },
         children: <Alert
           showIcon
@@ -156,7 +164,7 @@ export const PageOrgPolicys = (props: {
         }}
         rowKey={'id'}
         toolbar={{
-          title: `${t('organization')}:${orgInfo?.name || '-'}`,
+          title: `${orgInfo?.name}`,
           actions: [
             <Auth authKey="createOrganizationPolicy">
               <Button type="primary">
@@ -169,6 +177,7 @@ export const PageOrgPolicys = (props: {
         }}
         scroll={{ x: 'max-content' }}
         columns={columns}
+        dataSource={dataSource}
         request={async (params, sort) => {
           const table = { data: [] as OrgPolicy[], success: true, total: 0 },
             where: OrgPolicyWhereInput = {},

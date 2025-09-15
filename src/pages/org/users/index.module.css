@@ -1,20 +1,22 @@
 .users :global {
   .stretch {
-    position: absolute;
-    top: 50%;
-    left: -2px;
-    width: 24px;
-    height: 24px;
-    line-height: 24px;
-    text-align: center;
-    margin-top: -12px;
+    position        : absolute;
+    top             : 16px;
+    left            : 4px;
+    width           : 24px;
+    height          : 24px;
+    line-height     : 24px;
+    text-align      : center;
+    margin-top      : -12px;
     background-color: #fff;
-    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 1px 4px -1px rgba(25, 15, 15, 0.07), 0 0 1px 0 rgba(0, 0, 0, 0.08);
-    z-index: 10;
+    box-shadow      : 0 2px 8px -2px rgba(0, 0, 0, 0.05),
+      0 1px 4px -1px rgba(25, 15, 15, 0.07),
+      0 0 1px 0 rgba(0, 0, 0, 0.08);
+    z-index      : 10;
     border-radius: 50%;
-    color: rgba(0, 0, 0, 0.25);
-    font-size: 12px;
-    cursor: pointer;
+    color        : rgba(0, 0, 0, 0.25);
+    font-size    : 12px;
+    cursor       : pointer;
   }
 
   .stretch:hover {
@@ -23,10 +25,17 @@
 
   .stretch.dark {
     background-color: #1f1f1f;
-    color: rgba(255, 255, 255, 0.25);
+    color           : rgba(255, 255, 255, 0.25);
   }
 
   .stretch.dark:hover {
     color: rgba(255, 255, 255, 0.65);
   }
+}
+
+.ellipsis {
+  max-width    : 120px;
+  white-space  : nowrap;
+  overflow     : hidden;
+  text-overflow: ellipsis;
 }

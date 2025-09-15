@@ -6,12 +6,17 @@ import { assignOrgRoleUser, getOrgGroupList, getOrgRoleList } from '@/services/a
 import { useTranslation } from 'react-i18next';
 import { OrgRole, OrgRoleKind, OrgRoleWhereInput, User } from '@/generated/adminx/graphql';
 import { useLeavePrompt } from '@knockout-js/layout';
+import { getUserOrgRoleList } from '@/services/adminx/org/user';
 
 export default (props: {
   open: boolean;
   title?: string;
   orgId: string;
   userInfo?: User;
+  /**
+   * 根据登录用户限制角色选取
+   */
+  isLoginRestrict?: boolean;
   kind: OrgRoleKind;
   onClose: (isSuccess?: boolean) => void;
 }) => {
@@ -92,135 +97,143 @@ export default (props: {
       onFinish={onFinish}
       onOpenChange={onOpenChange}
     >
-      <Space direction="vertical">
-        <Alert showIcon message={t('drawer_org_role_alert_msg')} />
-        {
-          props.userInfo ? <>
-            <div>{t('user')}</div>
-            <div>
-              <Input value={props.userInfo.displayName} />
-            </div>
-          </> : ''
-        }
-        <div>
-          {props.kind === 'role' ? t('role') : t('user_group')}
-        </div>
-        <Row gutter={20}>
-          <Col span="16">
-            <div>
-              <Input.Search
-                value={keyword}
-                placeholder={`${t('search_keyword')}`}
-                onChange={(event) => {
-                  setKeyword(event.target.value);
-                }}
-                onSearch={() => {
-                  proTableRef.current?.reload(true);
-                }}
-              />
-            </div>
-            <br />
-            <ProTable
-              className="innerTable"
-              columns={columns}
-              actionRef={proTableRef}
-              request={async (params) => {
-                const table = { data: [] as OrgRole[], success: true, total: 0 },
-                  where: OrgRoleWhereInput = {};
-                if (keyword) {
-                  where.or = [
-                    { nameContains: keyword },
-                    { commentsContains: keyword },
-                  ]
-                }
-                where.kind = props.kind;
-                const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
-                  current: params.current,
-                  pageSize: params.pageSize,
-                  where,
-                }, {
-                  userId: props.userInfo?.id,
-                }) : await getOrgGroupList({
-                  current: params.current,
-                  pageSize: params.pageSize,
-                  where,
-                }, {
-                  userId: props.userInfo?.id,
-                });
-                if (result?.totalCount) {
-                  table.data = result.edges?.map(item => item?.node) as OrgRole[];
-                  table.total = result.totalCount;
-                }
-                setdataSource(table.data);
-                return table;
-              }}
-              search={false}
-              toolbar={{
-                settings: [],
-              }}
-              scroll={{ y: 500 }}
-              rowKey="id"
-              size="small"
-              pagination={false}
-              rowSelection={{
-                selectedRowKeys: selectedDatas.map(item => item.id),
-                onChange: (selectedRowKeys: string[]) => {
-                  const allIds = dataSource.map(item => item.id),
-                    oldDatas = selectedDatas.filter(sItem => !allIds.includes(sItem.id)),
-                    newDatas = selectedRowKeys.length ? dataSource.filter(item => selectedRowKeys.includes(item.id))
-                      : [];
-                  setSelectedDatas([...oldDatas, ...newDatas]);
-                  setSaveDisabled(false);
-                },
-                getCheckboxProps: (record) => ({
-                  disabled: record.isGrantUser,
-                }),
-                type: 'checkbox',
-              }}
-            />
-          </Col>
-          <Col span="8">
-            <div style={{ paddingBottom: '30px' }}>
-              <Row>
-                <Col flex="auto">
-                  {t('selected')}（{selectedDatas.length}）
-                </Col>
-                <Col >
-                  <a onClick={() => {
-                    setSelectedDatas([]);
-                    setSaveDisabled(true);
+      <div>
+        <Space direction="vertical">
+          <Alert showIcon message={t('drawer_org_role_alert_msg')} />
+          {
+            props.userInfo ? <>
+              <div>{t('user')}</div>
+              <div>
+                <Input value={props.userInfo.displayName} />
+              </div>
+            </> : ''
+          }
+          <div>
+            {props.kind === 'role' ? t('role') : t('user_group')}
+          </div>
+          <Row gutter={20}>
+            <Col span="16">
+              <div>
+                <Input.Search
+                  value={keyword}
+                  placeholder={`${t('search_keyword')}`}
+                  onChange={(event) => {
+                    setKeyword(event.target.value);
                   }}
-                  >{t('empty')}</a>
-                </Col>
-              </Row>
-            </div>
-            <div>
-              <List
-                style={{ overflow: 'auto', height: '500px' }}
-                bordered
+                  onSearch={() => {
+                    proTableRef.current?.reload(true);
+                  }}
+                />
+              </div>
+              <br />
+              <ProTable
+                className="innerTable"
+                columns={columns}
+                actionRef={proTableRef}
+                request={async (params) => {
+                  const table = { data: [] as OrgRole[], success: true, total: 0 },
+                    where: OrgRoleWhereInput = {};
+                  if (keyword) {
+                    where.or = [
+                      { nameContains: keyword },
+                      { commentsContains: keyword },
+                    ]
+                  }
+                  where.kind = props.kind;
+                  where.orgID = props.orgId;
+                  const result = props.kind === OrgRoleKind.Role ? props.isLoginRestrict ? props.userInfo?.id ? await getUserOrgRoleList(props.userInfo.id, {
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  }) : null : await getOrgRoleList({
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  }, {
+                    userId: props.userInfo?.id,
+                  }) : await getOrgGroupList({
+                    current: params.current,
+                    pageSize: params.pageSize,
+                    where,
+                  }, {
+                    userId: props.userInfo?.id,
+                  });
+                  if (result?.totalCount) {
+                    table.data = result.edges?.map(item => item?.node) as OrgRole[];
+                    table.total = result.totalCount;
+                  }
+                  setSelectedDatas([]);
+                  setdataSource(table.data);
+                  return table;
+                }}
+                search={false}
+                toolbar={{
+                  settings: [],
+                }}
+                scroll={{ y: 500 }}
+                rowKey="id"
                 size="small"
-                dataSource={selectedDatas}
-                renderItem={(item) => (<List.Item extra={
-                  <a onClick={() => {
-                    const index = selectedDatas.findIndex(pItem => pItem.id == item.id);
-                    if (index > -1) {
-                      selectedDatas.splice(index, 1);
-                      setSelectedDatas([...selectedDatas]);
-                    }
+                pagination={{ size: "small" }}
+                rowSelection={{
+                  selectedRowKeys: selectedDatas.map(item => item.id),
+                  onChange: (selectedRowKeys: string[]) => {
+                    const allIds = dataSource.map(item => item.id),
+                      oldDatas = selectedDatas.filter(sItem => !allIds.includes(sItem.id)),
+                      newDatas = selectedRowKeys.length ? dataSource.filter(item => selectedRowKeys.includes(item.id))
+                        : [];
+                    setSelectedDatas([...oldDatas, ...newDatas]);
                     setSaveDisabled(false);
-                  }}
-                  >
-                    <CloseOutlined />
-                  </a>
-                }
-                >
-                  <List.Item.Meta title={item.name} description={item.comments} />
-                </List.Item>)}
+                  },
+                  getCheckboxProps: (record) => ({
+                    disabled: record.isGrantUser,
+                  }),
+                  type: 'checkbox',
+                }}
               />
-            </div>
-          </Col>
-        </Row>
-      </Space>
+            </Col>
+            <Col span="8">
+              <div style={{ paddingBottom: '30px' }}>
+                <Row>
+                  <Col flex="auto">
+                    {t('selected')}（{selectedDatas.length}）
+                  </Col>
+                  <Col >
+                    <a onClick={() => {
+                      setSelectedDatas([]);
+                      setSaveDisabled(true);
+                    }}
+                    >{t('empty')}</a>
+                  </Col>
+                </Row>
+              </div>
+              <div>
+                <List
+                  style={{ overflow: 'auto', height: '500px' }}
+                  bordered
+                  size="small"
+                  dataSource={selectedDatas}
+                  renderItem={(item) => (<List.Item extra={
+                    <a onClick={() => {
+                      const index = selectedDatas.findIndex(pItem => pItem.id == item.id);
+                      if (index > -1) {
+                        selectedDatas.splice(index, 1);
+                        setSelectedDatas([...selectedDatas]);
+                      }
+                      setSaveDisabled(false);
+                    }}
+                    >
+                      <CloseOutlined />
+                    </a>
+                  }
+                  >
+                    <List.Item.Meta title={item.name} description={item.comments} />
+                  </List.Item>)}
+                />
+              </div>
+            </Col>
+          </Row>
+        </Space>
+      </div>
     </DrawerForm>
   );
 };

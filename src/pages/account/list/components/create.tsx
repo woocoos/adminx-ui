@@ -1,14 +1,20 @@
-import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserSimpleStatus, UserUserType } from '@/generated/adminx/graphql';
+import { CreateUserPasswordInput, User, UserLoginProfile, UserLoginProfileSetKind, UserPasswordScene, UserPasswordSimpleStatus, UserUserType, UserGender, OrgUserUserType, UserUserStatus } from '@/generated/adminx/graphql';
 import { getOrgInfo } from '@/services/adminx/org';
 import { UpdateUserInfoScene, createUserInfo, getUserInfoLoginProfile, restoreRecycleUser, updateUserInfo, updateUserProfile } from '@/services/adminx/user';
 import store from '@/store';
-import { DrawerForm, ProFormText, ProFormTextArea, ProFormSwitch } from '@ant-design/pro-components';
+import { DrawerForm, ProFormText, ProFormTextArea, ProFormSwitch, ProFormSelect } from '@ant-design/pro-components';
 import { Alert, Radio, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Sha256 from 'crypto-js/sha256';
 import { updateFormat } from '@/util';
 import { UploadAvatar, useLeavePrompt } from '@knockout-js/layout';
+import InputMobile from '@/components/inputMobile';
+
+type FormUser = User & {
+  email?: string | null;
+  mobile?: string | null;
+};
 
 type ProFormData = {
   principalName?: string;
@@ -19,6 +25,7 @@ type ProFormData = {
   comments?: string;
   canLogin?: boolean;
   passwordReset?: boolean;
+  verifyDevice?: boolean;
 };
 
 const ICE_APP_CODE = process.env.ICE_APP_CODE ?? '';
@@ -29,18 +36,19 @@ export default (props: {
   id?: string | null;
   orgId?: string;
   userType: UserUserType;
+  orgUserType?: OrgUserUserType;
   recycleInfo?: User;
   scene: UpdateUserInfoScene;
-  onClose: (isSuccess?: boolean) => void;
+  onClose: (isSuccess?: boolean, newInfo?: User | UserLoginProfile) => void;
 }) => {
   const { t } = useTranslation(),
     [saveLoading, setSaveLoading] = useState(false),
     [saveDisabled, setSaveDisabled] = useState(true),
     [checkLeave, setLeavePromptWhen] = useLeavePrompt(),
-    [initValues, setInitValues] = useState<User | UserLoginProfile | null>(null),
+    [initValues, setInitValues] = useState<FormUser | UserLoginProfile | null>(null),
     [domain, setDomain] = useState<string>(''),
     [setKind, setSetKind] = useState<UserLoginProfileSetKind>(UserLoginProfileSetKind.Auto),
-    [userState] = store.useModel('user');
+    [userState, userDispatcher] = store.useModel('user');
 
   useEffect(() => {
     setLeavePromptWhen(saveDisabled);
@@ -66,7 +74,7 @@ export default (props: {
       }
     },
     getRequest = async () => {
-      let info: User | UserLoginProfile | null = null;
+      let info: FormUser | UserLoginProfile | null = null;
       if (props.id) {
         const result = await getUserInfoLoginProfile(props.id);
         if (result?.id) {
@@ -75,11 +83,15 @@ export default (props: {
               info = result.loginProfile as UserLoginProfile;
             }
           } else {
-            info = result as User;
+            info = { ...result } as FormUser;
+            info.mobile = result.contact?.mobile
+            info.email = result.contact?.email
           }
         }
       } else if (props.scene === 'recycle' && props.recycleInfo) {
-        info = props.recycleInfo;
+        info = { ...props.recycleInfo };
+        info.mobile = props.recycleInfo.contact?.mobile
+        info.email = props.recycleInfo.contact?.email
         if (domain) {
           info.principalName = info.principalName.replace(`@${domain}`, '');
         }
@@ -94,17 +106,24 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      let isTrue = false;
+
       if (props.id) {
         if (props.scene === 'base') {
-          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}));
+          const result = await updateUserInfo(props.id, updateFormat(values, initValues || {}, ["email", "mobile"]), updateFormat({ email: values.email, mobile: values.mobile }, (initValues as FormUser)?.contact || {}));
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            if (userState.user?.id == result.id) {
+              userDispatcher.saveUser(result as User)
+            }
+            props.onClose(true, result as User);
           }
         } else if (props.scene === 'loginProfile') {
           const result = await updateUserProfile(props.id, updateFormat(values, initValues || {}));
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as UserLoginProfile);
           }
         }
       } else {
@@ -124,12 +143,15 @@ export default (props: {
           const result = await restoreRecycleUser(props.recycleInfo.id, {
             comments: values.comments,
             displayName: values.displayName,
+            principalName: values.principalName,
+          }, {
             email: values.email,
             mobile: values.mobile,
-            principalName: values.principalName,
           }, setKind, pwdInput);
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as User);
           }
         } else {
           let password: CreateUserPasswordInput | undefined;
@@ -141,28 +163,28 @@ export default (props: {
             };
           }
           const result = await createUserInfo(props?.orgId || userState.tenantId, {
-            mobile: values.mobile,
-            email: values.email,
+            contact: {
+              mobile: values.mobile,
+              email: values.email,
+            },
             principalName: values.principalName || '',
             displayName: values.displayName || '',
             comments: values.comments,
-            status: UserSimpleStatus.Active,
+            status: UserUserStatus.Active,
             loginProfile: {
               setKind,
               verifyDevice: false,
             },
             password,
-          }, props.userType);
+          }, props.userType, props.orgUserType ?? OrgUserUserType.External);
           if (result?.id) {
-            isTrue = true;
+            message.success(t('submit_success'));
+            setSaveDisabled(true);
+            props.onClose(true, result as User);
           }
         }
       }
-      if (isTrue) {
-        message.success(t('submit_success'));
-        setSaveDisabled(true);
-        props.onClose(true);
-      }
+
       setSaveLoading(false);
       return false;
     };
@@ -253,16 +275,36 @@ export default (props: {
             { type: 'email', message: `${t('format_error')}` },
           ]}
         />
-        <ProFormText name="mobile" label={t('mobile')} />
+        <ProFormSelect
+          name="gender"
+          width="lg"
+          label={t('gender')}
+          placeholder={`${t('please_enter_gender')}`}
+          options={[
+            { value: UserGender.Privacy, label: t('privacy') },
+            { value: UserGender.Male, label: t('male') },
+            { value: UserGender.Female, label: t('female') },
+          ]}
+          rules={[
+            {
+              required: true,
+              message: `${t('please_enter_gender')}`,
+            },
+          ]}
+        />
+        <ProFormText name="mobile" label={t('mobile')} >
+          <InputMobile />
+        </ProFormText>
         <ProFormTextArea
           name="comments"
-          label={t('introduction')}
-          placeholder={`${t('please_enter_introduction')}`}
+          label={t('internal_notes')}
+          placeholder={`${t('please_enter')}`}
         />
       </div>
       <div x-if={['loginProfile'].includes(props.scene)}>
         <ProFormSwitch name="canLogin" label={t('allow_pwd_login')} />
         <ProFormSwitch name="passwordReset" label={t('reset_login_pwd')} />
+        <ProFormSwitch name="verifyDevice" label={t('device_verification')} />
       </div>
     </DrawerForm>
   );

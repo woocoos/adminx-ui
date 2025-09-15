@@ -56,62 +56,64 @@ export default (props: {
       }}
       width={900}
     >
-      <ProTable
-        size="small"
-        search={{
-          searchText: `${t('query')}`,
-          resetText: `${t('reset')}`,
-          labelWidth: 'auto',
-        }}
-        rowKey={'id'}
-        scroll={{ x: 'max-content', y: 300 }}
-        options={false}
-        rowSelection={{
-          selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-          type: props.isMultiple ? 'checkbox' : 'radio',
-        }}
-        columns={columns}
-        request={async (params) => {
-          const table = { data: [] as OrgRole[], success: true, total: 0 },
-            where: OrgRoleWhereInput = {};
-          where.kind = props.kind;
-          where.orgID = props.orgId;
-          where.nameContains = params.nameContains;
-          const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
-            current: params.current,
-            pageSize: params.pageSize,
-            where,
-          }) : await getOrgGroupList({
-            current: params.current,
-            pageSize: params.pageSize,
-            where,
-          });
-          if (result?.totalCount) {
-            table.data = result.edges?.map(item => item?.node) as OrgRole[];
-            table.total = result.totalCount;
-          }
-          setDataSource(table.data);
-          setSelectedRowKeys([]);
-          return table;
-        }}
-        onRow={(record) => {
-          return {
-            onClick: () => {
-              if (props.isMultiple) {
-                if (selectedRowKeys.includes(record.id)) {
-                  setSelectedRowKeys(selectedRowKeys.filter(id => id != record.id));
+      <div>
+        <ProTable
+          size="small"
+          search={{
+            searchText: `${t('query')}`,
+            resetText: `${t('reset')}`,
+            labelWidth: 'auto',
+          }}
+          rowKey={'id'}
+          scroll={{ x: 'max-content', y: 300 }}
+          options={false}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys,
+            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+            type: props.isMultiple ? 'checkbox' : 'radio',
+          }}
+          columns={columns}
+          request={async (params) => {
+            const table = { data: [] as OrgRole[], success: true, total: 0 },
+              where: OrgRoleWhereInput = {};
+            where.kind = props.kind;
+            where.orgID = props.orgId;
+            where.nameContains = params.nameContains;
+            const result = props.kind === OrgRoleKind.Role ? await getOrgRoleList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            }) : await getOrgGroupList({
+              current: params.current,
+              pageSize: params.pageSize,
+              where,
+            });
+            if (result?.totalCount) {
+              table.data = result.edges?.map(item => item?.node) as OrgRole[];
+              table.total = result.totalCount;
+            }
+            setDataSource(table.data);
+            setSelectedRowKeys([]);
+            return table;
+          }}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                if (props.isMultiple) {
+                  if (selectedRowKeys.includes(record.id)) {
+                    setSelectedRowKeys(selectedRowKeys.filter(id => id != record.id));
+                  } else {
+                    selectedRowKeys.push(record.id);
+                    setSelectedRowKeys([...selectedRowKeys]);
+                  }
                 } else {
-                  selectedRowKeys.push(record.id);
-                  setSelectedRowKeys([...selectedRowKeys]);
+                  setSelectedRowKeys([record.id]);
                 }
-              } else {
-                setSelectedRowKeys([record.id]);
-              }
-            },
-          };
-        }}
-      />
+              },
+            };
+          }}
+        />
+      </div>
     </Modal>
   );
 };

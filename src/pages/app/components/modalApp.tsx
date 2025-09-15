@@ -4,22 +4,23 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { getOrgAppList } from '@/services/adminx/org/app';
-import defaultApp from '@/assets/images/default-app.png';
 import { App, AppKind, AppWhereInput } from '@/generated/adminx/graphql';
-import { parseStorageUrl } from '@knockout-js/api';
+import store from '@/store';
 
 export default (props: {
   open: boolean;
   orgId?: string;
+  isLoginOrgId?: boolean;
   isMultiple?: boolean;
   title: string;
   tableTitle?: string;
   onClose: (selectData?: App[]) => void;
 }) => {
   const { t } = useTranslation(),
+    [userState] = store.useModel('user'),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true
-      { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
+      // { title: 'LOGO', dataIndex: 'logo', width: 90, align: 'center', valueType: 'image', search: false },
       {
         title: t('name'),
         dataIndex: 'name',
@@ -83,14 +84,18 @@ export default (props: {
         scroll={{ x: 'max-content', y: 300 }}
         columns={columns}
         request={async (params, sort, filter) => {
+          let orgId = props.orgId;
           const table = { data: [] as App[], success: true, total: 0 },
             where: AppWhereInput = {};
           where.nameContains = params.nameContains;
           where.codeContains = params.codeContains;
           where.kindIn = filter.kind as AppKind[];
+          if (props.isLoginOrgId) {
+            orgId = userState.tenantId
+          }
 
-          if (props.orgId) {
-            const result = await getOrgAppList(props.orgId, {
+          if (orgId) {
+            const result = await getOrgAppList(orgId, {
               current: params.current,
               pageSize: params.pageSize,
               where,
@@ -98,14 +103,6 @@ export default (props: {
             if (result?.totalCount && result.edges) {
               for (const item of result.edges) {
                 if (item?.node) {
-                  let logo: string = defaultApp;
-                  if (item.node?.logo) {
-                    const logoRes = await parseStorageUrl(item.node.logo);
-                    if (logoRes) {
-                      logo = logoRes;
-                    }
-                  }
-                  item.node.logo = logo;
                   table.data.push(item.node as App);
                 }
               }
@@ -120,14 +117,6 @@ export default (props: {
             if (result?.totalCount && result.edges) {
               for (const item of result.edges) {
                 if (item?.node) {
-                  let logo: string = defaultApp;
-                  if (item.node?.logo) {
-                    const logoRes = await parseStorageUrl(item.node.logo);
-                    if (logoRes) {
-                      logo = logoRes;
-                    }
-                  }
-                  item.node.logo = logo;
                   table.data.push(item.node as App);
                 }
               }

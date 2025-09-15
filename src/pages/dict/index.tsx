@@ -8,6 +8,7 @@ import { AppDict, AppDictWhereInput } from '@/generated/adminx/graphql';
 import { delAppDictInfo, getAppDictList } from '@/services/adminx/dict';
 import InputApp from '../app/components/inputApp';
 import Create from './components/create';
+import { delDataSource, saveDataSource } from '@/util';
 
 export default () => {
   const { token } = useToken(),
@@ -75,12 +76,13 @@ export default () => {
                 onOk: async (close) => {
                   const result = await delAppDictInfo(record.id);
                   if (result === true) {
-                    if (dataSource.length === 1) {
+                    setDataSource(delDataSource(dataSource, record.id));
+                    if (dataSource.length === 0) {
                       const pageInfo = { ...proTableRef.current?.pageInfo };
                       pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
                       proTableRef.current?.setPageInfo?.(pageInfo);
+                      proTableRef.current?.reload();
                     }
-                    proTableRef.current?.reload();
                     close();
                   }
                 },
@@ -136,6 +138,7 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as AppDict[], success: true, total: 0 },
               where: AppDictWhereInput = {};
@@ -165,9 +168,9 @@ export default () => {
           open={modal.open}
           title={modal.title}
           id={modal.id}
-          onClose={(isSuccess) => {
-            if (isSuccess) {
-              proTableRef.current?.reload();
+          onClose={(isSuccess, newInfo) => {
+            if (isSuccess && newInfo) {
+              setDataSource(saveDataSource(dataSource, newInfo))
             }
             setModal({ open: false, title: '', id: '' });
           }}

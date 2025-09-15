@@ -6,7 +6,7 @@ import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import CreateAccount from '../list/components/create';
 import Auth from '@/components/auth';
-import { User, UserOrder, UserUserType, UserWhereInput } from '@/generated/adminx/graphql';
+import { User, UserOrder, UserUserType, UserWhereInput, UserAddrAddrType } from '@/generated/adminx/graphql';
 import { Link } from '@ice/runtime';
 
 export default (props: {
@@ -34,6 +34,9 @@ export default (props: {
         search: {
           transform: (value) => ({ emailContains: value || undefined }),
         },
+        render: (text, record) => {
+          return <div>{record?.contact?.email || '-'}</div>;
+        },
       },
       {
         title: t('mobile'),
@@ -41,6 +44,9 @@ export default (props: {
         width: 160,
         search: {
           transform: (value) => ({ mobileContains: value || undefined }),
+        },
+        render: (text, record) => {
+          return <div>{record?.contact?.mobile || '-'}</div>;
         },
       },
       {
@@ -62,7 +68,7 @@ export default (props: {
         },
       },
     ],
-    [, setDataSource] = useState<User[]>([]),
+    [dataSource, setDataSource] = useState<User[]>([]),
     [modal, setModal] = useState<{
       open: boolean;
       title: string;
@@ -103,13 +109,17 @@ export default (props: {
       }}
       scroll={{ x: 'max-content' }}
       columns={columns}
+      dataSource={dataSource}
       request={async (params) => {
         const table = { data: [] as User[], success: true, total: 0 },
           where: UserWhereInput = {};
         let orderBy: UserOrder | undefined;
         where.displayNameContains = params.displayNameContains;
-        where.emailContains = params.emailContains;
-        where.mobileContains = params.mobileContains;
+        where.hasAddressesWith = []
+        if (params.emailContains)
+          where.hasAddressesWith.push({ emailContains: params.emailContains, addrType: UserAddrAddrType.Contact })
+        if (params.mobileContains)
+          where.hasAddressesWith.push({ mobileContains: params.mobileContains, addrType: UserAddrAddrType.Contact })
         const result = await getRecycleUserList({
           current: params.current,
           pageSize: params.pageSize,
@@ -132,9 +142,11 @@ export default (props: {
       recycleInfo={modal.data}
       scene="recycle"
       userType={UserUserType.Member}
-      onClose={(isSuccess) => {
+      onClose={(isSuccess, newInfo) => {
         if (isSuccess) {
-          proTableRef.current?.reload();
+          if (newInfo) {
+            setDataSource(dataSource.filter(item => item.id !== newInfo.id));
+          }
           message.success(t('submit_success'));
         }
         setModal({ open: false, title: modal.title });

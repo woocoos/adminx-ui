@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from '@ice/runtime';
 import { useLeavePrompt } from '@knockout-js/layout';
 import { logout } from '@/services/auth';
+import Sha256 from 'crypto-js/sha256';
 
 type FormValues = { oldPwd: string; newPwd: string; reNewPwd: string };
 
@@ -32,7 +33,7 @@ export default () => {
     },
     onFinish = async (values: FormValues) => {
       setSaveLoading(true);
-      const result = await updatePassword(values.oldPwd, values.newPwd);
+      const result = await updatePassword(Sha256(values.oldPwd).toString(), Sha256(values.newPwd).toString());
       if (result === true) {
         message.success(t('submit_success'));
         logout()

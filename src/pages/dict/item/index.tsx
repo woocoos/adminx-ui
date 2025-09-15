@@ -8,6 +8,7 @@ import { EnumAppDictItemStatus, delAppDictItemInfo, getAppDictItemList, moveAppD
 import InputOrg from '@/pages/org/components/inputOrg';
 import Create from './components/create';
 import { Link, useSearchParams } from '@ice/runtime';
+import { delDataSource, saveDataSource } from '@/util';
 
 export default () => {
   const { token } = useToken(),
@@ -34,7 +35,7 @@ export default () => {
         width: 100,
       },
       {
-        title: t('org'),
+        title: t('organization'),
         dataIndex: 'org',
         width: 120,
         renderFormItem: () => {
@@ -81,12 +82,13 @@ export default () => {
                 onOk: async (close) => {
                   const result = await delAppDictItemInfo(record.id);
                   if (result === true) {
-                    if (dataSource.length === 1) {
+                    setDataSource(delDataSource(dataSource, record.id));
+                    if (dataSource.length === 0) {
                       const pageInfo = { ...proTableRef.current?.pageInfo };
                       pageInfo.current = pageInfo.current ? pageInfo.current > 2 ? pageInfo.current - 1 : 1 : 1;
                       proTableRef.current?.setPageInfo?.(pageInfo);
+                      proTableRef.current?.reload();
                     }
-                    proTableRef.current?.reload();
                     close();
                   }
                 },
@@ -143,20 +145,21 @@ export default () => {
           }}
           scroll={{ x: 'max-content' }}
           columns={columns}
+          dataSource={dataSource}
           request={async (params, sort, filter) => {
             const table = { data: [] as AppDictItem[], success: true, total: 0 };
             const result = await getAppDictItemList(searchParams.get('id') ?? '');
             if (result?.id) {
               setDictInfo(result as AppDict);
             }
-            if (result?.items) {
-              result.items.forEach(item => {
+            if (result?.orgItems) {
+              result.orgItems?.forEach(item => {
                 let isPubsh = true;
                 if (params.name) {
-                  isPubsh = isPubsh && item.name.indexOf(params.name) > -1
+                  isPubsh = isPubsh && item?.name.indexOf(params.name) > -1
                 }
                 if (params.code) {
-                  isPubsh = isPubsh && item.code.indexOf(params.code) > -1
+                  isPubsh = isPubsh && item?.code.indexOf(params.code) > -1
                 }
                 if (params.org) {
                   isPubsh = isPubsh && item.orgID == params.org.id
@@ -175,7 +178,7 @@ export default () => {
           }}
           pagination={false}
           dragSortKey="displaySort"
-          onDragSortEnd={async (newDataSource) => {
+          onDragSortEnd={async (_beforeIndex, _afterIndex, newDataSource) => {
             /**
              * 往下移动
              * o  [1, 2, 3, 4, 5]
@@ -231,9 +234,9 @@ export default () => {
             title={modal.title}
             appDictId={dictInfo.id}
             id={modal.id}
-            onClose={(isSuccess) => {
-              if (isSuccess) {
-                proTableRef.current?.reload();
+            onClose={(isSuccess, newInfo) => {
+              if (isSuccess && newInfo) {
+                setDataSource(saveDataSource(dataSource, newInfo))
               }
               setModal({ open: false, title: '', id: '' });
             }}

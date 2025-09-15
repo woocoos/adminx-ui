@@ -23,8 +23,12 @@
     "icon": "icon-icon_zuzhi2",
     "children": [
       {
-        "name": "部门管理",
+        "name": "组织管理",
         "path": "/org/departments"
+      },
+      {
+        "name": "成员管理",
+        "path": "/org/members"
       },
       {
         "name": "用户管理",
@@ -49,7 +53,7 @@
     "icon": "icon-shezhi",
     "children": [
       {
-        "name": "组织管理",
+        "name": "租户管理",
         "path": "/system/org"
       },
       {
@@ -67,6 +71,18 @@
       {
         "name": "数据字典",
         "path": "/dict"
+      },
+      {
+        "name": "国家地区",
+        "path": "/system/country"
+      },
+      {
+        "name": "币别资料",
+        "path": "/system/currency"
+      },
+      {
+        "name": "配额管理",
+        "path": "/system/quotaItem"
       }
     ]
   }

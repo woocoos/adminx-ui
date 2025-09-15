@@ -26,7 +26,7 @@ export default (props: {
   title?: string;
   id?: string | null;
   scene?: 'conf';
-  onClose?: (isSuccess?: boolean) => void;
+  onClose?: (isSuccess?: boolean, newInfo?: App) => void;
 }) => {
   const { t } = useTranslation(),
     [userState] = store.useModel('user'),
@@ -67,18 +67,34 @@ export default (props: {
     },
     onFinish = async (values: ProFormData) => {
       setSaveLoading(true);
-      const result = props.id
-        ? await updateAppInfo(props.id, updateFormat({
-          kind: values.kind || AppKind.Native,
-          name: values.name || '',
-          redirectURI: values.redirectURI,
-          scopes: values.scopes,
-          tokenValidity: values.tokenValidity,
-          refreshTokenValidity: values.refreshTokenValidity,
-          logo: values.logo,
-          comments: values.comments,
-        }, appInfo || {}))
-        : await createAppInfo({
+      if (props.id) {
+
+        if (props.scene == 'conf') {
+          const result = await updateAppInfo(props.id, updateFormat({
+            redirectURI: values.redirectURI,
+            scopes: values.scopes,
+            tokenValidity: values.tokenValidity,
+            refreshTokenValidity: values.refreshTokenValidity,
+          }, appInfo || {}))
+          if (result?.id) {
+            setSaveDisabled(true);
+            props.onClose?.(true, result as App);
+          }
+        } else {
+          const result = await updateAppInfo(props.id, updateFormat({
+            kind: values.kind || AppKind.Native,
+            name: values.name || '',
+            logo: values.logo,
+            comments: values.comments,
+          }, appInfo || {}))
+
+          if (result?.id) {
+            setSaveDisabled(true);
+            props.onClose?.(true, result as App);
+          }
+        }
+      } else {
+        const result = await createAppInfo({
           code: values.code || '',
           kind: values.kind || AppKind.Native,
           name: values.name || '',
@@ -89,10 +105,13 @@ export default (props: {
           logo: values.logo,
           comments: values.comments,
         });
-      if (result?.id) {
-        setSaveDisabled(true);
-        props.onClose?.(true);
+        if (result?.id) {
+          setSaveDisabled(true);
+          props.onClose?.(true, result as App);
+        }
       }
+
+
       setSaveLoading(false);
       return false;
     };

@@ -19,14 +19,17 @@ const schemaAstConfig: CodegenConfig = {
       config: {
         includeDirectives: true,
       },
-      schema: {
-        [GQLGEN_SCHEMA_ADMINX]: {
-          headers: {
-            "Authorization": `Bearer ${ICE_DEV_TOKEN}`,
-            "X-Tenant-ID": `${ICE_DEV_TID}`,
-          }
-        },
-      }
+      // 直接读取本地项目文件 schema
+      schema: "../knockout/api/graphql/*.graphql"
+      // 用api接口读取 schema
+      // schema: {
+      //   [GQLGEN_SCHEMA_ADMINX]: {
+      //     headers: {
+      //       "Authorization": `Bearer ${ICE_DEV_TOKEN}`,
+      //       "X-Tenant-ID": `${ICE_DEV_TID}`,
+      //     }
+      //   },
+      // }
     }
   }
 }

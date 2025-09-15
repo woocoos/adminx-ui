@@ -1,11 +1,14 @@
-import { TreeAction } from '@/generated/adminx/graphql';
+import { ListAction, TreeAction } from '@/generated/adminx/graphql';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import utc from 'dayjs/plugin/utc';
 import { ReactNode } from 'react';
 import menuJson from '../components/layout/menu.json';
+import { t } from 'i18next';
 
 export type TreeEditorAction = 'editor' | 'peer' | 'child';
+
+export type OrderSort = 'ASC' | 'DESC';
 
 export type TreeDataState<T> = {
   key: string;
@@ -209,9 +212,12 @@ export const getTreeDropData = <T>(treeData: TreeDataState<T>[], dragInfo: any) 
  * @param target   update对象
  * @param original 对比目标的原始数据
  */
-export const updateFormat = <T>(target: T, original: Record<string, any>) => {
+export const updateFormat = <T>(target: T, original: Record<string, any>, excludeTargetKey?: string[]) => {
   const ud: Record<string, any> = {};
   for (const key in target) {
+    if (excludeTargetKey && excludeTargetKey.includes(key)) {
+      continue;
+    }
     const tValue = target[key];
     if (tValue !== original[key]) {
       ud[key] = tValue;
@@ -253,4 +259,276 @@ export const getMenuAppActions = (list?: MenuJsonData[]) => {
     });
   }
   return initialAuth;
+}
+
+/**
+ * 新增或更新tree结构数据
+ * @param treeList
+ * @param updateData
+ * @param defaultKeys
+ */
+export const saveTreeData = <T extends { children?: T[] }>(
+  treeList: Array<T>,
+  updateData: T,
+  defaultKeys?: {
+    id?: string,
+    parentId?: string,
+    sort?: OrderSort,
+    topParentId?: string
+  }) => {
+  const keys = {
+    id: 'id', parentId: 'parentId', sort: 'ASC', topParentId: '0',
+    ...defaultKeys
+  }
+  const idx = treeList.findIndex(item => item[keys.id] == updateData[keys.id])
+  if (idx === -1) {
+    if (updateData[keys.parentId] == keys.topParentId) {
+      //顶层的时候处理
+      if (keys.sort === 'ASC') {
+        treeList.push(updateData)
+      } else {
+        treeList.unshift(updateData)
+      }
+    } else {
+      const pIdx = treeList.findIndex(item => item[keys.id] == updateData[keys.parentId])
+      if (pIdx === -1) {
+        // 继续在children寻找位置
+        for (let i = 0; i < treeList.length; i++) {
+          const childList = treeList[i].children;
+          if (childList) {
+            saveTreeData(childList, updateData, defaultKeys)
+          }
+        }
+      } else {
+        // 父节点在这一层
+        if (treeList[pIdx].children) {
+          const pcIdx = treeList[pIdx].children.findIndex(item => item[keys.id] == updateData[keys.id])
+          if (pcIdx === -1) {
+            if (keys.sort === 'ASC') {
+              treeList[pIdx].children.push(updateData)
+            } else {
+              treeList[pIdx].children.unshift(updateData)
+            }
+          } else {
+            treeList[pIdx].children[pcIdx] = {
+              ...treeList[pIdx].children[pcIdx],
+              ...updateData
+            }
+          }
+        } else {
+          treeList[pIdx].children = [updateData]
+        }
+      }
+    }
+  } else {
+    // 更新
+    treeList[idx] = {
+      ...treeList[idx],
+      ...updateData
+    }
+  }
+
+}
+
+
+/**
+ * 移除tree数据
+ * @param treeList
+ * @param id
+ * @param defaultKeys
+ */
+export const delTreeData = <T extends { children?: T[] }>(
+  treeList: Array<T>,
+  id: string,
+  defaultKeys?: {
+    id?: string,
+  }) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }
+  const idx = treeList.findIndex(item => item[keys.id] === id)
+  if (idx === -1) {
+    for (let i = 0; i < treeList.length; i++) {
+      const childList = treeList[i].children;
+      if (childList) {
+        delTreeData(childList, id, defaultKeys)
+      }
+    }
+  } else {
+    treeList.splice(idx, 1)
+  }
+}
+
+/**
+ * 创建或修改数据
+ * @param dataSource
+ * @param data
+ * @param defaultKeys
+ */
+export const saveDataSource = <T extends { id: string }>(
+  dataSource: Array<T>,
+  data: T,
+  defaultKeys?: {
+    id?: string,
+    sort?: OrderSort,
+  }) => {
+  const keys = {
+    id: 'id',
+    sort: 'DESC',
+    ...defaultKeys
+  }
+  const idx = dataSource.findIndex(item => item[keys.id] == data[keys.id])
+  if (idx === -1) {
+    switch (keys.sort) {
+      case 'ASC':
+        dataSource.push(data)
+        break;
+      case 'DESC':
+        dataSource.unshift(data)
+        break;
+      default:
+        dataSource.unshift(data)
+        break;
+    }
+  } else {
+    dataSource[idx] = data
+  }
+  return [...dataSource];
+}
+
+/**
+ * 根据id一移除数据
+ * @param dataSource
+ * @param id
+ * @param defaultKeys
+ */
+export const delDataSource = <T extends { id: string }>(dataSource: Array<T>, id: string, defaultKeys?: {
+  id?: string,
+}) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }
+  return dataSource.filter(item => item[keys.id] != id)
+}
+
+
+export const searchMoveList = <T extends Object>(sourceList: T[], newSourceList: T[], defaultKeys?: {
+  id?: string,
+}) => {
+  const keys = {
+    id: 'id',
+    ...defaultKeys
+  }, length = sourceList.length, changeIdxs: number[] = [];
+  for (let i = 0; i < length; i++) {
+    if (sourceList[i][keys.id] != newSourceList[i][keys.id]) {
+      changeIdxs.push(i);
+    }
+  }
+
+  if (changeIdxs.length >= 2) {
+    if (sourceList[changeIdxs[0]][keys.id] === newSourceList[changeIdxs[1]][keys.id]) {
+      // 上移
+      return {
+        sourceId: newSourceList[changeIdxs[0]][keys.id] as string,
+        targetId: sourceList[changeIdxs[0]][keys.id] as string,
+        action: ListAction.Up,
+      }
+    } else {
+      // 下移
+      const downIdx = changeIdxs.length - 1
+      return {
+        sourceId: newSourceList[changeIdxs[downIdx]][keys.id] as string,
+        targetId: sourceList[changeIdxs[downIdx]][keys.id] as string,
+        action: ListAction.Down,
+      }
+    }
+  }
+
+  return null
+}
+
+
+/**
+ * 验证域名是否输入正确
+ * @param domain
+ * @returns
+ */
+export const isValidDomain = (domain: string) => {
+  const regex = /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i;
+  return regex.test(domain);
+}
+
+/**
+ * 与运算处理，多选要赋值展现出来的数组值
+ * @param list
+ * @param value
+ * @returns
+ */
+export const getANDResult = <T extends number | string>(list: T[], value: T): T[] => {
+  // 将字符串转换为整数
+  const intValue = typeof value === 'string' ? parseInt(value, 10) : value;
+  // 如果转换后的值为 NaN 或 0，则返回空数组
+  if (isNaN(intValue as number) || intValue === 0) {
+    return [];
+  }
+  const val: T[] = [];
+  list.forEach((item) => {
+    // 将列表中的每个元素转换为整数进行位运算
+    const itemIntValue = typeof item === 'string' ? parseInt(item, 10) : item;
+    if (typeof itemIntValue === 'number' && typeof intValue === 'number') {
+      if ((itemIntValue & intValue) > 0) {
+        val.push(item);
+      }
+    }
+  });
+  return val;
+}
+/**
+ * 或运算处理，多选要存储的时候获取结果值
+ * @param list
+ * @returns
+ */
+export const getORResult = <T extends number | string>(list: T[]): T => {
+  let val: number = 0;
+
+  list.forEach((item) => {
+    const intValue = typeof item === 'string' ? parseInt(item, 10) : item;
+    // 确保 intValue 是数字类型
+    if (typeof intValue === 'number') {
+      val = val ^ intValue;
+    }
+  });
+  // 返回原始类型
+  return (typeof list[0] === 'string' ? val.toString() : val) as T;
+}
+
+/**
+ * 导出json
+ * @param text
+ * @param filename
+ */
+export const exportJson = (text: string, filename: string) => {
+  const blob = new Blob([text], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${filename}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * 读取文件内容
+ * @param file
+ * @returns
+ */
+export const readFile = async (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(reader.error);
+    reader.readAsText(file);
+  });
 }

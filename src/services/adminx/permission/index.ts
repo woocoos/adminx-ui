@@ -1,5 +1,5 @@
 import { gql } from '@/generated/adminx';
-import { CreatePermissionInput, PermissionOrder, PermissionWhereInput, UpdatePermissionInput } from '@/generated/adminx/graphql';
+import { CreatePermissionInput, OrderDirection, PermissionOrder, PermissionOrderField, PermissionWhereInput, UpdatePermissionInput } from '@/generated/adminx/graphql';
 import { gid } from '@knockout-js/api';
 import { mutation, paging, query } from '@knockout-js/ice-urql/request'
 
@@ -17,7 +17,7 @@ export const EnumPermissionStatus = {
 
 
 const queryOrgPolicyReferences = gql(/* GraphQL */`query orgPolicyReferences($orgPolicyId:ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  orgPolicyReferences(policyID:$orgPolicyId,first:$first,orderBy: $orderBy,where: $where){
+  orgPolicyReferences(policyID:$orgPolicyId, first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
@@ -60,7 +60,7 @@ const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: G
             id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
             userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
             role{ id,orgID,kind,name,isAppRole }
-            orgPolicy{ id,orgID,appPolicyID,name }
+            orgPolicy{ id,orgID,appPolicyID,name,comments }
             user{ id,displayName }
           }
         }
@@ -69,15 +69,30 @@ const queryUserPrmissionList = gql(/* GraphQL */`query userPrmissionList($gid: G
   }
 }`);
 
-const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
-  userExtendGroupPolicies(userID:$userId,first:$first,orderBy: $orderBy,where: $where){
+const queryUserExtendGroupPolicieList = gql(/* GraphQL */`query userExtendGroupPolicieList($userId: ID!,$orgID:ID,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  userExtendGroupPolicies(userID:$userId,orgID:$orgID,first:$first,orderBy: $orderBy,where: $where){
     totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
     edges{
       cursor,node{
         id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
         userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
         role{ id,orgID,kind,name,isAppRole }
-        orgPolicy{ id,orgID,appPolicyID,name }
+        orgPolicy{ id,orgID,appPolicyID,name,comments}
+        user{ id,displayName }
+      }
+    }
+  }
+}`);
+
+const queryUserExtendRolePolicieList = gql(/* GraphQL */`query userExtendRolePolicieList($userId: ID!,$orgID:ID,$first: Int,$orderBy:PermissionOrder,$where:PermissionWhereInput){
+  userExtendRolePolicies(userID:$userId,orgID:$orgID,first:$first,orderBy: $orderBy,where: $where){
+    totalCount,pageInfo{ hasNextPage,hasPreviousPage,startCursor,endCursor }
+    edges{
+      cursor,node{
+        id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+        userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+        role{ id,orgID,kind,name,isAppRole }
+        orgPolicy{ id,orgID,appPolicyID,name,comments}
         user{ id,displayName }
       }
     }
@@ -97,11 +112,23 @@ const queryPermissionInfo = gql(/* GraphQL */`query permissionInfo($gid:GID!){
 }`);
 
 const mutationCreatePermission = gql(/* GraphQL */`mutation createPermission($input: CreatePermissionInput!){
-  grant(input:$input){id}
+  grant(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+    role{ id,orgID,kind,name,isAppRole }
+    orgPolicy{ id,orgID,appPolicyID,name }
+    user{ id,displayName }
+  }
 }`);
 
 const mutationUpdatePermission = gql(/* GraphQL */`mutation updatePermission($permissionId:ID!,$input: UpdatePermissionInput!){
-  updatePermission(permissionID:$permissionId,input:$input){id}
+  updatePermission(permissionID:$permissionId,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,orgID,principalKind,
+    userID,roleID,orgPolicyID,startAt,endAt,status,isAllowRevoke,
+    role{ id,orgID,kind,name,isAppRole }
+    orgPolicy{ id,orgID,appPolicyID,name }
+    user{ id,displayName }
+  }
 }`);
 
 const mutationDelPermission = gql(/* GraphQL */`mutation revoke($permissionId:ID!,$orgId:ID!){
@@ -126,7 +153,10 @@ export async function getOrgPolicyReferenceList(
     orgPolicyId,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.orgPolicyReferences) {
     return result.data.orgPolicyReferences;
@@ -149,10 +179,13 @@ export async function getOrgPermissionList(
     orderBy?: PermissionOrder;
   }) {
   const result = await paging(queryOrgPrmissionList, {
-    gid: gid('org', orgId),
+    gid: gid('Org', orgId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1);
   if (result.data?.node?.__typename === 'Org') {
     return result.data.node.permissions;
@@ -174,10 +207,13 @@ export async function getUserPermissionList(
     orderBy?: PermissionOrder;
   }) {
   const result = await paging(queryUserPrmissionList, {
-    gid: gid('user', userId),
+    gid: gid('User', userId),
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1,
   );
   if (result.data?.node?.__typename === 'User') {
@@ -189,9 +225,6 @@ export async function getUserPermissionList(
 /**
  * 用户继承用户组的权限策略
  * @param userId
- * @param params
- * @param filter
- * @param sort
  * @returns
  */
 export async function getUserExtendGroupPolicyList(
@@ -202,16 +235,53 @@ export async function getUserExtendGroupPolicyList(
     where?: PermissionWhereInput;
     orderBy?: PermissionOrder;
   },
+  orgID?: string,
 ) {
   const result = await paging(queryUserExtendGroupPolicieList, {
     userId: userId,
+    orgID,
     first: gather.pageSize || 20,
     where: gather.where,
-    orderBy: gather.orderBy,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
   }, gather.current || 1,
   );
   if (result.data?.userExtendGroupPolicies) {
     return result.data.userExtendGroupPolicies;
+  }
+  return null;
+}
+
+/**
+ * 用户继承角色的权限策略
+ * @param userId
+ * @returns
+ */
+export async function getUserExtendRolePolicyList(
+  userId: string,
+  gather: {
+    current?: number;
+    pageSize?: number;
+    where?: PermissionWhereInput;
+    orderBy?: PermissionOrder;
+  },
+  orgID?: string,
+) {
+  const result = await paging(queryUserExtendRolePolicieList, {
+    userId: userId,
+    orgID,
+    first: gather.pageSize || 20,
+    where: gather.where,
+    orderBy: gather.orderBy ?? {
+      direction: OrderDirection.Desc,
+      field: PermissionOrderField.CreatedAt
+    },
+  }, gather.current || 1,
+  );
+  if (result.data?.userExtendRolePolicies) {
+    return result.data.userExtendRolePolicies;
   }
   return null;
 }
@@ -224,7 +294,7 @@ export async function getUserExtendGroupPolicyList(
  */
 export async function getPermissionInfo(permissionId: string) {
   const result = await query(queryPermissionInfo, {
-    gid: gid('permission', permissionId),
+    gid: gid('Permission', permissionId),
   });
   if (result.data?.node?.__typename === 'Permission') {
     return result.data.node;

@@ -48,7 +48,7 @@ export default (props: {
       setSaveLoading(false);
       setSaveDisabled(true);
       const data: ProFormData = {
-        kind: FileSourceKind.Local,
+        kind: FileSourceKind.AliOss,
         endpoint: '',
         stsEndpoint: '',
         region: '',
@@ -81,18 +81,17 @@ export default (props: {
       if (props.id) {
         const result = await updateFileSource(props.id, updateFormat(values, oldInfo || {}));
         if (result?.id) {
-          setSaveLoading(false);
           setSaveDisabled(true);
           props.onClose?.(true, result as FileSource);
         }
       } else {
         const result = await createFileSource(values);
         if (result?.id) {
-          setSaveLoading(false);
           setSaveDisabled(true);
           props.onClose?.(true, result as FileSource);
         }
       }
+      setSaveLoading(false);
       return false;
     };
 

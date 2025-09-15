@@ -23,7 +23,7 @@ export default (props: {
     [userState] = store.useModel('user'),
     columns: ProColumns<Org>[] = [
       // 有需要排序配置  sorter: true
-      { title: t('name'), dataIndex: 'name', width: 120 },
+      { title: t('name'), dataIndex: 'name', width: 180 },
       { title: t('code'), dataIndex: 'code', width: 120 },
       { title: t('type'), dataIndex: 'kind', width: 120, valueEnum: EnumOrgKind },
       { title: t('domain'), dataIndex: 'domain', width: 120, search: false },
@@ -57,91 +57,93 @@ export default (props: {
       }}
       width={900}
     >
-      <ProTable
-        size="small"
-        rowKey={'id'}
-        search={props.appId ? {
-          searchText: `${t('query')}`,
-          resetText: `${t('reset')}`,
-          labelWidth: 'auto',
-        } : false}
-        options={false}
-        expandable={{
-          expandedRowKeys: expandedRowKeys,
-          onExpandedRowsChange: (expandedKeys: string[]) => {
-            setExpandedRowKeys(expandedKeys);
-          },
-        }}
-        scroll={{ x: 'max-content', y: 300 }}
-        columns={columns}
-        request={async (params) => {
-          const table = { data: [] as Org[], success: true, total: 0 },
-            where: OrgWhereInput = {};
-          setExpandedRowKeys([]);
-          if (props.appId) {
-            where.nameContains = params.name;
-            where.codeContains = params.code;
-            where.kind = params.kind;
-            const data = await getAppOrgList(props.appId, {
-              current: params.current,
-              pageSize: params.pageSize,
-              where,
-            });
-            if (data?.totalCount) {
-              table.data = data.edges?.map(item => item?.node) as Org[];
-              table.total = data.totalCount;
-            }
-            setAllList(table.data);
-          } else {
-            let list: Org[] = [];
-            if (props.kind === 'org') {
-              list = await getOrgPathList(props.orgId || userState.tenantId, props.kind);
-              table.total = list.length;
-            } else {
-              where.kind = props.kind;
-              const result = await getOrgList({
-                pageSize: 999,
+      <div>
+        <ProTable
+          size="small"
+          rowKey={'id'}
+          search={props.appId ? {
+            searchText: `${t('query')}`,
+            resetText: `${t('reset')}`,
+            labelWidth: 'auto',
+          } : false}
+          options={false}
+          expandable={{
+            expandedRowKeys: expandedRowKeys,
+            onExpandedRowsChange: (expandedKeys: string[]) => {
+              setExpandedRowKeys(expandedKeys);
+            },
+          }}
+          scroll={{ x: 'max-content', y: 300 }}
+          columns={columns}
+          request={async (params) => {
+            const table = { data: [] as Org[], success: true, total: 0 },
+              where: OrgWhereInput = {};
+            setExpandedRowKeys([]);
+            if (props.appId) {
+              where.nameContains = params.name;
+              where.codeContains = params.code;
+              where.kind = params.kind;
+              const data = await getAppOrgList(props.appId, {
+                current: params.current,
+                pageSize: params.pageSize,
                 where,
               });
-              if (result?.totalCount) {
-                list = result.edges?.map(item => item?.node) as Org[];
-                table.total = result.totalCount;
+              if (data?.totalCount) {
+                table.data = data.edges?.map(item => item?.node) as Org[];
+                table.total = data.totalCount;
               }
-            }
-
-            if (list.length) {
-              table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
-              setExpandedRowKeys(list.map(item => item.id));
-            }
-            setAllList(list);
-          }
-          setSelectedRowKeys([]);
-          setDataSource(table.data);
-          return table;
-        }}
-        pagination={false}
-        rowSelection={{
-          selectedRowKeys: selectedRowKeys,
-          onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
-          type: props.isMultiple ? 'checkbox' : 'radio',
-        }}
-        onRow={(record) => {
-          return {
-            onClick: () => {
-              if (props.isMultiple) {
-                if (selectedRowKeys.includes(record.id)) {
-                  setSelectedRowKeys(selectedRowKeys.filter(id => id != record.id));
-                } else {
-                  selectedRowKeys.push(record.id);
-                  setSelectedRowKeys([...selectedRowKeys]);
-                }
+              setAllList(table.data);
+            } else {
+              let list: Org[] = [];
+              if (props.kind === 'org') {
+                list = await getOrgPathList(props.orgId || userState.tenantId, props.kind);
+                table.total = list.length;
               } else {
-                setSelectedRowKeys([record.id]);
+                where.kind = props.kind;
+                const result = await getOrgList({
+                  pageSize: 999,
+                  where,
+                });
+                if (result?.totalCount) {
+                  list = result.edges?.map(item => item?.node) as Org[];
+                  table.total = result.totalCount;
+                }
               }
-            },
-          };
-        }}
-      />
+
+              if (list.length) {
+                table.data = formatTreeData(list, undefined, { key: 'id', parentId: 'parentID' });
+                setExpandedRowKeys(list.map(item => item.id));
+              }
+              setAllList(list);
+            }
+            setSelectedRowKeys([]);
+            setDataSource(table.data);
+            return table;
+          }}
+          pagination={false}
+          rowSelection={{
+            selectedRowKeys: selectedRowKeys,
+            onChange: (selectedRowKeys: string[]) => { setSelectedRowKeys(selectedRowKeys); },
+            type: props.isMultiple ? 'checkbox' : 'radio',
+          }}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                if (props.isMultiple) {
+                  if (selectedRowKeys.includes(record.id)) {
+                    setSelectedRowKeys(selectedRowKeys.filter(id => id != record.id));
+                  } else {
+                    selectedRowKeys.push(record.id);
+                    setSelectedRowKeys([...selectedRowKeys]);
+                  }
+                } else {
+                  setSelectedRowKeys([record.id]);
+                }
+              },
+            };
+          }}
+        />
+      </div>
     </Modal>
   );
 };

@@ -1,5 +1,5 @@
 import { gql } from "@/generated/adminx";
-import { CreateFileIdentityInput, FileIdentityOrder, FileIdentityWhereInput, FileSourceKind, UpdateFileIdentityInput } from "@/generated/adminx/graphql";
+import { CreateFileIdentityInput, FileIdentityOrder, FileIdentityOrderField, FileIdentityWhereInput, FileSourceKind, OrderDirection, UpdateFileIdentityInput } from "@/generated/adminx/graphql";
 import { gid } from "@knockout-js/api";
 import { mutation, paging, query } from "@knockout-js/ice-urql/request";
 
@@ -38,11 +38,19 @@ const fileIdentityAccessKeySecretQuery = gql(/* GraphQL */`query fileIdentityAcc
 
 
 const mutationCreateFileIdentity = gql(/* GraphQL */`mutation createFileIdentity($input: CreateFileIdentityInput!){
-  createFileIdentity(input:$input){id}
+  createFileIdentity(input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,comments
+    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
+    org{ id,name }
+  }
 }`);
 
 const mutationUpdateFileIdentity = gql(/* GraphQL */`mutation updateFileIdentity($id:ID!,$input: UpdateFileIdentityInput!){
-  updateFileIdentity(id:$id,input:$input){id}
+  updateFileIdentity(id:$id,input:$input){
+    id,createdBy,createdAt,updatedBy,updatedAt,comments
+    accessKeyID,durationSeconds,fileSourceID,isDefault,policy,roleArn,tenantID,
+    org{ id,name }
+  }
 }`);
 
 const mutationDelFileIdentity = gql(/* GraphQL */`mutation deleteFileIdentity($id:ID!){
@@ -71,7 +79,10 @@ export async function getFileIdentityList(
       fileIdentityQuery, {
       first: gather.pageSize || 20,
       where: gather.where,
-      orderBy: gather.orderBy,
+      orderBy: gather.orderBy ?? {
+        direction: OrderDirection.Desc,
+        field: FileIdentityOrderField.CreatedAt
+      },
     }, gather.current || 1);
 
   if (result.data?.fileIdentities) {
@@ -90,7 +101,7 @@ export async function getFileIdentityInfo(fsId: string) {
   const
     result = await query(
       fileIdentityInfoQuery, {
-      gid: gid('file_identity', fsId),
+      gid: gid('FileIdentity', fsId),
     });
 
   if (result.data?.node?.__typename === "FileIdentity") {
