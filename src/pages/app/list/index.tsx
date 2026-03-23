@@ -26,6 +26,7 @@ export const PageAppList = (props: {
     { t } = useTranslation(),
     [auth] = useAuth(),
     // 表格相关
+    saveModalLoading = useRef(false),
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<App>[] = [
       // 有需要排序配置  sorter: true
@@ -264,6 +265,10 @@ export const PageAppList = (props: {
               isLoginOrgId={props.isFromOrg}
               isMultiple
               onClose={async (selectData) => {
+                if (saveModalLoading.current) {
+                  return;
+                }
+                saveModalLoading.current = true;
                 if (selectData?.length && props.orgId) {
                   for await (const item of selectData) {
                     await assignOrgApp(props.orgId, item.id);
@@ -271,6 +276,7 @@ export const PageAppList = (props: {
                   proTableRef.current?.reload();
                 }
                 setModal({ open: false, title: modal.title, id: '' });
+                saveModalLoading.current = false;
               }}
             />
 

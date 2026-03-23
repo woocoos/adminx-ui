@@ -17,6 +17,7 @@ export default () => {
     { t } = useTranslation(),
     [searchParams] = useSearchParams(),
     [appRoleInfo, setAppRoleInfo] = useState<AppRole>(),
+    saveModalLoading = useRef(false),
     // 表格相关
     proTableRef = useRef<ActionType>(),
     columns: ProColumns<Org>[] = [
@@ -197,6 +198,10 @@ export default () => {
         tableTitle={`${t('app')}：${appRoleInfo?.app?.name} ${t('auth_org_list')}`}
         appId={appRoleInfo?.appID || ''}
         onClose={async (selectData) => {
+          if (saveModalLoading.current) {
+            return;
+          }
+          saveModalLoading.current = true;
           const sdata = selectData?.[0];
           if (sdata && appRoleInfo) {
             const result = await assignOrgAppRole(sdata.id, appRoleInfo.id);
@@ -206,6 +211,7 @@ export default () => {
             }
           }
           setModal({ open: false, title: '' });
+          saveModalLoading.current = false;
         }}
       />
     </PageContainer>

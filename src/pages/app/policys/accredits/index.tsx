@@ -15,6 +15,7 @@ import { AppPolicy, Org, OrgWhereInput } from '@/generated/adminx/graphql';
 export default () => {
   const { token } = useToken(),
     { t } = useTranslation(),
+    saveModalLoading = useRef(false),
     [searchParams] = useSearchParams(),
     [appPolicyInfo, setAppPolicyInfo] = useState<AppPolicy>(),
     // 表格相关
@@ -173,6 +174,10 @@ export default () => {
         tableTitle={`${t('app')}：${appPolicyInfo?.app?.name} ${t('auth_org_list', { field: t('auth_org') })}`}
         appId={appPolicyInfo?.appID || ''}
         onClose={async (selectData) => {
+          if (saveModalLoading.current) {
+            return;
+          }
+          saveModalLoading.current = true;
           const sdata = selectData?.[0];
           if (sdata && appPolicyInfo) {
             const result = await assignOrgAppPolicy(sdata.id, appPolicyInfo.id);
@@ -182,6 +187,7 @@ export default () => {
             }
           }
           setModal({ open: false, title: '' });
+          saveModalLoading.current = false;
         }}
       />
     </PageContainer>
