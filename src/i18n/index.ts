@@ -15,6 +15,8 @@ i18n
   .init({
     resources,
     lng: LocaleType.zhCN,
+    // 后端会使用到:输出文案因此修改约定解析
+    nsSeparator: '::',
     interpolation: {
       escapeValue: false,
     },
