@@ -1,6 +1,6 @@
 import { PageContainer, ProCard, ProDescriptions, useToken } from '@ant-design/pro-components';
 import defaultAvatar from '@/assets/images/default-avatar.png';
-import { ReactNode, useEffect, useState } from 'react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Button, Divider, Modal, QRCode, Space, message } from 'antd';
 import UserCreate from '../list/components/create';
 import UserCreateIdentity from './components/createIdentity';
@@ -24,6 +24,7 @@ export default (props: {
   const { token } = useToken(),
     { t } = useTranslation(),
     navigate = useNavigate(),
+    saveModalLoading = useRef(false),
     [searchParams] = useSearchParams(),
     [userState] = store.useModel('user'),
     [loading, setLoading] = useState(false),
@@ -414,6 +415,10 @@ export default (props: {
         scene={modal.scene}
         userType={modal.userType}
         onClose={async (isSuccess, newInfo) => {
+          if (saveModalLoading.current) {
+            return;
+          }
+          saveModalLoading.current = true;
           if (isSuccess && newInfo) {
             if (modal.scene === 'base') {
               const userInfo = newInfo as User
@@ -437,6 +442,7 @@ export default (props: {
             }
           }
           setModal({ open: false, title: '', scene: modal.scene, userType: modal.userType });
+          saveModalLoading.current = false;
         }}
       />
       <UserCreateIdentity

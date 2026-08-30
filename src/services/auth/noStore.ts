@@ -63,12 +63,12 @@ export const initFillI18n = async () => {
   if (ICE_API_I18N_PREFIX) {
     const i18n = getI18n()
     try {
-      const file = await request.get(`/i18n/${i18n.language}.json?t=${randomId(5)}`)
+      const file = await request.get(`${ICE_API_I18N_PREFIX}/${i18n.language}.json?t=${randomId(5)}`)
       if (typeof file === 'object') {
         i18n.addResources(i18n.language, 'translation', file)
       }
     } catch (error) {
-      console.error(`${i18n.language}读取失败！`)
+      console.error(`${i18n?.language ?? 'i18n'}读取失败！`)
     }
   }
 }

@@ -10,11 +10,12 @@ import urqlPlugin from '@knockout-js/ice-urql';
 const ICE_BUILD_PUBLIC_PATH = process.env.ICE_BUILD_PUBLIC_PATH ?? '',
   ICE_DEV_PUBLIC_PATH = process.env.ICE_DEV_PUBLIC_PATH ?? '',
   NODE_ENV = process.env.NODE_ENV ?? '',
-  ICE_PROXY_DEO_PBF = process.env.ICE_PROXY_DEO_PBF ?? '',
+  ICE_PROXY_API = process.env.ICE_PROXY_API ?? '',
   ICE_PROXY_ADMINX = process.env.ICE_PROXY_ADMINX ?? '',
   ICE_PROXY_AUTH = process.env.ICE_PROXY_AUTH ?? '',
   ICE_API_ADMINX_PREFIX = process.env.ICE_API_ADMINX_PREFIX ?? '',
   ICE_API_AUTH_PREFIX = process.env.ICE_API_AUTH_PREFIX ?? '',
+  ICE_API_I18N_PREFIX = process.env.ICE_API_I18N_PREFIX ?? '',
   minify = NODE_ENV === 'production' ? 'swc' : false;
 
 // The project config, see https://v3.ice.work/docs/guide/basic/config
@@ -22,7 +23,7 @@ export default defineConfig(() => ({
   ssg: false,
   ssr: false,
   minify,
-  codeSplitting: 'page-vendors',
+  codeSplitting: false,// 'page-vendors',
   devPublicPath: ICE_DEV_PUBLIC_PATH,
   publicPath: ICE_BUILD_PUBLIC_PATH,
   compileDependencies: NODE_ENV === 'development' ? [] : true,
@@ -55,14 +56,18 @@ export default defineConfig(() => ({
   ],
   proxy: {
     [`${ICE_API_ADMINX_PREFIX}/`]: {
-      target: ICE_PROXY_ADMINX,
+      target: ICE_PROXY_ADMINX ? ICE_PROXY_ADMINX : ICE_PROXY_API,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' },
+      pathRewrite: ICE_PROXY_ADMINX ? { [`^${ICE_API_ADMINX_PREFIX}/`]: '/' } : {},
     },
     [`${ICE_API_AUTH_PREFIX}/`]: {
-      target: ICE_PROXY_AUTH,
+      target: ICE_PROXY_AUTH ? ICE_PROXY_AUTH : ICE_PROXY_API,
       changeOrigin: true,
-      pathRewrite: { [`^${ICE_API_AUTH_PREFIX}/`]: '/' },
+      pathRewrite: ICE_PROXY_AUTH ? { [`^${ICE_API_AUTH_PREFIX}/`]: '/' } : {},
+    },
+    [`${ICE_API_I18N_PREFIX ? ICE_API_I18N_PREFIX : '/i18n'}/`]: {
+      target: ICE_PROXY_API,
+      changeOrigin: true,
     },
   },
 }));
